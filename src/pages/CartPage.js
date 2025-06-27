@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { CartContext } from '../context/CartContext';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import './CartPage.css'; // Import CSS file
 
 const CartPage = () => {
     const {
@@ -78,72 +79,115 @@ const CartPage = () => {
         navigate('/checkout', { state: { selectedItems: itemsToOrder } });
     };
 
-    return (
-        <div style={{ padding: '2rem' }}>
-            <h2>Your Cart</h2>
+    const calculateShopTotal = (items) => {
+        return items.reduce((total, { product, quantity }) => total + (product.price * quantity), 0);
+    };
 
+    const calculateOverallTotal = () => {
+        return cart.reduce((total, { product, quantity }) => total + (product.price * quantity), 0);
+    };
+
+    return (
+        <div className="cart-page-container">
+            <h2 className="cart-page-title">Your Cart</h2>
+
+            {/* Toast Notification */}
             {toast && (
-                <div style={{
-                    background: '#4caf50', color: 'white',
-                    padding: '0.5rem 1rem', borderRadius: '5px',
-                    marginBottom: '1rem'
-                }}>
+                <div className="toast-notification">
                     {toast}
                 </div>
             )}
 
+            {/* Empty Cart State */}
             {isCartEmpty ? (
-                <p>No items in cart</p>
+                <div className="empty-cart-message">
+                    <img
+                        src="/empty-cart-icon.svg"
+                        alt="Empty Cart"
+                        className="empty-cart-icon"
+                    />
+                    <p>Your cart is empty</p>
+                    <button
+                        className="continue-shopping-btn"
+                        onClick={() => navigate('/')}
+                    >
+                        Continue Shopping
+                    </button>
+                </div>
             ) : (
-                <>
+                <div className="cart-content">
+                    {/* Shop-wise Cart Items */}
                     {Object.entries(grouped).map(([shopId, items]) => (
-                        <div key={shopId} style={{ border: '1px solid gray', margin: '1rem', padding: '1rem' }}>
-                            <h3>Shop: {getShopName(shopId)}</h3>
-                            <ul>
-                                {items.map(({ product }) => {
+                        <div key={shopId} className="cart-shop-section">
+                            <div className="cart-shop-header">
+                                <h3 className="cart-shop-name">
+                                    {getShopName(shopId)}
+                                </h3>
+                                <span className="cart-shop-total">
+                                    Total: ₹{calculateShopTotal(items).toFixed(2)}
+                                </span>
+                            </div>
+
+                            <div className="cart-shop-items">
+                                {items.map(({ product, quantity }) => {
                                     const quantityInput = tempQuantities[product._id] || '';
                                     const parsedQty = parseInt(quantityInput) || 0;
                                     return (
-                                        <li key={product._id}>
-                                            {product.name} - ₹{product.price} ×
-                                            <input
-                                                type="number"
-                                                min="0"
-                                                value={quantityInput}
-                                                onChange={e => handleChange(product._id, e.target.value)}
-                                                onBlur={() => handleBlur(product._id)}
-                                                style={{ width: '60px', margin: '0 10px' }}
-                                            />
-                                            = ₹{product.price * parsedQty}
-                                            <button
-                                                onClick={() => {
-                                                    removeFromCart(product._id);
-                                                    showToast('Item removed from cart');
-                                                }}
-                                                style={{ marginLeft: '1rem', color: 'red' }}
-                                            >
-                                                🗑️ Remove
-                                            </button>
-                                        </li>
+                                        <div key={product._id} className="cart-item">
+                                            <div className="cart-item-details">
+                                                <h4 className="cart-item-name">{product.name}</h4>
+                                                <p className="cart-item-price">₹{product.price}</p>
+                                            </div>
+                                            <div className="cart-item-quantity">
+                                                <input
+                                                    type="number"
+                                                    min="1"
+                                                    value={quantityInput}
+                                                    onChange={e => handleChange(product._id, e.target.value)}
+                                                    onBlur={() => handleBlur(product._id)}
+                                                    className="quantity-input"
+                                                />
+                                                <span className="cart-item-subtotal">
+                                                    ₹{(product.price * parsedQty).toFixed(2)}
+                                                </span>
+                                                <button
+                                                    onClick={() => {
+                                                        removeFromCart(product._id);
+                                                        showToast('Item removed from cart');
+                                                    }}
+                                                    className="remove-item-btn"
+                                                >
+                                                    🗑️
+                                                </button>
+                                            </div>
+                                        </div>
                                     );
                                 })}
-                            </ul>
+                            </div>
 
-                            <button onClick={() => handleCheckout(items)}>
+                            <button
+                                onClick={() => handleCheckout(items)}
+                                className="checkout-shop-btn"
+                            >
                                 Checkout This Shop
                             </button>
                         </div>
                     ))}
 
-                    <div style={{ textAlign: 'center', marginTop: '2rem' }}>
+                    {/* Overall Checkout */}
+                    <div className="cart-overall-checkout">
+                        <div className="cart-total">
+                            <span>Total Amount:</span>
+                            <strong>₹{calculateOverallTotal().toFixed(2)}</strong>
+                        </div>
                         <button
                             onClick={() => handleCheckout(cart)}
-                            style={{ fontWeight: 'bold', padding: '0.7rem 1.5rem' }}
+                            className="checkout-all-btn"
                         >
-                            Checkout All
+                            Checkout All Items
                         </button>
                     </div>
-                </>
+                </div>
             )}
         </div>
     );

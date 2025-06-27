@@ -1,16 +1,24 @@
-
-import React from 'react';
+import React, { useEffect, useContext } from 'react';
+import { CartContext } from '../context/CartContext';
 import { Link } from 'react-router-dom';
+import './OrderSuccessPage.css';
 
 const OrderSuccessPage = () => {
-    return (
-        <div style={{ padding: '2rem', textAlign: 'center' }}>
-            <h2>🎉 Order Confirmed!</h2>
-            <p>Your order has been successfully placed.</p>
-            <p>You'll receive a notification once it's out for delivery.</p>
+    const { clearCart } = useContext(CartContext);
 
-            <Link to="/">
-                <button style={{ marginTop: '1rem' }}>Back to Home</button>
+    useEffect(() => {
+        clearCart(); // Clear cart on page load
+        localStorage.removeItem('checkoutItems');
+        localStorage.removeItem('checkoutAddress');
+    }, [clearCart]);
+
+    return (
+        <div className="order-success-page">
+            <div className="success-icon" aria-label="Payment Successful" role="img">✔️</div>
+            <h2>Payment Successful</h2>
+            <p>Your order has been placed and will be prepared shortly.</p>
+            <Link to="/" className="btn-primary">
+                Back to Home
             </Link>
         </div>
     );

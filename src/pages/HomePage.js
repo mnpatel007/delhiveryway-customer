@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import './HomePage.css';  // Make sure this file exists and is in the right location
 
 const HomePage = () => {
     const [shops, setShops] = useState([]);
@@ -13,23 +14,24 @@ const HomePage = () => {
     }, []);
 
     return (
-        <div style={{ padding: '2rem' }}>
-            <h2>Available Shops</h2>
-            <ul>
+        <div className="home-container">
+            <h2 className="home-title">Available Shops</h2>
+            <ul className="shops-list">
                 {shops.map(shop => (
                     <li
                         key={shop._id}
-                        style={{
-                            border: '1px solid #ccc',
-                            padding: '1rem',
-                            marginBottom: '1rem',
-                            cursor: 'pointer'
-                        }}
+                        className="shop-item"
                         onClick={() => navigate(`/shop/${shop._id}`)}
+                        tabIndex={0}  // For keyboard accessibility
+                        onKeyDown={e => {
+                            if (e.key === "Enter" || e.key === " ") {
+                                navigate(`/shop/${shop._id}`);
+                            }
+                        }}
                     >
-                        <h3>{shop.name}</h3>
-                        <p>{shop.description}</p>
-                        <p>{shop.location}</p>
+                        <h3 className="shop-item-title">{shop.name}</h3>
+                        <p className="shop-item-description">{shop.description}</p>
+                        <p className="shop-item-location">{shop.location}</p>
                     </li>
                 ))}
             </ul>

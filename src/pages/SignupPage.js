@@ -2,38 +2,175 @@ import React, { useState, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import './SignupPage.css'; // Import CSS file
 
 const SignupPage = () => {
     const { login } = useContext(AuthContext);
-    const [name, setName] = useState('');
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
+    const [formData, setFormData] = useState({
+        name: '',
+        email: '',
+        password: '',
+        confirmPassword: ''
+    });
+    const [errors, setErrors] = useState({});
     const navigate = useNavigate();
 
-    const handleSignup = async () => {
+    // Handle input changes
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prevState => ({
+            ...prevState,
+            [name]: value
+        }));
+    };
+
+    // Validation function
+    const validateForm = () => {
+        const newErrors = {};
+
+        // Name validation
+        if (!formData.name.trim()) {
+            newErrors.name = 'Name is required';
+        } else if (formData.name.trim().length < 2) {
+            newErrors.name = 'Name must be at least 2 characters';
+        }
+
+        // Email validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!formData.email.trim()) {
+            newErrors.email = 'Email is required';
+        } else if (!emailRegex.test(formData.email)) {
+            newErrors.email = 'Invalid email format';
+        }
+
+        // Password validation
+        if (!formData.password) {
+            newErrors.password = 'Password is required';
+        } else if (formData.password.length < 8) {
+            newErrors.password = 'Password must be at least 8 characters';
+        } else if (!/(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])/.test(formData.password)) {
+            newErrors.password = 'Password must include uppercase, lowercase, number, and special character';
+        }
+
+        // Confirm password validation
+        if (formData.password !== formData.confirmPassword) {
+            newErrors.confirmPassword = 'Passwords do not match';
+        }
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
+    const handleSignup = async (e) => {
+        e.preventDefault(); // Prevent default form submission
+
+        // Validate form
+        if (!validateForm()) {
+            return;
+        }
+
         try {
+            const { confirmPassword, ...signupData } = formData;
             const res = await axios.post('http://localhost:5000/api/auth/signup', {
-                name,
-                email,
-                password,
-                role: 'customer'  // make sure this exists!
+                ...signupData,
+                role: 'customer'
             });
+
             login(res.data);
             navigate('/');
         } catch (err) {
-            console.error(err);
-            alert('Signup failed: ' + (err.response?.data?.message || 'unknown error'));
+            const serverError = err.response?.data?.message || 'Signup failed';
+            setErrors(prevErrors => ({
+                ...prevErrors,
+                submit: serverError
+            }));
         }
     };
 
-
     return (
-        <div>
-            <h2>Customer Signup</h2>
-            <input placeholder="Name" onChange={e => setName(e.target.value)} />
-            <input placeholder="Email" onChange={e => setEmail(e.target.value)} />
-            <input placeholder="Password" type="password" onChange={e => setPassword(e.target.value)} />
-            <button onClick={handleSignup}>Signup</button>
+        <div className="signup-container">
+            <div className="signup-wrapper">
+                <form className="signup-form" onSubmit={handleSignup}>
+                    <h2 className="signup-title">Create Account</h2>
+                    <p className="signup-subtitle">Sign up to get started</p>
+
+                    {errors.submit && (
+                        <div className="error-message">{errors.submit}</div>
+                    )}
+
+                    <div className="input-group">
+                        <label htmlFor="name">Full Name</label>
+                        <input
+                            id="name"
+                            type="text"
+                            name="name"
+                            placeholder="Enter your full name"
+                            value={formData.name}
+                            onChange={handleChange}
+                        />
+                        {errors.name && <span className="error-text">{errors.name}</span>}
+                    </div>
+
+                    <div className="input-group">
+                        <label htmlFor="email">Email</label>
+                        <input
+                            id="email"
+                            type="email"
+                            name="email"
+                            placeholder="Enter your email"
+                            value={formData.email}
+                            onChange={handleChange}
+                        />
+                        {errors.email && <span className="error-text">{errors.email}</span>}
+                    </div>
+
+                    <div className="input-group">
+                        <label htmlFor="password">Password</label>
+                        <input
+                            id="password"
+                            type="password"
+                            name="password"
+                            placeholder="Create a strong password"
+                            value={formData.password}
+                            onChange={handleChange}
+                        />
+                        {errors.password && <span className="error-text">{errors.password}</span>}
+                        <div className="password-requirements">
+                            Password must:
+                            <ul>
+                                <li>Be at least 8 characters</li>
+                                <li>Include uppercase and lowercase letters</li>
+                                <li>Include a number and special character</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div className="input-group">
+                        <label htmlFor="confirmPassword">Confirm Password</label>
+                        <input
+                            id="confirmPassword"
+                            type="password"
+                            name="confirmPassword"
+                            placeholder="Confirm your password"
+                            value={formData.confirmPassword}
+                            onChange={handleChange}
+                        />
+                        {errors.confirmPassword && <span className="error-text">{errors.confirmPassword}</span>}
+                    </div>
+
+                    <button
+                        type="submit"
+                        className="signup-button"
+                    >
+                        Create Account
+                    </button>
+
+                    <div className="login-link">
+                        Already have an account?
+                        <a href="/login"> Log In</a>
+                    </div>
+                </form>
+            </div>
         </div>
     );
 };

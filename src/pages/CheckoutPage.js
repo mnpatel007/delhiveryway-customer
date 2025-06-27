@@ -3,10 +3,14 @@ import { AuthContext } from '../context/AuthContext';
 import { CartContext } from '../context/CartContext';
 import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
+import { loadStripe } from '@stripe/stripe-js';
+import './CheckoutPage.css';
+
+const stripePromise = loadStripe('pk_test_51RdZkxRvhEVshUODDQprocdR1VZc3ANHK3sXO8CBX2R15UGdHybkDJ2LO0qqoHYTfghWvaghMbOfqP3lBWLgrMzz009Sc0sv3a');
 
 const CheckoutPage = () => {
     const { user } = useContext(AuthContext);
-    const { cart, clearCart, setCart } = useContext(CartContext);
+    const { cart, setCart } = useContext(CartContext);
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -19,6 +23,13 @@ const CheckoutPage = () => {
     const [tax, setTax] = useState(0);
     const [deliveryCharge, setDeliveryCharge] = useState(0);
     const [grandTotal, setGrandTotal] = useState(0);
+    const [shops, setShops] = useState([]);
+
+    useEffect(() => {
+        axios.get('http://localhost:5000/api/shops')
+            .then(res => setShops(res.data))
+            .catch(err => console.error('Failed to load shops:', err));
+    }, []);
 
     useEffect(() => {
         const shopSet = new Set();
@@ -40,67 +51,137 @@ const CheckoutPage = () => {
         setGrandTotal(grand);
     }, [selectedItems]);
 
-    const handlePlaceOrder = async () => {
+    const getShopName = (shopId) => {
+        const shop = shops.find(s => s._id === shopId);
+        return shop ? shop.name : 'Unknown Shop';
+    };
+
+    const handleStripePayment = async () => {
         if (!address.trim()) {
             alert("Please enter a delivery address.");
             return;
         }
 
-        const items = selectedItems.map(item => ({
-            productId: item.product._id,
-            quantity: item.quantity
-        }));
+        const stripe = await stripePromise;
 
         try {
             setLoading(true);
-            await axios.post('http://localhost:5000/api/orders', {
-                items,
-                address
-            }, {
-                headers: { Authorization: `Bearer ${user.token}` }
+
+            const formattedItems = selectedItems.map(item => ({
+                product: {
+                    _id: item.product._id,  // ✅ critical fix
+                    name: item.product.name,
+                    price: item.product.price
+                },
+                quantity: item.quantity
+            }));
+
+            const response = await axios.post(
+                'http://localhost:5000/api/payment/create-checkout-session',
+                {
+                    items: formattedItems,
+                    address
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${user.token}`
+                    }
+                }
+            );
+
+            localStorage.setItem('checkoutAddress', address);
+            localStorage.setItem('checkoutItems', JSON.stringify(selectedItems));
+
+            const result = await stripe.redirectToCheckout({
+                sessionId: response.data.id
             });
 
-            const remaining = cart.filter(
-                cartItem => !selectedItems.some(si => si.product._id === cartItem.product._id)
-            );
-            setCart(remaining);
-            localStorage.setItem('cart', JSON.stringify(remaining));
-
-            navigate('/order-success');
+            if (result.error) {
+                alert(result.error.message);
+            }
         } catch (err) {
-            console.error('Order failed:', err);
-            alert("Failed to place order. Please try again.");
+            console.error('Payment error:', err);
+            alert("Payment failed. Try again.");
         } finally {
             setLoading(false);
         }
     };
 
+
     return (
-        <div style={{ padding: '2rem' }}>
-            <h2>Checkout</h2>
+        <div className="checkout-container">
+            <div className="checkout-wrapper">
+                <div className="checkout-header">
+                    <h2>Checkout</h2>
+                </div>
 
-            <p><strong>Name:</strong> {user.user.name}</p>
-            <p><strong>Email:</strong> {user.user.email}</p>
+                <div className="checkout-content">
+                    <div className="checkout-user-details">
+                        <h3>Customer Details</h3>
+                        <div className="user-info">
+                            <p><span className="info-label">Name:</span>{user.user.name}</p>
+                            <p><span className="info-label">Email:</span>{user.user.email}</p>
+                        </div>
+                    </div>
 
-            <label>
-                <strong>Delivery Address:</strong><br />
-                <textarea
-                    value={address}
-                    onChange={e => setAddress(e.target.value)}
-                    rows={3}
-                    style={{ width: '100%', maxWidth: '400px' }}
-                />
-            </label>
+                    <div className="checkout-address">
+                        <h3>Delivery Address</h3>
+                        <textarea
+                            className="address-input"
+                            value={address}
+                            onChange={e => setAddress(e.target.value)}
+                            rows={4}
+                            placeholder="Enter your full delivery address"
+                        />
+                    </div>
 
-            <h3>Order Summary</h3>
-            <p><strong>Items Total:</strong> ₹{total.toFixed(2)}</p>
-            <p><strong>GST (5%):</strong> ₹{tax.toFixed(2)}</p>
-            <p><strong>Delivery Charge:</strong> ₹{deliveryCharge.toFixed(2)}</p>
-            <p><strong>Grand Total:</strong> ₹{grandTotal.toFixed(2)}</p>
+                    <div className="checkout-order-summary">
+                        <h3>Order Summary</h3>
 
-            <button onClick={handlePlaceOrder} disabled={loading}>
-                {loading ? 'Placing Order...' : 'Place Order'}
-            </button>
+                        {Object.entries(Object.groupBy(selectedItems, item => item.shopId)).map(([shopId, items]) => (
+                            <div key={shopId} className="shop-order-section">
+                                <h4 className="shop-name">{getShopName(shopId)}</h4>
+                                {items.map(({ product, quantity }) => (
+                                    <div key={product._id} className="order-item">
+                                        <div className="order-item-details">
+                                            <span className="product-name">{product.name}</span>
+                                            <span className="product-quantity">x {quantity}</span>
+                                        </div>
+                                        <span className="product-price">₹{(product.price * quantity).toFixed(2)}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        ))}
+
+                        <div className="order-total-breakdown">
+                            <div className="total-row">
+                                <span>Items Total</span>
+                                <span>₹{total.toFixed(2)}</span>
+                            </div>
+                            <div className="total-row">
+                                <span>GST (5%)</span>
+                                <span>₹{tax.toFixed(2)}</span>
+                            </div>
+                            <div className="total-row">
+                                <span>Delivery Charge</span>
+                                <span>₹{deliveryCharge.toFixed(2)}</span>
+                            </div>
+                            <div className="total-row grand-total">
+                                <strong>Grand Total</strong>
+                                <strong>₹{grandTotal.toFixed(2)}</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button
+                        className="place-order-btn"
+                        onClick={handleStripePayment}
+                        disabled={loading || !address.trim()}
+                    >
+                        {loading ? 'Redirecting...' : 'Pay Now'}
+                    </button>
+                </div>
+            </div>
         </div>
     );
 };

@@ -1,0 +1,209 @@
+:root {
+    --primary-color: #4a90e2;
+    --secondary-color: #2ecc71;
+    --background-color: #f4f6f9;
+    --text-color: #2c3e50;
+    --card-background: white;
+    --card-shadow: rgba(0, 0, 0, 0.1);
+}
+
+.cart-page-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+    background-color: var(--background-color);
+}
+
+.cart-page-title {
+    text-align: center;
+    color: var(--text-color);
+    margin-bottom: 2rem;
+}
+
+/* Toast Notification */
+.toast-notification {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: var(--secondary-color);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    z-index: 1000;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Empty Cart State */
+.empty-cart-message {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+    text-align: center;
+}
+
+.empty-cart-icon {
+    width: 200px;
+    margin-bottom: 1rem;
+}
+
+.continue-shopping-btn {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.continue-shopping-btn:hover {
+    background-color: #3a7bd5;
+}
+
+/* Cart Shop Section */
+.cart-shop-section {
+    background-color: var(--card-background);
+    border-radius: 12px;
+    box-shadow: 0 4px 15px var(--card-shadow);
+    margin-bottom: 1.5rem;
+    padding: 1.5rem;
+}
+
+.cart-shop-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 0.5rem;
+}
+
+.cart-shop-name {
+    color: var(--text-color);
+    margin: 0;
+}
+
+.cart-shop-total {
+    font-weight: bold;
+    color: var(--primary-color);
+}
+
+/* Cart Item */
+.cart-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 0;
+    border-bottom: 1px solid #eee;
+}
+
+.cart-item-details {
+    flex-grow: 1;
+}
+
+.cart-item-name {
+    margin: 0 0 0.5rem 0;
+    color: var(--text-color);
+}
+
+.cart-item-price {
+    color: #6c757d;
+    margin: 0;
+}
+
+.cart-item-quantity {
+    display: flex;
+    align-items: center;
+}
+
+.quantity-input {
+    width: 60px;
+    margin-right: 1rem;
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.cart-item-subtotal {
+    margin: 0 1rem;
+    font-weight: bold;
+    color: var(--primary-color);
+}
+
+.remove-item-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: transform 0.2s ease;
+}
+
+.remove-item-btn:hover {
+    transform: scale(1.2);
+}
+
+/* Checkout Buttons */
+.checkout-shop-btn,
+.checkout-all-btn {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 1rem;
+}
+
+.checkout-shop-btn:hover,
+.checkout-all-btn:hover {
+    background-color: #3a7bd5;
+}
+
+.cart-overall-checkout {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--card-background);
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px var(--card-shadow);
+    margin-top: 1.5rem;
+}
+
+.cart-total {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.cart-total strong {
+    color: var(--primary-color);
+    font-size: 1.5rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .cart-page-container {
+        padding: 1rem;
+    }
+
+    .cart-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .cart-item-quantity {
+        width: 100%;
+        justify-content: space-between;
+        margin-top: 0.5rem;
+    }
+
+    .cart-overall-checkout {
+        flex-direction: column;
+        gap: 1rem;
+    }
+}

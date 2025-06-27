@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider, AuthContext } from './context/AuthContext';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
@@ -12,12 +12,23 @@ import OrderSuccessPage from './pages/OrderSuccessPage';
 import CheckoutPage from './pages/CheckoutPage';
 import OrderHistoryPage from './pages/OrderHistoryPage';
 
-
-
-
 const PrivateRoute = ({ children }) => {
   const { user } = React.useContext(AuthContext);
   return user ? children : <Navigate to="/login" />;
+};
+
+// 👇 Wrapper that includes Navbar conditionally
+const Layout = ({ children }) => {
+  const location = useLocation();
+  const hideNavbarPaths = ['/login', '/signup'];
+  const shouldHideNavbar = hideNavbarPaths.includes(location.pathname);
+
+  return (
+    <>
+      {!shouldHideNavbar && <Navbar />}
+      {children}
+    </>
+  );
 };
 
 function App() {
@@ -25,17 +36,18 @@ function App() {
     <AuthProvider>
       <CartProvider>
         <BrowserRouter>
-          <Navbar />
-          <Routes>
-            <Route path="/" element={<PrivateRoute><HomePage /></PrivateRoute>} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/signup" element={<SignupPage />} />
-            <Route path="/shop/:id" element={<PrivateRoute><ShopPage /></PrivateRoute>} />
-            <Route path="/cart" element={<PrivateRoute><CartPage /></PrivateRoute>} />
-            <Route path="/order-success" element={<PrivateRoute><OrderSuccessPage /></PrivateRoute>} />
-            <Route path="/checkout" element={<PrivateRoute><CheckoutPage /></PrivateRoute>} />
-            <Route path="/orders" element={<PrivateRoute><OrderHistoryPage /></PrivateRoute>} />
-          </Routes>
+          <Layout>
+            <Routes>
+              <Route path="/" element={<PrivateRoute><HomePage /></PrivateRoute>} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/signup" element={<SignupPage />} />
+              <Route path="/shop/:id" element={<PrivateRoute><ShopPage /></PrivateRoute>} />
+              <Route path="/cart" element={<PrivateRoute><CartPage /></PrivateRoute>} />
+              <Route path="/order-success" element={<PrivateRoute><OrderSuccessPage /></PrivateRoute>} />
+              <Route path="/checkout" element={<PrivateRoute><CheckoutPage /></PrivateRoute>} />
+              <Route path="/orders" element={<PrivateRoute><OrderHistoryPage /></PrivateRoute>} />
+            </Routes>
+          </Layout>
         </BrowserRouter>
       </CartProvider>
     </AuthProvider>
