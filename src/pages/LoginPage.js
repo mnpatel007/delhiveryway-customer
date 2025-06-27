@@ -22,7 +22,7 @@ const LoginPage = () => {
         }
 
         try {
-            await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/auth/login`, { email, password });
+            const res = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/auth/login`, { email, password });
 
             if (res.data.user.role !== 'customer') {
                 setError('Not a customer account');
