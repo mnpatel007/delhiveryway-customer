@@ -20,13 +20,23 @@ const CartPage = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        axios.get('${process.env.REACT_APP_BACKEND_URL}/api/shops')
-            .then(res => setShops(res.data))
+        axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/shops`)
+            .then(res => {
+                const data = res.data;
+                if (Array.isArray(data)) {
+                    setShops(data);
+                } else if (Array.isArray(data.shops)) {
+                    setShops(data.shops);
+                } else {
+                    console.error("Unexpected API response format:", data);
+                    setShops([]);
+                }
+            })
             .catch(err => console.error('Failed to load shops:', err));
     }, []);
 
     const getShopName = (shopId) => {
-        const shop = shops.find(s => s._id === shopId);
+        const shop = Array.isArray(shops) ? shops.find(s => s._id === shopId) : null;
         return shop ? shop.name : 'Unknown Shop';
     };
 
