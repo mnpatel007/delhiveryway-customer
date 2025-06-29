@@ -8,7 +8,7 @@ const HomePage = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        axios.get('http://localhost:5000/api/shops')
+        axios.get('${process.env.REACT_APP_BACKEND_URL}/api/shops')
             .then(res => setShops(res.data))
             .catch(err => console.error('Failed to fetch shops:', err));
     }, []);

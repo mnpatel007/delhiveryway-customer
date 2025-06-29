@@ -26,7 +26,7 @@ const CheckoutPage = () => {
     const [shops, setShops] = useState([]);
 
     useEffect(() => {
-        axios.get('http://localhost:5000/api/shops')
+        axios.get('${process.env.REACT_APP_BACKEND_URL}/api/shops')
             .then(res => setShops(res.data))
             .catch(err => console.error('Failed to load shops:', err));
     }, []);
@@ -77,7 +77,7 @@ const CheckoutPage = () => {
             }));
 
             const response = await axios.post(
-                'http://localhost:5000/api/payment/create-checkout-session',
+                '${process.env.REACT_APP_BACKEND_URL}/api/payment/create-checkout-session',
                 {
                     items: formattedItems,
                     address

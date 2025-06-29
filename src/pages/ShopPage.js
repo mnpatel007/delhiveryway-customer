@@ -17,8 +17,8 @@ const ShopPage = () => {
             try {
                 setLoading(true);
                 const [shopRes, productRes] = await Promise.all([
-                    axios.get(`http://localhost:5000/api/shops/${id}`),
-                    axios.get(`http://localhost:5000/api/products/shop/${id}`)
+                    axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/shops/${id}`),
+                    axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/products/shop/${id}`)
                 ]);
 
                 setShop(shopRes.data);
