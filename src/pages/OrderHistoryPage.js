@@ -13,14 +13,14 @@ const OrderHistoryPage = () => {
         const fetchOrders = async () => {
             try {
                 setLoading(true);
-                const res = await axios.get('${process.env.REACT_APP_BACKEND_URL}/api/orders/customer', {
+                const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/orders/customer`, {
                     headers: { Authorization: `Bearer ${user.token}` }
                 });
 
-                // Sort orders by creation date in descending order (latest first)
-                const sortedOrders = res.data.sort((a, b) =>
-                    new Date(b.createdAt) - new Date(a.createdAt)
-                );
+                const data = res.data;
+                const sortedOrders = Array.isArray(data)
+                    ? data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+                    : [];
 
                 setOrders(sortedOrders);
                 setError(null);
