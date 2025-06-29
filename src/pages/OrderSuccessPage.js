@@ -8,13 +8,17 @@ const OrderSuccessPage = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        clearCart(); // Clear cart on page load
+        clearCart();
         localStorage.removeItem('checkoutItems');
         localStorage.removeItem('checkoutAddress');
     }, [clearCart]);
 
     const handleBackToHome = () => {
-        navigate('/');
+        // Navigate to dummy route, then to home to force remount
+        navigate('/refresh-temp', { replace: true });
+        setTimeout(() => {
+            navigate('/', { replace: true });
+        }, 0);
     };
 
     return (
