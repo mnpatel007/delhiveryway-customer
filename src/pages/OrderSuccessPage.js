@@ -5,7 +5,6 @@ import './OrderSuccessPage.css';
 
 const OrderSuccessPage = () => {
     const { clearCart } = useContext(CartContext);
-    const navigate = useNavigate();
 
     useEffect(() => {
         clearCart();
@@ -14,11 +13,7 @@ const OrderSuccessPage = () => {
     }, [clearCart]);
 
     const handleBackToHome = () => {
-        // Force remount of HomePage by navigating to temp route then home
-        navigate('/temp', { replace: true });
-        setTimeout(() => {
-            navigate('/', { replace: true });
-        }, 10); // 10ms delay to force unmount/mount
+        window.location.href = '/'; // ✅ Force full reload on home
     };
 
     return (
