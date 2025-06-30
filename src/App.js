@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import io from 'socket.io-client';
 import { AuthProvider, AuthContext } from './context/AuthContext';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
@@ -12,20 +13,64 @@ import OrderSuccessPage from './pages/OrderSuccessPage';
 import CheckoutPage from './pages/CheckoutPage';
 import OrderHistoryPage from './pages/OrderHistoryPage';
 
+const socket = io('https://delhiveryway-backend-1.onrender.com');
+
 const PrivateRoute = ({ children }) => {
-  const { user } = React.useContext(AuthContext);
+  const { user } = useContext(AuthContext);
   return user ? children : <Navigate to="/login" />;
 };
 
-// 👇 Wrapper that includes Navbar conditionally
 const Layout = ({ children }) => {
   const location = useLocation();
+  const { user } = useContext(AuthContext);
   const hideNavbarPaths = ['/login', '/signup'];
   const shouldHideNavbar = hideNavbarPaths.includes(location.pathname);
+
+  const [cancelAlert, setCancelAlert] = useState(null);
+
+  useEffect(() => {
+    if (user && user.user && user.user._id) {
+      socket.emit('registerCustomer', user.user._id);
+    }
+
+    socket.on('orderCancelled', (data) => {
+      setCancelAlert(data);
+    });
+
+    return () => {
+      socket.off('orderCancelled');
+    };
+  }, [user]);
 
   return (
     <>
       {!shouldHideNavbar && <Navbar />}
+      {cancelAlert && (
+        <div style={{
+          backgroundColor: '#ffe6e6',
+          color: '#990000',
+          padding: '15px',
+          margin: '10px',
+          borderRadius: '8px',
+          border: '1px solid #cc0000',
+          fontWeight: 'bold'
+        }}>
+          ❌ Your order was cancelled.<br />
+          💬 Reason: {cancelAlert.reason}<br />
+          💸 A refund has been initiated and will reflect in your account in 3–5 business days.
+          <button onClick={() => setCancelAlert(null)} style={{
+            float: 'right',
+            background: 'none',
+            border: 'none',
+            color: '#990000',
+            fontWeight: 'bold',
+            fontSize: '16px',
+            cursor: 'pointer'
+          }}>
+            ✖
+          </button>
+        </div>
+      )}
       {children}
     </>
   );

@@ -15,10 +15,10 @@ const OrderSuccessPage = () => {
 
     const handleBackToHome = () => {
         // Navigate to dummy route, then to home to force remount
-        navigate('/refresh-temp', { replace: true });
         setTimeout(() => {
             navigate('/', { replace: true });
         }, 0);
+        navigate('/refresh-temp', { replace: true });
     };
 
     return (
