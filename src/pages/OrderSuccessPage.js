@@ -14,11 +14,11 @@ const OrderSuccessPage = () => {
     }, [clearCart]);
 
     const handleBackToHome = () => {
-        // Navigate to dummy route, then to home to force remount
+        // Force remount of HomePage by navigating to temp route then home
+        navigate('/temp', { replace: true });
         setTimeout(() => {
             navigate('/', { replace: true });
-        }, 0);
-        navigate('/refresh-temp', { replace: true });
+        }, 10); // 10ms delay to force unmount/mount
     };
 
     return (
