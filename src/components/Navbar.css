@@ -1,0 +1,208 @@
+/* Google font */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+/* Navbar container */
+.navbar {
+    background: linear-gradient(135deg, #ff6a00 0%, #ee0979 100%);
+    padding: 1rem 2rem;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    box-shadow:
+        0 4px 20px rgba(238, 9, 121, 0.4),
+        inset 0 -3px 15px rgba(255, 106, 0, 0.7);
+    font-family: 'Poppins', sans-serif;
+}
+
+.navbar-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+/* Logo */
+.logo {
+    font-weight: 700;
+    font-size: 2rem;
+    color: #fff;
+    text-decoration: none;
+    letter-spacing: 2px;
+    user-select: none;
+    filter:
+        drop-shadow(0 0 6px #fff7f7) drop-shadow(0 0 10px #f72585);
+    transition: filter 0.3s ease;
+}
+
+.logo:hover,
+.logo:focus {
+    filter:
+        drop-shadow(0 0 12px #fff) drop-shadow(0 0 20px #ff4d6d);
+    outline: none;
+}
+
+/* Navigation links */
+.nav-links {
+    list-style: none;
+    display: flex;
+    gap: 2.5rem;
+}
+
+.nav-item {
+    color: #ffcdd2;
+    font-size: 1.1rem;
+    font-weight: 600;
+    position: relative;
+    cursor: pointer;
+    padding: 0.25rem 0;
+    user-select: none;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.nav-item::after {
+    content: '';
+    position: absolute;
+    bottom: -6px;
+    left: 0;
+    height: 3px;
+    width: 0%;
+    background: #fff;
+    border-radius: 2px;
+    transition: width 0.3s ease;
+}
+
+.nav-item:hover,
+.nav-item:focus {
+    color: #fff;
+    outline: none;
+}
+
+.nav-item:hover::after,
+.nav-item:focus::after,
+.nav-item.active::after {
+    width: 100%;
+}
+
+/* Active link */
+.active {
+    color: #fff;
+}
+
+.active::after {
+    width: 100%;
+    background: #f48fb1;
+    box-shadow:
+        0 0 8px #f48fb1,
+        0 0 15px #f06292;
+}
+
+/* Logout Button */
+.nav-logout-btn {
+    background: transparent;
+    border: 2px solid #fff;
+    color: #fff;
+    font-weight: 600;
+    font-size: 1rem;
+    padding: 0.45rem 1.2rem;
+    border-radius: 32px;
+    cursor: pointer;
+    transition: all 0.35s ease;
+    user-select: none;
+    font-family: 'Poppins', sans-serif;
+}
+
+.nav-logout-btn:hover,
+.nav-logout-btn:focus {
+    background: #f72585;
+    border-color: #f72585;
+    box-shadow:
+        0 0 12px #f72585,
+        0 0 30px #f48fb1;
+    color: #fff;
+    outline: none;
+}
+
+/* Hamburger (Mobile) */
+.menu-toggle {
+    display: none;
+    flex-direction: column;
+    justify-content: space-around;
+    width: 28px;
+    height: 22px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    z-index: 1100;
+}
+
+.menu-toggle:focus {
+    outline: none;
+}
+
+.menu-toggle .bar {
+    width: 100%;
+    height: 3px;
+    background-color: #fff;
+    border-radius: 2px;
+    transition: all 0.3s ease;
+    transform-origin: 1px;
+}
+
+.menu-toggle.open .bar:nth-child(1) {
+    transform: rotate(45deg);
+}
+
+.menu-toggle.open .bar:nth-child(2) {
+    opacity: 0;
+    transform: translateX(20px);
+}
+
+.menu-toggle.open .bar:nth-child(3) {
+    transform: rotate(-45deg);
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    .nav-links {
+        position: fixed;
+        top: 64px;
+        right: 0;
+        background: rgba(238, 9, 121, 0.95);
+        height: calc(100vh - 64px);
+        width: 230px;
+        flex-direction: column;
+        gap: 2rem;
+        padding: 3rem 1.5rem;
+        transform: translateX(100%);
+        transition: transform 0.3s ease;
+        border-radius: 12px 0 0 12px;
+        box-shadow: -6px 0 25px rgba(247, 37, 133, 0.7);
+        user-select: none;
+        z-index: 1050;
+    }
+
+    .nav-links.show {
+        transform: translateX(0);
+    }
+
+    .nav-item {
+        font-size: 1.3rem;
+    }
+
+    .nav-item::after {
+        display: none;
+    }
+
+    .menu-toggle {
+        display: flex;
+    }
+}
