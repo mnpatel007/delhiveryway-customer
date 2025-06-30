@@ -71,7 +71,7 @@ const SignupPage = () => {
 
         try {
             const { confirmPassword, ...signupData } = formData;
-            const res = await axios.post('${process.env.REACT_APP_BACKEND_URL}/api/auth/signup', {
+            const res = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/auth/signup`, {
                 ...signupData,
                 role: 'customer'
             });
