@@ -73,9 +73,11 @@ const FinalCheckoutPage = () => {
     }, []);
 
     const getShopName = (shopId) => {
-        const shop = shops.find(s => s._id === shopId);
+        const id = typeof shopId === 'object' ? shopId._id : shopId;
+        const shop = shops.find(s => s._id === id);
         return shop ? shop.name : 'Unknown Shop';
     };
+
 
     const groupByShop = () => {
         if (!finalOrder?.items) return {};
