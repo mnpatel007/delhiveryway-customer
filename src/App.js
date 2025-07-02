@@ -17,16 +17,16 @@ import OrderHistoryPage from './pages/OrderHistoryPage';
 import RehearsalCheckoutPage from './pages/RehearsalCheckoutPage';
 import AwaitingVendorReviewPage from './pages/AwaitingVendorReviewPage';
 
-// Connect Socket.IO once globally
+// Connect Socket.IO globally
 const socket = io('https://delhiveryway-backend-1.onrender.com');
 
-// Private route logic
+// Private route
 const PrivateRoute = ({ children }) => {
   const { user } = useContext(AuthContext);
   return user ? children : <Navigate to="/login" />;
 };
 
-// ✅ Global customer alert (outside router)
+// Global customer alert: order cancelled
 const GlobalCustomerAlert = () => {
   const { user } = useContext(AuthContext);
   const [cancelAlert, setCancelAlert] = useState(null);
@@ -40,7 +40,16 @@ const GlobalCustomerAlert = () => {
       setCancelAlert(data);
     });
 
-    return () => socket.off('orderCancelled');
+    socket.on('vendorConfirmedOrder', (data) => {
+      // Store the final version for /final-checkout
+      localStorage.setItem('finalCheckoutOrder', JSON.stringify(data));
+      window.location.href = '/final-checkout';
+    });
+
+    return () => {
+      socket.off('orderCancelled');
+      socket.off('vendorConfirmedOrder');
+    };
   }, [user]);
 
   if (!cancelAlert) return null;
@@ -70,7 +79,7 @@ const GlobalCustomerAlert = () => {
   );
 };
 
-// ✅ Layout wrapper for Navbar hiding
+// Hide navbar on login/signup
 const Layout = ({ children }) => {
   const location = useLocation();
   const hideNavbarPaths = ['/login', '/signup'];
