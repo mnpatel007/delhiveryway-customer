@@ -14,6 +14,8 @@ import CartPage from './pages/CartPage';
 import OrderSuccessPage from './pages/OrderSuccessPage';
 import CheckoutPage from './pages/CheckoutPage';
 import OrderHistoryPage from './pages/OrderHistoryPage';
+import RehearsalCheckoutPage from './pages/RehearsalCheckoutPage';
+
 
 // Connect Socket.IO once globally
 const socket = io('https://delhiveryway-backend-1.onrender.com');
@@ -98,6 +100,8 @@ function App() {
               <Route path="/order-success" element={<PrivateRoute><OrderSuccessPage /></PrivateRoute>} />
               <Route path="/checkout" element={<PrivateRoute><CheckoutPage /></PrivateRoute>} />
               <Route path="/orders" element={<PrivateRoute><OrderHistoryPage /></PrivateRoute>} />
+              <Route path="/rehearsal-checkout" element={<PrivateRoute><RehearsalCheckoutPage /></PrivateRoute>} />
+
             </Routes>
           </Layout>
         </BrowserRouter>

@@ -80,7 +80,7 @@ const CartPage = () => {
     const isCartEmpty = Object.keys(grouped).length === 0;
 
     const handleCheckout = (itemsToOrder) => {
-        navigate('/checkout', { state: { selectedItems: itemsToOrder } });
+        navigate('/rehearsal-checkout', { state: { selectedItems: itemsToOrder } });
     };
 
     const calculateShopTotal = (items) =>
