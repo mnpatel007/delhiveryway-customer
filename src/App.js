@@ -12,7 +12,7 @@ import SignupPage from './pages/SignupPage';
 import ShopPage from './pages/ShopPage';
 import CartPage from './pages/CartPage';
 import OrderSuccessPage from './pages/OrderSuccessPage';
-import CheckoutPage from './pages/CheckoutPage';
+import CheckoutPage from './pages/FinalCheckoutPage';
 import OrderHistoryPage from './pages/OrderHistoryPage';
 import RehearsalCheckoutPage from './pages/RehearsalCheckoutPage';
 import AwaitingVendorReviewPage from './pages/AwaitingVendorReviewPage';
@@ -107,7 +107,7 @@ function App() {
               <Route path="/shop/:id" element={<PrivateRoute><ShopPage /></PrivateRoute>} />
               <Route path="/cart" element={<PrivateRoute><CartPage /></PrivateRoute>} />
               <Route path="/order-success" element={<PrivateRoute><OrderSuccessPage /></PrivateRoute>} />
-              <Route path="/checkout" element={<PrivateRoute><CheckoutPage /></PrivateRoute>} />
+              <Route path="/final-checkout" element={<PrivateRoute><CheckoutPage /></PrivateRoute>} />
               <Route path="/orders" element={<PrivateRoute><OrderHistoryPage /></PrivateRoute>} />
               <Route path="/rehearsal-checkout" element={<PrivateRoute><RehearsalCheckoutPage /></PrivateRoute>} />
               <Route path="/awaiting-vendor-review" element={<PrivateRoute><AwaitingVendorReviewPage /></PrivateRoute>} />
