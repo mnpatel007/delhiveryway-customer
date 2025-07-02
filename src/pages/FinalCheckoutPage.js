@@ -23,7 +23,12 @@ const FinalCheckoutPage = () => {
             try {
                 const fullItems = await Promise.all(
                     items.map(async (item) => {
-                        const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/products/${item.productId}`);
+                        const res = await axios.get(
+                            `${process.env.REACT_APP_BACKEND_URL}/api/products/${item.productId}`,
+                            {
+                                headers: { Authorization: `Bearer ${user.token}` }
+                            }
+                        );
                         return {
                             product: res.data,
                             quantity: item.quantity,
@@ -31,6 +36,7 @@ const FinalCheckoutPage = () => {
                         };
                     })
                 );
+
                 setFinalOrder({ items: fullItems, address, deliveryCharge, totalAmount });
             } catch (err) {
                 console.error('❌ Failed to load product details:', err);
