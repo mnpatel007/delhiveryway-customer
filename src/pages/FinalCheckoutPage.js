@@ -74,16 +74,21 @@ const FinalCheckoutPage = () => {
 
     const getShopName = (shopId) => {
         const id = typeof shopId === 'object' ? shopId._id : shopId;
-        const shop = shops.find(s => s._id === id);
-        return shop ? shop.name : 'Unknown Shop';
+        const match = shops.find((shop) => shop._id === id);
+        return match ? match.name : 'Unknown Shop';
     };
+
 
 
     const groupByShop = () => {
         if (!finalOrder?.items) return {};
+
         return finalOrder.items.reduce((acc, item) => {
-            if (!acc[item.shopId]) acc[item.shopId] = [];
-            acc[item.shopId].push(item);
+            const shopId =
+                typeof item.shopId === 'object' ? item.shopId._id : item.shopId;
+
+            if (!acc[shopId]) acc[shopId] = [];
+            acc[shopId].push(item);
             return acc;
         }, {});
     };
