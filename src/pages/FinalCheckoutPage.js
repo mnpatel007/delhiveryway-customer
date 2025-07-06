@@ -112,7 +112,8 @@ const FinalCheckoutPage = () => {
                 `${process.env.REACT_APP_BACKEND_URL}/api/payment/create-checkout-session`,
                 {
                     items: formattedItems,
-                    address: finalOrder.address
+                    address: finalOrder.address,
+                    deliveryCharge
                 },
                 {
                     headers: { Authorization: `Bearer ${user.token}` }
