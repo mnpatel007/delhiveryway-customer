@@ -108,17 +108,23 @@ const FinalCheckoutPage = () => {
                 quantity: item.quantity
             }));
 
+            const shopSet = new Set(formattedItems.map(i => i.product.shopId));
+            const deliveryCharge = shopSet.size * 10;
+
             const response = await axios.post(
                 `${process.env.REACT_APP_BACKEND_URL}/api/payment/create-checkout-session`,
                 {
                     items: formattedItems,
                     address: finalOrder.address,
-                    deliveryCharge
+                    deliveryCharge  // ✅ NOW INCLUDED
                 },
                 {
-                    headers: { Authorization: `Bearer ${user.token}` }
+                    headers: {
+                        Authorization: `Bearer ${user.token}`
+                    }
                 }
             );
+
 
             const result = await stripe.redirectToCheckout({
                 sessionId: response.data.id
