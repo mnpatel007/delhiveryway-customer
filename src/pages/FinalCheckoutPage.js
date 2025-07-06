@@ -139,8 +139,12 @@ const FinalCheckoutPage = () => {
     }
 
     const itemTotal = finalOrder.items.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
-    const tax = itemTotal * 0.05;
-    const grandTotal = itemTotal + tax + finalOrder.deliveryCharge;
+    const gst = itemTotal * 0.05;
+    const platformFee = itemTotal * 0.029;
+    const tax = gst + platformFee;
+    const deliveryCharge = 30;
+    const grandTotal = itemTotal + tax + deliveryCharge;
+
 
     return (
         <div className="checkout-container">
@@ -190,12 +194,12 @@ const FinalCheckoutPage = () => {
                                 <span>₹{itemTotal.toFixed(2)}</span>
                             </div>
                             <div className="total-row">
-                                <span>GST (5%)</span>
+                                <span>Taxes and Other Charges</span>
                                 <span>₹{tax.toFixed(2)}</span>
                             </div>
                             <div className="total-row">
                                 <span>Delivery Charge</span>
-                                <span>₹{finalOrder.deliveryCharge.toFixed(2)}</span>
+                                <span>₹{deliveryCharge.toFixed(2)}</span>
                             </div>
                             <div className="total-row grand-total">
                                 <strong>Grand Total</strong>
