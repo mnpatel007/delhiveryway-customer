@@ -198,15 +198,15 @@ const FinalCheckoutPage = () => {
                                 <span>₹{tax.toFixed(2)}</span>
                             </div>
                             <div className="total-row">
-                                <span>Taxes and Other Charges</span>
-                                <span>₹{tax.toFixed(2)}</span>
-                            </div>
-                            <div className="total-row">
                                 <span>Delivery Charge</span>
-                                <span>₹30.00</span>
+                                <span>₹{deliveryCharge.toFixed(2)}</span>
                             </div>
-
+                            <div className="total-row total-grand">
+                                <span><strong>Grand Total</strong></span>
+                                <span><strong>₹{grandTotal.toFixed(2)}</strong></span>
+                            </div>
                         </div>
+
                     </div>
 
                     <button
