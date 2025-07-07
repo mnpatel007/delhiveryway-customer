@@ -2,7 +2,7 @@ import React, { useState, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import './SignupPage.css'; // Your existing CSS with small additions below
+import './SignupPage.css'; // Import CSS file
 
 const SignupPage = () => {
     const { login } = useContext(AuthContext);
@@ -13,27 +13,29 @@ const SignupPage = () => {
         confirmPassword: ''
     });
     const [errors, setErrors] = useState({});
-    const [successMessage, setSuccessMessage] = useState('');
     const navigate = useNavigate();
 
+    // Handle input changes
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prevState => ({
             ...prevState,
             [name]: value
         }));
-        if (successMessage) setSuccessMessage('');
     };
 
+    // Validation function
     const validateForm = () => {
         const newErrors = {};
 
+        // Name validation
         if (!formData.name.trim()) {
             newErrors.name = 'Name is required';
         } else if (formData.name.trim().length < 2) {
             newErrors.name = 'Name must be at least 2 characters';
         }
 
+        // Email validation
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!formData.email.trim()) {
             newErrors.email = 'Email is required';
@@ -41,6 +43,7 @@ const SignupPage = () => {
             newErrors.email = 'Invalid email format';
         }
 
+        // Password validation
         if (!formData.password) {
             newErrors.password = 'Password is required';
         } else if (formData.password.length < 8) {
@@ -49,6 +52,7 @@ const SignupPage = () => {
             newErrors.password = 'Password must include uppercase, lowercase, number, and special character';
         }
 
+        // Confirm password validation
         if (formData.password !== formData.confirmPassword) {
             newErrors.confirmPassword = 'Passwords do not match';
         }
@@ -58,9 +62,12 @@ const SignupPage = () => {
     };
 
     const handleSignup = async (e) => {
-        e.preventDefault();
+        e.preventDefault(); // Prevent default form submission
 
-        if (!validateForm()) return;
+        // Validate form
+        if (!validateForm()) {
+            return;
+        }
 
         try {
             const { confirmPassword, ...signupData } = formData;
@@ -69,14 +76,8 @@ const SignupPage = () => {
                 role: 'customer'
             });
 
-            setSuccessMessage(' ✅ Signup successful! Please check your email to verify your account before logging in.');
-            setErrors({});
-            setFormData({ name: '', email: '', password: '', confirmPassword: '' });
-
-            setTimeout(() => {
-                navigate('/login');
-            }, 4000);
-
+            login(res.data);
+            navigate('/');
         } catch (err) {
             const serverError = err.response?.data?.message || 'Signup failed';
             setErrors(prevErrors => ({
@@ -92,10 +93,6 @@ const SignupPage = () => {
                 <form className="signup-form" onSubmit={handleSignup}>
                     <h2 className="signup-title">Create Account</h2>
                     <p className="signup-subtitle">Sign up to get started</p>
-
-                    {successMessage && (
-                        <div className="success-message">{successMessage}</div>
-                    )}
 
                     {errors.submit && (
                         <div className="error-message">{errors.submit}</div>
