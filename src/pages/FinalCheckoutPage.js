@@ -202,7 +202,7 @@ const FinalCheckoutPage = () => {
                                 <span>₹{deliveryCharge.toFixed(2)}</span>
                             </div>
                             <div className="total-row total-grand">
-                                <span><strong>Grand Total</strong></span>
+                                <span><strong>Grand</strong></span>
                                 <span><strong>₹{grandTotal.toFixed(2)}</strong></span>
                             </div>
                         </div>
@@ -223,3 +223,4 @@ const FinalCheckoutPage = () => {
 };
 
 export default FinalCheckoutPage;
+//i think that's all
