@@ -124,6 +124,36 @@
     margin-bottom: 20px;
 }
 
+.success-message {
+    background-color: #d4edda;
+    /* Light green background */
+    border: 1px solid #c3e6cb;
+    /* Matching green border */
+    color: #155724;
+    /* Dark green text */
+    padding: 12px 16px;
+    /* Comfortable padding */
+    border-radius: 6px;
+    /* Rounded corners */
+    font-weight: 600;
+    font-size: 1rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 1rem;
+}
+
+/* Checkmark icon before the message text */
+.success-message::before {
+    content: "✔";
+    color: #198754;
+    /* Bootstrap green */
+    font-weight: 900;
+    font-size: 1.2rem;
+    display: inline-block;
+    line-height: 1;
+}
+
 /* Responsive Design */
 @media (max-width: 480px) {
     .signup-wrapper {
