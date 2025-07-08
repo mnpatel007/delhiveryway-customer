@@ -1,0 +1,138 @@
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.rehearsal-checkout-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.checkout-wrapper {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+    max-width: 500px;
+    width: 100%;
+    position: relative;
+    border-top: 5px solid #4CAF50;
+}
+
+.checkout-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.checkout-header h2 {
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.checkout-header p {
+    color: #666;
+}
+
+.address-section textarea {
+    width: 100%;
+    padding: 15px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    resize: vertical;
+    min-height: 120px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+}
+
+.address-section textarea:focus {
+    outline: none;
+    border-color: #4CAF50;
+}
+
+.error-message {
+    color: #d9534f;
+    margin-top: 10px;
+    font-size: 0.9rem;
+}
+
+.order-summary {
+    background: #f9f9f9;
+    border-radius: 10px;
+    padding: 20px;
+    margin: 20px 0;
+}
+
+.order-items {
+    margin-bottom: 15px;
+}
+
+.order-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.order-total {
+    display: flex;
+    justify-content: space-between;
+    font-weight: bold;
+    color: #333;
+}
+
+.confirm-button {
+    width: 100%;
+    padding: 15px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    position: relative;
+}
+
+.confirm-button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+.spinner {
+    width: 25px;
+    height: 25px;
+    border: 3px solid white;
+    border-top: 3px solid #4CAF50;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.checkout-note {
+    text-align: center;
+    margin-top: 20px;
+    color: #777;
+    font-size: 0.9rem;
+}
+
+@media (max-width: 600px) {
+    .checkout-wrapper {
+        margin: 20px 10px;
+        padding: 20px;
+    }
+}

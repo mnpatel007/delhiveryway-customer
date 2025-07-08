@@ -1,0 +1,118 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap');
+
+.verify-email-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    font-family: 'Inter', sans-serif;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.verify-email-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    padding: 40px;
+    max-width: 500px;
+    width: 100%;
+    text-align: center;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.verify-email-card.success {
+    border-top: 5px solid #4CAF50;
+}
+
+.verify-email-card.error {
+    border-top: 5px solid #f44336;
+}
+
+.verify-email-icon {
+    width: 100px;
+    height: 100px;
+    margin: 0 auto 20px;
+    color: #4CAF50;
+}
+
+.verify-email-card.error .verify-email-icon {
+    color: #f44336;
+}
+
+.verify-email-icon svg {
+    width: 100%;
+    height: 100%;
+    stroke: currentColor;
+}
+
+.verify-email-card h2 {
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.verify-email-message {
+    color: #666;
+    margin-bottom: 20px;
+}
+
+.redirect-countdown {
+    background-color: #f0f0f0;
+    padding: 10px;
+    border-radius: 8px;
+    margin-top: 20px;
+    color: #333;
+}
+
+.verify-email-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.btn-back-to-login,
+.btn-resend-verification {
+    flex: 1;
+    padding: 12px;
+    margin: 0 5px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-back-to-login {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.btn-resend-verification {
+    background-color: #f0f0f0;
+    color: #333;
+}
+
+.btn-back-to-login:hover {
+    background-color: #45a049;
+}
+
+.btn-resend-verification:hover {
+    background-color: #e0e0e0;
+}
+
+@media (max-width: 600px) {
+    .verify-email-card {
+        padding: 20px;
+        margin: 0 10px;
+    }
+
+    .verify-email-actions {
+        flex-direction: column;
+    }
+
+    .btn-back-to-login,
+    .btn-resend-verification {
+        margin: 5px 0;
+    }
+}

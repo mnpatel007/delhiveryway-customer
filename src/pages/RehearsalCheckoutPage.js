@@ -3,9 +3,10 @@ import { CartContext } from '../context/CartContext';
 import { AuthContext } from '../context/AuthContext';
 import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
+import './RehearsalCheckoutPage.css';
 
 const RehearsalCheckoutPage = () => {
-    const { cart } = useContext(CartContext);
+    const { cart, clearCart } = useContext(CartContext);
     const { user } = useContext(AuthContext);
     const navigate = useNavigate();
     const location = useLocation();
@@ -13,9 +14,24 @@ const RehearsalCheckoutPage = () => {
 
     const [address, setAddress] = useState('');
     const [loading, setLoading] = useState(false);
+    const [addressError, setAddressError] = useState('');
+
+    const calculateTotal = () => {
+        return selectedItems.reduce((total, { product, quantity }) =>
+            total + (product.price * quantity), 0);
+    };
 
     const handleConfirm = async () => {
-        if (!address.trim()) return alert('Please enter delivery address');
+        // Validate address
+        if (!address.trim()) {
+            setAddressError('Please enter a complete delivery address');
+            return;
+        }
+
+        if (address.length < 10) {
+            setAddressError('Address seems too short. Please provide more details.');
+            return;
+        }
 
         const formattedItems = selectedItems.map(item => ({
             productId: item.product._id,
@@ -24,47 +40,97 @@ const RehearsalCheckoutPage = () => {
 
         try {
             setLoading(true);
-            await axios.post(
+            const response = await axios.post(
                 `${process.env.REACT_APP_BACKEND_URL}/api/temp-orders`,
-                { items: formattedItems, address },
+                {
+                    items: formattedItems,
+                    address,
+                    totalAmount: calculateTotal()
+                },
                 {
                     headers: { Authorization: `Bearer ${user.token}` }
                 }
             );
-            navigate('/awaiting-vendor-review');
+
+            // Clear cart after successful order
+            clearCart();
+
+            // Navigate to awaiting page
+            navigate('/awaiting-vendor-review', {
+                state: {
+                    orderId: response.data._id,
+                    totalAmount: calculateTotal()
+                }
+            });
         } catch (err) {
             console.error('❌ Failed to create rehearsal order:', err);
-            alert('Failed to create order. Try again.');
+            alert('Failed to create order. Please try again.');
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <div className="checkout-container">
-            <h2>Rehearsal Checkout</h2>
-            <p>This is a temporary order. Vendor will review it before payment.</p>
+        <div className="rehearsal-checkout-container">
+            <div className="checkout-wrapper">
+                <div className="checkout-header">
+                    <h2>Rehearsal Checkout</h2>
+                    <p>Create a temporary order for vendor review</p>
+                </div>
 
-            <textarea
-                placeholder="Enter delivery address"
-                value={address}
-                onChange={e => setAddress(e.target.value)}
-                rows={4}
-                style={{ width: '100%', marginBottom: '1rem' }}
-            />
+                <div className="address-section">
+                    <h3>Delivery Address</h3>
+                    <textarea
+                        placeholder="Enter complete delivery address (including landmark)"
+                        value={address}
+                        onChange={(e) => {
+                            setAddress(e.target.value);
+                            setAddressError('');
+                        }}
+                        rows={4}
+                    />
+                    {addressError && (
+                        <div className="error-message">{addressError}</div>
+                    )}
+                </div>
 
-            <h4>Items in your order:</h4>
-            <ul>
-                {selectedItems.map(({ product, quantity }) => (
-                    <li key={product._id}>
-                        {product.name} × {quantity} - ₹{product.price * quantity}
-                    </li>
-                ))}
-            </ul>
+                <div className="order-summary">
+                    <h3>Order Summary</h3>
+                    <div className="order-items">
+                        {selectedItems.map(({ product, quantity }) => (
+                            <div key={product._id} className="order-item">
+                                <span className="item-name">{product.name}</span>
+                                <span className="item-details">
+                                    {quantity} × ₹{product.price} = ₹{product.price * quantity}
+                                </span>
+                            </div>
+                        ))}
+                    </div>
+                    <div className="order-total">
+                        <strong>Total Amount:</strong>
+                        <strong>₹{calculateTotal()}</strong>
+                    </div>
+                </div>
 
-            <button onClick={handleConfirm} disabled={loading}>
-                {loading ? 'Submitting...' : 'Confirm Order'}
-            </button>
+                <div className="checkout-actions">
+                    <button
+                        onClick={handleConfirm}
+                        disabled={loading}
+                        className={`confirm-button ${loading ? 'loading' : ''}`}
+                    >
+                        {loading ? (
+                            <div className="spinner"></div>
+                        ) : (
+                            'Confirm Order'
+                        )}
+                    </button>
+                </div>
+
+                <div className="checkout-note">
+                    <p>🔒 Secure Checkout</p>
+                    <p>💡 Vendor will review your order before final confirmation</p>
+                </div>
+            </div>
         </div>
     );
 };
