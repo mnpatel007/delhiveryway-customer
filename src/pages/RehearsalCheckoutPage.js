@@ -72,13 +72,13 @@ const RehearsalCheckoutPage = () => {
 
     return (
         <div className="rehearsal-checkout-container">
-            <div className="checkout-wrapper">
-                <div className="checkout-header">
+            <div className="rehearsal-checkout-wrapper">
+                <div className="rehearsal-checkout-header">
                     <h2>Rehearsal Checkout</h2>
                     <p>Create a temporary order for vendor review</p>
                 </div>
 
-                <div className="address-section">
+                <div className="rehearsal-address-section">
                     <h3>Delivery Address</h3>
                     <textarea
                         placeholder="Enter complete delivery address (including landmark)"
@@ -90,15 +90,15 @@ const RehearsalCheckoutPage = () => {
                         rows={4}
                     />
                     {addressError && (
-                        <div className="error-message">{addressError}</div>
+                        <div className="rehearsal-error-message">{addressError}</div>
                     )}
                 </div>
 
-                <div className="order-summary">
+                <div className="rehearsal-order-summary">
                     <h3>Order Summary</h3>
-                    <div className="order-items">
+                    <div className="rehearsal-order-items">
                         {selectedItems.map(({ product, quantity }) => (
-                            <div key={product._id} className="order-item">
+                            <div key={product._id} className="rehearsal-order-item">
                                 <span className="item-name">{product.name}</span>
                                 <span className="item-details">
                                     {quantity} × ₹{product.price} = ₹{product.price * quantity}
@@ -106,7 +106,7 @@ const RehearsalCheckoutPage = () => {
                             </div>
                         ))}
                     </div>
-                    <div className="order-total">
+                    <div className="rehearsal-order-total">
                         <strong>Total Amount:</strong>
                         <strong>₹{calculateTotal()}</strong>
                     </div>
@@ -116,17 +116,17 @@ const RehearsalCheckoutPage = () => {
                     <button
                         onClick={handleConfirm}
                         disabled={loading}
-                        className={`confirm-button ${loading ? 'loading' : ''}`}
+                        className={`rehearsal-confirm-button ${loading ? 'loading' : ''}`}
                     >
                         {loading ? (
-                            <div className="spinner"></div>
+                            <div className="rehearsal-spinner"></div>
                         ) : (
                             'Confirm Order'
                         )}
                     </button>
                 </div>
 
-                <div className="checkout-note">
+                <div className="rehearsal-checkout-note">
                     <p>🔒 Secure Checkout</p>
                     <p>💡 Vendor will review your order before final confirmation</p>
                 </div>
