@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AuthContext } from '../context/AuthContext';
+import { AuthContext } from './context/AuthContext';
 import io from 'socket.io-client';
 import './AwaitingVendorReviewPage.css';
 
@@ -18,12 +18,33 @@ const AwaitingVendorReviewPage = () => {
         setSocket(newSocket);
 
         // Retrieve order details from local storage
-        const storedOrder = JSON.parse(localStorage.getItem('pending_vendor'));
-        setOrderDetails(storedOrder);
+        try {
+            const storedOrder = JSON.parse(localStorage.getItem('pending_vendor'));
+            if (!storedOrder) {
+                navigate('/', {
+                    state: {
+                        error: 'No pending order found. Please place a new order.',
+                    },
+                });
+                return;
+            }
+            setOrderDetails(storedOrder);
+
+            // Subscribe to customer room
+            newSocket.emit('subscribeToCustomerRoom', storedOrder.customerId);
+
+        } catch (err) {
+            console.error('Invalid localStorage data for pending_vendor:', err);
+            navigate('/', {
+                state: {
+                    error: 'Order could not be loaded. Please try again.',
+                },
+            });
+        }
 
         // Countdown timer
         const timer = setInterval(() => {
-            setCountdown(prev => {
+            setCountdown((prev) => {
                 if (prev <= 1) {
                     clearInterval(timer);
                     handleTimeoutRedirect();
@@ -33,7 +54,7 @@ const AwaitingVendorReviewPage = () => {
             });
         }, 1000);
 
-        // Socket listeners for vendor actions
+        // Socket listeners
         newSocket.on('vendorConfirmedOrder', handleVendorConfirmation);
         newSocket.on('vendorRejectedOrder', handleVendorRejection);
 
@@ -42,10 +63,11 @@ const AwaitingVendorReviewPage = () => {
             clearInterval(timer);
             newSocket.disconnect();
         };
-    }, []);
+    }, [navigate]);
 
     const handleVendorConfirmation = (confirmedOrder) => {
         localStorage.setItem('finalCheckoutOrder', JSON.stringify(confirmedOrder));
+        localStorage.removeItem('pending_vendor');
         navigate('/final-checkout');
     };
 
@@ -53,8 +75,8 @@ const AwaitingVendorReviewPage = () => {
         localStorage.removeItem('pending_vendor');
         navigate('/', {
             state: {
-                rejectionReason: rejectionDetails.reason
-            }
+                rejectionReason: rejectionDetails.reason,
+            },
         });
     };
 
@@ -62,8 +84,8 @@ const AwaitingVendorReviewPage = () => {
         localStorage.removeItem('pending_vendor');
         navigate('/', {
             state: {
-                timeoutMessage: 'Order review timed out. Please place a new order.'
-            }
+                timeoutMessage: 'Order review timed out. Please place a new order.',
+            },
         });
     };
 
@@ -73,7 +95,7 @@ const AwaitingVendorReviewPage = () => {
         return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
     };
 
-    if (!orderDetails) return <div>Loading...</div>;
+    if (!orderDetails) return <div className="awaiting-vendor-review-container">Loading...</div>;
 
     return (
         <div className="awaiting-vendor-review-container">
@@ -84,9 +106,9 @@ const AwaitingVendorReviewPage = () => {
                 <div className="order-summary">
                     <h3>Order Details</h3>
                     <div className="order-info">
-                        <p><strong>Restaurant:</strong> {orderDetails.restaurantName}</p>
-                        <p><strong>Total Items:</strong> {orderDetails.totalItems}</p>
-                        <p><strong>Total Amount:</strong> ₹{orderDetails.totalAmount}</p>
+                        <p><strong>Restaurant:</strong> {orderDetails.restaurantName || 'N/A'}</p>
+                        <p><strong>Total Items:</strong> {orderDetails.totalItems || orderDetails.items?.length || 0}</p>
+                        <p><strong>Total Amount:</strong> ₹{orderDetails.totalAmount || orderDetails.items?.reduce((acc, item) => acc + item.quantity * item.product.price, 0)}</p>
                     </div>
                 </div>
 
@@ -97,23 +119,15 @@ const AwaitingVendorReviewPage = () => {
 
                 <div className="countdown-timer">
                     <h3>Time Remaining</h3>
-                    <div className="timer">
-                        {formatTime(countdown)}
-                    </div>
+                    <div className="timer">{formatTime(countdown)}</div>
                     <p className="timer-note">
-                        If not redirected within 2 minutes,
-                        you'll be guided to place a new order.
+                        If not redirected within 2 minutes, you'll be guided to place a new order.
                     </p>
                 </div>
 
                 <div className="additional-info">
-                    <p>
-                        🕒 Our vendor is carefully reviewing your order.
-                        Please wait while we confirm the details.
-                    </p>
-                    <p>
-                        💡 Sit tight! We're working to get your delicious meal confirmed.
-                    </p>
+                    <p>🕒 Our vendor is carefully reviewing your order.</p>
+                    <p>💡 Sit tight! We're working to get your delicious meal confirmed.</p>
                 </div>
             </div>
         </div>
