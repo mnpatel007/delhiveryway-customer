@@ -17,9 +17,12 @@ import OrderHistoryPage from './pages/OrderHistoryPage';
 import RehearsalCheckoutPage from './pages/RehearsalCheckoutPage';
 import AwaitingVendorReviewPage from './pages/AwaitingVendorReviewPage';
 import VerifyEmail from './pages/VerifyEmail';
+import ForgotPasswordPage from './pages/ForgotPasswordPage';
+import ResetPasswordPage from './pages/ResetPasswordPage';
+
 
 // Connect Socket.IO globally
-const socket = io('https://delhiveryway-backend-1.onrender.com');
+const socket = io('https://delhiveryway-backend.onrender.com');
 
 // Private route
 const PrivateRoute = ({ children }) => {
@@ -113,6 +116,8 @@ function App() {
               <Route path="/rehearsal-checkout" element={<PrivateRoute><RehearsalCheckoutPage /></PrivateRoute>} />
               <Route path="/awaiting-vendor-review" element={<PrivateRoute><AwaitingVendorReviewPage /></PrivateRoute>} />
               <Route path="/verify-email" element={<VerifyEmail />} />
+              <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+              <Route path="/reset-password" element={<ResetPasswordPage />} />
             </Routes>
           </Layout>
         </BrowserRouter>
