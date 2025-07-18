@@ -181,13 +181,6 @@ const CartPage = () => {
                             <span>Total Amount:</span>
                             <strong>₹{calculateOverallTotal().toFixed(2)}</strong>
                         </div>
-                        <button
-                            onClick={() => handleCheckout(cart)}
-                            className="checkout-all-btn"
-                            aria-label="Checkout all items in cart"
-                        >
-                            Checkout All Items
-                        </button>
                     </footer>
                 </div>
             )}
