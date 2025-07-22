@@ -98,9 +98,12 @@ const OrderHistoryPage = () => {
                 <div className="orders-list">
                     {orders.map(order => {
                         const itemTotal = order.items.reduce((sum, i) => sum + i.productId.price * i.quantity, 0);
-                        const deliveryCharge = order.deliveryCharge || 0;
-                        const grandTotal = order.totalAmount || (itemTotal + deliveryCharge);
-                        const tax = parseFloat((grandTotal - itemTotal - deliveryCharge).toFixed(2));
+                        const gst = itemTotal * 0.05;
+                        const platformFee = itemTotal * 0.029;
+                        const tax = gst + platformFee;
+                        const deliveryCharge = 30;
+                        const grandTotal = itemTotal + tax + deliveryCharge;
+
 
 
                         // Group items by shopId
