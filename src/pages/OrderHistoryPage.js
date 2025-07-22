@@ -98,9 +98,10 @@ const OrderHistoryPage = () => {
                 <div className="orders-list">
                     {orders.map(order => {
                         const itemTotal = order.items.reduce((sum, i) => sum + i.productId.price * i.quantity, 0);
-                        const tax = parseFloat((itemTotal * 0.05).toFixed(2));
-                        const deliveryCharge = 10 * new Set(order.items.map(i => i.productId.shopId._id)).size;
-                        const grandTotal = itemTotal + tax + deliveryCharge;
+                        const deliveryCharge = order.deliveryCharge || 0;
+                        const grandTotal = order.totalAmount || (itemTotal + deliveryCharge);
+                        const tax = parseFloat((grandTotal - itemTotal - deliveryCharge).toFixed(2));
+
 
                         // Group items by shopId
                         const grouped = {};
@@ -170,7 +171,7 @@ const OrderHistoryPage = () => {
                                             <span>₹{itemTotal.toFixed(2)}</span>
                                         </div>
                                         <div className="total-row">
-                                            <span>GST (5%)</span>
+                                            <span>Taxes and Other Charges</span>
                                             <span>₹{tax.toFixed(2)}</span>
                                         </div>
                                         <div className="total-row">
