@@ -41,7 +41,12 @@ const HomePage = () => {
                     >
                         <h3 className="shop-item-title">{shop.name}</h3>
                         <p className="shop-item-description">{shop.description}</p>
-                        <p className="shop-item-location">{shop.location}</p>
+                        <p className="shop-item-location">
+                            {shop.location && shop.location.lat && shop.location.lng
+                                ? `📍 ${shop.location.lat.toFixed(4)}, ${shop.location.lng.toFixed(4)}`
+                                : '📍 Location not available'
+                            }
+                        </p>
                     </li>
                 ))}
             </ul>
