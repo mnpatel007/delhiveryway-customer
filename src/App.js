@@ -22,7 +22,7 @@ import ResetPasswordPage from './pages/ResetPasswordPage';
 
 
 // Connect Socket.IO globally
-const socket = io('https://delhiveryway-backend-1.onrender.com');
+const socket = io(process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000');
 
 // Private route
 const PrivateRoute = ({ children }) => {
