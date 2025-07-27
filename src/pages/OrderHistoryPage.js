@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import axios from 'axios';
+import io from 'socket.io-client';
 import './OrderHistoryPage.css'; // Import CSS file
 
 const OrderHistoryPage = () => {
@@ -34,6 +35,60 @@ const OrderHistoryPage = () => {
 
         fetchOrders();
     }, [user]);
+
+    // Socket connection for real-time order updates
+    useEffect(() => {
+        if (!user?.id) return;
+
+        const socket = io(process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000');
+
+        // Join customer room
+        socket.emit('join', `customer_${user.id}`);
+
+        // Listen for order status updates
+        socket.on('orderStatusUpdate', (data) => {
+            console.log('Received order status update:', data);
+
+            // Update the specific order in state
+            setOrders(prevOrders =>
+                prevOrders.map(order =>
+                    order._id === data.orderId
+                        ? {
+                            ...order,
+                            status: data.status,
+                            pickedUpAt: data.status === 'picked_up' ? data.timestamp : order.pickedUpAt,
+                            deliveredAt: data.status === 'delivered' ? data.timestamp : order.deliveredAt,
+                            deliveryBoyLocation: data.deliveryBoyLocation || order.deliveryBoyLocation
+                        }
+                        : order
+                )
+            );
+
+            // Show notification for important updates
+            if (data.message && ['picked_up', 'delivered'].includes(data.status)) {
+                // You can add a toast notification here
+                alert(data.message);
+            }
+        });
+
+        // Listen for delivery location updates
+        socket.on('delivery_location_update', (data) => {
+            setOrders(prevOrders =>
+                prevOrders.map(order =>
+                    order._id === data.orderId
+                        ? {
+                            ...order,
+                            deliveryBoyLocation: data.deliveryBoyLocation
+                        }
+                        : order
+                )
+            );
+        });
+
+        return () => {
+            socket.disconnect();
+        };
+    }, [user?.id]);
 
     const formatDate = (dateStr) => {
         const d = new Date(dateStr);
