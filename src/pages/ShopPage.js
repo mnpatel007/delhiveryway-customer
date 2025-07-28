@@ -67,8 +67,7 @@ const ShopPage = () => {
                     <h2 className="shop-name">{shop.name}</h2>
                     <p className="shop-description">{shop.description}</p>
                     <div className="shop-location">
-                        <i className="location-icon">📍</i>
-                        {shop.address || 'Location not available'}
+                        {shop.address ? `📍 ${shop.address}` : '📍 Location not available'}
                     </div>
                 </div>
             </div>
