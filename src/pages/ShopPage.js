@@ -68,10 +68,7 @@ const ShopPage = () => {
                     <p className="shop-description">{shop.description}</p>
                     <div className="shop-location">
                         <i className="location-icon">📍</i>
-                        {shop.location && shop.location.lat && shop.location.lng
-                            ? `${shop.location.lat.toFixed(4)}, ${shop.location.lng.toFixed(4)}`
-                            : 'Location not available'
-                        }
+                        {shop.address || 'Location not available'}
                     </div>
                 </div>
             </div>
