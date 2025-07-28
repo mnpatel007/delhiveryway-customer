@@ -37,8 +37,23 @@ const GlobalCustomerAlert = () => {
 
   useEffect(() => {
     if (user?.user?._id) {
+      console.log(`🔌 Registering customer ${user.user._id} with socket`);
       socket.emit('registerCustomer', user.user._id);
     }
+
+    // Request notification permission
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission();
+    }
+
+    // Socket connection status
+    socket.on('connect', () => {
+      console.log('🔌 Customer socket connected');
+    });
+
+    socket.on('disconnect', () => {
+      console.log('🔌 Customer socket disconnected');
+    });
 
     socket.on('orderCancelled', (data) => {
       setCancelAlert(data);
@@ -50,9 +65,37 @@ const GlobalCustomerAlert = () => {
       window.location.href = '/final-checkout';
     });
 
+    // Handle OTP notifications for delivery
+    socket.on('orderStatusUpdate', (data) => {
+      console.log('🔔 Customer received order status update:', data);
+
+      // Show OTP notification if order is picked up
+      if (data.status === 'picked_up' && data.deliveryOTP) {
+        console.log(`🔐 Received OTP: ${data.deliveryOTP} for order ${data.orderId}`);
+
+        // Show a prominent notification with the OTP
+        const otpMessage = `🚚 Your order has been picked up!\n\n🔐 Your delivery OTP is: ${data.deliveryOTP}\n\nPlease share this OTP with the delivery person when they arrive.`;
+
+        // Show browser notification if permission granted
+        if (Notification.permission === 'granted') {
+          new Notification('Order Picked Up - OTP Required', {
+            body: `Your delivery OTP is: ${data.deliveryOTP}`,
+            icon: '/favicon.ico',
+            tag: 'delivery-otp'
+          });
+        }
+
+        // Show alert as fallback
+        alert(otpMessage);
+      }
+    });
+
     return () => {
       socket.off('orderCancelled');
       socket.off('vendorConfirmedOrder');
+      socket.off('orderStatusUpdate');
+      socket.off('connect');
+      socket.off('disconnect');
     };
   }, [user]);
 
