@@ -28,7 +28,7 @@ const RehearsalCheckoutPage = () => {
             return;
         }
 
-        if (address.length < 6) {
+        if (address.length < 5) {
             setAddressError('Address seems too short. Please provide more details.');
             return;
         }
