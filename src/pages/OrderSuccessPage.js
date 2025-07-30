@@ -33,11 +33,9 @@ const OrderSuccessPage = () => {
                             headers: { Authorization: `Bearer ${user.token}` }
                         }
                     );
-                    console.log('Order details from session:', response.data);
                     setOrderDetails(response.data);
                 } else if (location.state) {
                     // Fallback to location state
-                    console.log('Order details from location state:', location.state);
                     setOrderDetails(location.state);
                 }
             } catch (error) {
@@ -61,29 +59,19 @@ const OrderSuccessPage = () => {
         // Clear any remaining order data
         localStorage.removeItem('lastOrderAmount');
 
-        // Use a small delay to ensure proper navigation
-        setTimeout(() => {
-            window.location.href = '/';
-        }, 100);
+        // Force a complete page reload to home
+        window.location.replace('/');
     };
 
     const generateOrderId = () => {
         // Use the same format as delivery app: #{orderId.slice(-6)}
-        console.log('Generating order ID from:', orderDetails);
-
         if (orderDetails?.orderId) {
-            const id = `#${orderDetails.orderId.slice(-6)}`;
-            console.log('Using orderId:', id);
-            return id;
+            return `#${orderDetails.orderId.slice(-6)}`;
         }
         if (orderDetails?.sessionId) {
-            const id = `#${orderDetails.sessionId.slice(-6)}`;
-            console.log('Using sessionId:', id);
-            return id;
+            return `#${orderDetails.sessionId.slice(-6)}`;
         }
-        const id = `#${Date.now().toString().slice(-6)}`;
-        console.log('Using timestamp:', id);
-        return id;
+        return `#${Date.now().toString().slice(-6)}`;
     };
 
     const formatAmount = (amount) => {
@@ -133,7 +121,7 @@ const OrderSuccessPage = () => {
                 <div className="order-details-card">
                     <div className="order-header">
                         <h3>Order Details</h3>
-                        <span className="order-id">#{generateOrderId()}</span>
+                        <span className="order-id">{generateOrderId()}</span>
                     </div>
 
                     <div className="order-info">
