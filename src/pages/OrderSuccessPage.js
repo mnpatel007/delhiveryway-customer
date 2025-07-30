@@ -33,9 +33,11 @@ const OrderSuccessPage = () => {
                             headers: { Authorization: `Bearer ${user.token}` }
                         }
                     );
+                    console.log('Order details from session:', response.data);
                     setOrderDetails(response.data);
                 } else if (location.state) {
                     // Fallback to location state
+                    console.log('Order details from location state:', location.state);
                     setOrderDetails(location.state);
                 }
             } catch (error) {
@@ -56,18 +58,32 @@ const OrderSuccessPage = () => {
     }, [clearCart, location.state, location.search, user.token]);
 
     const handleBackToHome = () => {
-        window.location.href = '/'; // Force full reload to ensure proper navigation
+        // Clear any remaining order data
+        localStorage.removeItem('lastOrderAmount');
+
+        // Use a small delay to ensure proper navigation
+        setTimeout(() => {
+            window.location.href = '/';
+        }, 100);
     };
 
     const generateOrderId = () => {
         // Use the same format as delivery app: #{orderId.slice(-6)}
+        console.log('Generating order ID from:', orderDetails);
+
         if (orderDetails?.orderId) {
-            return `#${orderDetails.orderId.slice(-6)}`;
+            const id = `#${orderDetails.orderId.slice(-6)}`;
+            console.log('Using orderId:', id);
+            return id;
         }
         if (orderDetails?.sessionId) {
-            return `#${orderDetails.sessionId.slice(-6)}`;
+            const id = `#${orderDetails.sessionId.slice(-6)}`;
+            console.log('Using sessionId:', id);
+            return id;
         }
-        return `#${Date.now().toString().slice(-6)}`;
+        const id = `#${Date.now().toString().slice(-6)}`;
+        console.log('Using timestamp:', id);
+        return id;
     };
 
     const formatAmount = (amount) => {
