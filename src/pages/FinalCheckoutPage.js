@@ -108,6 +108,9 @@ const FinalCheckoutPage = () => {
                 quantity: item.quantity
             }));
 
+            // Store order amount for success page
+            localStorage.setItem('lastOrderAmount', finalOrder.totalAmount);
+
             const response = await axios.post(
                 `${process.env.REACT_APP_BACKEND_URL}/api/payment/create-checkout-session`,
                 {
