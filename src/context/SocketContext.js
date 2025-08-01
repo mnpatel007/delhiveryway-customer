@@ -288,6 +288,51 @@ export const SocketProvider = ({ children }) => {
                 }, 1000);
             });
 
+            // Listen for payment confirmations
+            newSocket.on('paymentConfirmed', (data) => {
+                console.log('💳 Payment confirmed:', data);
+
+                addNotification({
+                    id: Date.now(),
+                    type: 'payment_confirmed',
+                    title: '💳 Payment Successful!',
+                    message: `Payment of ₹${data.amount} has been processed successfully. Your order is now confirmed.`,
+                    data: data,
+                    timestamp: new Date().toISOString()
+                });
+
+                playNotificationSound();
+                showBrowserNotification('💳 Payment Successful!', `Payment of ₹${data.amount} processed successfully`);
+
+                // Clear any stored checkout data
+                localStorage.removeItem('finalCheckoutOrder');
+                localStorage.removeItem('rehearsalOrder');
+
+                // Redirect to orders page after a short delay
+                setTimeout(() => {
+                    if (window.confirm('🎉 Payment successful! Your order has been confirmed.\n\nWould you like to view your orders?')) {
+                        window.location.href = '/orders';
+                    }
+                }, 2000);
+            });
+
+            // Listen for delivery assignments
+            newSocket.on('deliveryAssigned', (data) => {
+                console.log('🚚 Delivery assigned:', data);
+
+                addNotification({
+                    id: Date.now(),
+                    type: 'delivery_assigned',
+                    title: '🚚 Delivery Partner Assigned!',
+                    message: `${data.deliveryPartner?.name || 'A delivery partner'} has been assigned to your order.`,
+                    data: data,
+                    timestamp: new Date().toISOString()
+                });
+
+                playNotificationSound();
+                showBrowserNotification('🚚 Delivery Partner Assigned!', `${data.deliveryPartner?.name || 'A delivery partner'} will deliver your order`);
+            });
+
             setSocket(newSocket);
 
             return () => {
