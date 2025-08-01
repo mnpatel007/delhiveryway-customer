@@ -9,6 +9,14 @@
  * @returns {number} Distance in kilometers
  */
 export const calculateDistance = (lat1, lng1, lat2, lng2) => {
+    // Validate coordinates
+    if (!lat1 || !lng1 || !lat2 || !lng2 ||
+        Math.abs(lat1) > 90 || Math.abs(lat2) > 90 ||
+        Math.abs(lng1) > 180 || Math.abs(lng2) > 180) {
+        console.error('Invalid coordinates:', { lat1, lng1, lat2, lng2 });
+        return 0; // Return 0 distance for invalid coordinates
+    }
+
     const R = 6371; // Earth's radius in kilometers
     const dLat = (lat2 - lat1) * Math.PI / 180;
     const dLng = (lng2 - lng1) * Math.PI / 180;
@@ -18,6 +26,13 @@ export const calculateDistance = (lat1, lng1, lat2, lng2) => {
         Math.sin(dLng / 2) * Math.sin(dLng / 2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     const distance = R * c;
+
+    // Additional validation - distance should be reasonable
+    if (distance > 20000) { // More than half Earth's circumference is suspicious
+        console.error('Suspicious distance calculated:', distance, 'km between', { lat1, lng1, lat2, lng2 });
+        return 0;
+    }
+
     return distance;
 };
 
@@ -53,28 +68,44 @@ export const calculateDeliveryCharge = (distance) => {
  */
 export const geocodeAddress = async (address) => {
     try {
-        // Using Google Maps Geocoding API (same as vendor app for accuracy)
+        // Try Google Maps API first if key is available and valid
+        if (process.env.REACT_APP_GOOGLE_MAPS_API_KEY &&
+            process.env.REACT_APP_GOOGLE_MAPS_API_KEY !== 'your_google_maps_api_key_here') {
+
+            const response = await fetch(
+                `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${process.env.REACT_APP_GOOGLE_MAPS_API_KEY}`
+            );
+            const data = await response.json();
+
+            if (data.status === 'OK' && data.results.length > 0) {
+                const location = data.results[0].geometry.location;
+                return {
+                    lat: location.lat,
+                    lng: location.lng
+                };
+            }
+        }
+
+        // Fallback to free geocoding service
+        console.log('Using fallback geocoding service...');
         const response = await fetch(
-            `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${process.env.REACT_APP_GOOGLE_MAPS_API_KEY}`
+            `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1`
         );
         const data = await response.json();
 
-        if (data.status === 'OK' && data.results.length > 0) {
-            const location = data.results[0].geometry.location;
+        if (data && data.length > 0) {
             return {
-                lat: location.lat,
-                lng: location.lng
+                lat: parseFloat(data[0].lat),
+                lng: parseFloat(data[0].lon)
             };
-        } else if (data.status === 'ZERO_RESULTS') {
-            throw new Error('Address not found');
         } else {
-            throw new Error(`Geocoding failed: ${data.status}`);
+            throw new Error('Address not found');
         }
     } catch (error) {
         console.error('Geocoding error:', error);
-        // Fallback to default coordinates (you can set this to your city center)
+        // Fallback to default coordinates (Delhi city center)
         return {
-            lat: 28.6139, // Delhi coordinates as fallback
+            lat: 28.6139,
             lng: 77.2090
         };
     }

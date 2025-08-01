@@ -40,27 +40,57 @@ const RehearsalCheckoutPage = () => {
 
         setCalculatingCharges(true);
         try {
-            const response = await fetch(
-                `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${process.env.REACT_APP_GOOGLE_MAPS_API_KEY}`
-            );
-            const data = await response.json();
+            let locationFound = false;
+            let formattedAddress = address;
 
-            if (data.status === 'OK' && data.results.length > 0) {
-                const location = data.results[0].geometry.location;
-                const formattedAddress = data.results[0].formatted_address;
+            // Try Google Maps API first if available
+            if (process.env.REACT_APP_GOOGLE_MAPS_API_KEY &&
+                process.env.REACT_APP_GOOGLE_MAPS_API_KEY !== 'your_google_maps_api_key_here') {
 
+                try {
+                    const response = await fetch(
+                        `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${process.env.REACT_APP_GOOGLE_MAPS_API_KEY}`
+                    );
+                    const data = await response.json();
+
+                    if (data.status === 'OK' && data.results.length > 0) {
+                        formattedAddress = data.results[0].formatted_address;
+                        locationFound = true;
+                    }
+                } catch (error) {
+                    console.log('Google Maps API failed, trying fallback...');
+                }
+            }
+
+            // If Google Maps failed or not available, use fallback
+            if (!locationFound) {
+                try {
+                    const response = await fetch(
+                        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1`
+                    );
+                    const data = await response.json();
+
+                    if (data && data.length > 0) {
+                        formattedAddress = data[0].display_name;
+                        locationFound = true;
+                    }
+                } catch (error) {
+                    console.log('Fallback geocoding also failed');
+                }
+            }
+
+            if (locationFound) {
                 // Update address with formatted address
                 setAddress(formattedAddress);
 
-                // Trigger delivery charge calculation with exact coordinates
+                // Trigger delivery charge calculation
                 await calculateDeliveryCharges(formattedAddress);
 
-                alert('✅ Exact location found! Delivery charges updated with precise coordinates.');
-            } else if (data.status === 'ZERO_RESULTS') {
-                alert('❌ Could not find this address. Please check and try again.');
+                alert('✅ Location found! Delivery charges updated.');
             } else {
-                alert(`❌ Location search failed: ${data.status}`);
+                alert('❌ Could not find this address. Please check and try again.');
             }
+
         } catch (error) {
             console.error('Find location error:', error);
             alert('❌ Failed to find location. Please check your internet connection.');
