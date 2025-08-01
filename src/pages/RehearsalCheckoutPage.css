@@ -34,6 +34,12 @@
     color: #666;
 }
 
+.address-input-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
 .rehearsal-address-section textarea {
     width: 100%;
     padding: 15px;
@@ -43,11 +49,41 @@
     min-height: 120px;
     font-size: 1rem;
     transition: border-color 0.3s ease;
+    box-sizing: border-box;
 }
 
 .rehearsal-address-section textarea:focus {
     outline: none;
     border-color: #4CAF50;
+}
+
+.find-location-btn {
+    background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    align-self: flex-start;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.find-location-btn:hover:not(:disabled) {
+    background: linear-gradient(135deg, #45a049 0%, #3d8b40 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+}
+
+.find-location-btn:disabled {
+    background: #cccccc;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
 }
 
 .rehearsal-error-message {

@@ -31,6 +31,44 @@ const RehearsalCheckoutPage = () => {
         return calculateItemsTotal() + calculateDeliveryTotal();
     };
 
+    // Find exact location using Google Maps API (same as vendor app)
+    const handleFindLocation = async () => {
+        if (!address.trim()) {
+            alert('Please enter an address first.');
+            return;
+        }
+
+        setCalculatingCharges(true);
+        try {
+            const response = await fetch(
+                `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${process.env.REACT_APP_GOOGLE_MAPS_API_KEY}`
+            );
+            const data = await response.json();
+
+            if (data.status === 'OK' && data.results.length > 0) {
+                const location = data.results[0].geometry.location;
+                const formattedAddress = data.results[0].formatted_address;
+
+                // Update address with formatted address
+                setAddress(formattedAddress);
+
+                // Trigger delivery charge calculation with exact coordinates
+                await calculateDeliveryCharges(formattedAddress);
+
+                alert('✅ Exact location found! Delivery charges updated with precise coordinates.');
+            } else if (data.status === 'ZERO_RESULTS') {
+                alert('❌ Could not find this address. Please check and try again.');
+            } else {
+                alert(`❌ Location search failed: ${data.status}`);
+            }
+        } catch (error) {
+            console.error('Find location error:', error);
+            alert('❌ Failed to find location. Please check your internet connection.');
+        } finally {
+            setCalculatingCharges(false);
+        }
+    };
+
     const calculateDeliveryCharges = async (customerAddress) => {
         if (!customerAddress.trim() || customerAddress.length < 5) {
             return;
@@ -145,15 +183,25 @@ const RehearsalCheckoutPage = () => {
 
                 <div className="rehearsal-address-section">
                     <h3>Delivery Address</h3>
-                    <textarea
-                        placeholder="Enter complete delivery address (including landmark)"
-                        value={address}
-                        onChange={(e) => {
-                            setAddress(e.target.value);
-                            setAddressError('');
-                        }}
-                        rows={4}
-                    />
+                    <div className="address-input-container">
+                        <textarea
+                            placeholder="Enter complete delivery address (including landmark)"
+                            value={address}
+                            onChange={(e) => {
+                                setAddress(e.target.value);
+                                setAddressError('');
+                            }}
+                            rows={4}
+                        />
+                        <button
+                            type="button"
+                            className="find-location-btn"
+                            onClick={handleFindLocation}
+                            disabled={!address.trim() || calculatingCharges}
+                        >
+                            📍 Find Exact Location
+                        </button>
+                    </div>
                     {addressError && (
                         <div className="rehearsal-error-message">{addressError}</div>
                     )}

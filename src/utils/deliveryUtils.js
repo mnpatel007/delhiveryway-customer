@@ -53,19 +53,22 @@ export const calculateDeliveryCharge = (distance) => {
  */
 export const geocodeAddress = async (address) => {
     try {
-        // Using a free geocoding service (you can replace with Google Maps API if needed)
+        // Using Google Maps Geocoding API (same as vendor app for accuracy)
         const response = await fetch(
-            `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1`
+            `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${process.env.REACT_APP_GOOGLE_MAPS_API_KEY}`
         );
         const data = await response.json();
 
-        if (data && data.length > 0) {
+        if (data.status === 'OK' && data.results.length > 0) {
+            const location = data.results[0].geometry.location;
             return {
-                lat: parseFloat(data[0].lat),
-                lng: parseFloat(data[0].lon)
+                lat: location.lat,
+                lng: location.lng
             };
-        } else {
+        } else if (data.status === 'ZERO_RESULTS') {
             throw new Error('Address not found');
+        } else {
+            throw new Error(`Geocoding failed: ${data.status}`);
         }
     } catch (error) {
         console.error('Geocoding error:', error);
