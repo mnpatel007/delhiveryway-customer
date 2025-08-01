@@ -115,7 +115,8 @@ const FinalCheckoutPage = () => {
                 `${process.env.REACT_APP_BACKEND_URL}/api/payment/create-checkout-session`,
                 {
                     items: formattedItems,
-                    address: finalOrder.address
+                    address: finalOrder.address,
+                    deliveryCharge: deliveryCharge
                 },
                 {
                     headers: { Authorization: `Bearer ${user.token}` }
@@ -145,7 +146,9 @@ const FinalCheckoutPage = () => {
     const gst = itemTotal * 0.05;
     const platformFee = itemTotal * 0.029;
     const tax = gst + platformFee;
-    const deliveryCharge = 30;
+
+    // Use delivery charge from finalOrder (calculated dynamically) or fallback to 30
+    const deliveryCharge = finalOrder.deliveryCharge || 30;
     const grandTotal = itemTotal + tax + deliveryCharge;
 
 

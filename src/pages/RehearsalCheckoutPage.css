@@ -130,9 +130,75 @@
     font-size: 0.9rem;
 }
 
+/* Delivery Charges Breakdown Styles */
+.rehearsal-order-breakdown {
+    margin: 15px 0;
+    padding: 15px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+}
+
+.breakdown-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 8px 0;
+    padding: 5px 0;
+}
+
+.breakdown-row:not(:last-child) {
+    border-bottom: 1px solid #e9ecef;
+}
+
+.delivery-charges-section {
+    margin: 10px 0;
+}
+
+.delivery-charges-section h4 {
+    margin: 0 0 10px 0;
+    color: #495057;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.delivery-charge {
+    padding-left: 15px;
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+
+.delivery-charge small {
+    color: #28a745;
+    font-weight: 500;
+}
+
+.breakdown-row span:first-child {
+    color: #495057;
+}
+
+.breakdown-row span:last-child {
+    font-weight: 500;
+    color: #28a745;
+}
+
+/* Loading state for delivery charges */
+.breakdown-row:has(.calculating) {
+    opacity: 0.7;
+}
+
 @media (max-width: 600px) {
     .rehearsal-checkout-wrapper {
         margin: 20px 10px;
         padding: 20px;
+    }
+
+    .breakdown-row {
+        font-size: 0.9rem;
+    }
+
+    .delivery-charge {
+        padding-left: 10px;
+        font-size: 0.85rem;
     }
 }

@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { CartContext } from '../context/CartContext';
 import { AuthContext } from '../context/AuthContext';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -15,11 +15,75 @@ const RehearsalCheckoutPage = () => {
     const [address, setAddress] = useState('');
     const [loading, setLoading] = useState(false);
     const [addressError, setAddressError] = useState('');
+    const [deliveryCharges, setDeliveryCharges] = useState({});
+    const [calculatingCharges, setCalculatingCharges] = useState(false);
 
-    const calculateTotal = () => {
+    const calculateItemsTotal = () => {
         return selectedItems.reduce((total, { product, quantity }) =>
             total + (product.price * quantity), 0);
     };
+
+    const calculateDeliveryTotal = () => {
+        return Object.values(deliveryCharges).reduce((total, charge) => total + charge.charge, 0);
+    };
+
+    const calculateGrandTotal = () => {
+        return calculateItemsTotal() + calculateDeliveryTotal();
+    };
+
+    const calculateDeliveryCharges = async (customerAddress) => {
+        if (!customerAddress.trim() || customerAddress.length < 5) {
+            return;
+        }
+
+        try {
+            setCalculatingCharges(true);
+
+            // Get unique shop IDs from selected items
+            const shopIds = [...new Set(selectedItems.map(item => item.product.shopId))];
+
+            const response = await axios.post(
+                `${process.env.REACT_APP_BACKEND_URL}/api/delivery/calculate-charges`,
+                {
+                    address: customerAddress,
+                    shopIds: shopIds
+                },
+                {
+                    headers: { Authorization: `Bearer ${user.token}` }
+                }
+            );
+
+            setDeliveryCharges(response.data.deliveryCharges);
+        } catch (error) {
+            console.error('Error calculating delivery charges:', error);
+            // Set default charges if calculation fails
+            const shopIds = [...new Set(selectedItems.map(item => item.product.shopId))];
+            const defaultCharges = {};
+            shopIds.forEach(shopId => {
+                defaultCharges[shopId] = {
+                    shopName: 'Shop',
+                    distance: 0,
+                    charge: 30 // Default charge
+                };
+            });
+            setDeliveryCharges(defaultCharges);
+        } finally {
+            setCalculatingCharges(false);
+        }
+    };
+
+    // Debounced effect to calculate delivery charges when address changes
+    useEffect(() => {
+        const timeoutId = setTimeout(() => {
+            if (address.trim() && address.length >= 5) {
+                calculateDeliveryCharges(address);
+            } else {
+                setDeliveryCharges({});
+            }
+        }, 1000); // 1 second delay
+
+        return () => clearTimeout(timeoutId);
+    }, [address]);
 
     const handleConfirm = async () => {
         // Validate address
@@ -45,7 +109,8 @@ const RehearsalCheckoutPage = () => {
                 {
                     items: formattedItems,
                     address,
-                    totalAmount: calculateTotal()
+                    totalAmount: calculateGrandTotal(),
+                    deliveryCharges: deliveryCharges
                 },
                 {
                     headers: { Authorization: `Bearer ${user.token}` }
@@ -106,9 +171,46 @@ const RehearsalCheckoutPage = () => {
                             </div>
                         ))}
                     </div>
+                    <div className="rehearsal-order-breakdown">
+                        <div className="breakdown-row">
+                            <span>Items Total:</span>
+                            <span>₹{calculateItemsTotal()}</span>
+                        </div>
+
+                        {Object.keys(deliveryCharges).length > 0 && (
+                            <>
+                                <div className="delivery-charges-section">
+                                    <h4>Delivery Charges:</h4>
+                                    {Object.entries(deliveryCharges).map(([shopId, charge]) => (
+                                        <div key={shopId} className="breakdown-row delivery-charge">
+                                            <span>
+                                                {charge.shopName}
+                                                {charge.distance > 0 && (
+                                                    <small> ({charge.distance}km)</small>
+                                                )}
+                                            </span>
+                                            <span>₹{charge.charge}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                                <div className="breakdown-row">
+                                    <span>Total Delivery:</span>
+                                    <span>₹{calculateDeliveryTotal()}</span>
+                                </div>
+                            </>
+                        )}
+
+                        {calculatingCharges && (
+                            <div className="breakdown-row">
+                                <span>Calculating delivery charges...</span>
+                                <span>⏳</span>
+                            </div>
+                        )}
+                    </div>
+
                     <div className="rehearsal-order-total">
-                        <strong>Total Amount:</strong>
-                        <strong>₹{calculateTotal()}</strong>
+                        <strong>Grand Total:</strong>
+                        <strong>₹{calculateGrandTotal()}</strong>
                     </div>
                 </div>
 
