@@ -67,42 +67,71 @@ export const calculateDeliveryCharge = (distance) => {
  * @returns {Promise<{lat: number, lng: number}>} Coordinates
  */
 export const geocodeAddress = async (address) => {
+    console.log('🔍 Frontend geocoding address:', address);
+
     try {
         // Try Google Maps API first if key is available and valid
         if (process.env.REACT_APP_GOOGLE_MAPS_API_KEY &&
             process.env.REACT_APP_GOOGLE_MAPS_API_KEY !== 'your_google_maps_api_key_here') {
 
-            const response = await fetch(
-                `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${process.env.REACT_APP_GOOGLE_MAPS_API_KEY}`
-            );
-            const data = await response.json();
+            console.log('🗺️ Trying Google Maps API...');
+            try {
+                const response = await fetch(
+                    `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${process.env.REACT_APP_GOOGLE_MAPS_API_KEY}`
+                );
+                const data = await response.json();
+                console.log('Google Maps API response status:', data.status);
 
-            if (data.status === 'OK' && data.results.length > 0) {
-                const location = data.results[0].geometry.location;
-                return {
-                    lat: location.lat,
-                    lng: location.lng
-                };
+                if (data.status === 'OK' && data.results.length > 0) {
+                    const location = data.results[0].geometry.location;
+                    const coords = {
+                        lat: location.lat,
+                        lng: location.lng
+                    };
+                    console.log('✅ Google Maps found coordinates:', coords);
+                    return coords;
+                } else {
+                    console.log('❌ Google Maps failed:', data.status, data.error_message);
+                }
+            } catch (gmError) {
+                console.log('❌ Google Maps API error:', gmError.message);
             }
+        } else {
+            console.log('⚠️ Google Maps API key not available or invalid');
         }
 
         // Fallback to free geocoding service
-        console.log('Using fallback geocoding service...');
-        const response = await fetch(
-            `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1`
-        );
-        const data = await response.json();
+        console.log('🌍 Using fallback geocoding service (OpenStreetMap)...');
+        try {
+            const response = await fetch(
+                `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1`,
+                {
+                    headers: {
+                        'User-Agent': 'DelhiveryWay-App/1.0'
+                    }
+                }
+            );
+            const data = await response.json();
+            console.log('OpenStreetMap response:', data.length, 'results');
 
-        if (data && data.length > 0) {
-            return {
-                lat: parseFloat(data[0].lat),
-                lng: parseFloat(data[0].lon)
-            };
-        } else {
-            throw new Error('Address not found');
+            if (data && data.length > 0) {
+                const coords = {
+                    lat: parseFloat(data[0].lat),
+                    lng: parseFloat(data[0].lon)
+                };
+                console.log('✅ OpenStreetMap found coordinates:', coords);
+                return coords;
+            } else {
+                console.log('❌ OpenStreetMap: No results found');
+                throw new Error('Address not found');
+            }
+        } catch (osmError) {
+            console.log('❌ OpenStreetMap error:', osmError.message);
+            throw osmError;
         }
     } catch (error) {
-        console.error('Geocoding error:', error);
+        console.error('🚨 All geocoding methods failed:', error.message);
+        console.log('🔄 Falling back to default Delhi coordinates');
         // Fallback to default coordinates (Delhi city center)
         return {
             lat: 28.6139,
