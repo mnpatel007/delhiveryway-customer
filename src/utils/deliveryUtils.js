@@ -37,8 +37,19 @@ export const calculateDistance = (lat1, lng1, lat2, lng2) => {
 };
 
 /**
+ * Calculate estimated road distance from straight-line distance
+ * @param {number} straightLineDistance - Straight-line distance in kilometers
+ * @returns {number} Estimated road distance in kilometers
+ */
+export const estimateRoadDistance = (straightLineDistance) => {
+    // Urban areas typically have 1.4-1.6x multiplier for road vs straight-line distance
+    const roadDistanceMultiplier = 1.5;
+    return straightLineDistance * roadDistanceMultiplier;
+};
+
+/**
  * Calculate delivery charge based on distance
- * @param {number} distance - Distance in kilometers
+ * @param {number} distance - Distance in kilometers (road distance)
  * @returns {number} Delivery charge in rupees
  */
 export const calculateDeliveryCharge = (distance) => {
