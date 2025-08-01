@@ -124,7 +124,7 @@ const RehearsalCheckoutPage = () => {
             navigate('/awaiting-vendor-review', {
                 state: {
                     orderId: response.data._id,
-                    totalAmount: calculateTotal()
+                    totalAmount: calculateGrandTotal()
                 }
             });
         } catch (err) {
