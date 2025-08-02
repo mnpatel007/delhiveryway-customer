@@ -63,29 +63,84 @@ const FinalCheckoutPage = () => {
 
                 console.log('📋 Final items array:', fullItems);
 
-                // If no items were successfully fetched, try to use cart data as fallback
-                if (fullItems.length === 0 && cartItems.length > 0) {
-                    console.log('🔄 Using cart items as fallback');
-                    const cartBasedItems = cartItems.map(item => ({
-                        product: {
-                            _id: item._id,
-                            name: item.name,
-                            price: item.price,
+                // If no items were successfully fetched, try different fallback strategies
+                if (fullItems.length === 0) {
+                    console.log('⚠️ No items found, trying fallback strategies...');
+
+                    // Strategy 1: Use cart data as fallback
+                    if (cartItems && cartItems.length > 0) {
+                        console.log('🔄 Using cart items as fallback');
+                        const cartBasedItems = cartItems.map(item => ({
+                            product: {
+                                _id: item._id,
+                                name: item.name,
+                                price: item.price,
+                                shopId: item.shopId
+                            },
+                            quantity: item.quantity,
                             shopId: item.shopId
-                        },
-                        quantity: item.quantity,
-                        shopId: item.shopId
-                    }));
+                        }));
 
-                    // Calculate delivery charge based on cart
-                    const calculatedDeliveryCharge = deliveryCharge || 30;
+                        setFinalOrder({
+                            items: cartBasedItems,
+                            address: address || 'Address not provided',
+                            deliveryCharge: deliveryCharge || 30,
+                            totalAmount
+                        });
+                    }
+                    // Strategy 2: If we have an orderId, fetch the order details directly
+                    else if (parsed.orderId) {
+                        console.log('🔄 Fetching order details from backend...');
+                        try {
+                            const orderRes = await axios.get(
+                                `${process.env.REACT_APP_BACKEND_URL}/api/orders/${parsed.orderId}`,
+                                {
+                                    headers: { Authorization: `Bearer ${user.token}` }
+                                }
+                            );
 
-                    setFinalOrder({
-                        items: cartBasedItems,
-                        address: address || 'Address not provided',
-                        deliveryCharge: calculatedDeliveryCharge,
-                        totalAmount
-                    });
+                            if (orderRes.data && orderRes.data.items && orderRes.data.items.length > 0) {
+                                console.log('✅ Order details fetched:', orderRes.data);
+                                const orderItems = orderRes.data.items.map(item => ({
+                                    product: item.product || item,
+                                    quantity: item.quantity,
+                                    shopId: item.shopId || (item.product && item.product.shopId)
+                                }));
+
+                                setFinalOrder({
+                                    items: orderItems,
+                                    address: orderRes.data.address || address,
+                                    deliveryCharge: orderRes.data.deliveryCharge || deliveryCharge || 30,
+                                    totalAmount: orderRes.data.totalAmount || totalAmount
+                                });
+                            } else {
+                                // Strategy 3: Set empty order with just delivery charge
+                                console.log('⚠️ No items found anywhere, setting minimal order');
+                                setFinalOrder({
+                                    items: [],
+                                    address: address || 'Address not provided',
+                                    deliveryCharge: deliveryCharge || 30,
+                                    totalAmount: totalAmount || (deliveryCharge || 30)
+                                });
+                            }
+                        } catch (orderErr) {
+                            console.error('❌ Failed to fetch order details:', orderErr);
+                            setFinalOrder({
+                                items: [],
+                                address: address || 'Address not provided',
+                                deliveryCharge: deliveryCharge || 30,
+                                totalAmount: totalAmount || (deliveryCharge || 30)
+                            });
+                        }
+                    } else {
+                        // Strategy 3: Set empty order with just delivery charge
+                        setFinalOrder({
+                            items: [],
+                            address: address || 'Address not provided',
+                            deliveryCharge: deliveryCharge || 30,
+                            totalAmount: totalAmount || (deliveryCharge || 30)
+                        });
+                    }
                 } else {
                     setFinalOrder({ items: fullItems, address, deliveryCharge, totalAmount });
                 }
