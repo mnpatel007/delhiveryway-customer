@@ -258,10 +258,28 @@ export const SocketProvider = ({ children }) => {
                     'Vendor has confirmed your order. Click to proceed to final checkout.'
                 );
 
-                // Auto-redirect to final checkout after a short delay
+                // Auto-redirect to final checkout based on current page
                 setTimeout(() => {
-                    if (window.confirm('🎉 Your order has been confirmed by the vendor!\n\nWould you like to proceed to final checkout now?')) {
+                    const currentPath = window.location.pathname;
+
+                    // If user is on awaiting vendor page, redirect automatically
+                    if (currentPath === '/awaiting-vendor' || currentPath.includes('awaiting')) {
+                        console.log('🔄 User on awaiting vendor page, auto-redirecting to final checkout...');
                         window.location.href = '/final-checkout';
+                    }
+                    // If user is on other pages, show confirmation dialog
+                    else {
+                        const userConfirmed = window.confirm('🎉 Your order has been confirmed by the vendor!\n\nWould you like to proceed to final checkout now?');
+                        if (userConfirmed) {
+                            window.location.href = '/final-checkout';
+                        } else {
+                            // User declined, optionally cancel the order
+                            const shouldCancel = window.confirm('Would you like to cancel this order instead?');
+                            if (shouldCancel) {
+                                // TODO: Implement order cancellation
+                                console.log('User chose to cancel order after declining final checkout');
+                            }
+                        }
                     }
                 }, 2000);
             });

@@ -68,3 +68,50 @@
     margin: 20px auto;
     animation: spin 1s linear infinite;
 }
+
+/* New styles for checkout ready state */
+.checkout-ready-section {
+    text-align: center;
+}
+
+.success-message {
+    background: linear-gradient(135deg, #4CAF50, #45a049);
+    color: white;
+    padding: 20px;
+    border-radius: 12px;
+    margin: 20px 0;
+}
+
+.success-icon {
+    font-size: 2rem;
+    display: block;
+    margin-bottom: 10px;
+}
+
+.success-message h3 {
+    margin: 10px 0;
+    font-size: 1.5rem;
+}
+
+.success-message p {
+    margin: 10px 0;
+    opacity: 0.9;
+}
+
+.proceed-checkout-btn {
+    background: linear-gradient(135deg, #FF6B6B, #FF5252);
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+}
+
+.proceed-checkout-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+}

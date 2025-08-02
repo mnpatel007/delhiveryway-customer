@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useSocket } from '../context/SocketContext';
 import './NotificationCenter.css';
 
 const NotificationCenter = () => {
+    const navigate = useNavigate();
     const {
         notifications,
         removeNotification,
@@ -31,6 +33,14 @@ const NotificationCenter = () => {
 
     const connectionStatus = getConnectionStatus();
     const unreadCount = notifications.length;
+
+    // Handle notification click
+    const handleNotificationClick = (notification) => {
+        if (notification.type === 'final_checkout_ready') {
+            navigate('/final-checkout');
+            setIsOpen(false);
+        }
+    };
 
     return (
         <div className="notification-center">
@@ -91,7 +101,8 @@ const NotificationCenter = () => {
                             notifications.map((notification) => (
                                 <div
                                     key={notification.id}
-                                    className={`notification-item ${notification.type}`}
+                                    className={`notification-item ${notification.type} ${notification.type === 'final_checkout_ready' ? 'clickable' : ''}`}
+                                    onClick={() => handleNotificationClick(notification)}
                                 >
                                     <div className="notification-content">
                                         <div className="notification-title">
@@ -103,10 +114,18 @@ const NotificationCenter = () => {
                                         <div className="notification-time">
                                             {new Date(notification.timestamp).toLocaleTimeString()}
                                         </div>
+                                        {notification.type === 'final_checkout_ready' && (
+                                            <div className="notification-action">
+                                                Click to proceed to checkout →
+                                            </div>
+                                        )}
                                     </div>
                                     <button
                                         className="remove-notification"
-                                        onClick={() => removeNotification(notification.id)}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            removeNotification(notification.id);
+                                        }}
                                         title="Remove notification"
                                     >
                                         ✖️
