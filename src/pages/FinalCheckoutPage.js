@@ -21,16 +21,14 @@ const FinalCheckoutPage = () => {
             return;
         }
 
-        console.log('📦 Raw saved data:', saved);
         const parsed = JSON.parse(saved);
-        console.log('📦 Parsed data:', parsed);
 
         const { items, address, deliveryCharge, totalAmount } = parsed;
 
         const fetchProductDetails = async () => {
             try {
                 const fullItems = [];
-                console.log('🔍 Processing items:', items);
+
 
                 for (const item of items) {
                     if (!item.productId) {
