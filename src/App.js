@@ -91,31 +91,40 @@ const Layout = ({ children }) => {
   );
 };
 
+// App content wrapper to use socket inside provider
+const AppContent = () => {
+  return (
+    <>
+      <GlobalCustomerAlert />
+      <BrowserRouter>
+        <Layout>
+          <Routes>
+            <Route path="/" element={<PrivateRoute><HomePage /></PrivateRoute>} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/signup" element={<SignupPage />} />
+            <Route path="/shop/:id" element={<PrivateRoute><ShopPage /></PrivateRoute>} />
+            <Route path="/cart" element={<PrivateRoute><CartPage /></PrivateRoute>} />
+            <Route path="/order-success" element={<PrivateRoute><OrderSuccessPage /></PrivateRoute>} />
+            <Route path="/final-checkout" element={<PrivateRoute><CheckoutPage /></PrivateRoute>} />
+            <Route path="/orders" element={<PrivateRoute><OrderHistoryPage /></PrivateRoute>} />
+            <Route path="/rehearsal-checkout" element={<PrivateRoute><RehearsalCheckoutPage /></PrivateRoute>} />
+            <Route path="/awaiting-vendor-review" element={<PrivateRoute><AwaitingVendorReviewPage /></PrivateRoute>} />
+            <Route path="/verify-email" element={<VerifyEmail />} />
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+            <Route path="/reset-password" element={<ResetPasswordPage />} />
+          </Routes>
+        </Layout>
+      </BrowserRouter>
+    </>
+  );
+};
+
 function App() {
   return (
     <AuthProvider>
       <CartProvider>
         <SocketProvider>
-          <GlobalCustomerAlert />
-          <BrowserRouter>
-            <Layout>
-              <Routes>
-                <Route path="/" element={<PrivateRoute><HomePage /></PrivateRoute>} />
-                <Route path="/login" element={<LoginPage />} />
-                <Route path="/signup" element={<SignupPage />} />
-                <Route path="/shop/:id" element={<PrivateRoute><ShopPage /></PrivateRoute>} />
-                <Route path="/cart" element={<PrivateRoute><CartPage /></PrivateRoute>} />
-                <Route path="/order-success" element={<PrivateRoute><OrderSuccessPage /></PrivateRoute>} />
-                <Route path="/final-checkout" element={<PrivateRoute><CheckoutPage /></PrivateRoute>} />
-                <Route path="/orders" element={<PrivateRoute><OrderHistoryPage /></PrivateRoute>} />
-                <Route path="/rehearsal-checkout" element={<PrivateRoute><RehearsalCheckoutPage /></PrivateRoute>} />
-                <Route path="/awaiting-vendor-review" element={<PrivateRoute><AwaitingVendorReviewPage /></PrivateRoute>} />
-                <Route path="/verify-email" element={<VerifyEmail />} />
-                <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-                <Route path="/reset-password" element={<ResetPasswordPage />} />
-              </Routes>
-            </Layout>
-          </BrowserRouter>
+          <AppContent />
         </SocketProvider>
       </CartProvider>
     </AuthProvider>
