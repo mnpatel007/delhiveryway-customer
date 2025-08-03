@@ -104,6 +104,14 @@ const RehearsalCheckoutPage = () => {
             return;
         }
 
+        // Check authentication
+        if (!user || !user.token) {
+            console.error('User not authenticated');
+            alert('Please log in to calculate delivery charges');
+            navigate('/login');
+            return;
+        }
+
         try {
             setCalculatingCharges(true);
 
@@ -124,6 +132,14 @@ const RehearsalCheckoutPage = () => {
             setDeliveryCharges(response.data.deliveryCharges);
         } catch (error) {
             console.error('Error calculating delivery charges:', error);
+            
+            // Handle 403 specifically
+            if (error.response?.status === 403) {
+                alert('Session expired. Please log in again.');
+                navigate('/login');
+                return;
+            }
+            
             // Set default charges if calculation fails
             const shopIds = [...new Set(selectedItems.map(item => item.product.shopId))];
             const defaultCharges = {};
@@ -154,6 +170,13 @@ const RehearsalCheckoutPage = () => {
     }, [address]);
 
     const handleConfirm = async () => {
+        // Check authentication first
+        if (!user || !user.token) {
+            alert('Please log in to place an order');
+            navigate('/login');
+            return;
+        }
+
         // Validate address
         if (!address.trim()) {
             setAddressError('Please enter a complete delivery address');
@@ -197,7 +220,14 @@ const RehearsalCheckoutPage = () => {
             });
         } catch (err) {
             console.error('❌ Failed to create rehearsal order:', err);
-            alert('Failed to create order. Please try again.');
+            
+            // Handle 403 specifically
+            if (err.response?.status === 403) {
+                alert('Session expired. Please log in again.');
+                navigate('/login');
+            } else {
+                alert('Failed to create order. Please try again.');
+            }
         } finally {
             setLoading(false);
         }
