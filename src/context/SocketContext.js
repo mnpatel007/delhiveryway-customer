@@ -269,12 +269,12 @@ export const SocketProvider = ({ children }) => {
                     }
                     // If user is on other pages, show confirmation dialog
                     else {
-                        const userConfirmed = confirm('🎉 Your order has been confirmed by the vendor!\n\nWould you like to proceed to final checkout now?');
+                        const userConfirmed = window.confirm('🎉 Your order has been confirmed by the vendor!\n\nWould you like to proceed to final checkout now?');
                         if (userConfirmed) {
                             window.location.href = '/final-checkout';
                         } else {
                             // User declined, optionally cancel the order
-                            const shouldCancel = confirm('Would you like to cancel this order instead?');
+                            const shouldCancel = window.confirm('Would you like to cancel this order instead?');
                             if (shouldCancel) {
                                 // TODO: Implement order cancellation
                                 console.log('User chose to cancel order after declining final checkout');
@@ -328,7 +328,7 @@ export const SocketProvider = ({ children }) => {
 
                 // Redirect to orders page after a short delay
                 setTimeout(() => {
-                    if (confirm('🎉 Payment successful! Your order has been confirmed.\n\nWould you like to view your orders?')) {
+                    if (window.confirm('🎉 Payment successful! Your order has been confirmed.\n\nWould you like to view your orders?')) {
                         window.location.href = '/orders';
                     }
                 }, 2000);
