@@ -24,6 +24,9 @@ const LoginPage = () => {
             setError('Please enter both email and password');
             return;
         }
+        
+        console.log('🔄 Attempting login to:', `${process.env.REACT_APP_BACKEND_URL}/api/auth/login`);
+        
         try {
             const res = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/auth/login`, { email, password });
 
@@ -35,7 +38,15 @@ const LoginPage = () => {
             login(res.data);
             navigate('/');
         } catch (err) {
-            setError(err.response?.data?.message || 'Login failed');
+            console.error('❌ Login error:', err);
+            
+            if (err.code === 'NETWORK_ERROR' || !err.response) {
+                setError('Cannot connect to server. Please check your internet connection.');
+            } else if (err.response?.status === 403) {
+                setError('Access denied. Server may be experiencing issues.');
+            } else {
+                setError(err.response?.data?.message || 'Login failed');
+            }
         }
     };
 
@@ -60,7 +71,15 @@ const LoginPage = () => {
             login(res.data);
             navigate('/');
         } catch (err) {
-            setError(err.response?.data?.message || 'Google login failed');
+            console.error('❌ Google login error:', err);
+            
+            if (err.code === 'NETWORK_ERROR' || !err.response) {
+                setError('Cannot connect to server. Please try again.');
+            } else if (err.response?.status === 403) {
+                setError('Google login blocked. Server may be experiencing issues.');
+            } else {
+                setError(err.response?.data?.message || 'Google login failed');
+            }
         }
     };
 
