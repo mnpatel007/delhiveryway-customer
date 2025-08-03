@@ -67,7 +67,8 @@ const OrderHistoryPage = () => {
             // Show notification for important updates
             if (data.message && ['picked_up', 'delivered'].includes(data.status)) {
                 // You can add a toast notification here
-                alert(data.message);
+                // Show notification for important updates
+                console.log('Order status update:', data.message);
             }
         });
 
@@ -144,7 +145,7 @@ const OrderHistoryPage = () => {
                     <p>You have not placed any orders yet.</p>
                     <button
                         className="start-shopping-btn"
-                        onClick={() => window.location.href = '/'}
+                        onClick={() => window.location.assign('/')}
                     >
                         Start Shopping
                     </button>

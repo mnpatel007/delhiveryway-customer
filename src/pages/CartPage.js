@@ -25,7 +25,7 @@ const CartPage = () => {
                 } else if (Array.isArray(data.shops)) {
                     setShops(data.shops);
                 } else {
-                    console.error("Unexpected API response format:", data);
+                    console.error("Unexpected API response format");
                     setShops([]);
                 }
             })
