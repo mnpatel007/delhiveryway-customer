@@ -105,10 +105,8 @@ const RehearsalCheckoutPage = () => {
         }
 
         // Check authentication
-        if (!user || !user.token) {
+        if (!user?.token) {
             console.error('User not authenticated');
-            alert('Please log in to calculate delivery charges');
-            navigate('/login');
             return;
         }
 
@@ -171,7 +169,7 @@ const RehearsalCheckoutPage = () => {
 
     const handleConfirm = async () => {
         // Check authentication first
-        if (!user || !user.token) {
+        if (!user?.token) {
             alert('Please log in to place an order');
             navigate('/login');
             return;

@@ -28,13 +28,7 @@ const LoginPage = () => {
         console.log('🔄 Attempting login to:', `${process.env.REACT_APP_BACKEND_URL}/api/auth/login`);
         
         try {
-            // Get CSRF token first
-            await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/csrf-token`, { withCredentials: true });
-            
-            const res = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/auth/login`, 
-                { email, password },
-                { withCredentials: true }
-            );
+            const res = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/auth/login`, { email, password });
 
             if (res.data.user.role !== 'customer') {
                 setError('Not a customer account');
@@ -62,15 +56,12 @@ const LoginPage = () => {
             const googleUser = jwtDecode(credentialResponse.credential);
             const { email, name, sub: googleId } = googleUser;
 
-            const res = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/auth/google`, 
-                {
-                    email,
-                    name,
-                    googleId,
-                    role: 'customer',
-                },
-                { withCredentials: true }
-            );
+            const res = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/auth/google`, {
+                email,
+                name,
+                googleId,
+                role: 'customer',
+            });
 
             if (res.data.user.role !== 'customer') {
                 setError('Not a customer account');
