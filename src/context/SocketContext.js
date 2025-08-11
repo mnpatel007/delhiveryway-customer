@@ -147,7 +147,6 @@ export const SocketProvider = ({ children }) => {
                     type: 'status_update',
                     title: 'Order Status Updated',
                     message: getStatusMessage(data.status, data),
-                    data: data,
                     timestamp: new Date().toISOString()
                 });
 
@@ -191,7 +190,6 @@ export const SocketProvider = ({ children }) => {
                     type: 'rehearsal_update',
                     title: 'Rehearsal Checkout Update',
                     message: `Your rehearsal checkout has been ${data.status}`,
-                    data: data,
                     timestamp: new Date().toISOString()
                 });
 
@@ -208,7 +206,6 @@ export const SocketProvider = ({ children }) => {
                     type: 'final_update',
                     title: 'Final Checkout Update',
                     message: `Your final checkout has been ${data.status}`,
-                    data: data,
                     timestamp: new Date().toISOString()
                 });
 
@@ -225,7 +222,6 @@ export const SocketProvider = ({ children }) => {
                     type: 'vendor_response',
                     title: 'Vendor Response',
                     message: data.accepted ? 'Your order has been accepted!' : `Order rejected: ${data.reason}`,
-                    data: data,
                     timestamp: new Date().toISOString()
                 });
 
@@ -248,7 +244,6 @@ export const SocketProvider = ({ children }) => {
                     type: 'final_checkout_ready',
                     title: '🎉 Ready for Final Checkout!',
                     message: 'Vendor has confirmed your order. You can now proceed to final checkout.',
-                    data: data,
                     timestamp: new Date().toISOString()
                 });
 
@@ -293,7 +288,6 @@ export const SocketProvider = ({ children }) => {
                     type: 'order_cancelled',
                     title: '❌ Order Cancelled',
                     message: `Your order has been cancelled. Reason: ${data.reason || 'No reason provided'}`,
-                    data: data,
                     timestamp: new Date().toISOString()
                 });
 
@@ -315,7 +309,6 @@ export const SocketProvider = ({ children }) => {
                     type: 'payment_confirmed',
                     title: '💳 Payment Successful!',
                     message: `Payment of ₹${data.amount} has been processed successfully. Your order is now confirmed.`,
-                    data: data,
                     timestamp: new Date().toISOString()
                 });
 
@@ -343,7 +336,6 @@ export const SocketProvider = ({ children }) => {
                     type: 'delivery_assigned',
                     title: '🚚 Delivery Partner Assigned!',
                     message: `${data.deliveryPartner?.name || 'A delivery partner'} has been assigned to your order.`,
-                    data: data,
                     timestamp: new Date().toISOString()
                 });
 
@@ -419,7 +411,16 @@ export const SocketProvider = ({ children }) => {
                 return prev; // Don't add duplicate
             }
 
-            return [notification, ...prev.slice(0, 49)]; // Keep last 50 notifications
+            // Create a clean notification object without nested data
+            const cleanNotification = {
+                id: notification.id,
+                type: notification.type,
+                title: notification.title,
+                message: notification.message,
+                timestamp: notification.timestamp
+            };
+
+            return [cleanNotification, ...prev.slice(0, 49)]; // Keep last 50 notifications
         });
     };
 
@@ -546,13 +547,7 @@ export const SocketProvider = ({ children }) => {
     const value = {
         socket,
         isConnected,
-        notifications: notifications.map(n => ({
-            id: n.id,
-            type: n.type,
-            title: n.title,
-            message: n.message,
-            timestamp: n.timestamp
-        })),
+        notifications,
         reconnectAttempts,
         addNotification,
         removeNotification,
