@@ -546,7 +546,13 @@ export const SocketProvider = ({ children }) => {
     const value = {
         socket,
         isConnected,
-        notifications,
+        notifications: notifications.map(n => ({
+            id: n.id,
+            type: n.type,
+            title: n.title,
+            message: n.message,
+            timestamp: n.timestamp
+        })),
         reconnectAttempts,
         addNotification,
         removeNotification,
