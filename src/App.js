@@ -1,11 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { clearProblematicStorage } from './utils/clearStorage';
-
 import { AuthProvider, AuthContext } from './context/AuthContext';
-
-// Clean storage on app start
-clearProblematicStorage();
 import { CartProvider } from './context/CartContext';
 import { SocketProvider, useSocket } from './context/SocketContext';
 
@@ -122,6 +118,11 @@ const AppContent = () => {
 };
 
 function App() {
+  // Clean storage on app start
+  useEffect(() => {
+    clearProblematicStorage();
+  }, []);
+
   return (
     <AuthProvider>
       <CartProvider>
