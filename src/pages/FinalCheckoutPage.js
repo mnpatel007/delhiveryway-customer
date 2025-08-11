@@ -299,7 +299,9 @@ const FinalCheckoutPage = () => {
                     <div className="checkout-address">
                         <h3>Delivery Address</h3>
                         <p style={{ background: '#f5f5f5', padding: '10px', borderRadius: '6px' }}>
-                            {finalOrder.address}
+                            {typeof finalOrder.address === 'object' ?
+                                `${finalOrder.address.street}, ${finalOrder.address.city}, ${finalOrder.address.state} ${finalOrder.address.zipCode}` :
+                                finalOrder.address}
                         </p>
                     </div>
 

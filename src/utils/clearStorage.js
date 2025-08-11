@@ -5,23 +5,43 @@ export const clearProblematicStorage = () => {
         const userData = localStorage.getItem('user');
         if (userData) {
             const parsed = JSON.parse(userData);
-            if (parsed.user?.address?.coordinates) {
-                // Clean the data
-                const cleanUser = {
-                    ...parsed,
-                    user: {
-                        ...parsed.user,
-                        address: {
-                            street: parsed.user.address.street || '',
-                            city: parsed.user.address.city || '',
-                            state: parsed.user.address.state || '',
-                            zipCode: parsed.user.address.zipCode || '',
-                            lat: parsed.user.address.coordinates?.lat || null,
-                            lng: parsed.user.address.coordinates?.lng || null
+            if (parsed.user?.address) {
+                // If address has coordinates, flatten them
+                if (parsed.user.address.coordinates) {
+                    const cleanUser = {
+                        ...parsed,
+                        user: {
+                            ...parsed.user,
+                            address: {
+                                street: parsed.user.address.street || '',
+                                city: parsed.user.address.city || '',
+                                state: parsed.user.address.state || '',
+                                zipCode: parsed.user.address.zipCode || '',
+                                lat: parsed.user.address.coordinates.lat,
+                                lng: parsed.user.address.coordinates.lng
+                            }
                         }
-                    }
-                };
-                localStorage.setItem('user', JSON.stringify(cleanUser));
+                    };
+                    localStorage.setItem('user', JSON.stringify(cleanUser));
+                }
+                // Ensure all address fields are present
+                else {
+                    const cleanUser = {
+                        ...parsed,
+                        user: {
+                            ...parsed.user,
+                            address: {
+                                street: parsed.user.address.street || '',
+                                city: parsed.user.address.city || '',
+                                state: parsed.user.address.state || '',
+                                zipCode: parsed.user.address.zipCode || '',
+                                lat: parsed.user.address.lat || null,
+                                lng: parsed.user.address.lng || null
+                            }
+                        }
+                    };
+                    localStorage.setItem('user', JSON.stringify(cleanUser));
+                }
             }
         }
     } catch (error) {

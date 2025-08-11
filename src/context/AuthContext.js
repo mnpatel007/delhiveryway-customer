@@ -13,13 +13,31 @@ export const AuthProvider = ({ children }) => {
             if (saved) {
                 const userData = JSON.parse(saved);
                 // Ensure the data is properly flattened
-                if (userData.user?.address?.coordinates) {
-                    userData.user.address = {
-                        ...userData.user.address,
-                        lat: userData.user.address.coordinates.lat,
-                        lng: userData.user.address.coordinates.lng
-                    };
-                    delete userData.user.address.coordinates;
+                if (userData.user?.address) {
+                    // If address has coordinates, flatten them
+                    if (userData.user.address.coordinates) {
+                        userData.user.address = {
+                            ...userData.user.address,
+                            lat: userData.user.address.coordinates.lat,
+                            lng: userData.user.address.coordinates.lng,
+                            street: userData.user.address.street || '',
+                            city: userData.user.address.city || '',
+                            state: userData.user.address.state || '',
+                            zipCode: userData.user.address.zipCode || ''
+                        };
+                        delete userData.user.address.coordinates;
+                    }
+                    // Ensure all address fields are present
+                    else {
+                        userData.user.address = {
+                            street: userData.user.address.street || '',
+                            city: userData.user.address.city || '',
+                            state: userData.user.address.state || '',
+                            zipCode: userData.user.address.zipCode || '',
+                            lat: userData.user.address.lat || null,
+                            lng: userData.user.address.lng || null
+                        };
+                    }
                 }
                 return userData;
             }
@@ -47,7 +65,7 @@ export const AuthProvider = ({ children }) => {
                 } : null
             } : null
         };
-        
+
         localStorage.setItem('user', JSON.stringify(flattenedUser));
         setUser(flattenedUser);
 

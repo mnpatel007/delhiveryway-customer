@@ -42,7 +42,9 @@ const HomePage = () => {
                         <h3 className="shop-item-title">{shop.name}</h3>
                         <p className="shop-item-description">{shop.description}</p>
                         <p className="shop-item-location">
-                            {shop.address ? shop.address : 'Location not available'}
+                            {shop.address ? (typeof shop.address === 'object' ?
+                                `${shop.address.street}, ${shop.address.city}, ${shop.address.state} ${shop.address.zipCode}` :
+                                shop.address) : 'Location not available'}
                         </p>
                     </li>
                 ))}

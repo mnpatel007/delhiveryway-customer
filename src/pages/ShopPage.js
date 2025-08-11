@@ -67,7 +67,9 @@ const ShopPage = () => {
                     <h2 className="shop-name">{shop.name}</h2>
                     <p className="shop-description">{shop.description}</p>
                     <div className="shop-location">
-                        {shop.address ? `📍 ${shop.address}` : '📍 Location not available'}
+                        {shop.address ? (typeof shop.address === 'object' ?
+                            `📍 ${shop.address.street}, ${shop.address.city}, ${shop.address.state} ${shop.address.zipCode}` :
+                            `📍 ${shop.address}`) : '📍 Location not available'}
                     </div>
                 </div>
             </div>

@@ -196,7 +196,9 @@ const OrderHistoryPage = () => {
 
                                 <div className="order-details">
                                     <div className="order-address">
-                                        <strong>Delivery Address:</strong> {order.address}
+                                        <strong>Delivery Address:</strong> {typeof order.address === 'object' ?
+                                            `${order.address.street}, ${order.address.city}, ${order.address.state} ${order.address.zipCode}` :
+                                            order.address}
                                     </div>
 
                                     {shopGroups.map((group, idx) => (
