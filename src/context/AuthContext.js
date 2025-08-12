@@ -1,86 +1,141 @@
-// src/context/AuthContext.js  (customer OR vendor repo)
-import { createContext, useState } from 'react';
-import io from 'socket.io-client';
-
-const socket = io(process.env.REACT_APP_BACKEND_URL, { withCredentials: true });
+import { createContext, useState, useEffect } from 'react';
+import axios from 'axios';
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(() => {
         try {
-            const saved = localStorage.getItem('user');
+            const saved = localStorage.getItem('customerAuth');
             if (saved) {
-                const userData = JSON.parse(saved);
-                // Ensure the data is properly flattened
-                if (userData.user?.address) {
-                    // If address has coordinates, flatten them
-                    if (userData.user.address.coordinates) {
-                        userData.user.address = {
-                            ...userData.user.address,
-                            lat: userData.user.address.coordinates.lat,
-                            lng: userData.user.address.coordinates.lng,
-                            street: userData.user.address.street || '',
-                            city: userData.user.address.city || '',
-                            state: userData.user.address.state || '',
-                            zipCode: userData.user.address.zipCode || ''
-                        };
-                        delete userData.user.address.coordinates;
-                    }
-                    // Ensure all address fields are present
-                    else {
-                        userData.user.address = {
-                            street: userData.user.address.street || '',
-                            city: userData.user.address.city || '',
-                            state: userData.user.address.state || '',
-                            zipCode: userData.user.address.zipCode || '',
-                            lat: userData.user.address.lat || null,
-                            lng: userData.user.address.lng || null
-                        };
-                    }
+                const authData = JSON.parse(saved);
+                // Set axios default header
+                if (authData.token) {
+                    axios.defaults.headers.common['Authorization'] = `Bearer ${authData.token}`;
                 }
-                return userData;
+                return authData;
             }
         } catch (error) {
-            console.error('Error parsing user data:', error);
-            localStorage.removeItem('user');
+            console.error('Error parsing auth data:', error);
+            localStorage.removeItem('customerAuth');
         }
         return null;
     });
 
-    const login = (userData) => {
-        // Flatten user data to avoid React serialization issues
-        const flattenedUser = {
-            ...userData,
-            user: userData.user ? {
-                ...userData.user,
-                // Flatten address object if it exists
-                address: userData.user.address ? {
-                    street: userData.user.address.street || '',
-                    city: userData.user.address.city || '',
-                    state: userData.user.address.state || '',
-                    zipCode: userData.user.address.zipCode || '',
-                    lat: userData.user.address.coordinates?.lat || null,
-                    lng: userData.user.address.coordinates?.lng || null
-                } : null
-            } : null
+    const [loading, setLoading] = useState(false);
+
+    // Set up axios interceptors
+    useEffect(() => {
+        // Request interceptor
+        const requestInterceptor = axios.interceptors.request.use(
+            (config) => {
+                if (user?.token) {
+                    config.headers.Authorization = `Bearer ${user.token}`;
+                }
+                return config;
+            },
+            (error) => Promise.reject(error)
+        );
+
+        // Response interceptor
+        const responseInterceptor = axios.interceptors.response.use(
+            (response) => response,
+            (error) => {
+                if (error.response?.status === 401) {
+                    // Token expired or invalid
+                    logout();
+                }
+                return Promise.reject(error);
+            }
+        );
+
+        return () => {
+            axios.interceptors.request.eject(requestInterceptor);
+            axios.interceptors.response.eject(responseInterceptor);
         };
+    }, [user]);
 
-        localStorage.setItem('user', JSON.stringify(flattenedUser));
-        setUser(flattenedUser);
+    const login = (authData) => {
+        try {
+            // Ensure we have the correct structure
+            const userData = {
+                user: authData.data?.user || authData.user,
+                token: authData.data?.token || authData.token
+            };
 
-        // NEW: join the user-id room immediately
-        socket.emit('authenticate', { userId: flattenedUser.user?.id || flattenedUser.id });
+            // Store in localStorage
+            localStorage.setItem('customerAuth', JSON.stringify(userData));
+
+            // Set axios default header
+            axios.defaults.headers.common['Authorization'] = `Bearer ${userData.token}`;
+
+            // Update state
+            setUser(userData);
+
+            console.log('✅ Customer logged in:', userData.user?.name);
+        } catch (error) {
+            console.error('Login error:', error);
+        }
     };
 
     const logout = () => {
-        localStorage.removeItem('user');
-        setUser(null);
-        socket.disconnect();
+        try {
+            // Clear localStorage
+            localStorage.removeItem('customerAuth');
+
+            // Clear axios header
+            delete axios.defaults.headers.common['Authorization'];
+
+            // Clear state
+            setUser(null);
+
+            console.log('✅ Customer logged out');
+        } catch (error) {
+            console.error('Logout error:', error);
+        }
+    };
+
+    const updateUser = (updatedUserData) => {
+        try {
+            const newAuthData = {
+                ...user,
+                user: { ...user.user, ...updatedUserData }
+            };
+
+            localStorage.setItem('customerAuth', JSON.stringify(newAuthData));
+            setUser(newAuthData);
+        } catch (error) {
+            console.error('Update user error:', error);
+        }
+    };
+
+    const isAuthenticated = () => {
+        return !!(user?.token && user?.user);
+    };
+
+    const getToken = () => {
+        return user?.token;
+    };
+
+    const getUser = () => {
+        return user?.user;
+    };
+
+    const value = {
+        user: user?.user || null,
+        token: user?.token || null,
+        loading,
+        login,
+        logout,
+        updateUser,
+        isAuthenticated,
+        getToken,
+        getUser,
+        setLoading
     };
 
     return (
-        <AuthContext.Provider value={{ user, login, logout }}>
+        <AuthContext.Provider value={value}>
             {children}
         </AuthContext.Provider>
     );

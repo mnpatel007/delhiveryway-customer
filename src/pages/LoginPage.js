@@ -23,14 +23,21 @@ const LoginPage = () => {
             setError('Please enter both email and password');
             return;
         }
-        
-        console.log('🔄 Attempting login to:', `${process.env.REACT_APP_BACKEND_URL}/api/auth/login`);
-        
-        try {
-            const res = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/auth/login`, { email, password });
 
-            if (res.data.user.role !== 'customer') {
-                setError('Not a customer account');
+        try {
+            const res = await axios.post(`${process.env.REACT_APP_API_URL}/auth/login`, {
+                email,
+                password
+            });
+
+            if (!res.data.success) {
+                setError(res.data.message || 'Login failed');
+                return;
+            }
+
+            const userData = res.data.data.user;
+            if (userData.role !== 'customer') {
+                setError('This account is not registered as a customer. Please use the correct app.');
                 return;
             }
 
@@ -38,13 +45,15 @@ const LoginPage = () => {
             navigate('/');
         } catch (err) {
             console.error('❌ Login error:', err);
-            
+
             if (err.code === 'NETWORK_ERROR' || !err.response) {
                 setError('Cannot connect to server. Please check your internet connection.');
+            } else if (err.response?.status === 423) {
+                setError('Account temporarily locked. Please try again later.');
             } else if (err.response?.status === 403) {
-                setError('Access denied. Server may be experiencing issues.');
+                setError('Please verify your email before logging in.');
             } else {
-                setError(err.response?.data?.message || 'Login failed');
+                setError(err.response?.data?.message || 'Login failed. Please try again.');
             }
         }
     };
@@ -55,15 +64,21 @@ const LoginPage = () => {
             const googleUser = jwtDecode(credentialResponse.credential);
             const { email, name, sub: googleId } = googleUser;
 
-            const res = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/auth/google`, {
+            const res = await axios.post(`${process.env.REACT_APP_API_URL}/auth/google`, {
                 email,
                 name,
                 googleId,
                 role: 'customer',
             });
 
-            if (res.data.user.role !== 'customer') {
-                setError('Not a customer account');
+            if (!res.data.success) {
+                setError(res.data.message || 'Google login failed');
+                return;
+            }
+
+            const userData = res.data.data.user;
+            if (userData.role !== 'customer') {
+                setError('This account is not registered as a customer. Please use the correct app.');
                 return;
             }
 
@@ -71,7 +86,7 @@ const LoginPage = () => {
             navigate('/');
         } catch (err) {
             console.error('❌ Google login error:', err);
-            setError('Google login failed. Please try regular login.');
+            setError(err.response?.data?.message || 'Google login failed. Please try regular login.');
         }
     };
 
