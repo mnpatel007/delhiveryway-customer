@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
 import { GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google';
-
 import './LoginPage.css';
 
 const clientId = '117679354054-t7tsl5najnu2kab80ffls6flkau21idl.apps.googleusercontent.com';
@@ -72,20 +71,16 @@ const LoginPage = () => {
             navigate('/');
         } catch (err) {
             console.error('❌ Google login error:', err);
-            
-            if (err.code === 'NETWORK_ERROR' || !err.response) {
-                setError('Cannot connect to server. Please try again.');
-            } else if (err.response?.status === 403) {
-                setError('Google login blocked. Server may be experiencing issues.');
-            } else {
-                setError(err.response?.data?.message || 'Google login failed');
-            }
+            setError('Google login failed. Please try regular login.');
         }
     };
 
-    const handleGoogleFailure = () => {
-        setError('Google login was unsuccessful. Please try again.');
+    const handleGoogleError = () => {
+        console.log('Google login cancelled or failed');
+        // Don't show error for user cancellation
     };
+
+
 
     return (
         <GoogleOAuthProvider clientId={clientId}>
@@ -139,8 +134,8 @@ const LoginPage = () => {
                         <p className="or-text">Or login with</p>
                         <GoogleLogin
                             onSuccess={handleGoogleSuccess}
-                            onError={handleGoogleFailure}
-                            useOneTap={true}
+                            onError={handleGoogleError}
+                            useOneTap={false}
                             width="320"
                         />
                     </div>
