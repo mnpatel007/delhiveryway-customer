@@ -1,14 +1,14 @@
 import React, { useEffect, useContext, useState } from 'react';
 import { CartContext } from '../context/CartContext';
 import { AuthContext } from '../context/AuthContext';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import axios from 'axios';
 import './OrderSuccessPage.css';
 
 const OrderSuccessPage = () => {
     const { clearCart } = useContext(CartContext);
     const { user } = useContext(AuthContext);
-    const navigate = useNavigate();
+
     const location = useLocation();
     const [orderDetails, setOrderDetails] = useState(null);
     const [loading, setLoading] = useState(true);

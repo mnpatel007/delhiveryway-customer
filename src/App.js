@@ -31,7 +31,7 @@ const PrivateRoute = ({ children }) => {
 
 // Global customer alert: order cancelled
 const GlobalCustomerAlert = () => {
-  const { notifications, removeNotification } = useSocket();
+  const { notifications } = useSocket();
   const [cancelAlert, setCancelAlert] = useState(null);
 
   // Listen for order cancellation notifications

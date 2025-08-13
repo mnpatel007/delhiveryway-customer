@@ -1,11 +1,10 @@
-import React, { useState, useContext } from 'react';
-import { AuthContext } from '../context/AuthContext';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './SignupPage.css'; // Your existing CSS with small additions below
 
 const SignupPage = () => {
-    const { login } = useContext(AuthContext);
+
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -64,7 +63,7 @@ const SignupPage = () => {
 
         try {
             const { confirmPassword, ...signupData } = formData;
-            const res = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/auth/signup`, {
+            await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/auth/signup`, {
                 ...signupData,
                 role: 'customer'
             });

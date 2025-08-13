@@ -22,7 +22,7 @@ const VerifyEmail = () => {
 
         const verifyEmail = async () => {
             try {
-                const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/auth/verify-email`, {
+                await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/auth/verify-email`, {
                     params: { token, email }
                 });
 

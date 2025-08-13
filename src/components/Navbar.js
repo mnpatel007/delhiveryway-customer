@@ -1,78 +1,187 @@
 import React, { useContext, useState } from 'react';
-import { Link, NavLink, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
+import { CartContext } from '../context/CartContext';
 import './Navbar.css';
 
 const Navbar = () => {
     const { user, logout } = useContext(AuthContext);
+    const { cartItems } = useContext(CartContext);
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
     const navigate = useNavigate();
-    const [menuOpen, setMenuOpen] = useState(false);
+    const location = useLocation();
+
+    const cartItemCount = cartItems.reduce((total, item) => total + item.quantity, 0);
 
     const handleLogout = () => {
         logout();
-        navigate('/login');
-        setMenuOpen(false);
+        navigate('/');
+        setIsMenuOpen(false);
     };
 
-    const toggleMenu = () => setMenuOpen(prev => !prev);
+    const isActive = (path) => location.pathname === path;
+
+    const toggleMenu = () => {
+        setIsMenuOpen(!isMenuOpen);
+    };
 
     return (
         <nav className="navbar">
-            <div className="navbar-inner">
-                <Link to="/" className="logo" aria-label="DelhiveryWay Homepage">
-                    <span className="logo-glow">DelhiveryWay</span>
+            <div className="navbar-container">
+                {/* Logo */}
+                <Link to="/" className="navbar-logo">
+                    <div className="logo-icon">🚚</div>
+                    <span className="logo-text">DelhiveryWay</span>
                 </Link>
 
-                <button
-                    className={`menu-toggle ${menuOpen ? 'open' : ''}`}
-                    onClick={toggleMenu}
-                    aria-label={menuOpen ? 'Close menu' : 'Open menu'}
-                    aria-expanded={menuOpen}
-                >
-                    <span className="bar"></span>
-                    <span className="bar"></span>
-                    <span className="bar"></span>
-                </button>
+                {/* Desktop Navigation */}
+                <div className="navbar-menu">
+                    <Link
+                        to="/"
+                        className={`navbar-link ${isActive('/') ? 'active' : ''}`}
+                    >
+                        <span className="link-icon">🏠</span>
+                        Home
+                    </Link>
 
-                <ul className={`nav-links ${menuOpen ? 'show' : ''}`}>
-                    {user ? (
+                    {user && (
                         <>
-                            <li>
-                                <NavLink to="/" exact="true" className="nav-item" activeclassname="active" onClick={() => setMenuOpen(false)}>
-                                    Home
-                                </NavLink>
-                            </li>
-                            <li>
-                                <NavLink to="/cart" className="nav-item" activeclassname="active" onClick={() => setMenuOpen(false)}>
-                                    Cart
-                                </NavLink>
-                            </li>
-                            <li>
-                                <NavLink to="/orders" className="nav-item" activeclassname="active" onClick={() => setMenuOpen(false)}>
-                                    My Orders
-                                </NavLink>
-                            </li>
-                            <li>
-                                <button className="nav-logout-btn" onClick={handleLogout}>
-                                    Logout
-                                </button>
-                            </li>
-                        </>
-                    ) : (
-                        <>
-                            <li>
-                                <NavLink to="/login" className="nav-item" activeclassname="active" onClick={() => setMenuOpen(false)}>
-                                    Login
-                                </NavLink>
-                            </li>
-                            <li>
-                                <NavLink to="/signup" className="nav-item" activeclassname="active" onClick={() => setMenuOpen(false)}>
-                                    Signup
-                                </NavLink>
-                            </li>
+                            <Link
+                                to="/orders"
+                                className={`navbar-link ${isActive('/orders') ? 'active' : ''}`}
+                            >
+                                <span className="link-icon">📦</span>
+                                Orders
+                            </Link>
+
+                            <Link
+                                to="/cart"
+                                className={`navbar-link cart-link ${isActive('/cart') ? 'active' : ''}`}
+                            >
+                                <span className="link-icon">🛒</span>
+                                Cart
+                                {cartItemCount > 0 && (
+                                    <span className="cart-badge">{cartItemCount}</span>
+                                )}
+                            </Link>
                         </>
                     )}
-                </ul>
+                </div>
+
+                {/* User Menu */}
+                <div className="navbar-user">
+                    {user ? (
+                        <div className="user-menu">
+                            <div className="user-info">
+                                <div className="user-avatar">
+                                    {user.name?.charAt(0).toUpperCase() || 'U'}
+                                </div>
+                                <div className="user-details">
+                                    <span className="user-name">{user.name}</span>
+                                    <span className="user-email">{user.email}</span>
+                                </div>
+                            </div>
+                            <button onClick={handleLogout} className="btn btn-secondary btn-sm">
+                                Logout
+                            </button>
+                        </div>
+                    ) : (
+                        <div className="auth-buttons">
+                            <Link to="/login" className="btn btn-secondary btn-sm">
+                                Login
+                            </Link>
+                            <Link to="/signup" className="btn btn-primary btn-sm">
+                                Sign Up
+                            </Link>
+                        </div>
+                    )}
+                </div>
+
+                {/* Mobile Menu Button */}
+                <button
+                    className="mobile-menu-btn"
+                    onClick={toggleMenu}
+                    aria-label="Toggle menu"
+                >
+                    <span className={`hamburger ${isMenuOpen ? 'open' : ''}`}>
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </span>
+                </button>
+            </div>
+
+            {/* Mobile Menu */}
+            <div className={`mobile-menu ${isMenuOpen ? 'open' : ''}`}>
+                <div className="mobile-menu-content">
+                    <Link
+                        to="/"
+                        className={`mobile-link ${isActive('/') ? 'active' : ''}`}
+                        onClick={() => setIsMenuOpen(false)}
+                    >
+                        <span className="link-icon">🏠</span>
+                        Home
+                    </Link>
+
+                    {user ? (
+                        <>
+                            <Link
+                                to="/orders"
+                                className={`mobile-link ${isActive('/orders') ? 'active' : ''}`}
+                                onClick={() => setIsMenuOpen(false)}
+                            >
+                                <span className="link-icon">📦</span>
+                                Orders
+                            </Link>
+
+                            <Link
+                                to="/cart"
+                                className={`mobile-link ${isActive('/cart') ? 'active' : ''}`}
+                                onClick={() => setIsMenuOpen(false)}
+                            >
+                                <span className="link-icon">🛒</span>
+                                Cart
+                                {cartItemCount > 0 && (
+                                    <span className="cart-badge">{cartItemCount}</span>
+                                )}
+                            </Link>
+
+                            <div className="mobile-user-info">
+                                <div className="user-avatar">
+                                    {user.name?.charAt(0).toUpperCase() || 'U'}
+                                </div>
+                                <div className="user-details">
+                                    <span className="user-name">{user.name}</span>
+                                    <span className="user-email">{user.email}</span>
+                                </div>
+                            </div>
+
+                            <button
+                                onClick={handleLogout}
+                                className="btn btn-secondary mobile-logout-btn"
+                            >
+                                Logout
+                            </button>
+                        </>
+                    ) : (
+                        <div className="mobile-auth-buttons">
+                            <Link
+                                to="/login"
+                                className="btn btn-secondary"
+                                onClick={() => setIsMenuOpen(false)}
+                            >
+                                Login
+                            </Link>
+                            <Link
+                                to="/signup"
+                                className="btn btn-primary"
+                                onClick={() => setIsMenuOpen(false)}
+                            >
+                                Sign Up
+                            </Link>
+                        </div>
+                    )}
+                </div>
             </div>
         </nav>
     );

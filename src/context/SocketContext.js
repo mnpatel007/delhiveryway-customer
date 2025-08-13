@@ -6,13 +6,64 @@ export const SocketContext = createContext();
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
 
+// Play notification sound - moved outside component to avoid dependency issues
+const playNotificationSound = () => {
+    try {
+        // Try to play MP3 file first
+        const audio = new Audio('/notification.mp3');
+        audio.volume = 0.5;
+        audio.play().catch(error => {
+            console.log('MP3 not available, generating sound:', error);
+            // Fallback: Generate a simple notification sound using Web Audio API
+            generateNotificationSound();
+        });
+    } catch (error) {
+        console.log('Audio not available:', error);
+        generateNotificationSound();
+    }
+};
+
+// Generate notification sound using Web Audio API
+const generateNotificationSound = () => {
+    try {
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+        // Create a simple notification sound (two-tone beep)
+        const playTone = (frequency, duration, delay = 0) => {
+            setTimeout(() => {
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+
+                oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
+                oscillator.type = 'sine';
+
+                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + duration);
+            }, delay);
+        };
+
+        // Play two-tone notification
+        playTone(800, 0.2, 0);     // First tone
+        playTone(600, 0.3, 250);   // Second tone
+
+    } catch (error) {
+        console.log('Web Audio API not available:', error);
+    }
+};
+
 export const SocketProvider = ({ children }) => {
     const { user } = useContext(AuthContext);
     const [socket, setSocket] = useState(null);
     const [isConnected, setIsConnected] = useState(false);
     const [notifications, setNotifications] = useState([]);
     const [reconnectAttempts, setReconnectAttempts] = useState(0);
-    const [lastActivity, setLastActivity] = useState(Date.now());
+    const [, setLastActivity] = useState(Date.now());
 
     // Track user activity to maintain connection
     useEffect(() => {
@@ -434,56 +485,7 @@ export const SocketProvider = ({ children }) => {
         setNotifications([]);
     };
 
-    // Play notification sound
-    const playNotificationSound = () => {
-        try {
-            // Try to play MP3 file first
-            const audio = new Audio('/notification.mp3');
-            audio.volume = 0.5;
-            audio.play().catch(error => {
-                console.log('MP3 not available, generating sound:', error);
-                // Fallback: Generate a simple notification sound using Web Audio API
-                generateNotificationSound();
-            });
-        } catch (error) {
-            console.log('Audio not available:', error);
-            generateNotificationSound();
-        }
-    };
 
-    // Generate notification sound using Web Audio API
-    const generateNotificationSound = () => {
-        try {
-            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-
-            // Create a simple notification sound (two-tone beep)
-            const playTone = (frequency, duration, delay = 0) => {
-                setTimeout(() => {
-                    const oscillator = audioContext.createOscillator();
-                    const gainNode = audioContext.createGain();
-
-                    oscillator.connect(gainNode);
-                    gainNode.connect(audioContext.destination);
-
-                    oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
-                    oscillator.type = 'sine';
-
-                    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
-
-                    oscillator.start(audioContext.currentTime);
-                    oscillator.stop(audioContext.currentTime + duration);
-                }, delay);
-            };
-
-            // Play two-tone notification
-            playTone(800, 0.2, 0);     // First tone
-            playTone(600, 0.3, 250);   // Second tone
-
-        } catch (error) {
-            console.log('Web Audio API not available:', error);
-        }
-    };
 
     // Show browser notification
     const showBrowserNotification = (title, body) => {

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext, useCallback } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import axios from 'axios';
@@ -10,8 +10,7 @@ const HomePage = () => {
     const [error, setError] = useState('');
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('all');
-    // eslint-disable-next-line no-unused-vars
-    const [categories] = useState(['all', 'grocery', 'pharmacy', 'electronics', 'clothing', 'restaurant']);
+    const [categories, setCategories] = useState(['all', 'grocery', 'pharmacy', 'electronics', 'clothing', 'restaurant']);
 
     const navigate = useNavigate();
     const { user } = useContext(AuthContext);
@@ -105,7 +104,11 @@ const HomePage = () => {
         }
     ];
 
-    const fetchShops = useCallback(async () => {
+    useEffect(() => {
+        fetchShops();
+    }, [selectedCategory, searchTerm]);
+
+    const fetchShops = async () => {
         try {
             setLoading(true);
             setError('');
@@ -156,11 +159,7 @@ const HomePage = () => {
         } finally {
             setLoading(false);
         }
-    }, [selectedCategory, searchTerm]);
-
-    useEffect(() => {
-        fetchShops();
-    }, [fetchShops]);
+    };
 
     const filterSampleShops = () => {
         let filtered = sampleShops;
