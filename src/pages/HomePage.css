@@ -34,6 +34,22 @@
     font-size: 1.1rem;
 }
 
+/* Info Banner */
+.info-banner {
+    background-color: #fff3cd;
+    border: 1px solid #ffeaa7;
+    border-radius: var(--border-radius);
+    padding: 1rem;
+    margin: 1rem 0;
+    text-align: center;
+}
+
+.info-banner p {
+    margin: 0;
+    color: #856404;
+    font-size: 0.9rem;
+}
+
 /* Search Section */
 .search-section {
     max-width: 800px;

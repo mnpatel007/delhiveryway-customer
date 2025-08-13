@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { shopsAPI, handleApiError } from '../services/api';
 import { AuthContext } from '../context/AuthContext';
+import axios from 'axios';
 import './HomePage.css';
 
 const HomePage = () => {
@@ -10,10 +10,99 @@ const HomePage = () => {
     const [error, setError] = useState('');
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('all');
-    const [categories, setCategories] = useState([]);
+    const [categories, setCategories] = useState(['all', 'grocery', 'pharmacy', 'electronics', 'clothing', 'restaurant']);
 
     const navigate = useNavigate();
     const { user } = useContext(AuthContext);
+
+    // Sample shops as fallback
+    const sampleShops = [
+        {
+            _id: 'sample1',
+            name: 'Fresh Mart Grocery',
+            description: 'Your neighborhood grocery store with fresh produce and daily essentials',
+            category: 'grocery',
+            address: {
+                street: '123 Main Street',
+                city: 'Mumbai',
+                state: 'Maharashtra',
+                zipCode: '400001'
+            },
+            rating: { average: 4.5, count: 120 },
+            deliveryFee: 0,
+            productCount: 50,
+            isOpenNow: true,
+            images: []
+        },
+        {
+            _id: 'sample2',
+            name: 'MedPlus Pharmacy',
+            description: 'Trusted pharmacy with medicines and health products',
+            category: 'pharmacy',
+            address: {
+                street: '456 Health Avenue',
+                city: 'Mumbai',
+                state: 'Maharashtra',
+                zipCode: '400002'
+            },
+            rating: { average: 4.8, count: 85 },
+            deliveryFee: 25,
+            productCount: 200,
+            isOpenNow: true,
+            images: []
+        },
+        {
+            _id: 'sample3',
+            name: 'TechZone Electronics',
+            description: 'Latest gadgets and electronics at competitive prices',
+            category: 'electronics',
+            address: {
+                street: '789 Tech Park',
+                city: 'Mumbai',
+                state: 'Maharashtra',
+                zipCode: '400003'
+            },
+            rating: { average: 4.3, count: 95 },
+            deliveryFee: 50,
+            productCount: 150,
+            isOpenNow: true,
+            images: []
+        },
+        {
+            _id: 'sample4',
+            name: 'Fashion Hub',
+            description: 'Trendy clothing and accessories for all ages',
+            category: 'clothing',
+            address: {
+                street: '321 Fashion Street',
+                city: 'Mumbai',
+                state: 'Maharashtra',
+                zipCode: '400004'
+            },
+            rating: { average: 4.2, count: 110 },
+            deliveryFee: 30,
+            productCount: 80,
+            isOpenNow: false,
+            images: []
+        },
+        {
+            _id: 'sample5',
+            name: 'Spice Garden Restaurant',
+            description: 'Authentic Indian cuisine with home-style cooking',
+            category: 'restaurant',
+            address: {
+                street: '654 Food Court',
+                city: 'Mumbai',
+                state: 'Maharashtra',
+                zipCode: '400005'
+            },
+            rating: { average: 4.6, count: 200 },
+            deliveryFee: 40,
+            productCount: 25,
+            isOpenNow: true,
+            images: []
+        }
+    ];
 
     useEffect(() => {
         fetchShops();
@@ -24,34 +113,80 @@ const HomePage = () => {
             setLoading(true);
             setError('');
 
-            const params = {
-                category: selectedCategory !== 'all' ? selectedCategory : undefined,
-                search: searchTerm || undefined,
-                limit: 20
-            };
+            const API_URL = process.env.REACT_APP_API_URL || 'https://delhiveryway-backend-1.onrender.com/api';
 
-            const response = await shopsAPI.getAll(params);
+            const params = new URLSearchParams();
+            if (selectedCategory !== 'all') params.append('category', selectedCategory);
+            if (searchTerm) params.append('search', searchTerm);
+            params.append('limit', '20');
 
-            if (response.success) {
-                setShops(response.data.shops || []);
+            const url = `${API_URL}/shops?${params.toString()}`;
+            console.log('🔄 Fetching shops from:', url);
 
-                // Extract categories for filter
-                if (response.data.filters?.categories) {
-                    setCategories(['all', ...response.data.filters.categories]);
+            const response = await axios.get(url, {
+                timeout: 10000,
+                headers: {
+                    'Content-Type': 'application/json'
                 }
-            } else {
-                setError(response.message || 'Failed to fetch shops');
+            });
+
+            console.log('📦 API Response:', response.data);
+
+            // Handle different response formats
+            let shopsData = [];
+            if (response.data.success) {
+                shopsData = response.data.data?.shops || response.data.shops || [];
+            } else if (Array.isArray(response.data)) {
+                shopsData = response.data;
+            } else if (response.data.shops) {
+                shopsData = response.data.shops;
             }
+
+            if (shopsData.length > 0) {
+                setShops(shopsData);
+                setError('');
+            } else {
+                console.log('No shops from API, using sample data');
+                setShops(filterSampleShops());
+                setError('Showing sample shops - backend may be updating');
+            }
+
         } catch (err) {
-            const errorInfo = handleApiError(err);
-            setError(errorInfo.message);
-            console.error('Failed to fetch shops:', err);
+            console.error('❌ Failed to fetch shops:', err);
+            console.log('Using sample shops as fallback');
+            setShops(filterSampleShops());
+            setError('Using sample data - please check your internet connection');
         } finally {
             setLoading(false);
         }
     };
 
+    const filterSampleShops = () => {
+        let filtered = sampleShops;
+
+        // Apply category filter
+        if (selectedCategory !== 'all') {
+            filtered = filtered.filter(shop => shop.category === selectedCategory);
+        }
+
+        // Apply search filter
+        if (searchTerm) {
+            const searchLower = searchTerm.toLowerCase();
+            filtered = filtered.filter(shop =>
+                shop.name.toLowerCase().includes(searchLower) ||
+                shop.description.toLowerCase().includes(searchLower) ||
+                shop.category.toLowerCase().includes(searchLower)
+            );
+        }
+
+        return filtered;
+    };
+
     const handleShopClick = (shopId) => {
+        if (shopId.startsWith('sample')) {
+            alert('This is sample data. Please wait for the backend to be fully deployed.');
+            return;
+        }
         navigate(`/shop/${shopId}`);
     };
 
@@ -71,25 +206,16 @@ const HomePage = () => {
         );
     }
 
-    if (error) {
-        return (
-            <div className="home-container">
-                <div className="error-container">
-                    <h3>Unable to load shops</h3>
-                    <p>{error}</p>
-                    <button onClick={fetchShops} className="retry-btn">
-                        Try Again
-                    </button>
-                </div>
-            </div>
-        );
-    }
-
     return (
         <div className="home-container">
             <div className="home-header">
                 <h1>Welcome to DelhiveryWay</h1>
                 {user && <p>Hello, {user.name}! Find shops near you.</p>}
+                {error && (
+                    <div className="info-banner">
+                        <p>ℹ️ {error}</p>
+                    </div>
+                )}
             </div>
 
             <div className="search-section">
@@ -132,9 +258,12 @@ const HomePage = () => {
                         <p>
                             {searchTerm || selectedCategory !== 'all'
                                 ? 'Try adjusting your search or filters'
-                                : 'No shops are currently available in your area'
+                                : 'No shops are currently available'
                             }
                         </p>
+                        <button onClick={fetchShops} className="retry-btn">
+                            Try Again
+                        </button>
                     </div>
                 ) : (
                     <div className="shops-grid">
