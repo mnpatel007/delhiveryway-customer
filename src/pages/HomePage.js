@@ -113,6 +113,27 @@ const HomePage = () => {
     ];
 
     const fetchShops = useCallback(async () => {
+        const filterSampleShops = () => {
+            let filtered = sampleShops;
+
+            // Apply category filter
+            if (selectedCategory !== 'all') {
+                filtered = filtered.filter(shop => shop.category === selectedCategory);
+            }
+
+            // Apply search filter
+            if (searchTerm) {
+                const searchLower = searchTerm.toLowerCase();
+                filtered = filtered.filter(shop =>
+                    shop.name.toLowerCase().includes(searchLower) ||
+                    shop.description.toLowerCase().includes(searchLower) ||
+                    shop.category.toLowerCase().includes(searchLower)
+                );
+            }
+
+            return filtered;
+        };
+
         try {
             setLoading(true);
             setError('');
@@ -166,27 +187,6 @@ const HomePage = () => {
     useEffect(() => {
         fetchShops();
     }, [fetchShops]);
-
-    const filterSampleShops = () => {
-        let filtered = sampleShops;
-
-        // Apply category filter
-        if (selectedCategory !== 'all') {
-            filtered = filtered.filter(shop => shop.category === selectedCategory);
-        }
-
-        // Apply search filter
-        if (searchTerm) {
-            const searchLower = searchTerm.toLowerCase();
-            filtered = filtered.filter(shop =>
-                shop.name.toLowerCase().includes(searchLower) ||
-                shop.description.toLowerCase().includes(searchLower) ||
-                shop.category.toLowerCase().includes(searchLower)
-            );
-        }
-
-        return filtered;
-    };
 
     const handleShopClick = (shopId) => {
         if (shopId.startsWith('sample')) {

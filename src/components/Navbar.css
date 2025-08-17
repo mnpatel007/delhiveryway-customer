@@ -1,17 +1,22 @@
 /* Modern Navbar Styles */
 .navbar {
     background-color: white;
-    border-bottom: 1px solid var(--gray-200);
-    box-shadow: var(--shadow-sm);
+    border-bottom: 1px solid #e2e8f0;
+    /* Using direct color instead of undefined variable */
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    /* Using direct shadow */
     position: sticky;
     top: 0;
     z-index: 50;
+    backdrop-filter: blur(10px);
+    /* Add backdrop blur for modern look */
 }
 
 .navbar-container {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 0 var(--space-4);
+    padding: 0 1rem;
+    /* Using direct value instead of undefined variable */
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -22,16 +27,19 @@
 .navbar-logo {
     display: flex;
     align-items: center;
-    gap: var(--space-3);
+    gap: 0.75rem;
+    /* Direct value */
     text-decoration: none;
-    color: var(--gray-900);
+    color: #1e293b;
+    /* Direct color */
     font-weight: 700;
     font-size: 1.25rem;
-    transition: color var(--transition-fast);
+    transition: color 0.15s ease;
 }
 
 .navbar-logo:hover {
-    color: var(--primary-600);
+    color: #6366f1;
+    /* Direct color */
 }
 
 .logo-icon {
@@ -39,7 +47,7 @@
 }
 
 .logo-text {
-    background: linear-gradient(135deg, var(--primary-600), var(--primary-800));
+    background: linear-gradient(135deg, #6366f1, #4f46e5);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
