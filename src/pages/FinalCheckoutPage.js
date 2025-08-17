@@ -2,7 +2,8 @@ import React, { useContext, useEffect, useState } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { CartContext } from '../context/CartContext';
 import { loadStripe } from '@stripe/stripe-js';
-import { productsAPI, ordersAPI, shopsAPI, apiCall, api } from '../services/api';
+import { productsAPI, ordersAPI, shopsAPI, apiCall } from '../services/api';
+import api from '../services/api';
 import './CheckoutPage.css';
 
 const stripePromise = loadStripe('pk_test_51RdZkxRvhEVshUODDQprocdR1VZc3ANHK3sXO8CBX2R15UGdHybkDJ2LO0qqoHYTfghWvaghMbOfqP3lBWLgrMzz009Sc0sv3a');
