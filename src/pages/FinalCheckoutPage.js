@@ -98,9 +98,9 @@ const FinalCheckoutPage = () => {
 
                                 setFinalOrder({
                                     items: orderItems,
-                                    address: orderRes.data.address || address,
-                                    deliveryCharge: orderRes.data.deliveryCharge || deliveryCharge || 30,
-                                    totalAmount: orderRes.data.totalAmount || totalAmount
+                                    address: orderResult.data.address || address,
+                                    deliveryCharge: orderResult.data.deliveryCharge || deliveryCharge || 30,
+                                    totalAmount: orderResult.data.totalAmount || totalAmount
                                 });
                             } else {
                                 // Strategy 3: Set empty order with just delivery charge
