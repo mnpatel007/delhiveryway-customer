@@ -14,10 +14,12 @@ const HomePage = () => {
     const fetchShops = async () => {
         try {
             const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/shops`);
-            setShops(response.data.slice(0, 6)); // Show only 6 shops
+            const shopsData = Array.isArray(response.data) ? response.data : response.data.shops || [];
+            setShops(shopsData.slice(0, 6)); // Show only 6 shops
             setLoading(false);
         } catch (error) {
             console.error('Error fetching shops:', error);
+            setShops([]);
             setLoading(false);
         }
     };
