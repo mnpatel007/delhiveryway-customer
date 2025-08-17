@@ -10,8 +10,15 @@ const HomePage = () => {
     const [error, setError] = useState('');
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('all');
-    // eslint-disable-next-line no-unused-vars
-    const [categories] = useState(['all', 'grocery', 'pharmacy', 'electronics', 'clothing', 'restaurant']);
+    const [showSearch, setShowSearch] = useState(false);
+    const [categories] = useState([
+        { id: 'all', name: 'All Categories', icon: '🏪', color: '#4a90e2' },
+        { id: 'grocery', name: 'Grocery', icon: '🛒', color: '#27ae60' },
+        { id: 'pharmacy', name: 'Pharmacy', icon: '💊', color: '#e74c3c' },
+        { id: 'electronics', name: 'Electronics', icon: '📱', color: '#9b59b6' },
+        { id: 'clothing', name: 'Fashion', icon: '👕', color: '#f39c12' },
+        { id: 'restaurant', name: 'Restaurants', icon: '🍽️', color: '#e67e22' }
+    ]);
 
     const navigate = useNavigate();
     const { user } = useContext(AuthContext);
@@ -194,65 +201,160 @@ const HomePage = () => {
         fetchShops();
     };
 
+    const handleCategoryClick = (categoryId) => {
+        setSelectedCategory(categoryId);
+        setShowSearch(false);
+    };
+
+    const handleQuickAction = (action) => {
+        switch (action) {
+            case 'orders':
+                navigate('/orders');
+                break;
+            case 'cart':
+                navigate('/cart');
+                break;
+            case 'profile':
+                navigate('/profile');
+                break;
+            default:
+                break;
+        }
+    };
+
     if (loading) {
         return (
-            <div className="home-container">
+            <div className="modern-home-container">
                 <div className="loading-container">
                     <div className="loading-spinner"></div>
-                    <p>Loading shops...</p>
+                    <p>Discovering amazing shops...</p>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="home-container">
-            <div className="home-header">
-                <h1>Welcome to DelhiveryWay</h1>
-                {user && <p>Hello, {user.name}! Find shops near you.</p>}
-                {error && (
-                    <div className="info-banner">
-                        <p>ℹ️ {error}</p>
+        <div className="modern-home-container">
+            {/* Hero Section */}
+            <section className="hero-section">
+                <div className="hero-content">
+                    <div className="hero-text">
+                        <h1 className="hero-title">
+                            <span className="gradient-text">DelhiveryWay</span>
+                            <br />
+                            <span className="hero-subtitle">Your Gateway to Everything</span>
+                        </h1>
+                        <p className="hero-description">
+                            Discover the best shops, restaurants, and services in your area. 
+                            Fast delivery, great prices, and exceptional service.
+                        </p>
+                        {user && (
+                            <div className="user-welcome">
+                                <span className="welcome-icon">👋</span>
+                                <span>Welcome back, {user.name}!</span>
+                            </div>
+                        )}
                     </div>
-                )}
-            </div>
+                    
+                    <div className="hero-search">
+                        <form onSubmit={handleSearch} className="hero-search-form">
+                            <div className="search-input-group">
+                                <span className="search-icon">🔍</span>
+                                <input
+                                    type="text"
+                                    placeholder="What are you looking for today?"
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    className="hero-search-input"
+                                />
+                                <button type="submit" className="hero-search-btn">
+                                    Search
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <div className="hero-visual">
+                    <div className="floating-elements">
+                        <div className="floating-card card-1">🛒</div>
+                        <div className="floating-card card-2">📱</div>
+                        <div className="floating-card card-3">🍕</div>
+                        <div className="floating-card card-4">💊</div>
+                    </div>
+                </div>
+            </section>
 
-            <div className="search-section">
-                <form onSubmit={handleSearch} className="search-form">
-                    <input
-                        type="text"
-                        placeholder="Search for shops, products, or categories..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="search-input"
-                    />
-                    <button type="submit" className="search-btn">
-                        Search
-                    </button>
-                </form>
+            {/* Quick Actions */}
+            {user && (
+                <section className="quick-actions-section">
+                    <div className="quick-actions-grid">
+                        <button 
+                            className="quick-action-card"
+                            onClick={() => handleQuickAction('orders')}
+                        >
+                            <div className="action-icon">📋</div>
+                            <span>My Orders</span>
+                        </button>
+                        <button 
+                            className="quick-action-card"
+                            onClick={() => handleQuickAction('cart')}
+                        >
+                            <div className="action-icon">🛒</div>
+                            <span>Shopping Cart</span>
+                        </button>
+                        <button 
+                            className="quick-action-card"
+                            onClick={() => handleQuickAction('profile')}
+                        >
+                            <div className="action-icon">👤</div>
+                            <span>Profile</span>
+                        </button>
+                    </div>
+                </section>
+            )}
 
-                <div className="category-filters">
+            {/* Featured Categories */}
+            <section className="categories-section">
+                <div className="section-header">
+                    <h2>Explore Categories</h2>
+                    <p>Find exactly what you need</p>
+                </div>
+                <div className="categories-grid">
                     {categories.map(category => (
                         <button
-                            key={category}
-                            onClick={() => setSelectedCategory(category)}
-                            className={`category-btn ${selectedCategory === category ? 'active' : ''}`}
+                            key={category.id}
+                            onClick={() => handleCategoryClick(category.id)}
+                            className={`category-card ${selectedCategory === category.id ? 'active' : ''}`}
+                            style={{ '--category-color': category.color }}
                         >
-                            {category === 'all' ? 'All Categories' :
-                                category.charAt(0).toUpperCase() + category.slice(1)}
+                            <div className="category-icon">{category.icon}</div>
+                            <span className="category-name">{category.name}</span>
                         </button>
                     ))}
                 </div>
-            </div>
+            </section>
 
-            <div className="shops-section">
-                <h2 className="section-title">
-                    {searchTerm ? `Search Results for "${searchTerm}"` : 'Available Shops'}
-                    <span className="shops-count">({shops.length} shops)</span>
-                </h2>
+            {/* Shops Section */}
+            <section className="shops-section">
+                <div className="section-header">
+                    <h2>
+                        {searchTerm ? `Search Results for "${searchTerm}"` : 'Available Shops'}
+                    </h2>
+                    <div className="shops-meta">
+                        <span className="shops-count">{shops.length} shops available</span>
+                        {error && (
+                            <div className="info-banner">
+                                <span className="info-icon">ℹ️</span>
+                                <span>{error}</span>
+                            </div>
+                        )}
+                    </div>
+                </div>
 
                 {shops.length === 0 ? (
                     <div className="no-shops">
+                        <div className="no-shops-icon">🏪</div>
                         <h3>No shops found</h3>
                         <p>
                             {searchTerm || selectedCategory !== 'all'
@@ -261,6 +363,7 @@ const HomePage = () => {
                             }
                         </p>
                         <button onClick={fetchShops} className="retry-btn">
+                            <span className="retry-icon">🔄</span>
                             Try Again
                         </button>
                     </div>
@@ -269,7 +372,7 @@ const HomePage = () => {
                         {shops.map(shop => (
                             <div
                                 key={shop._id}
-                                className="shop-card"
+                                className="modern-shop-card"
                                 onClick={() => handleShopClick(shop._id)}
                                 tabIndex={0}
                                 onKeyDown={e => {
@@ -278,76 +381,109 @@ const HomePage = () => {
                                     }
                                 }}
                             >
-                                <div className="shop-image">
-                                    {shop.images && shop.images.length > 0 ? (
-                                        <img
-                                            src={shop.images[0]}
-                                            alt={shop.name}
-                                            onError={(e) => {
-                                                e.target.src = '/placeholder-shop.png';
-                                            }}
-                                        />
-                                    ) : (
-                                        <div className="shop-placeholder">
-                                            <span className="shop-icon">🏪</span>
-                                        </div>
-                                    )}
+                                <div className="shop-card-header">
+                                    <div className="shop-image">
+                                        {shop.images && shop.images.length > 0 ? (
+                                            <img
+                                                src={shop.images[0]}
+                                                alt={shop.name}
+                                                onError={(e) => {
+                                                    e.target.src = '/placeholder-shop.png';
+                                                }}
+                                            />
+                                        ) : (
+                                            <div className="shop-placeholder">
+                                                <span className="shop-icon">🏪</span>
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="shop-status-badge">
+                                        <span className={`status-indicator ${shop.isOpenNow ? 'open' : 'closed'}`}>
+                                            {shop.isOpenNow ? '🟢 Open' : '🔴 Closed'}
+                                        </span>
+                                    </div>
                                 </div>
 
-                                <div className="shop-info">
-                                    <h3 className="shop-name">{shop.name}</h3>
-                                    <p className="shop-category">{shop.category}</p>
+                                <div className="shop-card-body">
+                                    <div className="shop-main-info">
+                                        <h3 className="shop-name">{shop.name}</h3>
+                                        <div className="shop-category-badge">
+                                            <span className="category-text">{shop.category}</span>
+                                        </div>
+                                    </div>
 
                                     {shop.description && (
                                         <p className="shop-description">
-                                            {shop.description.length > 100
-                                                ? `${shop.description.substring(0, 100)}...`
+                                            {shop.description.length > 80
+                                                ? `${shop.description.substring(0, 80)}...`
                                                 : shop.description
                                             }
                                         </p>
                                     )}
 
-                                    <div className="shop-details">
-                                        <div className="shop-rating">
-                                            <span className="rating-stars">
-                                                {'★'.repeat(Math.floor(shop.rating?.average || 4))}
-                                                {'☆'.repeat(5 - Math.floor(shop.rating?.average || 4))}
-                                            </span>
-                                            <span className="rating-text">
+                                    <div className="shop-rating-section">
+                                        <div className="rating-display">
+                                            <div className="stars">
+                                                {[...Array(5)].map((_, i) => (
+                                                    <span 
+                                                        key={i} 
+                                                        className={`star ${i < Math.floor(shop.rating?.average || 4) ? 'filled' : ''}`}
+                                                    >
+                                                        ★
+                                                    </span>
+                                                ))}
+                                            </div>
+                                            <span className="rating-score">
                                                 {shop.rating?.average?.toFixed(1) || '4.0'}
-                                                ({shop.rating?.count || 0})
+                                            </span>
+                                            <span className="rating-count">
+                                                ({shop.rating?.count || 0} reviews)
                                             </span>
                                         </div>
+                                    </div>
 
-                                        <div className="shop-location">
-                                            📍 {shop.address?.city}, {shop.address?.state}
+                                    <div className="shop-details-grid">
+                                        <div className="detail-item">
+                                            <span className="detail-icon">📍</span>
+                                            <span className="detail-text">
+                                                {shop.address?.city}, {shop.address?.state}
+                                            </span>
                                         </div>
-
+                                        
                                         {shop.deliveryFee !== undefined && (
-                                            <div className="delivery-fee">
-                                                {shop.deliveryFee === 0
-                                                    ? 'Free Delivery'
-                                                    : `₹${shop.deliveryFee} delivery`
-                                                }
+                                            <div className="detail-item">
+                                                <span className="detail-icon">🚚</span>
+                                                <span className={`detail-text ${shop.deliveryFee === 0 ? 'free-delivery' : ''}`}>
+                                                    {shop.deliveryFee === 0
+                                                        ? 'Free Delivery'
+                                                        : `₹${shop.deliveryFee} delivery`
+                                                    }
+                                                </span>
                                             </div>
                                         )}
 
                                         {shop.productCount !== undefined && (
-                                            <div className="product-count">
-                                                {shop.productCount} products
+                                            <div className="detail-item">
+                                                <span className="detail-icon">📦</span>
+                                                <span className="detail-text">
+                                                    {shop.productCount} products
+                                                </span>
                                             </div>
                                         )}
-
-                                        <div className={`shop-status ${shop.isOpenNow ? 'open' : 'closed'}`}>
-                                            {shop.isOpenNow ? '🟢 Open' : '🔴 Closed'}
-                                        </div>
                                     </div>
+                                </div>
+
+                                <div className="shop-card-footer">
+                                    <button className="view-shop-btn">
+                                        <span>View Shop</span>
+                                        <span className="arrow-icon">→</span>
+                                    </button>
                                 </div>
                             </div>
                         ))}
                     </div>
                 )}
-            </div>
+            </section>
         </div>
     );
 };

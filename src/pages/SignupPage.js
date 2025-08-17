@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authAPI, apiCall } from '../services/api';
-import './SignupPage.css'; // Your existing CSS with small additions below
+import './SignupPage.css';
 
 const SignupPage = () => {
-
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -13,6 +12,9 @@ const SignupPage = () => {
     });
     const [errors, setErrors] = useState({});
     const [successMessage, setSuccessMessage] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const navigate = useNavigate();
 
     const handleChange = (e) => {
@@ -22,6 +24,10 @@ const SignupPage = () => {
             [name]: value
         }));
         if (successMessage) setSuccessMessage('');
+        // Clear specific error when user starts typing
+        if (errors[name]) {
+            setErrors(prev => ({ ...prev, [name]: '' }));
+        }
     };
 
     const validateForm = () => {
@@ -58,8 +64,12 @@ const SignupPage = () => {
 
     const handleSignup = async (e) => {
         e.preventDefault();
+        setIsLoading(true);
 
-        if (!validateForm()) return;
+        if (!validateForm()) {
+            setIsLoading(false);
+            return;
+        }
 
         try {
             const { confirmPassword, ...signupData } = formData;
@@ -69,7 +79,7 @@ const SignupPage = () => {
             });
 
             if (result.success) {
-                setSuccessMessage(' ✅ Signup successful! Please check your email to verify your account before logging in.');
+                setSuccessMessage('✅ Account created successfully! Please check your email to verify your account before logging in.');
                 setErrors({});
                 setFormData({ name: '', email: '', password: '', confirmPassword: '' });
 
@@ -88,96 +98,234 @@ const SignupPage = () => {
                 ...prevErrors,
                 submit: serverError
             }));
+        } finally {
+            setIsLoading(false);
         }
     };
 
+    const getPasswordStrength = (password) => {
+        if (!password) return { score: 0, label: '', color: '' };
+        
+        let score = 0;
+        if (password.length >= 8) score++;
+        if (/[A-Z]/.test(password)) score++;
+        if (/[a-z]/.test(password)) score++;
+        if (/\d/.test(password)) score++;
+        if (/[@$!%*?&]/.test(password)) score++;
+
+        const labels = ['Very Weak', 'Weak', 'Fair', 'Good', 'Strong'];
+        const colors = ['#ff4444', '#ff8800', '#ffbb33', '#00C851', '#007E33'];
+        
+        return {
+            score: Math.min(score, 5),
+            label: labels[score - 1] || '',
+            color: colors[score - 1] || ''
+        };
+    };
+
+    const passwordStrength = getPasswordStrength(formData.password);
+
     return (
-        <div className="signup-container">
-            <div className="signup-wrapper">
-                <form className="signup-form" onSubmit={handleSignup}>
-                    <h2 className="signup-title">Create Account</h2>
-                    <p className="signup-subtitle">Sign up to get started</p>
+        <div className="modern-signup-container">
+            {/* Background Elements */}
+            <div className="floating-shapes">
+                <div className="shape shape-1"></div>
+                <div className="shape shape-2"></div>
+                <div className="shape shape-3"></div>
+                <div className="shape shape-4"></div>
+            </div>
 
-                    {successMessage && (
-                        <div className="success-message">{successMessage}</div>
-                    )}
-
-                    {errors.submit && (
-                        <div className="error-message">{errors.submit}</div>
-                    )}
-
-                    <div className="input-group">
-                        <label htmlFor="name">Full Name</label>
-                        <input
-                            id="name"
-                            type="text"
-                            name="name"
-                            placeholder="Enter your full name"
-                            value={formData.name}
-                            onChange={handleChange}
-                        />
-                        {errors.name && <span className="error-text">{errors.name}</span>}
-                    </div>
-
-                    <div className="input-group">
-                        <label htmlFor="email">Email</label>
-                        <input
-                            id="email"
-                            type="email"
-                            name="email"
-                            placeholder="Enter your email"
-                            value={formData.email}
-                            onChange={handleChange}
-                        />
-                        {errors.email && <span className="error-text">{errors.email}</span>}
-                    </div>
-
-                    <div className="input-group">
-                        <label htmlFor="password">Password</label>
-                        <input
-                            id="password"
-                            type="password"
-                            name="password"
-                            placeholder="Create a strong password"
-                            value={formData.password}
-                            onChange={handleChange}
-                        />
-                        {errors.password && <span className="error-text">{errors.password}</span>}
-                        <div className="password-requirements">
-                            Password must:
-                            <ul>
-                                <li>Be at least 8 characters</li>
-                                <li>Include uppercase and lowercase letters</li>
-                                <li>Include a number and special character</li>
-                            </ul>
+            {/* Main Content */}
+            <div className="signup-content">
+                {/* Left Side - Branding */}
+                <div className="branding-section">
+                    <div className="brand-content">
+                        <div className="logo-container">
+                            <div className="logo-icon">
+                                <span className="logo-text">DW</span>
+                            </div>
+                        </div>
+                        <h1 className="brand-title">Join DelhiveryWay</h1>
+                        <p className="brand-subtitle">Start your personal shopping journey today</p>
+                        <div className="brand-features">
+                            <div className="feature-item">
+                                <div className="feature-icon">🎯</div>
+                                <span>Personalized Experience</span>
+                            </div>
+                            <div className="feature-item">
+                                <div className="feature-icon">⚡</div>
+                                <span>Lightning Fast</span>
+                            </div>
+                            <div className="feature-item">
+                                <div className="feature-icon">🛡️</div>
+                                <span>100% Secure</span>
+                            </div>
                         </div>
                     </div>
+                </div>
 
-                    <div className="input-group">
-                        <label htmlFor="confirmPassword">Confirm Password</label>
-                        <input
-                            id="confirmPassword"
-                            type="password"
-                            name="confirmPassword"
-                            placeholder="Confirm your password"
-                            value={formData.confirmPassword}
-                            onChange={handleChange}
-                        />
-                        {errors.confirmPassword && <span className="error-text">{errors.confirmPassword}</span>}
+                {/* Right Side - Signup Form */}
+                <div className="form-section">
+                    <div className="form-container">
+                        <div className="form-header">
+                            <h2 className="welcome-text">Create Account</h2>
+                            <p className="signup-subtitle">Join thousands of happy customers</p>
+                        </div>
+
+                        {successMessage && (
+                            <div className="success-banner">
+                                <div className="success-icon">🎉</div>
+                                <span>{successMessage}</span>
+                            </div>
+                        )}
+
+                        {errors.submit && (
+                            <div className="error-banner">
+                                <div className="error-icon">⚠️</div>
+                                <span>{errors.submit}</span>
+                            </div>
+                        )}
+
+                        <form className="modern-signup-form" onSubmit={handleSignup}>
+                            <div className="input-group">
+                                <div className="input-wrapper">
+                                    <div className="input-icon">👤</div>
+                                    <input
+                                        type="text"
+                                        name="name"
+                                        placeholder="Enter your full name"
+                                        value={formData.name}
+                                        onChange={handleChange}
+                                        className={`modern-input ${errors.name ? 'error' : ''}`}
+                                        required
+                                    />
+                                </div>
+                                {errors.name && <span className="error-text">{errors.name}</span>}
+                            </div>
+
+                            <div className="input-group">
+                                <div className="input-wrapper">
+                                    <div className="input-icon">📧</div>
+                                    <input
+                                        type="email"
+                                        name="email"
+                                        placeholder="Enter your email"
+                                        value={formData.email}
+                                        onChange={handleChange}
+                                        className={`modern-input ${errors.email ? 'error' : ''}`}
+                                        required
+                                    />
+                                </div>
+                                {errors.email && <span className="error-text">{errors.email}</span>}
+                            </div>
+
+                            <div className="input-group">
+                                <div className="input-wrapper">
+                                    <div className="input-icon">🔒</div>
+                                    <input
+                                        type={showPassword ? "text" : "password"}
+                                        name="password"
+                                        placeholder="Create a strong password"
+                                        value={formData.password}
+                                        onChange={handleChange}
+                                        className={`modern-input ${errors.password ? 'error' : ''}`}
+                                        required
+                                    />
+                                    <button
+                                        type="button"
+                                        className="password-toggle"
+                                        onClick={() => setShowPassword(!showPassword)}
+                                    >
+                                        {showPassword ? '👁️' : '👁️‍🗨️'}
+                                    </button>
+                                </div>
+                                {errors.password && <span className="error-text">{errors.password}</span>}
+                                
+                                {/* Password Strength Indicator */}
+                                {formData.password && (
+                                    <div className="password-strength">
+                                        <div className="strength-bars">
+                                            {[1, 2, 3, 4, 5].map((level) => (
+                                                <div
+                                                    key={level}
+                                                    className={`strength-bar ${level <= passwordStrength.score ? 'active' : ''}`}
+                                                    style={{ backgroundColor: level <= passwordStrength.score ? passwordStrength.color : '#e1e5e9' }}
+                                                ></div>
+                                            ))}
+                                        </div>
+                                        <span className="strength-label" style={{ color: passwordStrength.color }}>
+                                            {passwordStrength.label}
+                                        </span>
+                                    </div>
+                                )}
+
+                                <div className="password-requirements">
+                                    <h4>Password Requirements:</h4>
+                                    <ul>
+                                        <li className={formData.password.length >= 8 ? 'met' : 'unmet'}>
+                                            At least 8 characters
+                                        </li>
+                                        <li className={/[A-Z]/.test(formData.password) ? 'met' : 'unmet'}>
+                                            One uppercase letter
+                                        </li>
+                                        <li className={/[a-z]/.test(formData.password) ? 'met' : 'unmet'}>
+                                            One lowercase letter
+                                        </li>
+                                        <li className={/\d/.test(formData.password) ? 'met' : 'unmet'}>
+                                            One number
+                                        </li>
+                                        <li className={/[@$!%*?&]/.test(formData.password) ? 'met' : 'unmet'}>
+                                            One special character (@$!%*?&)
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div className="input-group">
+                                <div className="input-wrapper">
+                                    <div className="input-icon">🔐</div>
+                                    <input
+                                        type={showConfirmPassword ? "text" : "password"}
+                                        name="confirmPassword"
+                                        placeholder="Confirm your password"
+                                        value={formData.confirmPassword}
+                                        onChange={handleChange}
+                                        className={`modern-input ${errors.confirmPassword ? 'error' : ''}`}
+                                        required
+                                    />
+                                    <button
+                                        type="button"
+                                        className="password-toggle"
+                                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                    >
+                                        {showConfirmPassword ? '👁️' : '👁️‍🗨️'}
+                                    </button>
+                                </div>
+                                {errors.confirmPassword && <span className="error-text">{errors.confirmPassword}</span>}
+                            </div>
+
+                            <button
+                                type="submit"
+                                className={`signup-button ${isLoading ? 'loading' : ''}`}
+                                disabled={isLoading}
+                            >
+                                {isLoading ? (
+                                    <div className="button-loader">
+                                        <div className="spinner"></div>
+                                        <span>Creating Account...</span>
+                                    </div>
+                                ) : (
+                                    'Create Account'
+                                )}
+                            </button>
+                        </form>
+
+                        <div className="login-prompt">
+                            <span>Already have an account?</span>
+                            <a href="/login" className="login-link">Sign In</a>
+                        </div>
                     </div>
-
-                    <button
-                        type="submit"
-                        className="signup-button"
-                    >
-                        Create Account
-                    </button>
-
-                    <div className="login-link">
-                        Already have an account?
-                        <a href="/login"> Log In</a>
-                    </div>
-                </form>
+                </div>
             </div>
         </div>
     );
