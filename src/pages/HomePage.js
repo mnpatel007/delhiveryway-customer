@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
-import axios from 'axios';
+import { shopsAPI, apiCall } from '../services/api';
 import './HomePage.css';
 
 const HomePage = () => {
@@ -110,42 +110,40 @@ const HomePage = () => {
             setLoading(true);
             setError('');
 
-            const API_URL = process.env.REACT_APP_API_URL || 'https://delhiveryway-backend-1.onrender.com/api';
+            const params = {};
+            if (selectedCategory !== 'all') params.category = selectedCategory;
+            if (searchTerm) params.search = searchTerm;
+            params.limit = 20;
 
-            const params = new URLSearchParams();
-            if (selectedCategory !== 'all') params.append('category', selectedCategory);
-            if (searchTerm) params.append('search', searchTerm);
-            params.append('limit', '20');
+            console.log('🔄 Fetching shops with params:', params);
 
-            const url = `${API_URL}/shops?${params.toString()}`;
-            console.log('🔄 Fetching shops from:', url);
+            const result = await apiCall(shopsAPI.getAll, params);
 
-            const response = await axios.get(url, {
-                timeout: 10000,
-                headers: {
-                    'Content-Type': 'application/json'
+            if (result.success) {
+                console.log('📦 API Response:', result.data);
+
+                // Handle different response formats
+                let shopsData = [];
+                if (result.data.success) {
+                    shopsData = result.data.data?.shops || result.data.shops || [];
+                } else if (Array.isArray(result.data)) {
+                    shopsData = result.data;
+                } else if (result.data.shops) {
+                    shopsData = result.data.shops;
                 }
-            });
 
-            console.log('📦 API Response:', response.data);
-
-            // Handle different response formats
-            let shopsData = [];
-            if (response.data.success) {
-                shopsData = response.data.data?.shops || response.data.shops || [];
-            } else if (Array.isArray(response.data)) {
-                shopsData = response.data;
-            } else if (response.data.shops) {
-                shopsData = response.data.shops;
-            }
-
-            if (shopsData.length > 0) {
-                setShops(shopsData);
-                setError('');
+                if (shopsData.length > 0) {
+                    setShops(shopsData);
+                    setError('');
+                } else {
+                    console.log('No shops from API, using sample data');
+                    setShops(filterSampleShops());
+                    setError('Showing sample shops - backend may be updating');
+                }
             } else {
-                console.log('No shops from API, using sample data');
+                console.log('API call failed, using sample data');
                 setShops(filterSampleShops());
-                setError('Showing sample shops - backend may be updating');
+                setError('Using sample data - please check your internet connection');
             }
 
         } catch (err) {

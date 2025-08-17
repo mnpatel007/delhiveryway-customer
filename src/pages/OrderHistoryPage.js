@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
-import axios from 'axios';
+import { ordersAPI, apiCall } from '../services/api';
 import io from 'socket.io-client';
 import './OrderHistoryPage.css'; // Import CSS file
 
@@ -14,17 +14,19 @@ const OrderHistoryPage = () => {
         const fetchOrders = async () => {
             try {
                 setLoading(true);
-                const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/orders/customer`, {
-                    headers: { Authorization: `Bearer ${user.token}` }
-                });
+                const result = await apiCall(ordersAPI.getCustomerOrders);
 
-                const data = res.data;
-                const sortedOrders = Array.isArray(data)
-                    ? data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-                    : [];
+                if (result.success) {
+                    const data = result.data;
+                    const sortedOrders = Array.isArray(data)
+                        ? data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+                        : [];
 
-                setOrders(sortedOrders);
-                setError(null);
+                    setOrders(sortedOrders);
+                    setError(null);
+                } else {
+                    setError(result.message || 'Failed to load order history. Please try again.');
+                }
             } catch (err) {
                 console.error('Failed to load orders:', err);
                 setError('Failed to load order history. Please try again.');
@@ -40,7 +42,7 @@ const OrderHistoryPage = () => {
     useEffect(() => {
         if (!user?.id) return;
 
-        const socket = io(process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000');
+        const socket = io(process.env.REACT_APP_SOCKET_URL || 'http://localhost:5000');
 
         // Join customer room
         socket.emit('join', `customer_${user.id}`);

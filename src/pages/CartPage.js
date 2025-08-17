@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { CartContext } from '../context/CartContext';
-import axios from 'axios';
+import { shopsAPI, apiCall } from '../services/api';
 import { useNavigate } from 'react-router-dom';
 import './CartPage.css';
 
@@ -17,19 +17,30 @@ const CartPage = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/shops`)
-            .then(res => {
-                const data = res.data;
-                if (Array.isArray(data)) {
-                    setShops(data);
-                } else if (Array.isArray(data.shops)) {
-                    setShops(data.shops);
+        const fetchShops = async () => {
+            try {
+                const result = await apiCall(shopsAPI.getAll);
+                if (result.success) {
+                    const data = result.data;
+                    if (Array.isArray(data)) {
+                        setShops(data);
+                    } else if (Array.isArray(data.shops)) {
+                        setShops(data.shops);
+                    } else {
+                        console.error("Unexpected API response format");
+                        setShops([]);
+                    }
                 } else {
-                    console.error("Unexpected API response format");
+                    console.error('Failed to load shops:', result.message);
                     setShops([]);
                 }
-            })
-            .catch(err => console.error('Failed to load shops:', err));
+            } catch (err) {
+                console.error('Failed to load shops:', err);
+                setShops([]);
+            }
+        };
+
+        fetchShops();
     }, []);
 
     const getShopName = (shopId) => {

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import { authAPI, apiCall } from '../services/api';
 
 const ForgotPasswordPage = () => {
     const [email, setEmail] = useState('');
@@ -11,8 +11,12 @@ const ForgotPasswordPage = () => {
         setMessage('');
         setError('');
         try {
-            await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/auth/forgot-password`, { email });
-            setMessage('✅ Reset link sent to your email');
+            const result = await apiCall(authAPI.forgotPassword, { email });
+            if (result.success) {
+                setMessage('✅ Reset link sent to your email');
+            } else {
+                setError(result.message || 'Failed to send reset link');
+            }
         } catch (err) {
             setError(err.response?.data?.message || 'Failed to send reset link');
         }

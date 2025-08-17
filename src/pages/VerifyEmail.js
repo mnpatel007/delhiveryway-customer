@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import axios from 'axios';
+import { authAPI, apiCall } from '../services/api';
 import './VerifyEmail.css';
 
 const VerifyEmail = () => {
@@ -22,26 +22,29 @@ const VerifyEmail = () => {
 
         const verifyEmail = async () => {
             try {
-                await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/auth/verify-email`, {
-                    params: { token, email }
-                });
+                const result = await apiCall(authAPI.verifyEmail, token, email);
 
-                setMessage('Email verified successfully!');
-                setSuccess(true);
+                if (result.success) {
+                    setMessage('Email verified successfully!');
+                    setSuccess(true);
 
-                // Start countdown
-                const countdownInterval = setInterval(() => {
-                    setCountdown(prev => {
-                        if (prev <= 1) {
-                            clearInterval(countdownInterval);
-                            navigate('/login');
-                            return 0;
-                        }
-                        return prev - 1;
-                    });
-                }, 1000);
+                    // Start countdown
+                    const countdownInterval = setInterval(() => {
+                        setCountdown(prev => {
+                            if (prev <= 1) {
+                                clearInterval(countdownInterval);
+                                navigate('/login');
+                                return 0;
+                            }
+                            return prev - 1;
+                        });
+                    }, 1000);
 
-                return () => clearInterval(countdownInterval);
+                    return () => clearInterval(countdownInterval);
+                } else {
+                    setMessage(result.message || 'Verification failed. Please try again.');
+                    setSuccess(false);
+                }
             } catch (err) {
                 setMessage(err.response?.data?.message || 'Verification failed. Please try again.');
                 setSuccess(false);

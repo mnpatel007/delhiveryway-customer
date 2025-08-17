@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { useParams } from 'react-router-dom';
-import axios from 'axios';
+import { shopsAPI, productsAPI, apiCall } from '../services/api';
 import { CartContext } from '../context/CartContext';
 import './ShopPage.css'; // Import CSS file
 
@@ -16,13 +16,22 @@ const ShopPage = () => {
         const fetchShopAndProducts = async () => {
             try {
                 setLoading(true);
-                const [shopRes, productRes] = await Promise.all([
-                    axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/shops/${id}`),
-                    axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/products/shop/${id}`)
+                const [shopResult, productResult] = await Promise.all([
+                    apiCall(shopsAPI.getById, id),
+                    apiCall(productsAPI.getByShop, id)
                 ]);
 
-                setShop(shopRes.data);
-                setProducts(productRes.data);
+                if (shopResult.success) {
+                    setShop(shopResult.data);
+                } else {
+                    console.error('Failed to fetch shop:', shopResult.message);
+                }
+
+                if (productResult.success) {
+                    setProducts(productResult.data);
+                } else {
+                    console.error('Failed to fetch products:', productResult.message);
+                }
             } catch (err) {
                 console.error('Error fetching shop or products:', err);
             } finally {

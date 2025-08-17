@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { CartContext } from '../context/CartContext';
 import { loadStripe } from '@stripe/stripe-js';
-import axios from 'axios';
+import { productsAPI, ordersAPI, shopsAPI, apiCall, api } from '../services/api';
 import './CheckoutPage.css';
 
 const stripePromise = loadStripe('pk_test_51RdZkxRvhEVshUODDQprocdR1VZc3ANHK3sXO8CBX2R15UGdHybkDJ2LO0qqoHYTfghWvaghMbOfqP3lBWLgrMzz009Sc0sv3a');
@@ -37,19 +37,14 @@ const FinalCheckoutPage = () => {
                     }
 
                     try {
-                        const res = await axios.get(
-                            `${process.env.REACT_APP_BACKEND_URL}/api/products/${item.productId}`,
-                            {
-                                headers: { Authorization: `Bearer ${user.token}` }
-                            }
-                        );
+                        const result = await apiCall(productsAPI.getById, item.productId);
 
-                        if (res.data) {
-                            console.log('✅ Product fetched:', res.data);
+                        if (result.success && result.data) {
+                            console.log('✅ Product fetched:', result.data);
                             fullItems.push({
-                                product: res.data,
+                                product: result.data,
                                 quantity: item.quantity,
-                                shopId: res.data.shopId
+                                shopId: result.data.shopId
                             });
                         }
 
@@ -90,16 +85,11 @@ const FinalCheckoutPage = () => {
                     else if (parsed.orderId) {
                         console.log('🔄 Fetching order details from backend...');
                         try {
-                            const orderRes = await axios.get(
-                                `${process.env.REACT_APP_BACKEND_URL}/api/orders/${parsed.orderId}`,
-                                {
-                                    headers: { Authorization: `Bearer ${user.token}` }
-                                }
-                            );
+                            const orderResult = await apiCall(ordersAPI.getById, parsed.orderId);
 
-                            if (orderRes.data && orderRes.data.items && orderRes.data.items.length > 0) {
-                                console.log('✅ Order details fetched:', orderRes.data);
-                                const orderItems = orderRes.data.items.map(item => ({
+                            if (orderResult.success && orderResult.data && orderResult.data.items && orderResult.data.items.length > 0) {
+                                console.log('✅ Order details fetched:', orderResult.data);
+                                const orderItems = orderResult.data.items.map(item => ({
                                     product: item.product || item,
                                     quantity: item.quantity,
                                     shopId: item.shopId || (item.product && item.product.shopId)
@@ -152,14 +142,20 @@ const FinalCheckoutPage = () => {
     }, [user.token, cartItems]);
 
     useEffect(() => {
-        axios
-            .get(`${process.env.REACT_APP_BACKEND_URL}/api/shops`)
-            .then(res => {
-                const data = res.data;
-                if (Array.isArray(data)) setShops(data);
-                else if (Array.isArray(data.shops)) setShops(data.shops);
-            })
-            .catch(err => console.error('Failed to load shops:', err));
+        const fetchShops = async () => {
+            try {
+                const result = await apiCall(shopsAPI.getAll);
+                if (result.success) {
+                    const data = result.data;
+                    if (Array.isArray(data)) setShops(data);
+                    else if (Array.isArray(data.shops)) setShops(data.shops);
+                }
+            } catch (err) {
+                console.error('Failed to load shops:', err);
+            }
+        };
+
+        fetchShops();
     }, []);
 
     const getShopName = (shopId) => {
@@ -201,17 +197,11 @@ const FinalCheckoutPage = () => {
             // Store order amount for success page
             localStorage.setItem('lastOrderAmount', finalOrder.totalAmount);
 
-            const response = await axios.post(
-                `${process.env.REACT_APP_BACKEND_URL}/api/payment/create-checkout-session`,
-                {
-                    items: formattedItems,
-                    address: finalOrder.address,
-                    deliveryCharge: deliveryCharge
-                },
-                {
-                    headers: { Authorization: `Bearer ${user.token}` }
-                }
-            );
+            const response = await api.post('/payment/create-checkout-session', {
+                items: formattedItems,
+                address: finalOrder.address,
+                deliveryCharge: deliveryCharge
+            });
 
             const result = await stripe.redirectToCheckout({
                 sessionId: response.data.id

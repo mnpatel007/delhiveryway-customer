@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import axios from 'axios';
+import { authAPI, apiCall } from '../services/api';
 
 const ResetPasswordPage = () => {
     const [params] = useSearchParams();
@@ -21,13 +21,17 @@ const ResetPasswordPage = () => {
         }
 
         try {
-            await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/auth/reset-password`, {
+            const result = await apiCall(authAPI.resetPassword, {
                 token,
                 email,
                 newPassword
             });
-            setMessage('✅ Password reset successful. Redirecting to login...');
-            setTimeout(() => navigate('/login'), 3000);
+            if (result.success) {
+                setMessage('✅ Password reset successful. Redirecting to login...');
+                setTimeout(() => navigate('/login'), 3000);
+            } else {
+                setError(result.message || 'Reset failed');
+            }
         } catch (err) {
             setError(err.response?.data?.message || 'Reset failed');
         }

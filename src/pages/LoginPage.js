@@ -1,7 +1,7 @@
 import React, { useState, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { authAPI, apiCall } from '../services/api';
 import { jwtDecode } from 'jwt-decode';
 import { GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google';
 import './LoginPage.css';
@@ -25,23 +25,20 @@ const LoginPage = () => {
         }
 
         try {
-            const res = await axios.post(`${process.env.REACT_APP_API_URL}/auth/login`, {
-                email,
-                password
-            });
+            const result = await apiCall(authAPI.login, { email, password });
 
-            if (!res.data.success) {
-                setError(res.data.message || 'Login failed');
+            if (!result.success) {
+                setError(result.message || 'Login failed');
                 return;
             }
 
-            const userData = res.data.data.user;
+            const userData = result.data.data?.user || result.data.user;
             if (userData.role !== 'customer') {
                 setError('This account is not registered as a customer. Please use the correct app.');
                 return;
             }
 
-            login(res.data);
+            login(result.data);
             navigate('/');
         } catch (err) {
             console.error('❌ Login error:', err);
@@ -64,25 +61,25 @@ const LoginPage = () => {
             const googleUser = jwtDecode(credentialResponse.credential);
             const { email, name, sub: googleId } = googleUser;
 
-            const res = await axios.post(`${process.env.REACT_APP_API_URL}/auth/google`, {
+            const result = await apiCall(authAPI.googleLogin, {
                 email,
                 name,
                 googleId,
                 role: 'customer',
             });
 
-            if (!res.data.success) {
-                setError(res.data.message || 'Google login failed');
+            if (!result.success) {
+                setError(result.message || 'Google login failed');
                 return;
             }
 
-            const userData = res.data.data.user;
+            const userData = result.data.data?.user || result.data.user;
             if (userData.role !== 'customer') {
                 setError('This account is not registered as a customer. Please use the correct app.');
                 return;
             }
 
-            login(res.data);
+            login(result.data);
             navigate('/');
         } catch (err) {
             console.error('❌ Google login error:', err);

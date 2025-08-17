@@ -2,7 +2,7 @@ import React, { useEffect, useContext, useState } from 'react';
 import { CartContext } from '../context/CartContext';
 import { AuthContext } from '../context/AuthContext';
 import { useLocation } from 'react-router-dom';
-import axios from 'axios';
+import { api } from '../services/api';
 import './OrderSuccessPage.css';
 
 const OrderSuccessPage = () => {
@@ -27,12 +27,7 @@ const OrderSuccessPage = () => {
 
                 if (sessionId) {
                     // Fetch session details from backend
-                    const response = await axios.get(
-                        `${process.env.REACT_APP_BACKEND_URL}/api/payments/session/${sessionId}`,
-                        {
-                            headers: { Authorization: `Bearer ${user.token}` }
-                        }
-                    );
+                    const response = await api.get(`/payment/session/${sessionId}`);
                     setOrderDetails(response.data);
                 } else if (location.state) {
                     // Fallback to location state

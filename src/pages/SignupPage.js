@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { authAPI, apiCall } from '../services/api';
 import './SignupPage.css'; // Your existing CSS with small additions below
 
 const SignupPage = () => {
@@ -63,19 +63,25 @@ const SignupPage = () => {
 
         try {
             const { confirmPassword, ...signupData } = formData;
-            await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/auth/signup`, {
+            const result = await apiCall(authAPI.signup, {
                 ...signupData,
                 role: 'customer'
             });
 
-            setSuccessMessage(' ✅ Signup successful! Please check your email to verify your account before logging in.');
-            setErrors({});
-            setFormData({ name: '', email: '', password: '', confirmPassword: '' });
+            if (result.success) {
+                setSuccessMessage(' ✅ Signup successful! Please check your email to verify your account before logging in.');
+                setErrors({});
+                setFormData({ name: '', email: '', password: '', confirmPassword: '' });
 
-            setTimeout(() => {
-                navigate('/login');
-            }, 4000);
-
+                setTimeout(() => {
+                    navigate('/login');
+                }, 4000);
+            } else {
+                setErrors(prevErrors => ({
+                    ...prevErrors,
+                    submit: result.message || 'Signup failed'
+                }));
+            }
         } catch (err) {
             const serverError = err.response?.data?.message || 'Signup failed';
             setErrors(prevErrors => ({
