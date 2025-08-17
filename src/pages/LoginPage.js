@@ -200,8 +200,8 @@ const LoginPage = () => {
                                     </a>
                                 </div>
 
-                                <button 
-                                    type="submit" 
+                                <button
+                                    type="submit"
                                     className={`login-button ${isLoading ? 'loading' : ''}`}
                                     disabled={isLoading || !email || !password}
                                 >

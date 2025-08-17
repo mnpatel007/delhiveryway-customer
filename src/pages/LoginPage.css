@@ -60,8 +60,15 @@
 }
 
 @keyframes float {
-    0%, 100% { transform: translateY(0px) rotate(0deg); }
-    50% { transform: translateY(-20px) rotate(180deg); }
+
+    0%,
+    100% {
+        transform: translateY(0px) rotate(0deg);
+    }
+
+    50% {
+        transform: translateY(-20px) rotate(180deg);
+    }
 }
 
 /* Main Content Layout */
@@ -374,8 +381,13 @@
 }
 
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 /* Divider */
@@ -434,11 +446,11 @@
         grid-template-columns: 1fr;
         max-width: 500px;
     }
-    
+
     .branding-section {
         display: none;
     }
-    
+
     .form-section {
         padding: 40px 30px;
     }
@@ -448,24 +460,24 @@
     .modern-login-container {
         padding: 20px;
     }
-    
+
     .login-content {
         border-radius: 16px;
     }
-    
+
     .form-section {
         padding: 30px 20px;
     }
-    
+
     .welcome-text {
         font-size: 28px;
     }
-    
+
     .modern-input {
         padding: 16px 18px 16px 45px;
         font-size: 15px;
     }
-    
+
     .input-icon {
         font-size: 16px;
         left: 14px;
@@ -477,29 +489,29 @@
     .form-section {
         background: #1a1a1a;
     }
-    
+
     .welcome-text {
         color: #ffffff;
     }
-    
+
     .login-subtitle {
         color: #a0a0a0;
     }
-    
+
     .modern-input {
         background: #2a2a2a;
         border-color: #404040;
         color: #ffffff;
     }
-    
+
     .modern-input:focus {
         background: #2a2a2a;
     }
-    
+
     .modern-input::placeholder {
         color: #808080;
     }
-    
+
     .divider span {
         background: #1a1a1a;
     }

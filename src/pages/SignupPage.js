@@ -105,7 +105,7 @@ const SignupPage = () => {
 
     const getPasswordStrength = (password) => {
         if (!password) return { score: 0, label: '', color: '' };
-        
+
         let score = 0;
         if (password.length >= 8) score++;
         if (/[A-Z]/.test(password)) score++;
@@ -115,7 +115,7 @@ const SignupPage = () => {
 
         const labels = ['Very Weak', 'Weak', 'Fair', 'Good', 'Strong'];
         const colors = ['#ff4444', '#ff8800', '#ffbb33', '#00C851', '#007E33'];
-        
+
         return {
             score: Math.min(score, 5),
             label: labels[score - 1] || '',
@@ -240,7 +240,7 @@ const SignupPage = () => {
                                     </button>
                                 </div>
                                 {errors.password && <span className="error-text">{errors.password}</span>}
-                                
+
                                 {/* Password Strength Indicator */}
                                 {formData.password && (
                                     <div className="password-strength">

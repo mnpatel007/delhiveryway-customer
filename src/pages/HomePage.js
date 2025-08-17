@@ -10,7 +10,7 @@ const HomePage = () => {
     const [error, setError] = useState('');
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('all');
-    const [showSearch, setShowSearch] = useState(false);
+
     const [categories] = useState([
         { id: 'all', name: 'All Categories', icon: '🏪', color: '#4a90e2' },
         { id: 'grocery', name: 'Grocery', icon: '🛒', color: '#27ae60' },
@@ -203,7 +203,6 @@ const HomePage = () => {
 
     const handleCategoryClick = (categoryId) => {
         setSelectedCategory(categoryId);
-        setShowSearch(false);
     };
 
     const handleQuickAction = (action) => {
@@ -245,7 +244,7 @@ const HomePage = () => {
                             <span className="hero-subtitle">Your Gateway to Everything</span>
                         </h1>
                         <p className="hero-description">
-                            Discover the best shops, restaurants, and services in your area. 
+                            Discover the best shops, restaurants, and services in your area.
                             Fast delivery, great prices, and exceptional service.
                         </p>
                         {user && (
@@ -255,7 +254,7 @@ const HomePage = () => {
                             </div>
                         )}
                     </div>
-                    
+
                     <div className="hero-search">
                         <form onSubmit={handleSearch} className="hero-search-form">
                             <div className="search-input-group">
@@ -274,7 +273,7 @@ const HomePage = () => {
                         </form>
                     </div>
                 </div>
-                
+
                 <div className="hero-visual">
                     <div className="floating-elements">
                         <div className="floating-card card-1">🛒</div>
@@ -289,21 +288,21 @@ const HomePage = () => {
             {user && (
                 <section className="quick-actions-section">
                     <div className="quick-actions-grid">
-                        <button 
+                        <button
                             className="quick-action-card"
                             onClick={() => handleQuickAction('orders')}
                         >
                             <div className="action-icon">📋</div>
                             <span>My Orders</span>
                         </button>
-                        <button 
+                        <button
                             className="quick-action-card"
                             onClick={() => handleQuickAction('cart')}
                         >
                             <div className="action-icon">🛒</div>
                             <span>Shopping Cart</span>
                         </button>
-                        <button 
+                        <button
                             className="quick-action-card"
                             onClick={() => handleQuickAction('profile')}
                         >
@@ -425,8 +424,8 @@ const HomePage = () => {
                                         <div className="rating-display">
                                             <div className="stars">
                                                 {[...Array(5)].map((_, i) => (
-                                                    <span 
-                                                        key={i} 
+                                                    <span
+                                                        key={i}
                                                         className={`star ${i < Math.floor(shop.rating?.average || 4) ? 'filled' : ''}`}
                                                     >
                                                         ★
@@ -449,7 +448,7 @@ const HomePage = () => {
                                                 {shop.address?.city}, {shop.address?.state}
                                             </span>
                                         </div>
-                                        
+
                                         {shop.deliveryFee !== undefined && (
                                             <div className="detail-item">
                                                 <span className="detail-icon">🚚</span>

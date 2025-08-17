@@ -7,7 +7,7 @@ import { SocketProvider, useSocket } from './context/SocketContext';
 
 import Navbar from './components/Navbar';
 import NotificationCenter from './components/NotificationCenter';
-import ConnectionStatus from './components/ConnectionStatus';
+
 import SocketDebugPanel from './components/SocketDebugPanel';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
@@ -81,7 +81,7 @@ const Layout = ({ children }) => {
 
   return (
     <>
-      <ConnectionStatus />
+
       {!shouldHideNavbar && <Navbar />}
       {!shouldHideNavbar && <NotificationCenter />}
       <SocketDebugPanel />

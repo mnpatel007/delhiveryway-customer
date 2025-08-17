@@ -62,17 +62,14 @@ export const SocketProvider = ({ children }) => {
     const [socket, setSocket] = useState(null);
     const [isConnected, setIsConnected] = useState(false);
     const [notifications, setNotifications] = useState([]);
-    const [reconnectAttempts, setReconnectAttempts] = useState(0);
+
     const [, setLastActivity] = useState(Date.now());
 
     // Track user activity to maintain connection
     useEffect(() => {
         const updateActivity = () => {
             setLastActivity(Date.now());
-            if (socket && !isConnected) {
-                console.log('🔄 User activity detected, attempting reconnection...');
-                socket.connect();
-            }
+
         };
 
         const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click'];
@@ -103,52 +100,26 @@ export const SocketProvider = ({ children }) => {
         return () => clearInterval(heartbeat);
     }, [socket, isConnected, user]);
 
-    // Page visibility change handler to reconnect when page becomes visible
-    useEffect(() => {
-        const handleVisibilityChange = () => {
-            if (document.visibilityState === 'visible' && socket && !isConnected) {
-                console.log('👁️ Page became visible, attempting reconnection...');
-                socket.connect();
-            }
-        };
 
-        document.addEventListener('visibilitychange', handleVisibilityChange);
-        return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
-    }, [socket, isConnected]);
 
-    // Window focus handler
-    useEffect(() => {
-        const handleFocus = () => {
-            if (socket && !isConnected) {
-                console.log('🎯 Window focused, attempting reconnection...');
-                socket.connect();
-            }
-        };
 
-        window.addEventListener('focus', handleFocus);
-        return () => window.removeEventListener('focus', handleFocus);
-    }, [socket, isConnected]);
 
     useEffect(() => {
         if (user?.user?._id) {
             console.log('🔌 Initializing customer socket connection...');
 
-            // Initialize socket connection with better options
+            // Initialize socket connection
             const newSocket = io(BACKEND_URL, {
                 withCredentials: true,
                 transports: ['websocket', 'polling'],
                 timeout: 20000,
-                reconnection: true,
-                reconnectionDelay: 1000,
-                reconnectionDelayMax: 5000,
-                maxReconnectionAttempts: 10,
                 forceNew: true
             });
 
             newSocket.on('connect', () => {
                 console.log('🟢 Customer socket connected:', newSocket.id);
                 setIsConnected(true);
-                setReconnectAttempts(0);
+
 
                 // Register as customer
                 newSocket.emit('registerCustomer', user.user._id);
@@ -158,36 +129,14 @@ export const SocketProvider = ({ children }) => {
             newSocket.on('disconnect', (reason) => {
                 console.log('🔴 Customer socket disconnected:', reason);
                 setIsConnected(false);
-
-                if (reason === 'io server disconnect') {
-                    // Server disconnected, try to reconnect
-                    setTimeout(() => newSocket.connect(), 1000);
-                }
             });
 
             newSocket.on('connect_error', (error) => {
                 console.error('❌ Customer socket connection error:', error);
                 setIsConnected(false);
-                setReconnectAttempts(prev => prev + 1);
             });
 
-            newSocket.on('reconnect', (attemptNumber) => {
-                console.log('🔄 Customer socket reconnected after', attemptNumber, 'attempts');
-                setIsConnected(true);
-                setReconnectAttempts(0);
-                // Re-register after reconnection
-                newSocket.emit('registerCustomer', user.user._id);
-            });
 
-            newSocket.on('reconnect_attempt', (attemptNumber) => {
-                console.log('🔄 Customer socket reconnection attempt:', attemptNumber);
-                setReconnectAttempts(attemptNumber);
-            });
-
-            newSocket.on('reconnect_failed', () => {
-                console.error('❌ Customer socket reconnection failed');
-                setIsConnected(false);
-            });
 
             // Listen for order status updates
             newSocket.on('orderStatusUpdate', (data) => {
@@ -550,7 +499,7 @@ export const SocketProvider = ({ children }) => {
         socket,
         isConnected,
         notifications,
-        reconnectAttempts,
+
         addNotification,
         removeNotification,
         clearNotifications,

@@ -146,7 +146,7 @@ const ShopPage = () => {
                             <span className="back-arrow">←</span>
                             <span>Back to Shops</span>
                         </button>
-                        
+
                         <div className="shop-main-info">
                             <div className="shop-avatar">
                                 {shop.images && shop.images.length > 0 ? (
@@ -155,11 +155,11 @@ const ShopPage = () => {
                                     <span className="shop-emoji">🏪</span>
                                 )}
                             </div>
-                            
+
                             <div className="shop-details">
                                 <h1 className="shop-name">{shop.name}</h1>
                                 <p className="shop-description">{shop.description}</p>
-                                
+
                                 <div className="shop-meta">
                                     <div className="meta-item">
                                         <span className="meta-icon">📍</span>
@@ -169,17 +169,17 @@ const ShopPage = () => {
                                                 shop.address) : 'Location not available'}
                                         </span>
                                     </div>
-                                    
+
                                     {shop.rating && (
                                         <div className="meta-item">
                                             <span className="meta-icon">⭐</span>
                                             <span className="meta-text">
-                                                {shop.rating.average?.toFixed(1) || '4.0'} 
+                                                {shop.rating.average?.toFixed(1) || '4.0'}
                                                 ({shop.rating.count || 0} reviews)
                                             </span>
                                         </div>
                                     )}
-                                    
+
                                     <div className="meta-item">
                                         <span className="meta-icon">📦</span>
                                         <span className="meta-text">
@@ -207,7 +207,7 @@ const ShopPage = () => {
                                 className="search-input"
                             />
                         </div>
-                        
+
                         <div className="filters-container">
                             <select
                                 value={selectedCategory}
@@ -216,12 +216,12 @@ const ShopPage = () => {
                             >
                                 {getCategories().map(category => (
                                     <option key={category} value={category}>
-                                        {category === 'all' ? 'All Categories' : 
-                                         category.charAt(0).toUpperCase() + category.slice(1)}
+                                        {category === 'all' ? 'All Categories' :
+                                            category.charAt(0).toUpperCase() + category.slice(1)}
                                     </option>
                                 ))}
                             </select>
-                            
+
                             <select
                                 value={sortBy}
                                 onChange={(e) => setSortBy(e.target.value)}
@@ -234,7 +234,7 @@ const ShopPage = () => {
                             </select>
                         </div>
                     </div>
-                    
+
                     <div className="view-controls">
                         <button
                             onClick={() => setViewMode('grid')}
@@ -276,7 +276,7 @@ const ShopPage = () => {
                             }
                         </p>
                         {searchTerm && (
-                            <button 
+                            <button
                                 onClick={() => setSearchTerm('')}
                                 className="clear-search-btn"
                             >
@@ -303,7 +303,7 @@ const ShopPage = () => {
                                             <span className="product-icon">📦</span>
                                         </div>
                                     )}
-                                    
+
                                     {product.category && (
                                         <div className="product-category-badge">
                                             {product.category}
@@ -331,7 +331,7 @@ const ShopPage = () => {
                                                 <span className="original-price">₹{product.originalPrice.toFixed(2)}</span>
                                             )}
                                         </div>
-                                        
+
                                         <button
                                             className="add-to-cart-btn"
                                             onClick={() => handleAddToCart(product)}

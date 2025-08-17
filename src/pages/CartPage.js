@@ -90,10 +90,10 @@ const CartPage = () => {
     const handleRemoveItem = async (productId, productName) => {
         setRemovingItem(productId);
         showToast(`Removing ${productName}...`);
-        
+
         // Simulate a small delay for better UX
         await new Promise(resolve => setTimeout(resolve, 300));
-        
+
         removeFromCart(productId);
         setRemovingItem(null);
         showToast(`${productName} removed from cart`);
@@ -147,13 +147,13 @@ const CartPage = () => {
                             Shopping Cart
                         </h1>
                         <p className="cart-subtitle">
-                            {isCartEmpty 
-                                ? 'Your cart is waiting for amazing products' 
+                            {isCartEmpty
+                                ? 'Your cart is waiting for amazing products'
                                 : `${calculateItemCount()} items from ${Object.keys(grouped).length} shop${Object.keys(grouped).length > 1 ? 's' : ''}`
                             }
                         </p>
                     </div>
-                    
+
                     {!isCartEmpty && (
                         <div className="cart-summary">
                             <div className="summary-item">
@@ -188,7 +188,7 @@ const CartPage = () => {
                         <p className="empty-cart-description">
                             Looks like you haven't added any items yet. Start shopping to fill your cart with amazing products!
                         </p>
-                        <button 
+                        <button
                             className="continue-shopping-btn"
                             onClick={() => navigate('/')}
                         >
@@ -201,8 +201,8 @@ const CartPage = () => {
                 /* Cart Content */
                 <div className="cart-content">
                     {Object.entries(grouped).map(([shopId, items], shopIndex) => (
-                        <section 
-                            key={shopId} 
+                        <section
+                            key={shopId}
                             className="cart-shop-section"
                             style={{ animationDelay: `${shopIndex * 0.1}s` }}
                         >
@@ -233,8 +233,8 @@ const CartPage = () => {
                                     const isRemoving = removingItem === product._id;
 
                                     return (
-                                        <article 
-                                            key={product._id} 
+                                        <article
+                                            key={product._id}
                                             className={`cart-item ${isRemoving ? 'removing' : ''}`}
                                             style={{ animationDelay: `${itemIndex * 0.05}s` }}
                                         >
@@ -263,7 +263,7 @@ const CartPage = () => {
                                                         {product.description || 'No description available'}
                                                     </p>
                                                 </div>
-                                                
+
                                                 <div className="item-price-info">
                                                     <div className="price-section">
                                                         <span className="item-price">₹{product.price.toFixed(2)}</span>
@@ -293,7 +293,7 @@ const CartPage = () => {
                                                     <span className="subtotal-label">Subtotal:</span>
                                                     <span className="subtotal-amount">₹{(product.price * parsedQty).toFixed(2)}</span>
                                                 </div>
-                                                
+
                                                 <button
                                                     onClick={() => handleRemoveItem(product._id, product.name)}
                                                     aria-label={`Remove ${product.name} from cart`}
@@ -336,8 +336,8 @@ const CartPage = () => {
                                 <span className="summary-value total-amount">₹{calculateOverallTotal().toFixed(2)}</span>
                             </div>
                         </div>
-                        
-                        <button 
+
+                        <button
                             className="checkout-all-btn"
                             onClick={() => handleCheckout(cart)}
                         >

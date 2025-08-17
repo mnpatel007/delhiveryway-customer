@@ -9,8 +9,8 @@ const NotificationCenter = () => {
         notifications,
         removeNotification,
         clearNotifications,
-        isConnected,
-        reconnectAttempts,
+
+
         requestNotificationPermission
     } = useSocket();
 
@@ -25,13 +25,7 @@ const NotificationCenter = () => {
         }
     };
 
-    const getConnectionStatus = () => {
-        if (isConnected) return { status: 'Connected', color: '#4CAF50' };
-        if (reconnectAttempts > 0) return { status: `Reconnecting... (${reconnectAttempts})`, color: '#FF9800' };
-        return { status: 'Disconnected', color: '#F44336' };
-    };
 
-    const connectionStatus = getConnectionStatus();
     const unreadCount = notifications.length;
 
     // Handle notification click
@@ -44,11 +38,7 @@ const NotificationCenter = () => {
 
     return (
         <div className="notification-center">
-            {/* Connection Status Indicator */}
-            <div className="connection-status" style={{ color: connectionStatus.color }}>
-                <span className="status-dot" style={{ backgroundColor: connectionStatus.color }}></span>
-                {connectionStatus.status}
-            </div>
+
 
             {/* Notification Bell */}
             <div className="notification-bell" onClick={() => setIsOpen(!isOpen)}>
