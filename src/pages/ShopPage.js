@@ -157,9 +157,14 @@ const ShopPage = () => {
     }, [products, searchTerm, selectedCategory, sortBy]);
 
     const handleAddToCart = (product) => {
-        addToCart(product, id);
-        setToast(`${product.name} added to cart`);
-        setTimeout(() => setToast(''), 3000);
+        const success = addToCart(product, 1); // quantity = 1, not the shop id
+        if (success) {
+            setToast(`${product.name} added to cart`);
+            setTimeout(() => setToast(''), 3000);
+        } else {
+            setToast('Failed to add to cart');
+            setTimeout(() => setToast(''), 3000);
+        }
     };
 
     const getCategories = () => {
