@@ -82,6 +82,7 @@ html {
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: smooth;
 }
 
 body {
@@ -89,6 +90,7 @@ body {
   color: var(--gray-900);
   background-color: var(--gray-50);
   min-height: 100vh;
+  overflow-x: hidden;
 }
 
 /* Typography */
@@ -101,6 +103,7 @@ h6 {
   font-weight: 600;
   line-height: 1.25;
   color: var(--gray-900);
+  margin-bottom: var(--space-4);
 }
 
 h1 {
@@ -130,6 +133,7 @@ h6 {
 p {
   line-height: 1.6;
   color: var(--gray-700);
+  margin-bottom: var(--space-4);
 }
 
 /* Links */
@@ -158,50 +162,62 @@ a:hover {
   transition: all var(--transition-fast);
   text-decoration: none;
   white-space: nowrap;
+  min-height: 44px;
 }
 
 .btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+  transform: none !important;
 }
 
 .btn-primary {
   background-color: var(--primary-600);
   color: white;
+  box-shadow: var(--shadow-sm);
 }
 
 .btn-primary:hover:not(:disabled) {
   background-color: var(--primary-700);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
 }
 
 .btn-secondary {
   background-color: white;
   color: var(--gray-700);
   border-color: var(--gray-300);
+  box-shadow: var(--shadow-sm);
 }
 
 .btn-secondary:hover:not(:disabled) {
   background-color: var(--gray-50);
   border-color: var(--gray-400);
+  transform: translateY(-1px);
 }
 
 .btn-success {
   background-color: var(--success-600);
   color: white;
+  box-shadow: var(--shadow-sm);
 }
 
 .btn-success:hover:not(:disabled) {
   background-color: var(--success-700);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
 }
 
 .btn-sm {
   padding: var(--space-2) var(--space-4);
   font-size: 0.75rem;
+  min-height: 36px;
 }
 
 .btn-lg {
   padding: var(--space-4) var(--space-8);
   font-size: 1rem;
+  min-height: 52px;
 }
 
 /* Form Elements */
@@ -225,6 +241,7 @@ a:hover {
   font-size: 0.875rem;
   transition: all var(--transition-fast);
   background-color: white;
+  min-height: 44px;
 }
 
 .form-input:focus {
@@ -244,6 +261,12 @@ a:hover {
   box-shadow: var(--shadow-sm);
   border: 1px solid var(--gray-200);
   overflow: hidden;
+  transition: all var(--transition-fast);
+}
+
+.card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
 }
 
 .card-header {
@@ -267,6 +290,9 @@ a:hover {
   border-radius: var(--radius-md);
   border: 1px solid;
   margin-bottom: var(--space-4);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
 }
 
 .alert-success {
@@ -366,6 +392,10 @@ a:hover {
   font-weight: 600;
 }
 
+.font-bold {
+  font-weight: 700;
+}
+
 .text-gray-500 {
   color: var(--gray-500);
 }
@@ -438,4 +468,123 @@ a:hover {
 
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
+}
+
+/* Focus styles for accessibility */
+*:focus-visible {
+  outline: 2px solid var(--primary-500);
+  outline-offset: 2px;
+}
+
+/* Smooth transitions for all interactive elements */
+button,
+a,
+input,
+select,
+textarea {
+  transition: all var(--transition-fast);
+}
+
+/* Error states */
+.error-state {
+  color: var(--error-600);
+  border-color: var(--error-500);
+}
+
+.error-state:focus {
+  border-color: var(--error-500);
+  box-shadow: 0 0 0 3px rgb(239 68 68 / 0.1);
+}
+
+/* Success states */
+.success-state {
+  color: var(--success-600);
+  border-color: var(--success-500);
+}
+
+/* Loading states */
+.loading {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+/* Skeleton loading */
+.skeleton {
+  background: linear-gradient(90deg, var(--gray-200) 25%, var(--gray-100) 50%, var(--gray-200) 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Toast notifications */
+.toast {
+  position: fixed;
+  top: var(--space-4);
+  right: var(--space-4);
+  z-index: 1000;
+  background: white;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xl);
+  border: 1px solid var(--gray-200);
+  padding: var(--space-4);
+  min-width: 300px;
+  animation: slideInRight 0.3s ease-out;
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+  .container {
+    padding: 0 var(--space-3);
+  }
+
+  .btn {
+    min-height: 48px;
+    padding: var(--space-4) var(--space-6);
+  }
+
+  .form-input {
+    min-height: 48px;
+    padding: var(--space-4);
+  }
+
+  .toast {
+    left: var(--space-3);
+    right: var(--space-3);
+    min-width: auto;
+  }
+}
+
+/* Print styles */
+@media print {
+  * {
+    background: transparent !important;
+    color: black !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  .no-print {
+    display: none !important;
+  }
 }
