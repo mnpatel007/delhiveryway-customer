@@ -34,13 +34,18 @@ const ShopPage = () => {
                 }
 
                 if (productResult.success) {
-                    setProducts(productResult.data);
-                    setFilteredProducts(productResult.data);
+                    const productsData = Array.isArray(productResult.data) ? productResult.data : [];
+                    setProducts(productsData);
+                    setFilteredProducts(productsData);
                 } else {
                     console.error('Failed to fetch products:', productResult.message);
+                    setProducts([]);
+                    setFilteredProducts([]);
                 }
             } catch (err) {
                 console.error('Error fetching shop or products:', err);
+                setProducts([]);
+                setFilteredProducts([]);
             } finally {
                 setLoading(false);
             }
@@ -92,6 +97,9 @@ const ShopPage = () => {
     };
 
     const getCategories = () => {
+        if (!Array.isArray(products)) {
+            return ['all'];
+        }
         const categories = ['all', ...new Set(products.map(p => p.category).filter(Boolean))];
         return categories;
     };
