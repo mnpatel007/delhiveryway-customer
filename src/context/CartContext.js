@@ -14,9 +14,11 @@ export const CartProvider = ({ children }) => {
     const [cartItems, setCartItems] = useState(() => {
         try {
             const savedCart = localStorage.getItem('customerCart');
-            return savedCart ? JSON.parse(savedCart) : [];
+            const parsed = savedCart ? JSON.parse(savedCart) : [];
+            console.log('📦 Cart restored from localStorage:', parsed.length, 'items');
+            return Array.isArray(parsed) ? parsed : [];
         } catch (error) {
-            console.error('Error loading cart from localStorage:', error);
+            console.error('❌ Error loading cart from localStorage:', error);
             return [];
         }
     });
@@ -24,9 +26,11 @@ export const CartProvider = ({ children }) => {
     const [selectedShop, setSelectedShop] = useState(() => {
         try {
             const savedShop = localStorage.getItem('selectedShop');
-            return savedShop ? JSON.parse(savedShop) : null;
+            const parsed = savedShop ? JSON.parse(savedShop) : null;
+            console.log('🏪 Selected shop restored:', parsed?.name || 'None');
+            return parsed;
         } catch (error) {
-            console.error('Error loading selected shop from localStorage:', error);
+            console.error('❌ Error loading selected shop from localStorage:', error);
             return null;
         }
     });
@@ -35,8 +39,9 @@ export const CartProvider = ({ children }) => {
     useEffect(() => {
         try {
             localStorage.setItem('customerCart', JSON.stringify(cartItems));
+            console.log('💾 Cart saved to localStorage:', cartItems.length, 'items');
         } catch (error) {
-            console.error('Error saving cart to localStorage:', error);
+            console.error('❌ Error saving cart to localStorage:', error);
         }
     }, [cartItems]);
 
@@ -45,106 +50,195 @@ export const CartProvider = ({ children }) => {
         try {
             if (selectedShop) {
                 localStorage.setItem('selectedShop', JSON.stringify(selectedShop));
+                console.log('💾 Selected shop saved:', selectedShop.name);
             } else {
                 localStorage.removeItem('selectedShop');
+                console.log('🗑️ Selected shop cleared');
             }
         } catch (error) {
-            console.error('Error saving selected shop to localStorage:', error);
+            console.error('❌ Error saving selected shop to localStorage:', error);
         }
     }, [selectedShop]);
 
     const addToCart = (product, quantity = 1, notes = '') => {
-        // Check if product is from a different shop
-        if (selectedShop && selectedShop._id !== product.shopId._id) {
-            const confirmSwitch = window.confirm(
-                `You have items from ${selectedShop.name} in your cart. Adding items from ${product.shopId.name} will clear your current cart. Continue?`
-            );
-
-            if (!confirmSwitch) {
+        try {
+            // Validate product data
+            if (!product || !product._id) {
+                console.error('❌ Invalid product data:', product);
                 return false;
             }
 
-            // Clear cart and switch shop
-            setCartItems([]);
-        }
-
-        // Set or update selected shop
-        if (!selectedShop || selectedShop._id !== product.shopId._id) {
-            setSelectedShop(product.shopId);
-        }
-
-        setCartItems(prevItems => {
-            const existingItem = prevItems.find(item => item._id === product._id);
-
-            if (existingItem) {
-                return prevItems.map(item =>
-                    item._id === product._id
-                        ? {
-                            ...item,
-                            quantity: item.quantity + quantity,
-                            notes: notes || item.notes
-                        }
-                        : item
-                );
+            // Ensure product has shopId
+            const productShopId = product.shopId?._id || product.shopId;
+            if (!productShopId) {
+                console.error('❌ Product missing shopId:', product);
+                return false;
             }
 
-            return [...prevItems, {
-                ...product,
-                quantity,
-                notes,
-                addedAt: new Date().toISOString()
-            }];
-        });
+            // Check if product is from a different shop
+            if (selectedShop && selectedShop._id !== productShopId) {
+                const confirmSwitch = window.confirm(
+                    `You have items from ${selectedShop.name} in your cart. Adding items from ${product.shopId?.name || 'this shop'} will clear your current cart. Continue?`
+                );
 
-        return true;
+                if (!confirmSwitch) {
+                    return false;
+                }
+
+                // Clear cart and switch shop
+                setCartItems([]);
+            }
+
+            // Set or update selected shop
+            if (!selectedShop || selectedShop._id !== productShopId) {
+                const shopData = product.shopId && typeof product.shopId === 'object' 
+                    ? product.shopId 
+                    : { _id: productShopId, name: 'Unknown Shop' };
+                setSelectedShop(shopData);
+            }
+
+            setCartItems(prevItems => {
+                const existingItem = prevItems.find(item => item._id === product._id);
+
+                if (existingItem) {
+                    console.log('📦 Updating existing item quantity:', product.name);
+                    return prevItems.map(item =>
+                        item._id === product._id
+                            ? {
+                                ...item,
+                                quantity: item.quantity + quantity,
+                                notes: notes || item.notes,
+                                updatedAt: new Date().toISOString()
+                            }
+                            : item
+                    );
+                }
+
+                console.log('📦 Adding new item to cart:', product.name);
+                return [...prevItems, {
+                    ...product,
+                    quantity,
+                    notes,
+                    addedAt: new Date().toISOString()
+                }];
+            });
+
+            return true;
+        } catch (error) {
+            console.error('❌ Error adding to cart:', error);
+            return false;
+        }
     };
 
     const removeFromCart = (productId) => {
-        setCartItems(prevItems => {
-            const newItems = prevItems.filter(item => item._id !== productId);
-
-            // Clear selected shop if cart becomes empty
-            if (newItems.length === 0) {
-                setSelectedShop(null);
+        try {
+            if (!productId) {
+                console.error('❌ Invalid productId for removal');
+                return false;
             }
 
-            return newItems;
-        });
+            setCartItems(prevItems => {
+                const newItems = prevItems.filter(item => item._id !== productId);
+                console.log('🗑️ Item removed from cart. Remaining items:', newItems.length);
+
+                // Clear selected shop if cart becomes empty
+                if (newItems.length === 0) {
+                    setSelectedShop(null);
+                }
+
+                return newItems;
+            });
+
+            return true;
+        } catch (error) {
+            console.error('❌ Error removing from cart:', error);
+            return false;
+        }
     };
 
     const updateQuantity = (productId, quantity) => {
-        if (quantity <= 0) {
-            removeFromCart(productId);
-            return;
-        }
+        try {
+            if (!productId) {
+                console.error('❌ Invalid productId for quantity update');
+                return false;
+            }
 
-        setCartItems(prevItems =>
-            prevItems.map(item =>
-                item._id === productId ? { ...item, quantity } : item
-            )
-        );
+            if (quantity <= 0) {
+                return removeFromCart(productId);
+            }
+
+            setCartItems(prevItems =>
+                prevItems.map(item =>
+                    item._id === productId 
+                        ? { 
+                            ...item, 
+                            quantity: Math.max(1, parseInt(quantity) || 1),
+                            updatedAt: new Date().toISOString()
+                        } 
+                        : item
+                )
+            );
+
+            console.log('📦 Quantity updated for product:', productId, 'New quantity:', quantity);
+            return true;
+        } catch (error) {
+            console.error('❌ Error updating quantity:', error);
+            return false;
+        }
     };
 
     const updateNotes = (productId, notes) => {
-        setCartItems(prevItems =>
-            prevItems.map(item =>
-                item._id === productId ? { ...item, notes } : item
-            )
-        );
+        try {
+            if (!productId) {
+                console.error('❌ Invalid productId for notes update');
+                return false;
+            }
+
+            setCartItems(prevItems =>
+                prevItems.map(item =>
+                    item._id === productId 
+                        ? { 
+                            ...item, 
+                            notes: notes || '',
+                            updatedAt: new Date().toISOString()
+                        } 
+                        : item
+                )
+            );
+
+            console.log('📝 Notes updated for product:', productId);
+            return true;
+        } catch (error) {
+            console.error('❌ Error updating notes:', error);
+            return false;
+        }
     };
 
     const clearCart = () => {
-        setCartItems([]);
-        setSelectedShop(null);
-        localStorage.removeItem('customerCart');
-        localStorage.removeItem('selectedShop');
+        try {
+            setCartItems([]);
+            setSelectedShop(null);
+            localStorage.removeItem('customerCart');
+            localStorage.removeItem('selectedShop');
+            console.log('🗑️ Cart cleared completely');
+            return true;
+        } catch (error) {
+            console.error('❌ Error clearing cart:', error);
+            return false;
+        }
     };
 
     const getCartTotal = () => {
-        return cartItems.reduce((total, item) => {
-            const price = item.discountedPrice || item.price;
-            return total + (price * item.quantity);
-        }, 0);
+        try {
+            return cartItems.reduce((total, item) => {
+                const price = parseFloat(item.discountedPrice || item.price || 0);
+                const quantity = parseInt(item.quantity || 0);
+                return total + (price * quantity);
+            }, 0);
+        } catch (error) {
+            console.error('❌ Error calculating cart total:', error);
+            return 0;
+        }
     };
 
     const getCartSubtotal = () => {
@@ -152,109 +246,172 @@ export const CartProvider = ({ children }) => {
     };
 
     const getDeliveryFee = () => {
-        return selectedShop?.deliveryFee || 0;
+        try {
+            return parseFloat(selectedShop?.deliveryFee || 0);
+        } catch (error) {
+            console.error('❌ Error getting delivery fee:', error);
+            return 0;
+        }
     };
 
     const getServiceFee = () => {
-        const subtotal = getCartSubtotal();
-        return Math.round(subtotal * 0.05); // 5% service fee
+        try {
+            const subtotal = getCartSubtotal();
+            return Math.round(subtotal * 0.05 * 100) / 100; // 5% service fee, rounded to 2 decimals
+        } catch (error) {
+            console.error('❌ Error calculating service fee:', error);
+            return 0;
+        }
     };
 
     const getTaxes = () => {
-        const subtotal = getCartSubtotal();
-        return Math.round(subtotal * 0.05); // 5% tax
+        try {
+            const subtotal = getCartSubtotal();
+            return Math.round(subtotal * 0.05 * 100) / 100; // 5% tax, rounded to 2 decimals
+        } catch (error) {
+            console.error('❌ Error calculating taxes:', error);
+            return 0;
+        }
     };
 
     const getGrandTotal = () => {
-        return getCartSubtotal() + getDeliveryFee() + getServiceFee() + getTaxes();
+        try {
+            const subtotal = getCartSubtotal();
+            const deliveryFee = getDeliveryFee();
+            const serviceFee = getServiceFee();
+            const taxes = getTaxes();
+            return Math.round((subtotal + deliveryFee + serviceFee + taxes) * 100) / 100;
+        } catch (error) {
+            console.error('❌ Error calculating grand total:', error);
+            return 0;
+        }
     };
 
     const getCartItemsCount = () => {
-        return cartItems.reduce((total, item) => total + item.quantity, 0);
+        try {
+            return cartItems.reduce((total, item) => total + parseInt(item.quantity || 0), 0);
+        } catch (error) {
+            console.error('❌ Error counting cart items:', error);
+            return 0;
+        }
     };
 
     const isProductInCart = (productId) => {
-        return cartItems.some(item => item._id === productId);
+        try {
+            return cartItems.some(item => item._id === productId);
+        } catch (error) {
+            console.error('❌ Error checking if product in cart:', error);
+            return false;
+        }
     };
 
     const getProductQuantityInCart = (productId) => {
-        const item = cartItems.find(item => item._id === productId);
-        return item ? item.quantity : 0;
+        try {
+            const item = cartItems.find(item => item._id === productId);
+            return item ? parseInt(item.quantity || 0) : 0;
+        } catch (error) {
+            console.error('❌ Error getting product quantity:', error);
+            return 0;
+        }
     };
 
     const canAddToCart = (product) => {
-        // Check if product is available
-        if (!product.isActive || !product.inStock) {
-            return { canAdd: false, reason: 'Product is not available' };
-        }
+        try {
+            // Check if product is available
+            if (!product.isActive || !product.inStock) {
+                return { canAdd: false, reason: 'Product is not available' };
+            }
 
-        // Check if adding to cart from different shop
-        if (selectedShop && selectedShop._id !== product.shopId._id) {
-            return {
-                canAdd: true,
-                requiresConfirmation: true,
-                reason: `This will clear items from ${selectedShop.name}`
-            };
-        }
+            // Check if adding to cart from different shop
+            if (selectedShop && selectedShop._id !== (product.shopId?._id || product.shopId)) {
+                return {
+                    canAdd: true,
+                    requiresConfirmation: true,
+                    reason: `This will clear items from ${selectedShop.name}`
+                };
+            }
 
-        return { canAdd: true };
+            return { canAdd: true };
+        } catch (error) {
+            console.error('❌ Error checking if can add to cart:', error);
+            return { canAdd: false, reason: 'Error checking product availability' };
+        }
     };
 
     const validateCart = () => {
-        const errors = [];
+        try {
+            const errors = [];
 
-        if (cartItems.length === 0) {
-            errors.push('Cart is empty');
-            return { isValid: false, errors };
-        }
-
-        if (!selectedShop) {
-            errors.push('No shop selected');
-            return { isValid: false, errors };
-        }
-
-        // Check minimum order value
-        const subtotal = getCartSubtotal();
-        if (subtotal < selectedShop.minOrderValue) {
-            errors.push(`Minimum order value is ₹${selectedShop.minOrderValue}`);
-        }
-
-        // Check maximum order value
-        if (selectedShop.maxOrderValue && subtotal > selectedShop.maxOrderValue) {
-            errors.push(`Maximum order value is ₹${selectedShop.maxOrderValue}`);
-        }
-
-        // Check product availability
-        cartItems.forEach(item => {
-            if (!item.isActive || !item.inStock) {
-                errors.push(`${item.name} is no longer available`);
+            if (cartItems.length === 0) {
+                errors.push('Cart is empty');
+                return { isValid: false, errors };
             }
 
-            if (item.stockQuantity && item.quantity > item.stockQuantity) {
-                errors.push(`Only ${item.stockQuantity} ${item.name} available`);
+            if (!selectedShop) {
+                errors.push('No shop selected');
+                return { isValid: false, errors };
             }
-        });
 
-        return { isValid: errors.length === 0, errors };
+            // Check minimum order value
+            const subtotal = getCartSubtotal();
+            if (selectedShop.minOrderValue && subtotal < selectedShop.minOrderValue) {
+                errors.push(`Minimum order value is ₹${selectedShop.minOrderValue}`);
+            }
+
+            // Check maximum order value
+            if (selectedShop.maxOrderValue && subtotal > selectedShop.maxOrderValue) {
+                errors.push(`Maximum order value is ₹${selectedShop.maxOrderValue}`);
+            }
+
+            // Check product availability
+            cartItems.forEach(item => {
+                if (!item.isActive || !item.inStock) {
+                    errors.push(`${item.name} is no longer available`);
+                }
+
+                if (item.stockQuantity && item.quantity > item.stockQuantity) {
+                    errors.push(`Only ${item.stockQuantity} ${item.name} available`);
+                }
+            });
+
+            return { isValid: errors.length === 0, errors };
+        } catch (error) {
+            console.error('❌ Error validating cart:', error);
+            return { isValid: false, errors: ['Error validating cart'] };
+        }
     };
 
     const getOrderSummary = () => {
-        const subtotal = getCartSubtotal();
-        const deliveryFee = getDeliveryFee();
-        const serviceFee = getServiceFee();
-        const taxes = getTaxes();
-        const total = getGrandTotal();
+        try {
+            const subtotal = getCartSubtotal();
+            const deliveryFee = getDeliveryFee();
+            const serviceFee = getServiceFee();
+            const taxes = getTaxes();
+            const total = getGrandTotal();
 
-        return {
-            items: cartItems,
-            itemCount: getCartItemsCount(),
-            subtotal,
-            deliveryFee,
-            serviceFee,
-            taxes,
-            total,
-            shop: selectedShop
-        };
+            return {
+                items: cartItems,
+                itemCount: getCartItemsCount(),
+                subtotal,
+                deliveryFee,
+                serviceFee,
+                taxes,
+                total,
+                shop: selectedShop
+            };
+        } catch (error) {
+            console.error('❌ Error getting order summary:', error);
+            return {
+                items: [],
+                itemCount: 0,
+                subtotal: 0,
+                deliveryFee: 0,
+                serviceFee: 0,
+                taxes: 0,
+                total: 0,
+                shop: null
+            };
+        }
     };
 
     // Legacy support for existing components
@@ -265,20 +422,28 @@ export const CartProvider = ({ children }) => {
     }));
 
     const increaseQuantity = (productId) => {
-        updateQuantity(productId, getProductQuantityInCart(productId) + 1);
+        const currentQuantity = getProductQuantityInCart(productId);
+        return updateQuantity(productId, currentQuantity + 1);
     };
 
     const decreaseQuantity = (productId) => {
-        updateQuantity(productId, getProductQuantityInCart(productId) - 1);
+        const currentQuantity = getProductQuantityInCart(productId);
+        return updateQuantity(productId, Math.max(0, currentQuantity - 1));
     };
 
     const setCart = (newCart) => {
-        const items = newCart.map(item => ({
-            ...item.product,
-            quantity: item.quantity,
-            notes: item.notes || ''
-        }));
-        setCartItems(items);
+        try {
+            const items = newCart.map(item => ({
+                ...item.product,
+                quantity: item.quantity,
+                notes: item.notes || ''
+            }));
+            setCartItems(items);
+            return true;
+        } catch (error) {
+            console.error('❌ Error setting cart:', error);
+            return false;
+        }
     };
 
     const value = {
