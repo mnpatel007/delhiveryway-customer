@@ -35,30 +35,29 @@ const ShopPage = () => {
 
                 console.log('🔍 Product API Result:', productResult);
 
-                if (productResult.success) {
-                    let productsData = productResult.data;
+                // Handle multiple response formats
+                let productsData = [];
 
-                    // Handle different response structures
-                    if (!Array.isArray(productsData)) {
-                        if (productsData && Array.isArray(productsData.products)) {
-                            productsData = productsData.products;
-                        } else if (productsData && typeof productsData === 'object') {
-                            // If it's an object, try to extract array values
-                            const values = Object.values(productsData);
-                            productsData = values.find(val => Array.isArray(val)) || [];
-                        } else {
-                            productsData = [];
-                        }
-                    }
-
-                    console.log('📦 Setting products:', productsData);
-                    setProducts(productsData);
-                    setFilteredProducts(productsData);
+                if (Array.isArray(productResult)) {
+                    // Direct array response
+                    productsData = productResult;
+                    console.log('📦 Direct array response');
+                } else if (productResult && productResult.success && productResult.data) {
+                    // Standard API response with success wrapper
+                    productsData = Array.isArray(productResult.data) ? productResult.data : [];
+                    console.log('📦 Success wrapper response');
+                } else if (productResult && Array.isArray(productResult.products)) {
+                    // Response with products property
+                    productsData = productResult.products;
+                    console.log('📦 Products property response');
                 } else {
-                    console.error('Failed to fetch products:', productResult.message);
-                    setProducts([]);
-                    setFilteredProducts([]);
+                    console.warn('⚠️ Unknown response format:', productResult);
+                    productsData = [];
                 }
+
+                console.log('📦 Final products data:', productsData, 'Length:', productsData.length);
+                setProducts(productsData);
+                setFilteredProducts(productsData);
             } catch (err) {
                 console.error('Error fetching shop or products:', err);
                 setProducts([]);
