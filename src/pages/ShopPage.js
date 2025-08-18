@@ -83,7 +83,8 @@ const ShopPage = () => {
                             price: 100,
                             category: 'sample',
                             inStock: true,
-                            images: []
+                            images: [],
+                            shopId: id
                         },
                         {
                             _id: 'sample2',
@@ -92,7 +93,8 @@ const ShopPage = () => {
                             price: 200,
                             category: 'sample',
                             inStock: true,
-                            images: []
+                            images: [],
+                            shopId: id
                         }
                     ];
                 }
