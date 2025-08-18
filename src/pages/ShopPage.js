@@ -33,8 +33,25 @@ const ShopPage = () => {
                     console.error('Failed to fetch shop:', shopResult.message);
                 }
 
+                console.log('🔍 Product API Result:', productResult);
+
                 if (productResult.success) {
-                    const productsData = Array.isArray(productResult.data) ? productResult.data : [];
+                    let productsData = productResult.data;
+
+                    // Handle different response structures
+                    if (!Array.isArray(productsData)) {
+                        if (productsData && Array.isArray(productsData.products)) {
+                            productsData = productsData.products;
+                        } else if (productsData && typeof productsData === 'object') {
+                            // If it's an object, try to extract array values
+                            const values = Object.values(productsData);
+                            productsData = values.find(val => Array.isArray(val)) || [];
+                        } else {
+                            productsData = [];
+                        }
+                    }
+
+                    console.log('📦 Setting products:', productsData);
                     setProducts(productsData);
                     setFilteredProducts(productsData);
                 } else {
@@ -56,6 +73,14 @@ const ShopPage = () => {
 
     // Filter and sort products
     useEffect(() => {
+        console.log('🔄 Filtering products:', products, 'Length:', products?.length);
+
+        if (!Array.isArray(products)) {
+            console.warn('⚠️ Products is not an array:', products);
+            setFilteredProducts([]);
+            return;
+        }
+
         let filtered = products;
 
         // Apply search filter
@@ -87,6 +112,7 @@ const ShopPage = () => {
             }
         });
 
+        console.log('✅ Filtered products result:', filtered, 'Length:', filtered.length);
         setFilteredProducts(filtered);
     }, [products, searchTerm, selectedCategory, sortBy]);
 
