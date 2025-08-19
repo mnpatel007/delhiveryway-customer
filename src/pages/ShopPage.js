@@ -33,70 +33,13 @@ const ShopPage = () => {
                     console.error('Failed to fetch shop:', shopResult.message);
                 }
 
-                console.log('🔍 Product API Result:', productResult);
-                console.log('🔍 Product API Result keys:', Object.keys(productResult || {}));
-                console.log('🔍 Product API Result.data:', productResult?.data);
-                console.log('🔍 Product API Result.products:', productResult?.products);
-                console.log('🔍 Product API Result.success:', productResult?.success);
-
-                // Handle multiple response formats
                 let productsData = [];
-
-                if (Array.isArray(productResult)) {
-                    // Direct array response
-                    productsData = productResult;
-                    console.log('📦 Direct array response');
-                } else if (productResult && productResult.success && productResult.data) {
-                    // Standard API response with success wrapper
-                    productsData = Array.isArray(productResult.data) ? productResult.data : [];
-                    console.log('📦 Success wrapper response');
-                } else if (productResult && Array.isArray(productResult.products)) {
-                    // Response with products property
-                    productsData = productResult.products;
-                    console.log('📦 Products property response');
-                } else if (productResult && typeof productResult === 'object') {
-                    // Try to find any array in the object
-                    const values = Object.values(productResult);
-                    const arrayValue = values.find(val => Array.isArray(val) && val.length > 0);
-                    if (arrayValue) {
-                        productsData = arrayValue;
-                        console.log('📦 Found array in object values:', arrayValue.length, 'items');
-                    } else {
-                        console.warn('⚠️ No array found in object:', Object.keys(productResult));
-                        productsData = [];
-                    }
+                
+                if (productResult.success && productResult.data) {
+                    productsData = productResult.data.products || [];
                 } else {
-                    console.warn('⚠️ Unknown response format:', productResult);
+                    console.warn('⚠️ Failed to fetch products:', productResult.message);
                     productsData = [];
-                }
-
-                console.log('📦 Final products data:', productsData, 'Length:', productsData.length);
-
-                // Temporary fallback - if no products, create sample ones
-                if (productsData.length === 0) {
-                    console.log('⚠️ No products found, using sample data');
-                    productsData = [
-                        {
-                            _id: 'sample1',
-                            name: 'Sample Product 1',
-                            description: 'This is a sample product',
-                            price: 100,
-                            category: 'sample',
-                            inStock: true,
-                            images: [],
-                            shopId: id
-                        },
-                        {
-                            _id: 'sample2',
-                            name: 'Sample Product 2',
-                            description: 'Another sample product',
-                            price: 200,
-                            category: 'sample',
-                            inStock: true,
-                            images: [],
-                            shopId: id
-                        }
-                    ];
                 }
 
                 setProducts(productsData);
