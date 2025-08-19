@@ -35,17 +35,23 @@ const ShopPage = () => {
 
                 let productsData = [];
                 
+                console.log('🔍 Product API Result:', productResult);
+                
                 if (productResult.success && productResult.data) {
                     productsData = productResult.data.products || [];
+                    console.log('📦 Products found:', productsData.length);
                 } else {
                     console.warn('⚠️ Failed to fetch products:', productResult.message);
                     productsData = [];
                 }
+                
+                console.log('📦 Final products data:', productsData);
 
                 setProducts(productsData);
                 setFilteredProducts(productsData);
             } catch (err) {
                 console.error('Error fetching shop or products:', err);
+                console.error('Error details:', err.response?.data);
                 setProducts([]);
                 setFilteredProducts([]);
             } finally {
