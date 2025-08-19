@@ -5,6 +5,7 @@ import { AuthProvider, AuthContext } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 import { SocketProvider, useSocket } from './context/SocketContext';
 
+import ErrorBoundary from './components/ErrorBoundary';
 import Navbar from './components/Navbar';
 import NotificationCenter from './components/NotificationCenter';
 
@@ -124,13 +125,15 @@ function App() {
   }, []);
 
   return (
-    <AuthProvider>
-      <CartProvider>
-        <SocketProvider>
-          <AppContent />
-        </SocketProvider>
-      </CartProvider>
-    </AuthProvider>
+    <ErrorBoundary>
+      <AuthProvider>
+        <CartProvider>
+          <SocketProvider>
+            <AppContent />
+          </SocketProvider>
+        </CartProvider>
+      </AuthProvider>
+    </ErrorBoundary>
   );
 }
 
