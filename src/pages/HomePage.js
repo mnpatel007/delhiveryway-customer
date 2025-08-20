@@ -142,17 +142,18 @@ const HomePage = () => {
             if (shopsData.length > 0) {
                 setShops(shopsData);
                 setError('');
+                console.log('✅ Shops loaded successfully:', shopsData.length);
             } else {
-                console.log('No shops from API, using sample data');
+                console.log('⚠️ No shops from API, using sample data');
                 setShops(filterSampleShops());
                 setError('Showing sample shops - backend may be updating');
             }
 
         } catch (err) {
             console.error('❌ Failed to fetch shops:', err);
-            console.log('Using sample shops as fallback');
+            console.log('🔄 Using sample shops as fallback');
             setShops(filterSampleShops());
-            setError('Using sample data - please check your internet connection');
+            setError('Using sample data - please check your internet connection or try again later');
         } finally {
             setLoading(false);
         }

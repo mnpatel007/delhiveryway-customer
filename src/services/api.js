@@ -1,11 +1,10 @@
 import axios from 'axios';
-
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://delhiveryway-backend-1.onrender.com/api';
+import config from '../config/config';
 
 // Create axios instance with better configuration
 const api = axios.create({
-    baseURL: API_BASE_URL,
-    timeout: 60000, // Increased timeout for better reliability
+    baseURL: config.API_BASE_URL,
+    timeout: config.API_TIMEOUT,
     headers: {
         'Content-Type': 'application/json',
     },
@@ -109,7 +108,7 @@ export const shopsAPI = {
     getAll: (params = {}) => {
         // Add default parameters for better results
         const defaultParams = {
-            limit: 50,
+            limit: config.DEFAULT_PAGE_SIZE,
             page: 1,
             active: true,
             ...params
@@ -128,7 +127,7 @@ export const shopsAPI = {
 export const productsAPI = {
     getByShop: (shopId, params = {}) => {
         const defaultParams = {
-            limit: 100,
+            limit: config.MAX_PAGE_SIZE,
             active: true,
             ...params
         };
@@ -145,7 +144,7 @@ export const ordersAPI = {
     create: (orderData) => api.post('/orders', orderData),
     getCustomerOrders: (params = {}) => {
         const defaultParams = {
-            limit: 50,
+            limit: config.DEFAULT_PAGE_SIZE,
             page: 1,
             sort: '-createdAt',
             ...params

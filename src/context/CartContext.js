@@ -325,42 +325,7 @@ export const CartProvider = ({ children }) => {
         }
     };
 
-    // Legacy support for existing components
-    const cart = cartItems.map(item => ({
-        product: item,
-        shopId: selectedShop?._id,
-        quantity: item.quantity
-    }));
-
-    const increaseQuantity = (productId) => {
-        const currentItem = cartItems.find(item => item._id === productId);
-        const currentQuantity = currentItem ? currentItem.quantity : 0;
-        return updateQuantity(productId, currentQuantity + 1);
-    };
-
-    const decreaseQuantity = (productId) => {
-        const currentItem = cartItems.find(item => item._id === productId);
-        const currentQuantity = currentItem ? currentItem.quantity : 0;
-        return updateQuantity(productId, Math.max(0, currentQuantity - 1));
-    };
-
-    const setCart = (newCart) => {
-        try {
-            const items = newCart.map(item => ({
-                ...item.product,
-                quantity: item.quantity,
-                notes: item.notes || ''
-            }));
-            setCartItems(items);
-            return true;
-        } catch (error) {
-            console.error('❌ Error setting cart:', error);
-            return false;
-        }
-    };
-
     const value = {
-        // New API
         cartItems,
         selectedShop,
         addToCart,
@@ -374,13 +339,7 @@ export const CartProvider = ({ children }) => {
         getTaxes,
         getGrandTotal,
         getCartItemsCount,
-        getOrderSummary,
-
-        // Legacy API for backward compatibility
-        cart,
-        increaseQuantity,
-        decreaseQuantity,
-        setCart
+        getOrderSummary
     };
 
     return (

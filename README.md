@@ -1,70 +1,259 @@
-# Getting Started with Create React App
+# DelhiveryWay Customer Portal
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A modern, responsive customer portal for the DelhiveryWay delivery platform built with React.
 
-## Available Scripts
+## Features
 
-In the project directory, you can run:
+### 🛍️ Shopping Experience
+- **Shop Discovery**: Browse and search through available shops by category
+- **Product Browsing**: View products with images, descriptions, and pricing
+- **Smart Cart Management**: Add items to cart with quantity controls and notes
+- **Multi-shop Support**: Shop from different stores with automatic cart management
 
-### `npm start`
+### 🛒 Cart & Checkout
+- **Persistent Cart**: Cart data saved locally for seamless shopping
+- **Order Summary**: Detailed breakdown of costs including taxes and delivery fees
+- **Secure Checkout**: Integrated Stripe payment processing
+- **Address Management**: Easy delivery address input and validation
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+### 📦 Order Management
+- **Order History**: Complete order tracking and history
+- **Real-time Updates**: Live order status updates via WebSocket
+- **Order Details**: Comprehensive order information and item breakdowns
+- **Status Tracking**: Visual status indicators for order progress
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+### 🔐 User Management
+- **Authentication**: Secure login and registration system
+- **Profile Management**: User profile and preferences
+- **Password Recovery**: Forgot password and reset functionality
+- **Session Management**: Secure token-based authentication
 
-### `npm test`
+## Technology Stack
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+- **Frontend**: React 19.1.0 with modern hooks
+- **Routing**: React Router DOM 7.6.2
+- **State Management**: React Context API
+- **HTTP Client**: Axios with interceptors and retry logic
+- **Real-time**: Socket.io client for live updates
+- **Payments**: Stripe integration for secure transactions
+- **Styling**: CSS3 with modern design patterns
+- **Build Tool**: Create React App 5.0.1
 
-### `npm run build`
+## Project Structure
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+```
+src/
+├── components/          # Reusable UI components
+│   ├── Navbar.js       # Navigation component
+│   ├── NotificationCenter.js  # Real-time notifications
+│   └── ErrorBoundary.js      # Error handling
+├── context/            # React Context providers
+│   ├── AuthContext.js  # Authentication state
+│   ├── CartContext.js  # Shopping cart management
+│   └── SocketContext.js # WebSocket connections
+├── pages/              # Main application pages
+│   ├── HomePage.js     # Shop discovery
+│   ├── ShopPage.js     # Individual shop view
+│   ├── CartPage.js     # Shopping cart
+│   ├── CheckoutPage.js # Payment processing
+│   └── OrderHistoryPage.js # Order tracking
+├── services/           # API and external services
+│   └── api.js         # HTTP client and API endpoints
+├── config/             # Configuration files
+│   └── config.js      # Environment and app settings
+└── utils/              # Utility functions
+```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## Getting Started
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### Prerequisites
+- Node.js 18+ 
+- npm or yarn package manager
 
-### `npm run eject`
+### Installation
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd client-customer
+   ```
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+3. **Environment Configuration**
+   ```bash
+   cp env.example .env
+   ```
+   
+   Update the `.env` file with your configuration:
+   ```env
+   REACT_APP_API_URL=https://your-backend-url.com/api
+   REACT_APP_STRIPE_PUBLISHABLE_KEY=pk_test_your_stripe_key
+   REACT_APP_SOCKET_URL=https://your-backend-url.com
+   ```
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+4. **Start development server**
+   ```bash
+   npm start
+   ```
 
-## Learn More
+5. **Build for production**
+   ```bash
+   npm run build
+   ```
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## Configuration
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+### Environment Variables
 
-### Code Splitting
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `REACT_APP_API_URL` | Backend API endpoint | `https://delhiveryway-backend-1.onrender.com/api` |
+| `REACT_APP_STRIPE_PUBLISHABLE_KEY` | Stripe public key | Test key provided |
+| `REACT_APP_SOCKET_URL` | WebSocket server URL | `https://delhiveryway-backend-1.onrender.com` |
+| `REACT_APP_APP_NAME` | Application name | `DelhiveryWay Customer` |
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+### Feature Flags
 
-### Analyzing the Bundle Size
+- `ENABLE_GOOGLE_OAUTH`: Enable Google OAuth login
+- `ENABLE_STRIPE_PAYMENTS`: Enable Stripe payment processing
+- `ENABLE_SOCKET_NOTIFICATIONS`: Enable real-time notifications
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+## API Integration
 
-### Making a Progressive Web App
+### Authentication Endpoints
+- `POST /auth/login` - User login
+- `POST /auth/signup` - User registration
+- `GET /auth/profile` - Get user profile
+- `PUT /auth/profile` - Update user profile
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+### Shop Endpoints
+- `GET /shops` - List all shops
+- `GET /shops/:id` - Get shop details
+- `GET /shops/search` - Search shops
+- `GET /shops/category/:category` - Get shops by category
 
-### Advanced Configuration
+### Product Endpoints
+- `GET /products/shop/:shopId` - Get products by shop
+- `GET /products/:id` - Get product details
+- `GET /products/search` - Search products
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+### Order Endpoints
+- `POST /orders` - Create new order
+- `GET /orders/customer` - Get customer orders
+- `GET /orders/:id` - Get order details
+- `PUT /orders/:id/cancel` - Cancel order
 
-### Deployment
+### Payment Endpoints
+- `POST /payment/create-checkout-session` - Create Stripe checkout session
+- `POST /payment/confirm` - Confirm payment
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+## Key Features Implementation
 
-### `npm run build` fails to minify
+### Cart Management
+The cart system uses React Context for state management with localStorage persistence:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+```javascript
+const { addToCart, removeFromCart, updateQuantity } = useContext(CartContext);
+```
+
+### Real-time Updates
+WebSocket integration for live order status updates:
+
+```javascript
+socket.on('orderStatusUpdate', (data) => {
+    // Update order status in real-time
+});
+```
+
+### Payment Processing
+Secure Stripe integration for checkout:
+
+```javascript
+const stripe = await stripePromise;
+const result = await stripe.redirectToCheckout({
+    sessionId: response.data.id
+});
+```
+
+## Styling and Design
+
+- **Responsive Design**: Mobile-first approach with CSS Grid and Flexbox
+- **Modern UI**: Clean, intuitive interface with smooth animations
+- **Accessibility**: ARIA labels and keyboard navigation support
+- **Theme System**: CSS custom properties for consistent theming
+
+## Error Handling
+
+- **Error Boundaries**: React error boundaries for component-level error handling
+- **API Error Handling**: Comprehensive error handling with user-friendly messages
+- **Fallback UI**: Graceful degradation when services are unavailable
+- **Retry Logic**: Automatic retry for failed API requests
+
+## Performance Optimizations
+
+- **Code Splitting**: Route-based code splitting for better performance
+- **Image Optimization**: Lazy loading and error handling for images
+- **Caching**: API response caching for improved user experience
+- **Bundle Optimization**: Tree shaking and dead code elimination
+
+## Testing
+
+```bash
+# Run tests
+npm test
+
+# Run tests with coverage
+npm test -- --coverage
+
+# Run tests in watch mode
+npm test -- --watch
+```
+
+## Deployment
+
+### Build
+```bash
+npm run build
+```
+
+### Environment Setup
+Ensure all environment variables are properly configured in your deployment environment.
+
+### Static Hosting
+The build output can be deployed to any static hosting service:
+- Netlify
+- Vercel
+- AWS S3
+- GitHub Pages
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
+
+## License
+
+This project is licensed under the MIT License.
+
+## Support
+
+For support and questions:
+- Create an issue in the repository
+- Contact the development team
+- Check the documentation
+
+## Changelog
+
+### Version 1.0.0
+- Initial release with core shopping functionality
+- Cart management and checkout system
+- Order tracking and history
+- Real-time notifications
+- Stripe payment integration

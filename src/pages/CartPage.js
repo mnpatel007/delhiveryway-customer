@@ -1,46 +1,13 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { CartContext } from '../context/CartContext';
-import { shopsAPI, apiCall } from '../services/api';
 import { useNavigate } from 'react-router-dom';
 import './CartPage.css';
 
 const CartPage = () => {
     const { cartItems, selectedShop, removeFromCart, updateQuantity, getOrderSummary, clearCart } = useContext(CartContext);
     const [toast, setToast] = useState('');
-    const [shops, setShops] = useState([]);
-    const [loading, setLoading] = useState(true);
     const [removingItem, setRemovingItem] = useState(null);
     const navigate = useNavigate();
-
-    useEffect(() => {
-        const fetchShops = async () => {
-            try {
-                setLoading(true);
-                const result = await apiCall(shopsAPI.getAll);
-                if (result.success) {
-                    const data = result.data;
-                    if (Array.isArray(data)) {
-                        setShops(data);
-                    } else if (Array.isArray(data.shops)) {
-                        setShops(data.shops);
-                    } else {
-                        console.error("Unexpected API response format");
-                        setShops([]);
-                    }
-                } else {
-                    console.error('Failed to load shops:', result.message);
-                    setShops([]);
-                }
-            } catch (err) {
-                console.error('Failed to load shops:', err);
-                setShops([]);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchShops();
-    }, []);
 
     const showToast = (msg) => {
         setToast(msg);
@@ -78,27 +45,11 @@ const CartPage = () => {
             return;
         }
 
-        // Navigate to checkout with cart data
-        navigate('/final-checkout', {
-            state: {
-                items: cartItems,
-                shop: selectedShop
-            }
-        });
+        // Navigate to checkout
+        navigate('/final-checkout');
     };
 
     const orderSummary = getOrderSummary();
-
-    if (loading) {
-        return (
-            <div className="cart-page-container">
-                <div className="loading-state">
-                    <div className="loading-spinner"></div>
-                    <p>Loading your cart...</p>
-                </div>
-            </div>
-        );
-    }
 
     return (
         <div className="cart-page-container">

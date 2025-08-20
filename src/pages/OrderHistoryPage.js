@@ -2,7 +2,8 @@ import React, { useEffect, useState, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { ordersAPI, apiCall } from '../services/api';
 import io from 'socket.io-client';
-import './OrderHistoryPage.css'; // Import CSS file
+import config from '../config/config';
+import './OrderHistoryPage.css';
 
 const OrderHistoryPage = () => {
     const { user } = useContext(AuthContext);
@@ -42,7 +43,7 @@ const OrderHistoryPage = () => {
     useEffect(() => {
         if (!user?.id) return;
 
-        const socket = io(process.env.REACT_APP_SOCKET_URL || 'http://localhost:5000');
+        const socket = io(config.SOCKET_URL);
 
         // Join customer room
         socket.emit('join', `customer_${user.id}`);
@@ -68,8 +69,6 @@ const OrderHistoryPage = () => {
 
             // Show notification for important updates
             if (data.message && ['picked_up', 'delivered'].includes(data.status)) {
-                // You can add a toast notification here
-                // Show notification for important updates
                 console.log('Order status update:', data.message);
             }
         });
@@ -94,22 +93,70 @@ const OrderHistoryPage = () => {
     }, [user?.id]);
 
     const formatDate = (dateStr) => {
-        const d = new Date(dateStr);
-        return d.toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-        });
+        try {
+            const d = new Date(dateStr);
+            return d.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        } catch (error) {
+            return 'Invalid Date';
+        }
     };
 
     const getStatusColor = (status) => {
+        if (!status) return '';
+        
         switch (status.toLowerCase()) {
             case 'pending': return 'status-pending';
-            case 'completed': return 'status-completed';
+            case 'confirmed': return 'status-confirmed';
+            case 'preparing': return 'status-preparing';
+            case 'ready': return 'status-ready';
+            case 'picked_up': return 'status-picked-up';
+            case 'delivered': return 'status-delivered';
             case 'cancelled': return 'status-cancelled';
-            default: return '';
+            default: return 'status-pending';
+        }
+    };
+
+    const getStatusDisplayName = (status) => {
+        if (!status) return 'Unknown';
+        
+        switch (status.toLowerCase()) {
+            case 'pending': return 'Pending';
+            case 'confirmed': return 'Confirmed';
+            case 'preparing': return 'Preparing';
+            case 'ready': return 'Ready for Pickup';
+            case 'picked_up': return 'Picked Up';
+            case 'delivered': return 'Delivered';
+            case 'cancelled': return 'Cancelled';
+            default: return status;
+        }
+    };
+
+    const calculateOrderTotal = (order) => {
+        try {
+            if (!order.items || !Array.isArray(order.items)) return 0;
+            
+            const itemTotal = order.items.reduce((sum, item) => {
+                const product = item.productId || item.product || item;
+                const price = parseFloat(product.price || 0);
+                const quantity = parseInt(item.quantity || 1);
+                return sum + (price * quantity);
+            }, 0);
+            
+            const gst = itemTotal * 0.05;
+            const platformFee = itemTotal * 0.029;
+            const tax = gst + platformFee;
+            const deliveryCharge = 30;
+            
+            return itemTotal + tax + deliveryCharge;
+        } catch (error) {
+            console.error('Error calculating order total:', error);
+            return 0;
         }
     };
 
@@ -139,11 +186,7 @@ const OrderHistoryPage = () => {
 
             {orders.length === 0 ? (
                 <div className="empty-order-history">
-                    <img
-                        src="/empty-orders-icon.svg"
-                        alt="No Orders"
-                        className="empty-orders-icon"
-                    />
+                    <div className="empty-orders-icon">📦</div>
                     <p>You have not placed any orders yet.</p>
                     <button
                         className="start-shopping-btn"
@@ -155,28 +198,25 @@ const OrderHistoryPage = () => {
             ) : (
                 <div className="orders-list">
                     {orders.map(order => {
-                        const itemTotal = order.items.reduce((sum, i) => sum + i.productId.price * i.quantity, 0);
-                        const gst = itemTotal * 0.05;
-                        const platformFee = itemTotal * 0.029;
-                        const tax = gst + platformFee;
-                        const deliveryCharge = 30;
-                        const grandTotal = itemTotal + tax + deliveryCharge;
+                        const grandTotal = calculateOrderTotal(order);
 
-
-
-                        // Group items by shopId
+                        // Group items by shop
                         const grouped = {};
-                        order.items.forEach(item => {
-                            const shopId = item.productId.shopId._id;
-                            const shopName = item.productId.shopId.name;
-                            if (!grouped[shopId]) {
-                                grouped[shopId] = {
-                                    shopName,
-                                    items: []
-                                };
-                            }
-                            grouped[shopId].items.push(item);
-                        });
+                        if (order.items && Array.isArray(order.items)) {
+                            order.items.forEach(item => {
+                                const product = item.productId || item.product || item;
+                                const shopId = product.shopId?._id || product.shopId;
+                                const shopName = product.shopId?.name || 'Unknown Shop';
+                                
+                                if (!grouped[shopId]) {
+                                    grouped[shopId] = {
+                                        shopName,
+                                        items: []
+                                    };
+                                }
+                                grouped[shopId].items.push(item);
+                            });
+                        }
 
                         const shopGroups = Object.values(grouped);
 
@@ -187,7 +227,7 @@ const OrderHistoryPage = () => {
                                         {formatDate(order.createdAt)}
                                     </div>
                                     <div className={`order-status ${getStatusColor(order.status)}`}>
-                                        {order.status}
+                                        {getStatusDisplayName(order.status)}
                                     </div>
                                     {order.status === 'cancelled' && order.reason && (
                                         <div className="order-reason">
@@ -199,48 +239,48 @@ const OrderHistoryPage = () => {
                                 <div className="order-details">
                                     <div className="order-address">
                                         <strong>Delivery Address:</strong> {typeof order.address === 'object' ?
-                                            `${order.address.street}, ${order.address.city}, ${order.address.state} ${order.address.zipCode}` :
-                                            order.address}
+                                            `${order.address.street || ''}, ${order.address.city || ''}, ${order.address.state || ''} ${order.address.zipCode || ''}` :
+                                            order.address || 'Address not provided'}
                                     </div>
 
-                                    {shopGroups.map((group, idx) => (
-                                        <div key={idx} className="order-shop-group">
-                                            <h4 className="shop-name">
-                                                {group.shopName}
-                                            </h4>
-                                            <div className="shop-items">
-                                                {group.items.map((item, i) => (
-                                                    <div key={i} className="order-item">
-                                                        <div className="item-details">
-                                                            <span className="item-name">
-                                                                {item.productId.name}
-                                                            </span>
-                                                            <span className="item-quantity">
-                                                                × {item.quantity}
-                                                            </span>
-                                                        </div>
-                                                        <span className="item-price">
-                                                            ₹{(item.productId.price * item.quantity).toFixed(2)}
-                                                        </span>
-                                                    </div>
-                                                ))}
+                                    {shopGroups.length > 0 ? (
+                                        shopGroups.map((group, idx) => (
+                                            <div key={idx} className="order-shop-group">
+                                                <h4 className="shop-name">
+                                                    {group.shopName}
+                                                </h4>
+                                                <div className="shop-items">
+                                                    {group.items.map((item, i) => {
+                                                        const product = item.productId || item.product || item;
+                                                        const price = parseFloat(product.price || 0);
+                                                        const quantity = parseInt(item.quantity || 1);
+                                                        
+                                                        return (
+                                                            <div key={i} className="order-item">
+                                                                <div className="item-details">
+                                                                    <span className="item-name">
+                                                                        {product.name || 'Unknown Product'}
+                                                                    </span>
+                                                                    <span className="item-quantity">
+                                                                        × {quantity}
+                                                                    </span>
+                                                                </div>
+                                                                <span className="item-price">
+                                                                    ₹{(price * quantity).toFixed(2)}
+                                                                </span>
+                                                            </div>
+                                                        );
+                                                    })}
+                                                </div>
                                             </div>
+                                        ))
+                                    ) : (
+                                        <div className="no-items">
+                                            <p>No items found in this order</p>
                                         </div>
-                                    ))}
+                                    )}
 
                                     <div className="order-total-breakdown">
-                                        <div className="total-row">
-                                            <span>Items Total</span>
-                                            <span>₹{itemTotal.toFixed(2)}</span>
-                                        </div>
-                                        <div className="total-row">
-                                            <span>Taxes and Other Charges</span>
-                                            <span>₹{tax.toFixed(2)}</span>
-                                        </div>
-                                        <div className="total-row">
-                                            <span>Delivery Charge</span>
-                                            <span>₹{deliveryCharge.toFixed(2)}</span>
-                                        </div>
                                         <div className="total-row grand-total">
                                             <strong>Grand Total</strong>
                                             <strong>₹{grandTotal.toFixed(2)}</strong>

@@ -68,6 +68,21 @@
     border-radius: 8px;
     resize: vertical;
     min-height: 100px;
+    font-family: inherit;
+    font-size: 1rem;
+    line-height: 1.5;
+    transition: border-color 0.3s ease;
+}
+
+.address-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+}
+
+.address-input::placeholder {
+    color: #999;
+    font-style: italic;
 }
 
 .shop-order-section {

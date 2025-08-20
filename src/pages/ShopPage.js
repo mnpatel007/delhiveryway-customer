@@ -12,29 +12,75 @@ const ShopPage = () => {
     const [filteredProducts, setFilteredProducts] = useState([]);
     const [toast, setToast] = useState('');
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState('');
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('all');
     const [sortBy, setSortBy] = useState('name');
     const [viewMode, setViewMode] = useState('grid');
     const { addToCart } = useContext(CartContext);
 
+    // Sample products as fallback when API fails
+    const sampleProducts = [
+        {
+            _id: 'sample1',
+            name: 'Fresh Vegetables',
+            description: 'Organic fresh vegetables from local farms',
+            price: 150,
+            originalPrice: 180,
+            category: 'grocery',
+            inStock: true,
+            images: [],
+            shopId: id
+        },
+        {
+            _id: 'sample2',
+            name: 'Bread & Pastries',
+            description: 'Freshly baked bread and pastries',
+            price: 80,
+            originalPrice: 100,
+            category: 'bakery',
+            inStock: true,
+            images: [],
+            shopId: id
+        },
+        {
+            _id: 'sample3',
+            name: 'Dairy Products',
+            description: 'Fresh milk, cheese, and yogurt',
+            price: 120,
+            originalPrice: 120,
+            category: 'dairy',
+            inStock: true,
+            images: [],
+            shopId: id
+        }
+    ];
+
     useEffect(() => {
         const fetchShopAndProducts = async () => {
             try {
                 setLoading(true);
+                setError('');
+
+                console.log('🔄 Fetching shop and products for shop ID:', id);
 
                 // Fetch shop details
                 const shopResult = await apiCall(shopsAPI.getById, id);
+                console.log('🏪 Shop API response:', shopResult);
+
                 if (shopResult.success) {
                     setShop(shopResult.data);
                 } else {
                     console.error('Failed to fetch shop:', shopResult.message);
                     setShop(null);
+                    setError('Failed to load shop details');
                     return;
                 }
 
-                // Fetch products
+                // Fetch products with better error handling
+                console.log('📦 Fetching products for shop:', id);
                 const productResult = await apiCall(productsAPI.getByShop, id);
+                console.log('📦 Products API response:', productResult);
 
                 let productsData = [];
                 if (productResult.success && productResult.data) {
@@ -46,16 +92,31 @@ const ShopPage = () => {
                     } else if (productResult.data.data && Array.isArray(productResult.data.data)) {
                         productsData = productResult.data.data;
                     }
+
+                    console.log('✅ Products loaded successfully:', productsData.length);
+                } else {
+                    console.warn('⚠️ API returned no products, using sample data');
+                    productsData = sampleProducts;
+                    setError('Using sample data - API may be updating');
                 }
 
-                console.log('📦 Products loaded:', productsData.length);
+                // Ensure products have required fields
+                productsData = productsData.map(product => ({
+                    ...product,
+                    shopId: product.shopId || id,
+                    inStock: product.inStock !== undefined ? product.inStock : true,
+                    price: parseFloat(product.price || 0),
+                    originalPrice: parseFloat(product.originalPrice || product.price || 0)
+                }));
+
                 setProducts(productsData);
                 setFilteredProducts(productsData);
 
             } catch (err) {
-                console.error('Error fetching data:', err);
-                setProducts([]);
-                setFilteredProducts([]);
+                console.error('❌ Error fetching data:', err);
+                setError('Failed to load data. Using sample products.');
+                setProducts(sampleProducts);
+                setFilteredProducts(sampleProducts);
             } finally {
                 setLoading(false);
             }
@@ -184,6 +245,13 @@ const ShopPage = () => {
                     <div className="toast-content">
                         <span>{toast}</span>
                     </div>
+                </div>
+            )}
+
+            {/* Error Banner */}
+            {error && (
+                <div className="error-banner">
+                    <p>⚠️ {error}</p>
                 </div>
             )}
 
