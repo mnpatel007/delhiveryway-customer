@@ -44,21 +44,56 @@ const ShopPage = () => {
                 console.log('📦 Fetching products for shop:', id);
                 const productResult = await apiCall(productsAPI.getByShop, id);
                 console.log('📦 Products API response:', productResult);
+                console.log('📦 Product result success:', productResult.success);
+                console.log('📦 Product result data:', productResult.data);
+                console.log('📦 Product result data type:', typeof productResult.data);
+                console.log('📦 Product result data is array:', Array.isArray(productResult.data));
 
                 let productsData = [];
                 if (productResult.success && productResult.data) {
                     // Handle different response formats
                     if (Array.isArray(productResult.data)) {
                         productsData = productResult.data;
+                        console.log('✅ Using direct array format');
                     } else if (productResult.data.products && Array.isArray(productResult.data.products)) {
                         productsData = productResult.data.products;
+                        console.log('✅ Using products.products format');
+                    } else if (productResult.data.data && productResult.data.data.products && Array.isArray(productResult.data.data.products)) {
+                        productsData = productResult.data.data.products;
+                        console.log('✅ Using products.data.products format');
                     } else if (productResult.data.data && Array.isArray(productResult.data.data)) {
                         productsData = productResult.data.data;
+                        console.log('✅ Using products.data format');
+                    } else {
+                        console.log('⚠️ Unknown data format:', productResult.data);
+                        // Try to find any array in the response
+                        const keys = Object.keys(productResult.data);
+                        console.log('🔍 Available keys:', keys);
+                        for (const key of keys) {
+                            if (Array.isArray(productResult.data[key])) {
+                                console.log(`🔍 Found array in key: ${key}`, productResult.data[key]);
+                                productsData = productResult.data[key];
+                                break;
+                            } else if (productResult.data[key] && typeof productResult.data[key] === 'object') {
+                                const subKeys = Object.keys(productResult.data[key]);
+                                console.log(`🔍 Sub-keys in ${key}:`, subKeys);
+                                for (const subKey of subKeys) {
+                                    if (Array.isArray(productResult.data[key][subKey])) {
+                                        console.log(`🔍 Found array in ${key}.${subKey}`, productResult.data[key][subKey]);
+                                        productsData = productResult.data[key][subKey];
+                                        break;
+                                    }
+                                }
+                                if (productsData.length > 0) break;
+                            }
+                        }
                     }
 
                     console.log('✅ Products loaded successfully:', productsData.length);
+                    console.log('📦 Raw products data:', productsData);
                 } else {
                     console.warn('⚠️ API returned no products');
+                    console.log('❌ Product result:', productResult);
                     setError('No products found - API may be updating');
                 }
 
