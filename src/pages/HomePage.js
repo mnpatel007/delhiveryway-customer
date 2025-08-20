@@ -199,29 +199,53 @@ const HomePage = () => {
 
     if (loading) {
         return (
-            <div className="home-container">
-                <div className="loading-container">
+            <div className="home-page-container">
+                <div className="loading-state">
                     <div className="loading-spinner"></div>
-                    <p>Loading shops...</p>
+                    <h3>Loading Shops...</h3>
+                    <p>Please wait while we fetch the latest shops</p>
+                </div>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="home-page-container">
+                <div className="error-state">
+                    <div className="error-icon">🏪</div>
+                    <h2>Oops! Something went wrong</h2>
+                    <p>{error}</p>
+                    <button onClick={retryFetch} className="retry-btn">
+                        Try Again
+                    </button>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="home-container">
-            <div className="home-header">
-                <h1>Welcome to DelhiveryWay</h1>
-                {user && <p>Hello, {user.name}! Find shops near you.</p>}
-                {error && (
-                    <div className="info-banner">
-                        <p>ℹ️ {error}</p>
-                    </div>
-                )}
+        <div className="home-page-container">
+            {/* Hero Section */}
+            <div className="hero-section">
+                <h1 className="hero-title">Welcome to DelhiveryWay</h1>
+                <p className="hero-subtitle">
+                    Discover amazing shops and products delivered right to your doorstep.
+                    From groceries to electronics, we've got everything you need.
+                </p>
+                <div className="hero-actions">
+                    <button className="hero-btn primary" onClick={() => document.querySelector('.search-input').focus()}>
+                        🛍️ Start Shopping
+                    </button>
+                    <button className="hero-btn secondary" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+                        📍 View All Shops
+                    </button>
+                </div>
             </div>
 
+            {/* Search Section */}
             <div className="search-section">
-                <form onSubmit={handleSearch} className="search-form">
+                <div className="search-container">
                     <input
                         type="text"
                         placeholder="Search for shops, products, or categories..."
@@ -229,121 +253,84 @@ const HomePage = () => {
                         onChange={(e) => setSearchTerm(e.target.value)}
                         className="search-input"
                     />
-                    <button type="submit" className="search-btn">
-                        Search
-                    </button>
-                </form>
-
-                <div className="category-filters">
-                    {categories.map(category => (
-                        <button
-                            key={category}
-                            onClick={() => setSelectedCategory(category)}
-                            className={`category-btn ${selectedCategory === category ? 'active' : ''}`}
-                        >
-                            {category === 'all' ? 'All Categories' :
-                                category.charAt(0).toUpperCase() + category.slice(1)}
-                        </button>
-                    ))}
+                    <span className="search-icon">🔍</span>
                 </div>
             </div>
 
+            {/* Shops Section */}
             <div className="shops-section">
-                <h2 className="section-title">
-                    {searchTerm ? `Search Results for "${searchTerm}"` : 'Available Shops'}
-                    <span className="shops-count">({shops.length} shops)</span>
-                </h2>
+                <div className="section-header">
+                    <h2 className="section-title">Discover Amazing Shops</h2>
+                    <p className="section-subtitle">
+                        Explore our curated collection of shops offering quality products and excellent service
+                    </p>
+                </div>
 
-                {shops.length === 0 ? (
+                {filteredShops.length === 0 ? (
                     <div className="no-shops">
-                        <h3>No shops found</h3>
+                        <div className="no-shops-icon">🏪</div>
+                        <h3>No Shops Found</h3>
                         <p>
-                            {searchTerm || selectedCategory !== 'all'
-                                ? 'Try adjusting your search or filters'
-                                : 'No shops are currently available'
+                            {searchTerm
+                                ? `No shops match "${searchTerm}". Try adjusting your search.`
+                                : 'No shops are available at the moment. Please check back later.'
                             }
                         </p>
-                        <button onClick={fetchShops} className="retry-btn">
-                            Try Again
-                        </button>
                     </div>
                 ) : (
                     <div className="shops-grid">
-                        {shops.map(shop => (
-                            <div
-                                key={shop._id}
-                                className="shop-card"
-                                onClick={() => handleShopClick(shop._id)}
-                                tabIndex={0}
-                                onKeyDown={e => {
-                                    if (e.key === "Enter" || e.key === " ") {
-                                        handleShopClick(shop._id);
-                                    }
-                                }}
-                            >
+                        {filteredShops.map(shop => (
+                            <div key={shop._id} className="shop-card" onClick={() => navigate(`/shop/${shop._id}`)}>
                                 <div className="shop-image">
                                     {shop.images && shop.images.length > 0 ? (
                                         <img
                                             src={shop.images[0]}
                                             alt={shop.name}
                                             onError={(e) => {
-                                                e.target.src = '/placeholder-shop.png';
+                                                e.target.style.display = 'none';
+                                                e.target.nextSibling.style.display = 'flex';
                                             }}
                                         />
-                                    ) : (
-                                        <div className="shop-placeholder">
-                                            <span className="shop-icon">🏪</span>
-                                        </div>
-                                    )}
+                                    ) : null}
+                                    <div className="shop-emoji" style={{ display: shop.images && shop.images.length > 0 ? 'none' : 'flex' }}>
+                                        🏪
+                                    </div>
                                 </div>
 
                                 <div className="shop-info">
                                     <h3 className="shop-name">{shop.name}</h3>
-                                    <p className="shop-category">{shop.category}</p>
+                                    <p className="shop-description">
+                                        {shop.description || 'Welcome to our shop! We offer quality products and excellent service.'}
+                                    </p>
 
-                                    {shop.description && (
-                                        <p className="shop-description">
-                                            {shop.description.length > 100
-                                                ? `${shop.description.substring(0, 100)}...`
-                                                : shop.description
-                                            }
-                                        </p>
-                                    )}
-
-                                    <div className="shop-details">
-                                        <div className="shop-rating">
-                                            <span className="rating-stars">
-                                                {'★'.repeat(Math.floor(shop.rating?.average || 4))}
-                                                {'☆'.repeat(5 - Math.floor(shop.rating?.average || 4))}
+                                    <div className="shop-meta">
+                                        {shop.category && (
+                                            <span className="meta-item">
+                                                🏷️ {shop.category}
                                             </span>
-                                            <span className="rating-text">
-                                                {shop.rating?.average?.toFixed(1) || '4.0'}
-                                                ({shop.rating?.count || 0})
+                                        )}
+                                        {shop.productCount > 0 && (
+                                            <span className="meta-item">
+                                                📦 {shop.productCount} products
                                             </span>
-                                        </div>
-
-                                        <div className="shop-location">
-                                            📍 {shop.address?.city}, {shop.address?.state}
-                                        </div>
-
+                                        )}
                                         {shop.deliveryFee !== undefined && (
-                                            <div className="delivery-fee">
-                                                {shop.deliveryFee === 0
-                                                    ? 'Free Delivery'
-                                                    : `₹${shop.deliveryFee} delivery`
-                                                }
+                                            <span className="meta-item">
+                                                🚚 {shop.deliveryFee === 0 ? 'Free delivery' : `₹${shop.deliveryFee} delivery`}
+                                            </span>
+                                        )}
+                                    </div>
+
+                                    <div className="shop-footer">
+                                        {shop.rating && (
+                                            <div className="shop-rating">
+                                                <span>⭐ {shop.rating.average?.toFixed(1) || '4.0'}</span>
+                                                <span>({shop.rating.count || 0})</span>
                                             </div>
                                         )}
-
-                                        {shop.productCount !== undefined && (
-                                            <div className="product-count">
-                                                {shop.productCount} products
-                                            </div>
-                                        )}
-
-                                        <div className={`shop-status ${shop.isOpenNow ? 'open' : 'closed'}`}>
-                                            {shop.isOpenNow ? '🟢 Open' : '🔴 Closed'}
-                                        </div>
+                                        <button className="visit-shop-btn">
+                                            Visit Shop →
+                                        </button>
                                     </div>
                                 </div>
                             </div>
