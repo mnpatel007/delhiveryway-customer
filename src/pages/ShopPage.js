@@ -226,11 +226,27 @@ const ShopPage = () => {
 
     if (loading) {
         return (
-            <div className="shop-page-container">
+            <div className="modern-shop-container">
                 <div className="loading-state">
                     <div className="loading-spinner"></div>
-                    <h3>Loading Shop...</h3>
-                    <p>Please wait while we fetch the latest products</p>
+                    <h3>Loading shop...</h3>
+                    <p>Please wait while we fetch the shop details and products</p>
+                </div>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="modern-shop-container">
+                <div className="error-state">
+                    <div className="error-icon">❌</div>
+                    <h2>Oops! Something went wrong</h2>
+                    <p>{error}</p>
+                    <button onClick={() => window.history.back()} className="back-btn">
+                        <span className="back-arrow">←</span>
+                        Go Back
+                    </button>
                 </div>
             </div>
         );
@@ -238,13 +254,14 @@ const ShopPage = () => {
 
     if (!shop) {
         return (
-            <div className="shop-page-container">
+            <div className="modern-shop-container">
                 <div className="error-state">
                     <div className="error-icon">🏪</div>
-                    <h2>Shop Not Found</h2>
-                    <p>The shop you're looking for doesn't exist or may have been removed.</p>
-                    <button onClick={handleBackToShops} className="btn btn-primary">
-                        ← Back to Shops
+                    <h2>Shop not found</h2>
+                    <p>The shop you're looking for doesn't exist or has been removed.</p>
+                    <button onClick={() => navigate('/')} className="back-btn">
+                        <span className="back-arrow">←</span>
+                        Back to Home
                     </button>
                 </div>
             </div>
@@ -252,31 +269,25 @@ const ShopPage = () => {
     }
 
     return (
-        <div className="shop-page-container">
+        <div className="modern-shop-container">
             {/* Toast Notification */}
             {toast && (
                 <div className="toast-notification">
                     <div className="toast-content">
-                        <span>{toast}</span>
+                        <span className="toast-icon">✅</span>
+                        <span className="toast-message">{toast}</span>
                     </div>
                 </div>
             )}
 
-            {/* Error Banner */}
-            {error && (
-                <div className="error-banner">
-                    <p>⚠️ {error}</p>
-                </div>
-            )}
-
-            {/* Shop Header */}
-            <div className="shop-header">
-                <div className="shop-header-content">
+            {/* Shop Hero Section */}
+            <div className="shop-hero">
+                <div className="shop-hero-content">
                     <button onClick={handleBackToShops} className="back-button">
                         <span>←</span> Back to Shops
                     </button>
 
-                    <div className="shop-info">
+                    <div className="shop-main-info">
                         <div className="shop-avatar">
                             {shop.images && shop.images.length > 0 ? (
                                 <img src={shop.images[0]} alt={shop.name} />
@@ -292,18 +303,20 @@ const ShopPage = () => {
                             <div className="shop-meta">
                                 {shop.rating && (
                                     <div className="meta-item">
-                                        <span>⭐ {shop.rating.average?.toFixed(1) || '4.0'}</span>
-                                        <span>({shop.rating.count || 0} reviews)</span>
+                                        <span className="meta-icon">⭐</span>
+                                        <span className="meta-text">{shop.rating.average?.toFixed(1) || '4.0'} ({shop.rating.count || 0} reviews)</span>
                                     </div>
                                 )}
 
                                 <div className="meta-item">
-                                    <span>📦 {products.length} products</span>
+                                    <span className="meta-icon">📦</span>
+                                    <span className="meta-text">{products.length} products</span>
                                 </div>
 
                                 {shop.deliveryFee !== undefined && (
                                     <div className="meta-item">
-                                        <span>🚚 {shop.deliveryFee === 0 ? 'Free delivery' : `₹${shop.deliveryFee} delivery`}</span>
+                                        <span className="meta-icon">🚚</span>
+                                        <span className="meta-text">{shop.deliveryFee === 0 ? 'Free delivery' : `₹${shop.deliveryFee} delivery`}</span>
                                     </div>
                                 )}
                             </div>
@@ -312,10 +325,10 @@ const ShopPage = () => {
                 </div>
             </div>
 
-            {/* Search and Filters */}
+            {/* Shop Controls Section */}
             <div className="shop-controls">
                 <div className="controls-content">
-                    <div className="search-section">
+                    <div className="search-and-filters">
                         <div className="search-container">
                             <input
                                 type="text"
@@ -327,52 +340,47 @@ const ShopPage = () => {
                             <span className="search-icon">🔍</span>
                         </div>
 
-                        {(searchTerm || selectedCategory !== 'all') && (
-                            <button onClick={clearSearch} className="clear-filters-btn">
-                                Clear Filters
-                            </button>
-                        )}
+                        <div className="filters-container">
+                            <select
+                                value={selectedCategory}
+                                onChange={(e) => setSelectedCategory(e.target.value)}
+                                className="category-filter"
+                            >
+                                {getCategories().map(category => (
+                                    <option key={category} value={category}>
+                                        {category === 'all' ? 'All Categories' :
+                                            category.charAt(0).toUpperCase() + category.slice(1)}
+                                    </option>
+                                ))}
+                            </select>
+
+                            <select
+                                value={sortBy}
+                                onChange={(e) => setSortBy(e.target.value)}
+                                className="sort-filter"
+                            >
+                                <option value="name">Sort by Name</option>
+                                <option value="price">Sort by Price</option>
+                                <option value="price-desc">Sort by Price (High to Low)</option>
+                            </select>
+                        </div>
                     </div>
 
-                    <div className="filters-section">
-                        <select
-                            value={selectedCategory}
-                            onChange={(e) => setSelectedCategory(e.target.value)}
-                            className="filter-select"
+                    <div className="view-controls">
+                        <button
+                            onClick={() => setViewMode('grid')}
+                            className={`view-btn ${viewMode === 'grid' ? 'active' : ''}`}
                         >
-                            {getCategories().map(category => (
-                                <option key={category} value={category}>
-                                    {category === 'all' ? 'All Categories' :
-                                        category.charAt(0).toUpperCase() + category.slice(1)}
-                                </option>
-                            ))}
-                        </select>
-
-                        <select
-                            value={sortBy}
-                            onChange={(e) => setSortBy(e.target.value)}
-                            className="filter-select"
+                            <span className="view-icon">⊞</span>
+                            Grid
+                        </button>
+                        <button
+                            onClick={() => setViewMode('list')}
+                            className={`view-btn ${viewMode === 'list' ? 'active' : ''}`}
                         >
-                            <option value="name">Sort by Name</option>
-                            <option value="price-low">Price: Low to High</option>
-                            <option value="price-high">Price: High to Low</option>
-                            <option value="newest">Newest First</option>
-                        </select>
-
-                        <div className="view-toggle">
-                            <button
-                                onClick={() => setViewMode('grid')}
-                                className={`view-btn ${viewMode === 'grid' ? 'active' : ''}`}
-                            >
-                                ⊞
-                            </button>
-                            <button
-                                onClick={() => setViewMode('list')}
-                                className={`view-btn ${viewMode === 'list' ? 'active' : ''}`}
-                            >
-                                ☰
-                            </button>
-                        </div>
+                            <span className="view-icon">☰</span>
+                            List
+                        </button>
                     </div>
                 </div>
             </div>
@@ -380,7 +388,7 @@ const ShopPage = () => {
             {/* Products Section */}
             <div className="products-section">
                 <div className="products-header">
-                    <h2>
+                    <h2 className="products-title">
                         {searchTerm ? `Search Results for "${searchTerm}"` : 'Our Products'}
                     </h2>
                     <span className="products-count">
@@ -412,20 +420,21 @@ const ShopPage = () => {
                             }
                         </p>
                         {(searchTerm || selectedCategory !== 'all') && (
-                            <button onClick={clearSearch} className="btn btn-primary">
+                            <button onClick={clearSearch} className="clear-search-btn">
                                 Clear Filters
                             </button>
                         )}
                     </div>
                 ) : (
-                    <div className={`products-grid ${viewMode}`}>
+                    <div className={`products-container ${viewMode === 'grid' ? 'grid-view' : 'list-view'}`}>
                         {filteredProducts.map(product => (
                             <div key={product._id} className="product-card">
-                                <div className="product-image">
+                                <div className="product-image-section">
                                     {product.images && product.images.length > 0 ? (
                                         <img
                                             src={product.images[0]}
                                             alt={product.name}
+                                            className="product-image"
                                             onError={(e) => {
                                                 e.target.style.display = 'none';
                                                 e.target.nextSibling.style.display = 'flex';
@@ -437,23 +446,25 @@ const ShopPage = () => {
                                     </div>
                                 </div>
 
-                                <div className="product-info">
-                                    <h3 className="product-name">
-                                        {product.name || 'Unnamed Product'}
-                                    </h3>
+                                <div className="product-content">
+                                    <div className="product-header">
+                                        <h3 className="product-name">
+                                            {product.name || 'Unnamed Product'}
+                                        </h3>
 
-                                    {product.description ? (
-                                        <p className="product-description">
-                                            {product.description.length > 80
-                                                ? `${product.description.substring(0, 80)}...`
-                                                : product.description
-                                            }
-                                        </p>
-                                    ) : (
-                                        <p className="product-description no-description">
-                                            No description available
-                                        </p>
-                                    )}
+                                        {product.description ? (
+                                            <p className="product-description">
+                                                {product.description.length > 80
+                                                    ? `${product.description.substring(0, 80)}...`
+                                                    : product.description
+                                                }
+                                            </p>
+                                        ) : (
+                                            <p className="product-description no-description">
+                                                No description available
+                                            </p>
+                                        )}
+                                    </div>
 
                                     {/* Product details section */}
                                     <div className="product-details">
@@ -462,19 +473,22 @@ const ShopPage = () => {
                                                 📦 Stock: {product.stockQuantity} {product.unit || 'units'}
                                             </span>
                                         )}
+
                                         {product.tags && product.tags.length > 0 && (
                                             <div className="product-tags">
                                                 {product.tags.slice(0, 3).map((tag, index) => (
-                                                    <span key={index} className="tag">{tag}</span>
+                                                    <span key={index} className="tag">
+                                                        {tag}
+                                                    </span>
                                                 ))}
                                             </div>
                                         )}
                                     </div>
 
                                     <div className="product-footer">
-                                        <div className="price-section">
-                                            <span className="current-price">
-                                                ₹{(product.price || 0).toFixed(2)}
+                                        <div className="product-price-section">
+                                            <span className="product-price">
+                                                ₹{product.price?.toFixed(2) || '0.00'}
                                             </span>
                                             {product.originalPrice && product.originalPrice > product.price && (
                                                 <span className="original-price">
@@ -488,17 +502,8 @@ const ShopPage = () => {
                                             className="add-to-cart-btn"
                                             disabled={!product.inStock}
                                         >
-                                            {product.inStock ? (
-                                                <>
-                                                    <span>🛒</span>
-                                                    Add to Cart
-                                                </>
-                                            ) : (
-                                                <>
-                                                    <span>❌</span>
-                                                    Out of Stock
-                                                </>
-                                            )}
+                                            <span className="cart-icon">🛒</span>
+                                            {product.inStock ? 'Add to Cart' : 'Out of Stock'}
                                         </button>
                                     </div>
                                 </div>
