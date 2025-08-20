@@ -388,6 +388,19 @@ const ShopPage = () => {
                     </span>
                 </div>
 
+                {/* Temporary Debug Section */}
+                {process.env.NODE_ENV === 'development' && (
+                    <div className="debug-section" style={{ background: '#f5f5f5', padding: '1rem', margin: '1rem 0', borderRadius: '8px', fontSize: '12px' }}>
+                        <h4>🔍 Debug Info:</h4>
+                        <p><strong>Total Products:</strong> {products.length}</p>
+                        <p><strong>Filtered Products:</strong> {filteredProducts.length}</p>
+                        <p><strong>Raw Products Data:</strong></p>
+                        <pre style={{ background: 'white', padding: '0.5rem', borderRadius: '4px', overflow: 'auto', maxHeight: '200px' }}>
+                            {JSON.stringify(products, null, 2)}
+                        </pre>
+                    </div>
+                )}
+
                 {filteredProducts.length === 0 ? (
                     <div className="no-products">
                         <div className="no-products-icon">📦</div>
@@ -422,23 +435,27 @@ const ShopPage = () => {
                                     <div className="product-placeholder" style={{ display: product.images && product.images.length > 0 ? 'none' : 'flex' }}>
                                         <span className="product-icon">📦</span>
                                     </div>
-
-                                    {/* Remove incorrect category badge - products shouldn't show shop category */}
                                 </div>
 
                                 <div className="product-info">
-                                    <h3 className="product-name">{product.name || 'Unnamed Product'}</h3>
+                                    <h3 className="product-name">
+                                        {product.name || 'Unnamed Product'}
+                                    </h3>
 
-                                    {product.description && (
+                                    {product.description ? (
                                         <p className="product-description">
                                             {product.description.length > 80
                                                 ? `${product.description.substring(0, 80)}...`
                                                 : product.description
                                             }
                                         </p>
+                                    ) : (
+                                        <p className="product-description no-description">
+                                            No description available
+                                        </p>
                                     )}
 
-                                    {/* Add more product details */}
+                                    {/* Product details section */}
                                     <div className="product-details">
                                         {product.stockQuantity !== undefined && (
                                             <span className="stock-info">
@@ -456,9 +473,13 @@ const ShopPage = () => {
 
                                     <div className="product-footer">
                                         <div className="price-section">
-                                            <span className="current-price">₹{(product.price || 0).toFixed(2)}</span>
+                                            <span className="current-price">
+                                                ₹{(product.price || 0).toFixed(2)}
+                                            </span>
                                             {product.originalPrice && product.originalPrice > product.price && (
-                                                <span className="original-price">₹{product.originalPrice.toFixed(2)}</span>
+                                                <span className="original-price">
+                                                    ₹{product.originalPrice.toFixed(2)}
+                                                </span>
                                             )}
                                         </div>
 
