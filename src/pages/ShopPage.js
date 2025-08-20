@@ -91,6 +91,22 @@ const ShopPage = () => {
 
                     console.log('✅ Products loaded successfully:', productsData.length);
                     console.log('📦 Raw products data:', productsData);
+
+                    // Log individual product details for debugging
+                    productsData.forEach((product, index) => {
+                        console.log(`📦 Product ${index + 1}:`, {
+                            id: product._id,
+                            name: product.name,
+                            description: product.description,
+                            price: product.price,
+                            category: product.category,
+                            stockQuantity: product.stockQuantity,
+                            unit: product.unit,
+                            tags: product.tags,
+                            images: product.images,
+                            inStock: product.inStock
+                        });
+                    });
                 } else {
                     console.warn('⚠️ API returned no products');
                     console.log('❌ Product result:', productResult);
@@ -407,15 +423,11 @@ const ShopPage = () => {
                                         <span className="product-icon">📦</span>
                                     </div>
 
-                                    {product.category && (
-                                        <div className="category-badge">
-                                            {product.category}
-                                        </div>
-                                    )}
+                                    {/* Remove incorrect category badge - products shouldn't show shop category */}
                                 </div>
 
                                 <div className="product-info">
-                                    <h3 className="product-name">{product.name}</h3>
+                                    <h3 className="product-name">{product.name || 'Unnamed Product'}</h3>
 
                                     {product.description && (
                                         <p className="product-description">
@@ -425,6 +437,22 @@ const ShopPage = () => {
                                             }
                                         </p>
                                     )}
+
+                                    {/* Add more product details */}
+                                    <div className="product-details">
+                                        {product.stockQuantity !== undefined && (
+                                            <span className="stock-info">
+                                                📦 Stock: {product.stockQuantity} {product.unit || 'units'}
+                                            </span>
+                                        )}
+                                        {product.tags && product.tags.length > 0 && (
+                                            <div className="product-tags">
+                                                {product.tags.slice(0, 3).map((tag, index) => (
+                                                    <span key={index} className="tag">{tag}</span>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
 
                                     <div className="product-footer">
                                         <div className="price-section">
