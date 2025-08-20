@@ -19,43 +19,6 @@ const ShopPage = () => {
     const [viewMode, setViewMode] = useState('grid');
     const { addToCart } = useContext(CartContext);
 
-    // Sample products as fallback when API fails
-    const sampleProducts = [
-        {
-            _id: 'sample1',
-            name: 'Fresh Vegetables',
-            description: 'Organic fresh vegetables from local farms',
-            price: 150,
-            originalPrice: 180,
-            category: 'grocery',
-            inStock: true,
-            images: [],
-            shopId: id
-        },
-        {
-            _id: 'sample2',
-            name: 'Bread & Pastries',
-            description: 'Freshly baked bread and pastries',
-            price: 80,
-            originalPrice: 100,
-            category: 'bakery',
-            inStock: true,
-            images: [],
-            shopId: id
-        },
-        {
-            _id: 'sample3',
-            name: 'Dairy Products',
-            description: 'Fresh milk, cheese, and yogurt',
-            price: 120,
-            originalPrice: 120,
-            category: 'dairy',
-            inStock: true,
-            images: [],
-            shopId: id
-        }
-    ];
-
     useEffect(() => {
         const fetchShopAndProducts = async () => {
             try {
@@ -95,9 +58,8 @@ const ShopPage = () => {
 
                     console.log('✅ Products loaded successfully:', productsData.length);
                 } else {
-                    console.warn('⚠️ API returned no products, using sample data');
-                    productsData = sampleProducts;
-                    setError('Using sample data - API may be updating');
+                    console.warn('⚠️ API returned no products');
+                    setError('No products found - API may be updating');
                 }
 
                 // Ensure products have required fields
@@ -109,14 +71,15 @@ const ShopPage = () => {
                     originalPrice: parseFloat(product.originalPrice || product.price || 0)
                 }));
 
+                console.log('📦 Final products array:', productsData);
                 setProducts(productsData);
                 setFilteredProducts(productsData);
 
             } catch (err) {
                 console.error('❌ Error fetching data:', err);
-                setError('Failed to load data. Using sample products.');
-                setProducts(sampleProducts);
-                setFilteredProducts(sampleProducts);
+                setError('Failed to load data. Please check your connection and try again.');
+                setProducts([]);
+                setFilteredProducts([]);
             } finally {
                 setLoading(false);
             }

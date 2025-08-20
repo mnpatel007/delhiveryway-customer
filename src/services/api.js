@@ -9,8 +9,8 @@ const api = axios.create({
         'Content-Type': 'application/json',
     },
     // Add retry configuration
-    retry: 3,
-    retryDelay: 1000,
+    retry: config.RETRY_ATTEMPTS,
+    retryDelay: config.RETRY_DELAY,
 });
 
 // Enhanced request interceptor
@@ -55,6 +55,11 @@ api.interceptors.response.use(
         const config = error.config;
 
         console.error(`❌ API Error: ${config?.method?.toUpperCase()} ${config?.url} - ${error.response?.status || 'Network Error'}`);
+
+        // Handle CORS errors specifically
+        if (error.message?.includes('CORS') || error.code === 'ERR_NETWORK') {
+            console.warn('🌐 CORS or Network error detected, this might be a development environment issue');
+        }
 
         // Handle authentication errors
         if (error.response?.status === 401) {
@@ -131,7 +136,14 @@ export const productsAPI = {
             active: true,
             ...params
         };
-        return api.get(`/products/shop/${shopId}`, { params: defaultParams });
+
+        // Use CORS proxy in development if enabled
+        let url = `/products/shop/${shopId}`;
+        if (config.IS_DEVELOPMENT && config.ENABLE_CORS_PROXY) {
+            url = `https://cors-anywhere.herokuapp.com/${config.API_BASE_URL}${url}`;
+        }
+
+        return api.get(url, { params: defaultParams });
     },
     getById: (id) => api.get(`/products/${id}`),
     search: (params = {}) => api.get('/products/search', { params }),
