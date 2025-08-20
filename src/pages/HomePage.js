@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext, useCallback } from 'react';
+import React, { useEffect, useState, useContext, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import axios from 'axios';
@@ -15,6 +15,7 @@ const HomePage = () => {
 
     const navigate = useNavigate();
     const { user } = useContext(AuthContext);
+    const searchInputRef = useRef(null);
 
     // Sample shops as fallback
     const sampleShops = [
@@ -197,6 +198,23 @@ const HomePage = () => {
         fetchShops();
     };
 
+    const retryFetch = () => {
+        setError('');
+        fetchShops();
+    };
+
+    // Filter shops based on search and category
+    const filteredShops = shops.filter(shop => {
+        const matchesSearch = !searchTerm ||
+            shop.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            shop.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            shop.category.toLowerCase().includes(searchTerm.toLowerCase());
+
+        const matchesCategory = selectedCategory === 'all' || shop.category === selectedCategory;
+
+        return matchesSearch && matchesCategory;
+    });
+
     if (loading) {
         return (
             <div className="home-page-container">
@@ -234,7 +252,7 @@ const HomePage = () => {
                     From groceries to electronics, we've got everything you need.
                 </p>
                 <div className="hero-actions">
-                    <button className="hero-btn primary" onClick={() => document.querySelector('.search-input').focus()}>
+                    <button className="hero-btn primary" onClick={() => searchInputRef.current.focus()}>
                         🛍️ Start Shopping
                     </button>
                     <button className="hero-btn secondary" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
@@ -251,7 +269,13 @@ const HomePage = () => {
                         placeholder="Search for shops, products, or categories..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
+                        onKeyPress={(e) => {
+                            if (e.key === 'Enter') {
+                                fetchShops();
+                            }
+                        }}
                         className="search-input"
+                        ref={searchInputRef}
                     />
                     <span className="search-icon">🔍</span>
                 </div>
@@ -280,7 +304,7 @@ const HomePage = () => {
                 ) : (
                     <div className="shops-grid">
                         {filteredShops.map(shop => (
-                            <div key={shop._id} className="shop-card" onClick={() => navigate(`/shop/${shop._id}`)}>
+                            <div key={shop._id} className="shop-card" onClick={() => handleShopClick(shop._id)}>
                                 <div className="shop-image">
                                     {shop.images && shop.images.length > 0 ? (
                                         <img
