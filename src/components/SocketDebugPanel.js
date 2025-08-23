@@ -14,12 +14,14 @@ const SocketDebugPanel = () => {
     // Check API health
     const checkApiHealth = async () => {
         try {
-            const response = await fetch(`${config.API_BASE_URL}/health`, {
+            // Try a basic endpoint that likely exists
+            const response = await fetch(`${config.API_BASE_URL}/shops`, {
                 method: 'GET',
                 timeout: 5000
             });
 
-            if (response.ok) {
+            if (response.ok || response.status === 401) {
+                // 200 OK or 401 Unauthorized means API is responding
                 setApiStatus('healthy');
             } else {
                 setApiStatus('unhealthy');
@@ -33,7 +35,7 @@ const SocketDebugPanel = () => {
 
     useEffect(() => {
         checkApiHealth();
-        const interval = setInterval(checkApiHealth, 30000); // Check every 30 seconds
+        const interval = setInterval(checkApiHealth, 60000); // Check every 60 seconds
 
         return () => clearInterval(interval);
     }, []);
