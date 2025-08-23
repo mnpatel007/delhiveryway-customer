@@ -65,6 +65,17 @@ export const SocketProvider = ({ children }) => {
 
     const [, setLastActivity] = useState(Date.now());
 
+    // Auto-request browser notification permission on first load
+    useEffect(() => {
+        try {
+            if ('Notification' in window && Notification.permission !== 'granted' && Notification.permission !== 'denied') {
+                requestNotificationPermission();
+            }
+        } catch (e) {
+            console.log('Notification API not available:', e);
+        }
+    }, []);
+
     // Track user activity to maintain connection
     useEffect(() => {
         const updateActivity = () => {
