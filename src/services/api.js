@@ -1,16 +1,17 @@
 import axios from 'axios';
-import config from '../config/config';
+
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://delhiveryway-backend-1.onrender.com/api';
 
 // Create axios instance with better configuration
 const api = axios.create({
-    baseURL: config.API_BASE_URL,
-    timeout: config.API_TIMEOUT,
+    baseURL: API_BASE_URL,
+    timeout: 60000, // Increased timeout for better reliability
     headers: {
         'Content-Type': 'application/json',
     },
     // Add retry configuration
-    retry: config.RETRY_ATTEMPTS,
-    retryDelay: config.RETRY_DELAY,
+    retry: 3,
+    retryDelay: 1000,
 });
 
 // Enhanced request interceptor
@@ -55,11 +56,6 @@ api.interceptors.response.use(
         const config = error.config;
 
         console.error(`❌ API Error: ${config?.method?.toUpperCase()} ${config?.url} - ${error.response?.status || 'Network Error'}`);
-
-        // Handle CORS errors specifically
-        if (error.message?.includes('CORS') || error.code === 'ERR_NETWORK') {
-            console.warn('🌐 CORS or Network error detected, this might be a development environment issue');
-        }
 
         // Handle authentication errors
         if (error.response?.status === 401) {
@@ -113,7 +109,7 @@ export const shopsAPI = {
     getAll: (params = {}) => {
         // Add default parameters for better results
         const defaultParams = {
-            limit: config.DEFAULT_PAGE_SIZE,
+            limit: 50,
             page: 1,
             active: true,
             ...params
@@ -132,18 +128,11 @@ export const shopsAPI = {
 export const productsAPI = {
     getByShop: (shopId, params = {}) => {
         const defaultParams = {
-            limit: config.MAX_PAGE_SIZE,
+            limit: 100,
             active: true,
             ...params
         };
-
-        // Use CORS proxy in development if enabled
-        let url = `/products/shop/${shopId}`;
-        if (config.IS_DEVELOPMENT && config.ENABLE_CORS_PROXY) {
-            url = `https://cors-anywhere.herokuapp.com/${config.API_BASE_URL}${url}`;
-        }
-
-        return api.get(url, { params: defaultParams });
+        return api.get(`/products/shop/${shopId}`, { params: defaultParams });
     },
     getById: (id) => api.get(`/products/${id}`),
     search: (params = {}) => api.get('/products/search', { params }),
@@ -156,7 +145,7 @@ export const ordersAPI = {
     create: (orderData) => api.post('/orders', orderData),
     getCustomerOrders: (params = {}) => {
         const defaultParams = {
-            limit: config.DEFAULT_PAGE_SIZE,
+            limit: 50,
             page: 1,
             sort: '-createdAt',
             ...params
