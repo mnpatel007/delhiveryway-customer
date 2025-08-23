@@ -339,6 +339,19 @@
     backdrop-filter: blur(10px);
 }
 
+/* Mobile-first touch improvements */
+@media (max-width: 768px) {
+    .view-btn, .category-filter, .sort-filter {
+        min-height: 44px;
+        touch-action: manipulation;
+    }
+    
+    .search-input {
+        min-height: 44px;
+        font-size: 16px; /* Prevents zoom on iOS */
+    }
+}
+
 .controls-content {
     max-width: 1200px;
     margin: 0 auto;
@@ -450,7 +463,7 @@
 /* Products Section */
 .products-section {
     max-width: 1200px;
-    margin: 0 auto;
+    margin: 2rem auto;
     padding: 3rem 2rem;
     background: var(--background-secondary);
     border-radius: var(--border-radius-lg);
@@ -829,47 +842,166 @@
 }
 
 @media (max-width: 768px) {
-    .products-section {
+    .shop-hero {
         padding: 2rem 1rem;
+    }
+    
+    .shop-main-info {
+        flex-direction: column;
+        text-align: center;
+        gap: 1.5rem;
+    }
+    
+    .shop-name {
+        font-size: 2rem;
+    }
+    
+    .shop-description {
+        font-size: 1.1rem;
+    }
+    
+    .shop-controls {
+        padding: 1rem;
+    }
+    
+    .controls-content {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .search-and-filters {
+        flex-direction: column;
+        width: 100%;
+        gap: 1rem;
+    }
+    
+    .search-container {
+        max-width: 100%;
+    }
+    
+    .filters-container {
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    
+    .products-section {
+        padding: 1.5rem 1rem;
+        margin: 1rem;
+        border-radius: var(--border-radius);
     }
 
     .products-header {
         flex-direction: column;
-        gap: 1.25rem;
-        border-bottom: none;
-        padding-bottom: 0;
-    }
-
-    .products-container.grid-view {
-        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-        gap: 1.8rem;
-    }
-
-    .products-container.list-view .product-card {
-        grid-template-columns: 1fr;
+        gap: 1rem;
         text-align: center;
-        box-shadow: var(--shadow-lg);
+    }
+    
+    .products-title {
+        font-size: 1.75rem;
     }
 
-    .products-container.list-view .product-image-section {
-        width: 100%;
-        height: 200px;
-        border-radius: var(--border-radius-lg);
-    }
-}
-
-@media (max-width: 480px) {
     .products-container.grid-view {
         grid-template-columns: 1fr;
         gap: 1.5rem;
     }
-
+    
+    .product-card {
+        min-height: auto;
+        box-shadow: var(--shadow-lg);
+    }
+    
+    .product-image-section {
+        height: 180px;
+    }
+    
+    .product-content {
+        padding: 1.5rem 1.25rem;
+    }
+    
     .product-name {
-        font-size: 1.25rem;
+        font-size: 1.3rem;
+        white-space: normal;
+    }
+    
+    .product-footer {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: stretch;
+    }
+    
+    .add-to-cart-btn {
+        width: 100%;
+        justify-content: center;
+        padding: 1rem;
+        font-size: 1rem;
     }
 
+    .products-container.list-view .product-card {
+        grid-template-columns: 1fr;
+    }
+
+    .products-container.list-view .product-image-section {
+        width: 100%;
+        height: 180px;
+        border-radius: var(--border-radius) var(--border-radius) 0 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .shop-hero {
+        padding: 1.5rem 0.75rem;
+    }
+    
+    .shop-name {
+        font-size: 1.75rem;
+    }
+    
+    .shop-avatar {
+        width: 80px;
+        height: 80px;
+    }
+    
+    .shop-emoji {
+        font-size: 2rem;
+    }
+    
+    .products-section {
+        padding: 1rem 0.75rem;
+        margin: 0.5rem;
+    }
+    
+    .products-title {
+        font-size: 1.5rem;
+    }
+    
+    .product-content {
+        padding: 1.25rem 1rem;
+    }
+
+    .product-name {
+        font-size: 1.2rem;
+    }
+    
+    .product-price {
+        font-size: 1.4rem;
+    }
+    
     .add-to-cart-btn {
-        padding: 0.7rem 1.2rem;
-        font-size: 0.9rem;
+        padding: 0.875rem;
+        font-size: 0.95rem;
+    }
+    
+    .no-products {
+        padding: 2rem 1rem;
+        margin: 2rem 0.5rem;
+    }
+    
+    .no-products-icon {
+        font-size: 3rem;
+    }
+    
+    .clear-search-btn {
+        padding: 0.75rem 1.5rem;
+        font-size: 1rem;
     }
 }
