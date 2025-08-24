@@ -11,6 +11,31 @@ const OrderHistoryPage = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
+    const handleBillApproval = async (orderId) => {
+        try {
+            const result = await apiCall(() => 
+                api.put(`/orders/${orderId}/approve-bill`)
+            );
+            
+            if (result.success) {
+                // Update the order status in local state
+                setOrders(prevOrders =>
+                    prevOrders.map(order =>
+                        order._id === orderId
+                            ? { ...order, status: 'bill_approved' }
+                            : order
+                    )
+                );
+                alert('Bill approved successfully!');
+            } else {
+                alert('Failed to approve bill: ' + result.message);
+            }
+        } catch (error) {
+            console.error('Error approving bill:', error);
+            alert('Failed to approve bill. Please try again.');
+        }
+    };
+
     useEffect(() => {
         const fetchOrders = async () => {
             try {
@@ -257,6 +282,22 @@ const OrderHistoryPage = () => {
                                     <div className={`order-status ${getStatusColor(order.status)}`}>
                                         {getStatusDisplayName(order.status)}
                                     </div>
+                                    {order.status === 'bill_uploaded' && (
+                                        <div className="bill-actions">
+                                            <button 
+                                                className="view-bill-btn"
+                                                onClick={() => window.open(order.billImage, '_blank')}
+                                            >
+                                                View Bill
+                                            </button>
+                                            <button 
+                                                className="approve-bill-btn"
+                                                onClick={() => handleBillApproval(order._id)}
+                                            >
+                                                Approve Bill
+                                            </button>
+                                        </div>
+                                    )}
                                     {order.status === 'cancelled' && order.reason && (
                                         <div className="order-reason">
                                             <strong>Reason:</strong> {order.reason}
@@ -271,40 +312,49 @@ const OrderHistoryPage = () => {
                                             order.address || 'Address not provided'}
                                     </div>
 
-                                    {shopGroups.length > 0 ? (
-                                        shopGroups.map((group, idx) => (
-                                            <div key={idx} className="order-shop-group">
-                                                <h4 className="shop-name">
-                                                    {group.shopName}
-                                                </h4>
-                                                <div className="shop-items">
-                                                    {group.items.map((item, i) => {
-                                                        const product = item.productId || item.product || item;
-                                                        const price = parseFloat(product.price || 0);
-                                                        const quantity = parseInt(item.quantity || 1);
-                                                        
-                                                        return (
-                                                            <div key={i} className="order-item">
-                                                                <div className="item-details">
-                                                                    <span className="item-name">
-                                                                        {product.name || 'Unknown Product'}
-                                                                    </span>
-                                                                    <span className="item-quantity">
-                                                                        × {quantity}
-                                                                    </span>
-                                                                </div>
-                                                                <span className="item-price">
-                                                                    ₹{(price * quantity).toFixed(2)}
-                                                                </span>
-                                                            </div>
-                                                        );
-                                                    })}
+                                    {/* Show shop info if available */}
+                                    {order.shopId && (
+                                        <div className="order-shop-group">
+                                            <h4 className="shop-name">
+                                                {order.shopId.name || 'Shop'}
+                                            </h4>
+                                        </div>
+                                    )}
+
+                                    {/* Show items or fallback to order description */}
+                                    {order.items && order.items.length > 0 ? (
+                                        order.items.map((item, i) => {
+                                            const product = item.productId || item.product || item;
+                                            const price = parseFloat(product.price || item.price || 0);
+                                            const quantity = parseInt(item.quantity || 1);
+                                            
+                                            return (
+                                                <div key={i} className="order-item">
+                                                    <div className="item-details">
+                                                        <span className="item-name">
+                                                            {product.name || item.name || item.description || 'Product'}
+                                                        </span>
+                                                        <span className="item-quantity">
+                                                            × {quantity}
+                                                        </span>
+                                                    </div>
+                                                    <span className="item-price">
+                                                        ₹{(price * quantity).toFixed(2)}
+                                                    </span>
                                                 </div>
-                                            </div>
-                                        ))
+                                            );
+                                        })
                                     ) : (
-                                        <div className="no-items">
-                                            <p>No items found in this order</p>
+                                        <div className="order-item">
+                                            <div className="item-details">
+                                                <span className="item-name">
+                                                    {order.description || order.orderNumber || 'Custom Order'}
+                                                </span>
+                                                <span className="item-quantity">× 1</span>
+                                            </div>
+                                            <span className="item-price">
+                                                ₹{order.totalAmount || order.amount || 0}
+                                            </span>
                                         </div>
                                     )}
 

@@ -20,6 +20,40 @@
     margin-bottom: 2rem;
 }
 
+.bill-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.view-bill-btn, .approve-bill-btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: background-color 0.3s ease;
+}
+
+.view-bill-btn {
+    background-color: #007bff;
+    color: white;
+}
+
+.view-bill-btn:hover {
+    background-color: #0056b3;
+}
+
+.approve-bill-btn {
+    background-color: #28a745;
+    color: white;
+}
+
+.approve-bill-btn:hover {
+    background-color: #1e7e34;
+}
+
 /* Loading State */
 .order-history-loading {
     display: flex;
