@@ -293,8 +293,14 @@ const OrderHistoryPage = () => {
                                                 className="view-bill-btn"
                                                 onClick={() => {
                                                     const billUrl = order.billImage || order.billPhoto || order.bill;
+                                                    console.log('Bill URL:', billUrl);
                                                     if (billUrl) {
-                                                        window.open(billUrl, '_blank');
+                                                        // If it's a relative path, prepend the API base URL
+                                                        const fullUrl = billUrl.startsWith('http') 
+                                                            ? billUrl 
+                                                            : `http://localhost:5000${billUrl}`;
+                                                        console.log('Opening URL:', fullUrl);
+                                                        window.open(fullUrl, '_blank');
                                                     } else {
                                                         alert('Bill image not available');
                                                     }
