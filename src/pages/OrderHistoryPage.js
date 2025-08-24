@@ -319,13 +319,21 @@ const OrderHistoryPage = () => {
 
                                 <div className="order-details">
                                     <div className="order-address">
-                                        <strong>Delivery Address:</strong> {
-                                            order.deliveryAddress || 
-                                            order.address || 
-                                            (typeof order.address === 'object' ?
-                                                `${order.address.street || ''}, ${order.address.city || ''}, ${order.address.state || ''} ${order.address.zipCode || ''}` :
-                                                'Address not provided')
-                                        }
+                                        <strong>Delivery Address:</strong> {(() => {
+                                            const addr = order.deliveryAddress || order.address;
+                                            if (typeof addr === 'string') {
+                                                return addr;
+                                            } else if (typeof addr === 'object' && addr !== null) {
+                                                const parts = [
+                                                    addr.street,
+                                                    addr.city,
+                                                    addr.state,
+                                                    addr.zipCode
+                                                ].filter(Boolean);
+                                                return parts.length > 0 ? parts.join(', ') : 'Address not provided';
+                                            }
+                                            return 'Address not provided';
+                                        })()}
                                     </div>
 
                                     {/* Show shop info if available */}
