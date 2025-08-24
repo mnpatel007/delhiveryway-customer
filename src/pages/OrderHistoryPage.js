@@ -19,9 +19,13 @@ const OrderHistoryPage = () => {
 
                 if (result.success) {
                     console.log('API result:', result);
-                    const data = result.data;
-                    // Handle both array format and object format with pagination
-                    const ordersArray = Array.isArray(data) ? data : (data.orders || data);
+                    console.log('result.data:', result.data);
+                    console.log('result.data.data:', result.data.data);
+                    
+                    // The backend returns { success: true, data: { data: [...], pagination: {...} } }
+                    const ordersArray = result.data.data || result.data || [];
+                    console.log('Extracted orders array:', ordersArray);
+                    
                     const sortedOrders = Array.isArray(ordersArray)
                         ? ordersArray.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
                         : [];
