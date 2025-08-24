@@ -292,8 +292,9 @@ const OrderHistoryPage = () => {
                                             <button 
                                                 className="view-bill-btn"
                                                 onClick={() => {
-                                                    const billUrl = order.billImage || order.billPhoto || order.bill;
+                                                    const billUrl = order.billImage || order.billPhoto || order.bill || order.actualBill?.photo;
                                                     console.log('Bill URL:', billUrl);
+                                                    console.log('Order actualBill:', order.actualBill);
                                                     if (billUrl) {
                                                         // If it's a relative path, prepend the API base URL
                                                         const fullUrl = billUrl.startsWith('http') 
