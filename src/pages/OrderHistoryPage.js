@@ -192,11 +192,16 @@ const OrderHistoryPage = () => {
 
     const calculateOrderTotal = (order) => {
         try {
+            // Use actual order total if available
+            if (order.totalAmount || order.finalAmount || order.amount) {
+                return parseFloat(order.totalAmount || order.finalAmount || order.amount);
+            }
+            
             if (!order.items || !Array.isArray(order.items)) return 0;
             
             const itemTotal = order.items.reduce((sum, item) => {
                 const product = item.productId || item.product || item;
-                const price = parseFloat(product.price || 0);
+                const price = parseFloat(product.price || item.price || 0);
                 const quantity = parseInt(item.quantity || 1);
                 return sum + (price * quantity);
             }, 0);
@@ -286,7 +291,14 @@ const OrderHistoryPage = () => {
                                         <div className="bill-actions">
                                             <button 
                                                 className="view-bill-btn"
-                                                onClick={() => window.open(order.billImage, '_blank')}
+                                                onClick={() => {
+                                                    const billUrl = order.billImage || order.billPhoto || order.bill;
+                                                    if (billUrl) {
+                                                        window.open(billUrl, '_blank');
+                                                    } else {
+                                                        alert('Bill image not available');
+                                                    }
+                                                }}
                                             >
                                                 View Bill
                                             </button>
@@ -307,9 +319,13 @@ const OrderHistoryPage = () => {
 
                                 <div className="order-details">
                                     <div className="order-address">
-                                        <strong>Delivery Address:</strong> {typeof order.address === 'object' ?
-                                            `${order.address.street || ''}, ${order.address.city || ''}, ${order.address.state || ''} ${order.address.zipCode || ''}` :
-                                            order.address || 'Address not provided'}
+                                        <strong>Delivery Address:</strong> {
+                                            order.deliveryAddress || 
+                                            order.address || 
+                                            (typeof order.address === 'object' ?
+                                                `${order.address.street || ''}, ${order.address.city || ''}, ${order.address.state || ''} ${order.address.zipCode || ''}` :
+                                                'Address not provided')
+                                        }
                                     </div>
 
                                     {/* Show shop info if available */}
