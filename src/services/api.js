@@ -307,5 +307,6 @@ export const clearCache = () => {
     console.log('🗑️ Cache cleared');
 };
 
-// Export the main api instance
+// Export the main api instance and named export
+export { api };
 export default api;
