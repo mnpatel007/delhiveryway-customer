@@ -14,11 +14,19 @@ const OrderConfirmationPage = () => {
     useEffect(() => {
         const fetchOrder = async () => {
             try {
-                const response = await api.get(`/orders/${orderId}`);
-                if (response.data.success) {
-                    setOrder(response.data.data.order);
+                // Get order from URL params or location state
+                if (orderId) {
+                    const response = await api.get(`/orders/${orderId}`);
+                    if (response.data.success) {
+                        setOrder(response.data.data.order);
+                    } else {
+                        setError('Order not found');
+                    }
+                } else if (location.state?.order) {
+                    // Use order from navigation state if no orderId in URL
+                    setOrder(location.state.order);
                 } else {
-                    setError('Order not found');
+                    setError('No order information available');
                 }
             } catch (err) {
                 console.error('Error fetching order:', err);
@@ -28,9 +36,7 @@ const OrderConfirmationPage = () => {
             }
         };
 
-        if (orderId) {
-            fetchOrder();
-        }
+        fetchOrder();
     }, [orderId]);
 
     if (loading) {

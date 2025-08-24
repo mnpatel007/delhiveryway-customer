@@ -109,6 +109,7 @@ const AppContent = () => {
             <Route path="/order-success" element={<PrivateRoute><OrderSuccessPage /></PrivateRoute>} />
             <Route path="/final-checkout" element={<PrivateRoute><CheckoutPage /></PrivateRoute>} />
             <Route path="/order-confirmation" element={<PrivateRoute><OrderConfirmationPage /></PrivateRoute>} />
+            <Route path="/order-confirmation/:orderId" element={<PrivateRoute><OrderConfirmationPage /></PrivateRoute>} />
             <Route path="/revised-order/:orderId" element={<PrivateRoute><RevisedOrderPage /></PrivateRoute>} />
             <Route path="/orders" element={<PrivateRoute><OrderHistoryPage /></PrivateRoute>} />
 
