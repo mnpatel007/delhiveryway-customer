@@ -1,20 +1,26 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { CartContext } from '../context/CartContext';
-import { loadStripe } from '@stripe/stripe-js';
+import { useNavigate } from 'react-router-dom';
 import { shopsAPI, apiCall } from '../services/api';
 import api from '../services/api';
-import config from '../config/config';
 import './CheckoutPage.css';
-
-const stripePromise = loadStripe(config.STRIPE_PUBLISHABLE_KEY);
 
 const FinalCheckoutPage = () => {
     const { user } = useContext(AuthContext);
-    const { cartItems, selectedShop, getOrderSummary } = useContext(CartContext);
+    const { cartItems, selectedShop, getOrderSummary, clearCart } = useContext(CartContext);
     const [loading, setLoading] = useState(false);
     const [shops, setShops] = useState([]);
-    const [deliveryAddress, setDeliveryAddress] = useState('');
+    const [deliveryAddress, setDeliveryAddress] = useState({
+        street: '',
+        city: '',
+        state: '',
+        zipCode: '',
+        instructions: '',
+        contactName: user?.name || '',
+        contactPhone: user?.phone || ''
+    });
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchShops = async () => {
@@ -42,48 +48,70 @@ const FinalCheckoutPage = () => {
         return match ? match.name : 'Unknown Shop';
     };
 
-    const handleStripePayment = async () => {
-        if (!deliveryAddress.trim()) {
-            alert('Please enter a delivery address');
+    const handleConfirmOrder = async () => {
+        // Validate delivery address
+        if (!deliveryAddress.street.trim() || !deliveryAddress.city.trim() || !deliveryAddress.state.trim()) {
+            alert('Please fill in all required address fields (Street, City, State)');
             return;
         }
 
-        const stripe = await stripePromise;
         try {
             setLoading(true);
 
+            // Format items for order placement
             const formattedItems = cartItems.map(item => ({
-                product: {
-                    _id: item._id,
-                    name: item.name,
-                    price: item.price,
-                    shopId: item.shopId
-                },
-                quantity: item.quantity
+                productId: item._id,
+                name: item.name,
+                price: item.price,
+                quantity: item.quantity,
+                notes: item.notes || ''
             }));
 
-            // Store order amount for success page
-            localStorage.setItem('lastOrderAmount', orderSummary.total);
-
-            const response = await api.post('/payment/create-checkout-session', {
+            // Place order without payment
+            const response = await api.post('/orders', {
+                shopId: selectedShop._id,
                 items: formattedItems,
-                address: deliveryAddress,
-                deliveryCharge: orderSummary.deliveryFee
+                deliveryAddress: {
+                    street: deliveryAddress.street,
+                    city: deliveryAddress.city,
+                    state: deliveryAddress.state,
+                    zipCode: deliveryAddress.zipCode,
+                    coordinates: {
+                        lat: 0, // TODO: Get actual coordinates
+                        lng: 0
+                    },
+                    instructions: deliveryAddress.instructions,
+                    contactName: deliveryAddress.contactName,
+                    contactPhone: deliveryAddress.contactPhone
+                },
+                paymentMethod: 'cash' // Default to cash on delivery
             });
 
-            const result = await stripe.redirectToCheckout({
-                sessionId: response.data.id
-            });
-
-            if (result.error) {
-                alert(result.error.message);
+            if (response.data.success) {
+                // Clear cart after successful order placement
+                clearCart();
+                
+                // Navigate to order confirmation page
+                navigate(`/order-confirmation/${response.data.data.order._id}`, {
+                    state: { orderNumber: response.data.data.order.orderNumber }
+                });
+            } else {
+                alert('Failed to place order. Please try again.');
             }
+
         } catch (err) {
-            console.error('Payment error:', err);
-            alert('Payment failed. Try again.');
+            console.error('Order placement error:', err);
+            alert(err.response?.data?.message || 'Failed to place order. Please try again.');
         } finally {
             setLoading(false);
         }
+    };
+
+    const handleAddressChange = (field, value) => {
+        setDeliveryAddress(prev => ({
+            ...prev,
+            [field]: value
+        }));
     };
 
     if (cartItems.length === 0) {
@@ -126,14 +154,91 @@ const FinalCheckoutPage = () => {
 
                     <div className="checkout-address">
                         <h3>Delivery Address</h3>
-                        <textarea
-                            value={deliveryAddress}
-                            onChange={(e) => setDeliveryAddress(e.target.value)}
-                            placeholder="Enter your complete delivery address..."
-                            className="address-input"
-                            rows="3"
-                            required
-                        />
+                        <div className="address-form">
+                            <div className="form-row">
+                                <div className="form-group">
+                                    <label>Street Address *</label>
+                                    <input
+                                        type="text"
+                                        value={deliveryAddress.street}
+                                        onChange={(e) => handleAddressChange('street', e.target.value)}
+                                        placeholder="Enter street address"
+                                        className="form-input"
+                                        required
+                                    />
+                                </div>
+                            </div>
+                            <div className="form-row">
+                                <div className="form-group">
+                                    <label>City *</label>
+                                    <input
+                                        type="text"
+                                        value={deliveryAddress.city}
+                                        onChange={(e) => handleAddressChange('city', e.target.value)}
+                                        placeholder="Enter city"
+                                        className="form-input"
+                                        required
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label>State *</label>
+                                    <input
+                                        type="text"
+                                        value={deliveryAddress.state}
+                                        onChange={(e) => handleAddressChange('state', e.target.value)}
+                                        placeholder="Enter state"
+                                        className="form-input"
+                                        required
+                                    />
+                                </div>
+                            </div>
+                            <div className="form-row">
+                                <div className="form-group">
+                                    <label>ZIP Code</label>
+                                    <input
+                                        type="text"
+                                        value={deliveryAddress.zipCode}
+                                        onChange={(e) => handleAddressChange('zipCode', e.target.value)}
+                                        placeholder="Enter ZIP code"
+                                        className="form-input"
+                                    />
+                                </div>
+                            </div>
+                            <div className="form-row">
+                                <div className="form-group">
+                                    <label>Contact Name</label>
+                                    <input
+                                        type="text"
+                                        value={deliveryAddress.contactName}
+                                        onChange={(e) => handleAddressChange('contactName', e.target.value)}
+                                        placeholder="Contact person name"
+                                        className="form-input"
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label>Contact Phone</label>
+                                    <input
+                                        type="tel"
+                                        value={deliveryAddress.contactPhone}
+                                        onChange={(e) => handleAddressChange('contactPhone', e.target.value)}
+                                        placeholder="Contact phone number"
+                                        className="form-input"
+                                    />
+                                </div>
+                            </div>
+                            <div className="form-row">
+                                <div className="form-group">
+                                    <label>Delivery Instructions</label>
+                                    <textarea
+                                        value={deliveryAddress.instructions}
+                                        onChange={(e) => handleAddressChange('instructions', e.target.value)}
+                                        placeholder="Any special delivery instructions..."
+                                        className="form-textarea"
+                                        rows="3"
+                                    />
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <div className="checkout-order-summary">
@@ -180,10 +285,10 @@ const FinalCheckoutPage = () => {
 
                     <button
                         className="place-order-btn"
-                        onClick={handleStripePayment}
-                        disabled={loading || !deliveryAddress.trim()}
+                        onClick={handleConfirmOrder}
+                        disabled={loading || !deliveryAddress.street.trim() || !deliveryAddress.city.trim() || !deliveryAddress.state.trim()}
                     >
-                        {loading ? 'Processing...' : 'Pay Now'}
+                        {loading ? 'Placing Order...' : '✅ Confirm Order'}
                     </button>
                 </div>
             </div>

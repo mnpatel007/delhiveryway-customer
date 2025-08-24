@@ -17,6 +17,8 @@ import ShopPage from './pages/ShopPage';
 import CartPage from './pages/CartPage';
 import OrderSuccessPage from './pages/OrderSuccessPage';
 import CheckoutPage from './pages/FinalCheckoutPage';
+import OrderConfirmationPage from './pages/OrderConfirmationPage';
+import RevisedOrderPage from './pages/RevisedOrderPage';
 import OrderHistoryPage from './pages/OrderHistoryPage';
 
 import VerifyEmail from './pages/VerifyEmail';
@@ -106,6 +108,8 @@ const AppContent = () => {
             <Route path="/cart" element={<PrivateRoute><CartPage /></PrivateRoute>} />
             <Route path="/order-success" element={<PrivateRoute><OrderSuccessPage /></PrivateRoute>} />
             <Route path="/final-checkout" element={<PrivateRoute><CheckoutPage /></PrivateRoute>} />
+            <Route path="/order-confirmation" element={<PrivateRoute><OrderConfirmationPage /></PrivateRoute>} />
+            <Route path="/revised-order/:orderId" element={<PrivateRoute><RevisedOrderPage /></PrivateRoute>} />
             <Route path="/orders" element={<PrivateRoute><OrderHistoryPage /></PrivateRoute>} />
 
             <Route path="/verify-email" element={<VerifyEmail />} />
