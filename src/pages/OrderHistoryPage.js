@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
-import { ordersAPI, apiCall } from '../services/api';
+import { ordersAPI, apiCall, api } from '../services/api';
 import io from 'socket.io-client';
 import config from '../config/config';
 import './OrderHistoryPage.css';
