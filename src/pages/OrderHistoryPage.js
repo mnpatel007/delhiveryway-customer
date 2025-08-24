@@ -112,10 +112,20 @@ const OrderHistoryPage = () => {
         
         switch (status.toLowerCase()) {
             case 'pending': return 'status-pending';
+            case 'pending_shopper': return 'status-pending';
+            case 'accepted_by_shopper': return 'status-confirmed';
+            case 'shopper_at_shop': return 'status-preparing';
+            case 'shopping_in_progress': return 'status-preparing';
+            case 'shopping': return 'status-preparing';
+            case 'final_shopping': return 'status-preparing';
+            case 'bill_uploaded': return 'status-ready';
+            case 'bill_sent': return 'status-ready';
+            case 'bill_approved': return 'status-confirmed';
             case 'confirmed': return 'status-confirmed';
             case 'preparing': return 'status-preparing';
             case 'ready': return 'status-ready';
             case 'picked_up': return 'status-picked-up';
+            case 'out_for_delivery': return 'status-picked-up';
             case 'delivered': return 'status-delivered';
             case 'cancelled': return 'status-cancelled';
             default: return 'status-pending';
@@ -127,13 +137,23 @@ const OrderHistoryPage = () => {
         
         switch (status.toLowerCase()) {
             case 'pending': return 'Pending';
+            case 'pending_shopper': return 'Finding Personal Shopper';
+            case 'accepted_by_shopper': return 'Personal Shopper Assigned';
+            case 'shopper_at_shop': return 'Shopper Arrived at Store';
+            case 'shopping_in_progress': return 'Shopping in Progress';
+            case 'shopping': return 'Shopping in Progress';
+            case 'final_shopping': return 'Finalizing Purchase';
+            case 'bill_uploaded': return 'Bill Uploaded - Awaiting Approval';
+            case 'bill_sent': return 'Bill Sent for Approval';
+            case 'bill_approved': return 'Bill Approved - Preparing Delivery';
             case 'confirmed': return 'Confirmed';
             case 'preparing': return 'Preparing';
             case 'ready': return 'Ready for Pickup';
             case 'picked_up': return 'Picked Up';
+            case 'out_for_delivery': return 'Out for Delivery';
             case 'delivered': return 'Delivered';
             case 'cancelled': return 'Cancelled';
-            default: return status;
+            default: return status.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
         }
     };
 
