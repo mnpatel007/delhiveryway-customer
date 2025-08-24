@@ -18,11 +18,15 @@ const OrderHistoryPage = () => {
                 const result = await apiCall(ordersAPI.getCustomerOrders);
 
                 if (result.success) {
+                    console.log('API result:', result);
                     const data = result.data;
-                    const sortedOrders = Array.isArray(data)
-                        ? data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+                    // Handle both array format and object format with pagination
+                    const ordersArray = Array.isArray(data) ? data : (data.orders || data);
+                    const sortedOrders = Array.isArray(ordersArray)
+                        ? ordersArray.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
                         : [];
 
+                    console.log('Processed orders:', sortedOrders);
                     setOrders(sortedOrders);
                     setError(null);
                 } else {
