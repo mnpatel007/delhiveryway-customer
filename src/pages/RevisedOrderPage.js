@@ -24,55 +24,6 @@ const RevisedOrderPage = () => {
     useEffect(() => {
         const fetchOrder = async () => {
             try {
-                const response = await api.get(`/api/orders/${orderId}`);
-                setOrder(response.data);
-            } catch (err) {
-                console.error('Error fetching order:', err);
-                setError('Failed to load order details');
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        if (orderId) {
-            fetchOrder();
-        }
-    }, [orderId]);
-
-    const handleApproveRevision = async () => {
-        try {
-            setApproving(true);
-            await api.put(`/api/orders/${orderId}/approve-revision`);
-            navigate(`/orders/${orderId}`);
-        } catch (err) {
-            console.error('Error approving revision:', err);
-            setError('Failed to approve order changes');
-            setApproving(false);
-        }
-    };
-
-    const getOriginalTotal = () => {
-        return order?.items?.reduce((total, item) => total + (item.price * item.quantity), 0) || 0;
-    };
-
-    const getRevisedTotal = () => {
-        return order?.items?.reduce((total, item) => {
-            if (!item.isAvailable) return total;
-            return total + ((item.revisedPrice || item.price) * (item.revisedQuantity || item.quantity));
-        }, 0) || 0;
-    };
-
-const RevisedOrderPage = () => {
-    const { orderId } = useParams();
-    const navigate = useNavigate();
-    const [order, setOrder] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [approving, setApproving] = useState(false);
-    const [error, setError] = useState('');
-
-    useEffect(() => {
-        const fetchOrder = async () => {
-            try {
                 const response = await api.get(`/orders/${orderId}`);
                 if (response.data.success) {
                     const orderData = response.data.data.order;
@@ -101,7 +52,7 @@ const RevisedOrderPage = () => {
         try {
             setApproving(true);
             const response = await api.post(`/orders/${orderId}/approve-revision`);
-            
+
             if (response.data.success) {
                 // Navigate to order tracking page
                 navigate(`/orders/${orderId}`, {
@@ -151,7 +102,7 @@ const RevisedOrderPage = () => {
                     <div className="error-state">
                         <h2>Order Not Found</h2>
                         <p>The requested order could not be found.</p>
-                        <button 
+                        <button
                             className="btn btn-primary"
                             onClick={() => navigate('/orders')}
                         >
@@ -170,7 +121,7 @@ const RevisedOrderPage = () => {
                     <div className="error-state">
                         <h2>❌ Error</h2>
                         <p>{error}</p>
-                        <button 
+                        <button
                             className="btn btn-primary"
                             onClick={() => navigate('/orders')}
                         >
@@ -188,36 +139,18 @@ const RevisedOrderPage = () => {
     const taxes = Math.round(revisedSubtotal * 0.05);
     const revisedTotal = revisedSubtotal + deliveryFee + taxes;
 
-if (error) {
     return (
         <div className="checkout-container">
             <div className="checkout-wrapper">
-                <div className="error-state">
-                    <h2>❌ Error</h2>
-                    <p>{error}</p>
-                    <button 
-                        className="btn btn-primary"
-                        onClick={() => navigate('/orders')}
-                    >
-                        View My Orders
-                    </button>
+                <div className="checkout-header">
+                    <div className="revision-icon" aria-hidden="true">🔄</div>
+                    <h2>Order Revised by Shopper</h2>
+                    <p>Your personal shopper has checked item availability and made some adjustments to your order.</p>
                 </div>
-            </div>
-        </div>
-    );
-}
-
-return (
-    <div className="checkout-container">
-        <div className="checkout-wrapper">
-            <div className="checkout-header">
-                <div className="revision-icon">🔄</div>
-                <h2>Order Revised by Shopper</h2>
-                <p>Your personal shopper has checked item availability and made some adjustments to your order.</p>
-            </div>
 
                 <div className="checkout-content">
                     <div className="order-confirmation-details">
+
                         <div className="confirmation-section">
                             <h3>Order Information</h3>
                             <div className="info-grid">
@@ -244,10 +177,10 @@ return (
                             <h3>Item Changes</h3>
                             <div className="items-comparison">
                                 {order?.items?.map((item, index) => {
-                                    const hasChanges = item.revisedQuantity !== item.quantity || 
-                                                     item.revisedPrice !== item.price || 
-                                                     !item.isAvailable;
-                                    
+                                    const hasChanges = item.revisedQuantity !== item.quantity ||
+                                        item.revisedPrice !== item.price ||
+                                        !item.isAvailable;
+
                                     return (
                                         <div key={index} className={`item-comparison ${hasChanges ? 'has-changes' : ''}`}>
                                             <div className="item-header">
@@ -256,7 +189,7 @@ return (
                                                 {item.isAvailable && hasChanges && <span className="changed-badge">Modified</span>}
                                                 {item.isAvailable && !hasChanges && <span className="unchanged-badge">No Changes</span>}
                                             </div>
-                                            
+
                                             <div className="item-details">
                                                 <div className="detail-row">
                                                     <span className="detail-label">Quantity:</span>
@@ -269,7 +202,7 @@ return (
                                                         )}
                                                     </div>
                                                 </div>
-                                                
+
                                                 <div className="detail-row">
                                                     <span className="detail-label">Price per unit:</span>
                                                     <div className="detail-comparison">
@@ -281,7 +214,7 @@ return (
                                                         )}
                                                     </div>
                                                 </div>
-                                                
+
                                                 <div className="detail-row">
                                                     <span className="detail-label">Total:</span>
                                                     <div className="detail-comparison">
@@ -295,7 +228,7 @@ return (
                                                         )}
                                                     </div>
                                                 </div>
-                                                
+
                                                 {item.shopperNotes && (
                                                     <div className="shopper-notes">
                                                         <strong>Shopper's Note:</strong> {item.shopperNotes}
@@ -304,18 +237,11 @@ return (
                                             </div>
                                         </div>
                                     );
-                                });
+                                })}
                             </div>
                         </div>
 
-                        {error && (
-                            <div className="error-message">
-                                <h3>❌ Error</h3>
-                                <p>{error}</p>
-                            </div>
-                        )}
-
-                        {revisedTotal !== (originalSubtotal + deliveryFee + Math.round(originalSubtotal * 0.05)) && (
+                        {(revisedTotal !== (originalSubtotal + deliveryFee + Math.round(originalSubtotal * 0.05))) && (
                             <div className="savings-info">
                                 <span className="savings-label">
                                     {revisedTotal < (originalSubtotal + deliveryFee + Math.round(originalSubtotal * 0.05)) ? 'You Save:' : 'Additional Amount:'}
@@ -349,143 +275,19 @@ return (
                     </div>
 
                     <div className="confirmation-actions">
-                        <button 
+                        <button
                             className="btn btn-secondary"
                             onClick={() => navigate('/orders')}
                         >
                             View All Orders
                         </button>
-                        <button 
+                        <button
                             className="btn btn-primary"
                             onClick={handleApproveRevision}
                             disabled={approving}
                         >
                             {approving ? 'Processing...' : 'Approve Changes'}
                         </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
-};
-
-export default RevisedOrderPage;
-
-            <div className="checkout-content">
-                <div className="order-confirmation-details">
-                    <div className="confirmation-section">
-                        <h3>Order Information</h3>
-                        <div className="info-grid">
-                            <div className="info-item">
-                                <span className="info-label">Order Number:</span>
-                                <span className="info-value">{order?.orderNumber}</span>
-                            </div>
-                            <div className="info-item">
-                                <span className="info-label">Shopper:</span>
-                                <span className="info-value">{order?.personalShopperId?.name || 'Assigned'}</span>
-                            </div>
-                            <div className="info-item">
-                                <span className="info-label">Original Total:</span>
-                                <span className="info-value">{formatPrice(originalSubtotal + deliveryFee + Math.round(originalSubtotal * 0.05))}</span>
-                            </div>
-                            <div className="info-item">
-                                <span className="info-label">Revised Total:</span>
-                                <span className="info-value revised-total">{formatPrice(revisedTotal)}</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="confirmation-section">
-                        <h3>Item Changes</h3>
-                        <div className="items-comparison">
-                            {order?.items?.map((item, index) => {
-                                const hasChanges = item.revisedQuantity !== item.quantity || 
-                                                 item.revisedPrice !== item.price || 
-                                                 !item.isAvailable;
-                                
-                                return (
-                                    <div key={index} className={`item-comparison ${hasChanges ? 'has-changes' : ''}`}>
-                                        <div className="item-header">
-                                            <h4>{item.name}</h4>
-                                            {!item.isAvailable && <span className="unavailable-badge">Unavailable</span>}
-                                            {item.isAvailable && hasChanges && <span className="changed-badge">Modified</span>}
-                                            {item.isAvailable && !hasChanges && <span className="unchanged-badge">No Changes</span>}
-                                        </div>
-                                        
-                                        <div className="item-details">
-                                            <div className="detail-row">
-                                                <span className="detail-label">Quantity:</span>
-                                                <div className="detail-comparison">
-                                                    <span className={item.quantity !== item.revisedQuantity ? 'original-value crossed' : 'original-value'}>
-                                                        {item.quantity}
-                                                    </span>
-                                                    {item.quantity !== item.revisedQuantity && (
-                                                        <span className="revised-value">→ {item.revisedQuantity || 0}</span>
-                                                    )}
-                                                </div>
-                                            </div>
-                                            
-                                            <div className="detail-row">
-                                                <span className="detail-label">Price per unit:</span>
-                                                <div className="detail-comparison">
-                                                    <span className={item.price !== item.revisedPrice ? 'original-value crossed' : 'original-value'}>
-                                                        ₹{item.price?.toFixed(2)}
-                                                    </span>
-                                                    {item.price !== item.revisedPrice && (
-                                                        <span className="revised-value">→ ₹{(item.revisedPrice || 0).toFixed(2)}</span>
-                                                    )}
-                                                </div>
-                                            </div>
-                                            
-                                            <div className="detail-row">
-                                                <span className="detail-label">Total:</span>
-                                                <div className="detail-comparison">
-                                                    <span className={hasChanges ? 'original-value crossed' : 'original-value'}>
-                                                        ₹{(item.price * item.quantity).toFixed(2)}
-                                                    </span>
-                                                    {hasChanges && (
-                                                        <span className="revised-value">
-                                                            → ₹{item.isAvailable ? ((item.revisedPrice || item.price) * (item.revisedQuantity || 0)).toFixed(2) : '0.00'}
-                                                        </span>
-                                                    )}
-                                                </div>
-                                            </div>
-                                            
-                                            {item.shopperNotes && (
-                                                <div className="shopper-notes">
-                                                    <strong>Shopper's Note:</strong> {item.shopperNotes}
-                                                </div>
-                                            )}
-                                        </div>
-                                {revisedTotal !== (originalSubtotal + deliveryFee + Math.round(originalSubtotal * 0.1)) && (
-                                    <div className="savings-info">
-                                        <span className="savings-label">
-                                            {revisedTotal < (originalSubtotal + deliveryFee + Math.round(originalSubtotal * 0.1)) ? 'You Save:' : 'Additional Amount:'}
-                                        </span>
-                                        <span className={`savings-amount ${revisedTotal < (originalSubtotal + deliveryFee + Math.round(originalSubtotal * 0.1)) ? 'positive' : 'negative'}`}>
-                                            ₹{Math.abs(revisedTotal - (originalSubtotal + deliveryFee + Math.round(originalSubtotal * 0.1))).toFixed(2)}
-                                        </span>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-
-                        <div className="confirmation-actions">
-                            <button 
-                                className="btn btn-secondary"
-                                onClick={() => navigate('/orders')}
-                                disabled={approving}
-                            >
-                                Cancel Order
-                            </button>
-                            <button 
-                                className="btn btn-primary"
-                                onClick={handleApproveRevision}
-                                disabled={approving}
-                            >
-                                {approving ? 'Approving...' : '✅ Approve Revised Order'}
-                            </button>
-                        </div>
                     </div>
                 </div>
             </div>
