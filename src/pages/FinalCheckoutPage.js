@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { CartContext } from '../context/CartContext';
 import { useNavigate } from 'react-router-dom';
-import { shopsAPI, apiCall } from '../services/api';
+import { shopsAPI, apiCall, api } from '../services/api';
 import './FinalCheckoutPage.css';
 
 // Format price with Indian Rupee symbol and proper formatting
@@ -34,11 +34,12 @@ const FinalCheckoutPage = () => {
     useEffect(() => {
         const fetchShops = async () => {
             try {
-                const result = await apiCall(shopsAPI.getAll);
-                if (result.success) {
-                    const data = result.data;
-                    if (Array.isArray(data)) setShops(data);
-                    else if (Array.isArray(data.shops)) setShops(data.shops);
+                const { data } = await api.get('/shops');
+                if (data?.success) {
+                    const shopsData = data.data || data.shops;
+                    if (Array.isArray(shopsData)) {
+                        setShops(shopsData);
+                    }
                 }
             } catch (err) {
                 console.error('Failed to load shops:', err);

@@ -24,6 +24,55 @@ const RevisedOrderPage = () => {
     useEffect(() => {
         const fetchOrder = async () => {
             try {
+                const response = await api.get(`/api/orders/${orderId}`);
+                setOrder(response.data);
+            } catch (err) {
+                console.error('Error fetching order:', err);
+                setError('Failed to load order details');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        if (orderId) {
+            fetchOrder();
+        }
+    }, [orderId]);
+
+    const handleApproveRevision = async () => {
+        try {
+            setApproving(true);
+            await api.put(`/api/orders/${orderId}/approve-revision`);
+            navigate(`/orders/${orderId}`);
+        } catch (err) {
+            console.error('Error approving revision:', err);
+            setError('Failed to approve order changes');
+            setApproving(false);
+        }
+    };
+
+    const getOriginalTotal = () => {
+        return order?.items?.reduce((total, item) => total + (item.price * item.quantity), 0) || 0;
+    };
+
+    const getRevisedTotal = () => {
+        return order?.items?.reduce((total, item) => {
+            if (!item.isAvailable) return total;
+            return total + ((item.revisedPrice || item.price) * (item.revisedQuantity || item.quantity));
+        }, 0) || 0;
+    };
+
+const RevisedOrderPage = () => {
+    const { orderId } = useParams();
+    const navigate = useNavigate();
+    const [order, setOrder] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [approving, setApproving] = useState(false);
+    const [error, setError] = useState('');
+
+    useEffect(() => {
+        const fetchOrder = async () => {
+            try {
                 const response = await api.get(`/orders/${orderId}`);
                 if (response.data.success) {
                     const orderData = response.data.data.order;
@@ -88,7 +137,26 @@ const RevisedOrderPage = () => {
                 <div className="checkout-wrapper">
                     <div className="loading-state">
                         <div className="loading-spinner"></div>
-                        <p>Loading order revision...</p>
+                        <p>Loading order details...</p>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    if (!order) {
+        return (
+            <div className="checkout-container">
+                <div className="checkout-wrapper">
+                    <div className="error-state">
+                        <h2>Order Not Found</h2>
+                        <p>The requested order could not be found.</p>
+                        <button 
+                            className="btn btn-primary"
+                            onClick={() => navigate('/orders')}
+                        >
+                            View My Orders
+                        </button>
                     </div>
                 </div>
             </div>
@@ -120,14 +188,33 @@ const RevisedOrderPage = () => {
     const taxes = Math.round(revisedSubtotal * 0.05);
     const revisedTotal = revisedSubtotal + deliveryFee + taxes;
 
+if (error) {
     return (
         <div className="checkout-container">
             <div className="checkout-wrapper">
-                <div className="checkout-header">
-                    <div className="revision-icon">🔄</div>
-                    <h2>Order Revised by Shopper</h2>
-                    <p>Your personal shopper has checked item availability and made some adjustments to your order.</p>
+                <div className="error-state">
+                    <h2>❌ Error</h2>
+                    <p>{error}</p>
+                    <button 
+                        className="btn btn-primary"
+                        onClick={() => navigate('/orders')}
+                    >
+                        View My Orders
+                    </button>
                 </div>
+            </div>
+        </div>
+    );
+}
+
+return (
+    <div className="checkout-container">
+        <div className="checkout-wrapper">
+            <div className="checkout-header">
+                <div className="revision-icon">🔄</div>
+                <h2>Order Revised by Shopper</h2>
+                <p>Your personal shopper has checked item availability and made some adjustments to your order.</p>
+            </div>
 
                 <div className="checkout-content">
                     <div className="order-confirmation-details">
@@ -217,43 +304,72 @@ const RevisedOrderPage = () => {
                                             </div>
                                         </div>
                                     );
-                                })}
+                                });
                             </div>
                         </div>
 
-if (error) {
-return (
-    <div className="checkout-container">
-        <div className="checkout-wrapper">
-            <div className="error-state">
-                <h2>❌ Error</h2>
-                <p>{error}</p>
-                <button 
-                    className="btn btn-primary"
-                    onClick={() => navigate('/orders')}
-                >
-                    View My Orders
-                </button>
+                        {error && (
+                            <div className="error-message">
+                                <h3>❌ Error</h3>
+                                <p>{error}</p>
+                            </div>
+                        )}
+
+                        {revisedTotal !== (originalSubtotal + deliveryFee + Math.round(originalSubtotal * 0.05)) && (
+                            <div className="savings-info">
+                                <span className="savings-label">
+                                    {revisedTotal < (originalSubtotal + deliveryFee + Math.round(originalSubtotal * 0.05)) ? 'You Save:' : 'Additional Amount:'}
+                                </span>
+                                <span className={`savings-amount ${revisedTotal < (originalSubtotal + deliveryFee + Math.round(originalSubtotal * 0.05)) ? 'positive' : 'negative'}`}>
+                                    {formatPrice(Math.abs(revisedTotal - (originalSubtotal + deliveryFee + Math.round(originalSubtotal * 0.05))))}
+                                </span>
+                            </div>
+                        )}
+
+                        <div className="order-summary">
+                            <h3>Order Summary</h3>
+                            <div className="summary-row">
+                                <span>Items ({order.items?.length || 0})</span>
+                                <span>{formatPrice(revisedSubtotal)}</span>
+                            </div>
+                            <div className="summary-row">
+                                <span>Delivery Fee</span>
+                                <span>{formatPrice(deliveryFee)}</span>
+                            </div>
+                            <div className="summary-row">
+                                <span>Taxes (5%)</span>
+                                <span>{formatPrice(taxes)}</span>
+                            </div>
+                            <div className="summary-divider"></div>
+                            <div className="summary-row total-row">
+                                <span>Total Amount</span>
+                                <span>{formatPrice(revisedTotal)}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="confirmation-actions">
+                        <button 
+                            className="btn btn-secondary"
+                            onClick={() => navigate('/orders')}
+                        >
+                            View All Orders
+                        </button>
+                        <button 
+                            className="btn btn-primary"
+                            onClick={handleApproveRevision}
+                            disabled={approving}
+                        >
+                            {approving ? 'Processing...' : 'Approve Changes'}
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
-);
-}
+    );
+};
 
-const originalSubtotal = getOriginalTotal();
-const revisedSubtotal = getRevisedTotal();
-const deliveryFee = order?.orderValue?.deliveryFee || 0;
-const taxes = Math.round(revisedSubtotal * 0.05);
-const revisedTotal = revisedSubtotal + deliveryFee + taxes;
-
-return (
-    <div className="checkout-container">
-        <div className="checkout-wrapper">
-            <div className="checkout-header">
-                <div className="revision-icon">🔄</div>
-                <h2>Order Revised by Shopper</h2>
-                <p>Your personal shopper has checked item availability and made some adjustments to your order.</p>
-            </div>
+export default RevisedOrderPage;
 
             <div className="checkout-content">
                 <div className="order-confirmation-details">
