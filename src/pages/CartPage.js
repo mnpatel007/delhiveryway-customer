@@ -3,6 +3,16 @@ import { CartContext } from '../context/CartContext';
 import { useNavigate } from 'react-router-dom';
 import './CartPage.css';
 
+// Format price with Indian Rupee symbol and proper formatting
+const formatPrice = (price) => {
+    return new Intl.NumberFormat('en-IN', {
+        style: 'currency',
+        currency: 'INR',
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    }).format(price);
+};
+
 const CartPage = () => {
     const { cartItems, selectedShop, removeFromCart, updateQuantity, getOrderSummary, clearCart } = useContext(CartContext);
     const [toast, setToast] = useState('');
@@ -122,7 +132,7 @@ const CartPage = () => {
                                         <p>{cartItems.length} item{cartItems.length > 1 ? 's' : ''}</p>
                                     </div>
                                     <div className="shop-total">
-                                        <span>₹{orderSummary.subtotal.toFixed(2)}</span>
+                                        <span>{formatPrice(orderSummary.subtotal)}</span>
                                     </div>
                                 </div>
                             </div>
@@ -161,7 +171,7 @@ const CartPage = () => {
                                                 {item.description || 'No description available'}
                                             </p>
                                             <div className="item-price">
-                                                ₹{(item.price || 0).toFixed(2)} per unit
+                                                {formatPrice(item.price || 0)} per unit
                                             </div>
                                         </div>
 
@@ -179,7 +189,7 @@ const CartPage = () => {
                                             </div>
 
                                             <div className="item-total">
-                                                <span>Total: ₹{itemTotal.toFixed(2)}</span>
+                                                <span>Total: {formatPrice(itemTotal)}</span>
                                             </div>
 
                                             <button
@@ -202,28 +212,25 @@ const CartPage = () => {
 
                             <div className="summary-breakdown">
                                 <div className="summary-row">
-                                    <span>Subtotal ({orderSummary.itemCount} items)</span>
-                                    <span>₹{orderSummary.subtotal.toFixed(2)}</span>
+                                    <span>Items ({orderSummary.itemCount})</span>
+                                    <span>{formatPrice(orderSummary.subtotal)}</span>
                                 </div>
 
                                 <div className="summary-row">
                                     <span>Delivery Fee</span>
-                                    <span>₹{orderSummary.deliveryFee.toFixed(2)}</span>
+                                    <span>{formatPrice(orderSummary.deliveryFee)}</span>
                                 </div>
 
                                 <div className="summary-row">
-                                    <span>Service Fee</span>
-                                    <span>₹{orderSummary.serviceFee.toFixed(2)}</span>
+                                    <span>Taxes (5%)</span>
+                                    <span>{formatPrice(orderSummary.taxes)}</span>
                                 </div>
 
-                                <div className="summary-row">
-                                    <span>Taxes</span>
-                                    <span>₹{orderSummary.taxes.toFixed(2)}</span>
-                                </div>
+                                <div className="summary-divider"></div>
 
                                 <div className="summary-row total-row">
-                                    <span>Total</span>
-                                    <span>₹{orderSummary.total.toFixed(2)}</span>
+                                    <span>Total Amount</span>
+                                    <span>{formatPrice(orderSummary.total)}</span>
                                 </div>
                             </div>
 

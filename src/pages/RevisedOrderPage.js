@@ -3,6 +3,16 @@ import { useParams, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import './CheckoutPage.css';
 
+// Format price with Indian Rupee symbol and proper formatting
+const formatPrice = (price) => {
+    return new Intl.NumberFormat('en-IN', {
+        style: 'currency',
+        currency: 'INR',
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    }).format(price);
+};
+
 const RevisedOrderPage = () => {
     const { orderId } = useParams();
     const navigate = useNavigate();
@@ -107,9 +117,8 @@ const RevisedOrderPage = () => {
     const originalSubtotal = getOriginalTotal();
     const revisedSubtotal = getRevisedTotal();
     const deliveryFee = order?.orderValue?.deliveryFee || 0;
-    const serviceFee = Math.round(revisedSubtotal * 0.05);
     const taxes = Math.round(revisedSubtotal * 0.05);
-    const revisedTotal = revisedSubtotal + deliveryFee + serviceFee + taxes;
+    const revisedTotal = revisedSubtotal + deliveryFee + taxes;
 
     return (
         <div className="checkout-container">
@@ -135,11 +144,11 @@ const RevisedOrderPage = () => {
                                 </div>
                                 <div className="info-item">
                                     <span className="info-label">Original Total:</span>
-                                    <span className="info-value">₹{(originalSubtotal + deliveryFee + Math.round(originalSubtotal * 0.1)).toFixed(2)}</span>
+                                    <span className="info-value">{formatPrice(originalSubtotal + deliveryFee + Math.round(originalSubtotal * 0.05))}</span>
                                 </div>
                                 <div className="info-item">
                                     <span className="info-label">Revised Total:</span>
-                                    <span className="info-value revised-total">₹{revisedTotal.toFixed(2)}</span>
+                                    <span className="info-value revised-total">{formatPrice(revisedTotal)}</span>
                                 </div>
                             </div>
                         </div>
@@ -212,30 +221,126 @@ const RevisedOrderPage = () => {
                             </div>
                         </div>
 
-                        <div className="confirmation-section">
-                            <h3>Revised Order Summary</h3>
-                            <div className="order-total-breakdown">
-                                <div className="total-row">
-                                    <span>Items Total</span>
-                                    <span>₹{revisedSubtotal.toFixed(2)}</span>
-                                </div>
-                                <div className="total-row">
-                                    <span>Delivery Fee</span>
-                                    <span>₹{deliveryFee.toFixed(2)}</span>
-                                </div>
-                                <div className="total-row">
-                                    <span>Service Fee</span>
-                                    <span>₹{serviceFee.toFixed(2)}</span>
-                                </div>
-                                <div className="total-row">
-                                    <span>Taxes</span>
-                                    <span>₹{taxes.toFixed(2)}</span>
-                                </div>
-                                <div className="total-row total-grand">
-                                    <span><strong>Final Total</strong></span>
-                                    <span><strong>₹{revisedTotal.toFixed(2)}</strong></span>
-                                </div>
+if (error) {
+return (
+    <div className="checkout-container">
+        <div className="checkout-wrapper">
+            <div className="error-state">
+                <h2>❌ Error</h2>
+                <p>{error}</p>
+                <button 
+                    className="btn btn-primary"
+                    onClick={() => navigate('/orders')}
+                >
+                    View My Orders
+                </button>
+            </div>
+        </div>
+    </div>
+);
+}
+
+const originalSubtotal = getOriginalTotal();
+const revisedSubtotal = getRevisedTotal();
+const deliveryFee = order?.orderValue?.deliveryFee || 0;
+const taxes = Math.round(revisedSubtotal * 0.05);
+const revisedTotal = revisedSubtotal + deliveryFee + taxes;
+
+return (
+    <div className="checkout-container">
+        <div className="checkout-wrapper">
+            <div className="checkout-header">
+                <div className="revision-icon">🔄</div>
+                <h2>Order Revised by Shopper</h2>
+                <p>Your personal shopper has checked item availability and made some adjustments to your order.</p>
+            </div>
+
+            <div className="checkout-content">
+                <div className="order-confirmation-details">
+                    <div className="confirmation-section">
+                        <h3>Order Information</h3>
+                        <div className="info-grid">
+                            <div className="info-item">
+                                <span className="info-label">Order Number:</span>
+                                <span className="info-value">{order?.orderNumber}</span>
+                            </div>
+                            <div className="info-item">
+                                <span className="info-label">Shopper:</span>
+                                <span className="info-value">{order?.personalShopperId?.name || 'Assigned'}</span>
+                            </div>
+                            <div className="info-item">
+                                <span className="info-label">Original Total:</span>
+                                <span className="info-value">{formatPrice(originalSubtotal + deliveryFee + Math.round(originalSubtotal * 0.05))}</span>
+                            </div>
+                            <div className="info-item">
+                                <span className="info-label">Revised Total:</span>
+                                <span className="info-value revised-total">{formatPrice(revisedTotal)}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="confirmation-section">
+                        <h3>Item Changes</h3>
+                        <div className="items-comparison">
+                            {order?.items?.map((item, index) => {
+                                const hasChanges = item.revisedQuantity !== item.quantity || 
+                                                 item.revisedPrice !== item.price || 
+                                                 !item.isAvailable;
                                 
+                                return (
+                                    <div key={index} className={`item-comparison ${hasChanges ? 'has-changes' : ''}`}>
+                                        <div className="item-header">
+                                            <h4>{item.name}</h4>
+                                            {!item.isAvailable && <span className="unavailable-badge">Unavailable</span>}
+                                            {item.isAvailable && hasChanges && <span className="changed-badge">Modified</span>}
+                                            {item.isAvailable && !hasChanges && <span className="unchanged-badge">No Changes</span>}
+                                        </div>
+                                        
+                                        <div className="item-details">
+                                            <div className="detail-row">
+                                                <span className="detail-label">Quantity:</span>
+                                                <div className="detail-comparison">
+                                                    <span className={item.quantity !== item.revisedQuantity ? 'original-value crossed' : 'original-value'}>
+                                                        {item.quantity}
+                                                    </span>
+                                                    {item.quantity !== item.revisedQuantity && (
+                                                        <span className="revised-value">→ {item.revisedQuantity || 0}</span>
+                                                    )}
+                                                </div>
+                                            </div>
+                                            
+                                            <div className="detail-row">
+                                                <span className="detail-label">Price per unit:</span>
+                                                <div className="detail-comparison">
+                                                    <span className={item.price !== item.revisedPrice ? 'original-value crossed' : 'original-value'}>
+                                                        ₹{item.price?.toFixed(2)}
+                                                    </span>
+                                                    {item.price !== item.revisedPrice && (
+                                                        <span className="revised-value">→ ₹{(item.revisedPrice || 0).toFixed(2)}</span>
+                                                    )}
+                                                </div>
+                                            </div>
+                                            
+                                            <div className="detail-row">
+                                                <span className="detail-label">Total:</span>
+                                                <div className="detail-comparison">
+                                                    <span className={hasChanges ? 'original-value crossed' : 'original-value'}>
+                                                        ₹{(item.price * item.quantity).toFixed(2)}
+                                                    </span>
+                                                    {hasChanges && (
+                                                        <span className="revised-value">
+                                                            → ₹{item.isAvailable ? ((item.revisedPrice || item.price) * (item.revisedQuantity || 0)).toFixed(2) : '0.00'}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            </div>
+                                            
+                                            {item.shopperNotes && (
+                                                <div className="shopper-notes">
+                                                    <strong>Shopper's Note:</strong> {item.shopperNotes}
+                                                </div>
+                                            )}
+                                        </div>
                                 {revisedTotal !== (originalSubtotal + deliveryFee + Math.round(originalSubtotal * 0.1)) && (
                                     <div className="savings-info">
                                         <span className="savings-label">

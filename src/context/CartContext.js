@@ -241,22 +241,53 @@ export const CartProvider = ({ children }) => {
         }
     };
 
-    const getDeliveryFee = () => {
-        try {
-            return parseFloat(selectedShop?.deliveryFee || 30);
-        } catch (error) {
-            console.error('❌ Error getting delivery fee:', error);
-            return 30;
-        }
+    // Calculate distance between two coordinates using Haversine formula
+    const calculateDistance = (lat1, lon1, lat2, lon2) => {
+        const R = 6371; // Earth's radius in km
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLon = (lon2 - lon1) * Math.PI / 180;
+        const a = 
+            Math.sin(dLat/2) * Math.sin(dLat/2) +
+            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+            Math.sin(dLon/2) * Math.sin(dLon/2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        return R * c; // Distance in km
     };
 
-    const getServiceFee = () => {
+    const getDeliveryFee = () => {
         try {
-            const subtotal = getCartSubtotal();
-            return Math.round(subtotal * 0.05 * 100) / 100; // 5% service fee
+            // Get customer's location from localStorage or use default
+            const customerLocation = JSON.parse(localStorage.getItem('customerLocation')) || null;
+            const shopLocation = selectedShop?.address?.coordinates;
+            
+            if (!customerLocation || !shopLocation) {
+                return 30; // Default fee if location data is missing
+            }
+            
+            // Calculate distance in km
+            const distance = calculateDistance(
+                shopLocation.lat,
+                shopLocation.lng,
+                customerLocation.lat,
+                customerLocation.lng
+            );
+            
+            // Calculate delivery fee based on distance
+            const baseFee = 30; // Base fee for up to 2km
+            const perKmRate = 15; // Additional fee per km after 2km
+            const maxFee = 200; // Maximum delivery fee cap
+            
+            if (distance <= 2) {
+                return baseFee;
+            } else if (distance <= 10) {
+                return Math.min(baseFee + ((distance - 2) * perKmRate), maxFee);
+            } else {
+                // For distances over 10km, add a premium
+                return Math.min(baseFee + (8 * perKmRate) + ((distance - 10) * 20), maxFee);
+            }
         } catch (error) {
-            console.error('❌ Error calculating service fee:', error);
-            return 0;
+            console.error('❌ Error calculating delivery fee:', error);
+            return 30; // Default fee in case of error
         }
     };
 
@@ -274,9 +305,8 @@ export const CartProvider = ({ children }) => {
         try {
             const subtotal = getCartSubtotal();
             const deliveryFee = getDeliveryFee();
-            const serviceFee = getServiceFee();
             const taxes = getTaxes();
-            return Math.round((subtotal + deliveryFee + serviceFee + taxes) * 100) / 100;
+            return Math.round((subtotal + deliveryFee + taxes) * 100) / 100;
         } catch (error) {
             console.error('❌ Error calculating grand total:', error);
             return 0;
@@ -296,7 +326,6 @@ export const CartProvider = ({ children }) => {
         try {
             const subtotal = getCartSubtotal();
             const deliveryFee = getDeliveryFee();
-            const serviceFee = getServiceFee();
             const taxes = getTaxes();
             const total = getGrandTotal();
 
@@ -305,7 +334,6 @@ export const CartProvider = ({ children }) => {
                 itemCount: getCartItemsCount(),
                 subtotal,
                 deliveryFee,
-                serviceFee,
                 taxes,
                 total,
                 shop: selectedShop
@@ -335,7 +363,6 @@ export const CartProvider = ({ children }) => {
         clearCart,
         getCartSubtotal,
         getDeliveryFee,
-        getServiceFee,
         getTaxes,
         getGrandTotal,
         getCartItemsCount,

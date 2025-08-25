@@ -3,8 +3,17 @@ import { AuthContext } from '../context/AuthContext';
 import { CartContext } from '../context/CartContext';
 import { useNavigate } from 'react-router-dom';
 import { shopsAPI, apiCall } from '../services/api';
-import api from '../services/api';
-import './CheckoutPage.css';
+import './FinalCheckoutPage.css';
+
+// Format price with Indian Rupee symbol and proper formatting
+const formatPrice = (price) => {
+    return new Intl.NumberFormat('en-IN', {
+        style: 'currency',
+        currency: 'INR',
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    }).format(price);
+};
 
 const FinalCheckoutPage = () => {
     const { user } = useContext(AuthContext);
@@ -253,7 +262,7 @@ const FinalCheckoutPage = () => {
                                             <span className="product-name">{item.name}</span>
                                             <span className="product-quantity">x {item.quantity}</span>
                                         </div>
-                                        <span className="product-price">₹{(item.price * item.quantity).toFixed(2)}</span>
+                                        <span className="product-price">{formatPrice(item.price * item.quantity)}</span>
                                     </div>
                                 ))}
                             </div>
@@ -261,24 +270,21 @@ const FinalCheckoutPage = () => {
 
                         <div className="order-total-breakdown">
                             <div className="total-row">
-                                <span>Items Total ({orderSummary.itemCount} items)</span>
-                                <span>₹{orderSummary.subtotal.toFixed(2)}</span>
+                                <span>Items ({orderSummary.itemCount})</span>
+                                <span>{formatPrice(orderSummary.subtotal)}</span>
                             </div>
                             <div className="total-row">
                                 <span>Delivery Fee</span>
-                                <span>₹{orderSummary.deliveryFee.toFixed(2)}</span>
+                                <span>{formatPrice(orderSummary.deliveryFee)}</span>
                             </div>
                             <div className="total-row">
-                                <span>Service Fee</span>
-                                <span>₹{orderSummary.serviceFee.toFixed(2)}</span>
+                                <span>Taxes (5%)</span>
+                                <span>{formatPrice(orderSummary.taxes)}</span>
                             </div>
-                            <div className="total-row">
-                                <span>Taxes</span>
-                                <span>₹{orderSummary.taxes.toFixed(2)}</span>
-                            </div>
+                            <div className="summary-divider"></div>
                             <div className="total-row total-grand">
-                                <span><strong>Grand Total</strong></span>
-                                <span><strong>₹{orderSummary.total.toFixed(2)}</strong></span>
+                                <span><strong>Total Amount</strong></span>
+                                <span><strong>{formatPrice(orderSummary.total)}</strong></span>
                             </div>
                         </div>
                     </div>
