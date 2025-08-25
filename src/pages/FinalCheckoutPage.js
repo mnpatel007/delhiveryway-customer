@@ -74,15 +74,24 @@ const FinalCheckoutPage = () => {
             setIsGeocoding(true);
 
             // Geocode the address to get coordinates
-            const fullAddress = `${deliveryAddress.street}, ${deliveryAddress.city}, ${deliveryAddress.state} ${deliveryAddress.zipCode}`.trim();
-            const coordinates = await geocodeAddress(fullAddress);
+            const coordinates = await geocodeAddress({
+                street: deliveryAddress.street,
+                city: deliveryAddress.city,
+                state: deliveryAddress.state,
+                zipCode: deliveryAddress.zipCode
+            });
             
-            if (!coordinates) {
-                throw new Error('Could not determine location coordinates for the provided address.');
-            }
-
             console.log('Geocoded coordinates:', coordinates);
             setIsGeocoding(false);
+            
+            // Format the full address for display
+            const fullAddress = [
+                deliveryAddress.street,
+                deliveryAddress.city,
+                deliveryAddress.state,
+                deliveryAddress.zipCode,
+                'India'
+            ].filter(Boolean).join(', ');
 
             // Format items for order placement
             const formattedItems = cartItems.map(item => ({
