@@ -3,6 +3,7 @@ import { AuthContext } from '../context/AuthContext';
 import { CartContext } from '../context/CartContext';
 import { useNavigate } from 'react-router-dom';
 import { shopsAPI, apiCall, api } from '../services/api';
+import { geocodeAddress } from '../utils/geocoding';
 import './FinalCheckoutPage.css';
 
 // Format price with Indian Rupee symbol and proper formatting
@@ -29,6 +30,8 @@ const FinalCheckoutPage = () => {
         contactName: user?.name || '',
         contactPhone: user?.phone || ''
     });
+    const [isGeocoding, setIsGeocoding] = useState(false);
+    const [geocodingError, setGeocodingError] = useState('');
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -67,6 +70,19 @@ const FinalCheckoutPage = () => {
 
         try {
             setLoading(true);
+            setGeocodingError('');
+            setIsGeocoding(true);
+
+            // Geocode the address to get coordinates
+            const fullAddress = `${deliveryAddress.street}, ${deliveryAddress.city}, ${deliveryAddress.state} ${deliveryAddress.zipCode}`.trim();
+            const coordinates = await geocodeAddress(fullAddress);
+            
+            if (!coordinates) {
+                throw new Error('Could not determine location coordinates for the provided address.');
+            }
+
+            console.log('Geocoded coordinates:', coordinates);
+            setIsGeocoding(false);
 
             // Format items for order placement
             const formattedItems = cartItems.map(item => ({
@@ -87,9 +103,10 @@ const FinalCheckoutPage = () => {
                     state: deliveryAddress.state,
                     zipCode: deliveryAddress.zipCode,
                     coordinates: {
-                        lat: 0, // TODO: Get actual coordinates
-                        lng: 0
+                        lat: coordinates.lat,
+                        lng: coordinates.lng
                     },
+                    formattedAddress: fullAddress,
                     instructions: deliveryAddress.instructions,
                     contactName: deliveryAddress.contactName,
                     contactPhone: deliveryAddress.contactPhone
@@ -111,9 +128,15 @@ const FinalCheckoutPage = () => {
 
         } catch (err) {
             console.error('Order placement error:', err);
-            alert(err.response?.data?.message || 'Failed to place order. Please try again.');
+            const errorMessage = isGeocoding 
+                ? `Error processing address: ${err.message || 'Could not determine location coordinates'}`
+                : (err.response?.data?.message || 'Failed to place order. Please try again.');
+                
+            setGeocodingError(errorMessage);
+            alert(errorMessage);
         } finally {
             setLoading(false);
+            setIsGeocoding(false);
         }
     };
 
@@ -132,13 +155,23 @@ const FinalCheckoutPage = () => {
                         <h2>Your Cart is Empty</h2>
                         <p>Please add some items to your cart before proceeding to checkout.</p>
                     </div>
-                    <div className="checkout-content">
+                    <div className="checkout-actions">
                         <button 
-                            className="btn btn-primary"
-                            onClick={() => window.history.back()}
+                            className="btn btn-primary" 
+                            onClick={handleConfirmOrder}
+                            disabled={loading || isGeocoding}
                         >
-                            ← Back to Shopping
+                            {isGeocoding 
+                                ? 'Locating your address...' 
+                                : loading 
+                                    ? 'Placing Order...' 
+                                    : 'Confirm Order'}
                         </button>
+                        {geocodingError && (
+                            <div className="error-message" style={{ marginTop: '10px', color: 'red' }}>
+                                {geocodingError}
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
