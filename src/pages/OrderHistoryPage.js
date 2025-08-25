@@ -296,12 +296,19 @@ const OrderHistoryPage = () => {
                                                     console.log('Bill URL:', billUrl);
                                                     console.log('Order actualBill:', order.actualBill);
                                                     if (billUrl) {
-                                                        // If it's a relative path, prepend the API base URL
-                                                        const fullUrl = billUrl.startsWith('http') 
-                                                            ? billUrl 
-                                                            : `http://localhost:5000${billUrl}`;
-                                                        console.log('Opening URL:', fullUrl);
-                                                        window.open(fullUrl, '_blank');
+                                                        // Check if it's a base64 image
+                                                        if (billUrl.startsWith('data:image/')) {
+                                                            // Create a new window with the base64 image
+                                                            const newWindow = window.open();
+                                                            newWindow.document.write(`<img src="${billUrl}" style="max-width: 100%; height: auto;" />`);
+                                                        } else {
+                                                            // If it's a relative path, prepend the API base URL
+                                                            const fullUrl = billUrl.startsWith('http') 
+                                                                ? billUrl 
+                                                                : `http://localhost:5000${billUrl}`;
+                                                            console.log('Opening URL:', fullUrl);
+                                                            window.open(fullUrl, '_blank');
+                                                        }
                                                     } else {
                                                         alert('Bill image not available');
                                                     }
