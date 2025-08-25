@@ -1,166 +1,166 @@
 import axios from 'axios';
 
-// API Configuration
+// ====== Config ======
 const GOOGLE_MAPS_API_KEY = 'AIzaSyBTM8risurfzxPDibLQTKHOA9DSr89S6FA';
-const NOMINATIM_URL = 'https://nominatim.openstreetmap.org/search';
+const NOMINATIM_SEARCH_URL = 'https://nominatim.openstreetmap.org/search';
+const NOMINATIM_REVERSE_URL = 'https://nominatim.openstreetmap.org/reverse';
 const GOOGLE_GEOCODE_URL = 'https://maps.googleapis.com/maps/api/geocode/json';
 
-// Cache for storing geocoding results to reduce API calls
+// Simple in-memory cache (address string -> {lat, lng})
 const geocodeCache = new Map();
 
-// Helper function to format address components
-const formatAddressComponents = (address) => {
-    const components = [
-        address.street,
-        address.landmark ? `near ${address.landmark}` : '',
-        address.area || '',
-        address.city,
-        address.state,
-        address.zipCode,
-        'India' // Default to India since it's the primary market
-    ].filter(Boolean); // Remove empty strings
+// ---------- Helpers ----------
+const normalizeString = (s) => (s || '').toString().trim();
+const isFiniteNum = (n) => Number.isFinite(Number(n));
 
-    return components.join(', ');
+const formatAddressComponents = (address) => {
+  if (typeof address === 'string') return normalizeString(address);
+
+  const parts = [
+    normalizeString(address.street),
+    address.landmark ? `near ${normalizeString(address.landmark)}` : '',
+    normalizeString(address.area),
+    normalizeString(address.city),
+    normalizeString(address.state),
+    normalizeString(address.zipCode),
+    'India', // default market
+  ].filter(Boolean);
+
+  return parts.join(', ');
 };
 
+const toLL = (lat, lng) => ({
+  lat: parseFloat(lat),
+  lng: parseFloat(lng),
+});
+
+// ---------- Geocoding ----------
 /**
- * Geocode an address using available services
- * @param {string|object} address - The address to geocode (string or address object)
- * @returns {Promise<{lat: number, lng: number}>} - Object containing latitude and longitude
+ * Geocode an address (string or object) -> { lat, lng }
  */
 export const geocodeAddress = async (address) => {
-  if (!address) {
-    throw new Error('Address is required');
-  }
+  if (!address) throw new Error('Address is required');
 
-  // If address is an object, format it
-  const addressString = typeof address === 'string' 
-    ? address 
-    : formatAddressComponents(address);
+  const addressString = formatAddressComponents(address);
+  const cacheKey = addressString.toLowerCase();
 
-  // Check cache first
-  const cacheKey = addressString.toLowerCase().trim();
   if (geocodeCache.has(cacheKey)) {
     return geocodeCache.get(cacheKey);
   }
 
+  // 1) Try Google Geocoding API
   try {
-    // First try Google Maps Geocoding API
-    try {
-      const response = await axios.get(GOOGLE_GEOCODE_URL, {
-        params: {
-          address: addressString,
-          key: GOOGLE_MAPS_API_KEY,
-          region: 'in',
-          components: 'country:IN',
-          bounds: '68.17665,7.96553,97.40256,35.49401' // Rough bounds of India
-        },
-        timeout: 5000 // 5 second timeout
-      });
+    const resp = await axios.get(GOOGLE_GEOCODE_URL, {
+      params: {
+        address: addressString,
+        key: GOOGLE_MAPS_API_KEY,
+        region: 'in',
+        components: 'country:IN',
+        bounds: '7.96553,68.17665|35.49401,97.40256', // SW|NE (lat,lng|lat,lng)
+      },
+      timeout: 8000,
+    });
 
-      if (response.data && response.data.status === 'OK' && response.data.results.length > 0) {
-        const { lat, lng } = response.data.results[0].geometry.location;
-        const result = { lat, lng };
-        geocodeCache.set(cacheKey, result);
-        return result;
-      } else if (response.data.status === 'ZERO_RESULTS') {
-        console.warn('Google Geocoding API returned no results, falling back to Nominatim');
-      } else {
-        console.warn('Google Geocoding API error:', response.data.status, 'Falling back to Nominatim');
-      }
-    } catch (googleError) {
-      console.warn('Google Geocoding API failed, falling back to Nominatim:', googleError);
+    const { data } = resp;
+
+    if (data?.status === 'OK' && Array.isArray(data.results) && data.results.length > 0) {
+      const { lat, lng } = data.results[0].geometry.location;
+      const result = toLL(lat, lng);
+      geocodeCache.set(cacheKey, result);
+      return result;
     }
 
-    // Fallback to Nominatim (OpenStreetMap)
-    const response = await axios.get(NOMINATIM_URL, {
+    if (data?.status === 'ZERO_RESULTS') {
+      // Fall through to Nominatim
+      // console.warn('Google Geocoding: ZERO_RESULTS. Falling back to Nominatim.');
+    } else {
+      // console.warn('Google Geocoding non-OK status:', data?.status);
+    }
+  } catch (googleErr) {
+    // console.warn('Google Geocoding failed. Falling back to Nominatim:', googleErr);
+  }
+
+  // 2) Fallback to Nominatim (OpenStreetMap)
+  try {
+    const resp = await axios.get(NOMINATIM_SEARCH_URL, {
       params: {
         q: addressString,
         format: 'json',
         addressdetails: 1,
         limit: 1,
-        countrycodes: 'in', // Focus on India
+        countrycodes: 'in',
         'accept-language': 'en',
-        namedetails: 1,
-        extratags: 1
       },
-      headers: {
-        'User-Agent': 'DelhiveryWay/1.0 (contact@delhiveryway.com)' // Required by Nominatim
-      },
-      timeout: 5000 // 5 second timeout
+      timeout: 8000,
+      // Nominatim asks for a valid User-Agent (browser will provide one).
+      // If you proxy via backend, set a descriptive UA there per their policy.
     });
 
-    if (response.data && response.data[0]) {
-      const result = {
-        lat: parseFloat(response.data[0].lat),
-        lng: parseFloat(response.data[0].lon)
-      };
+    if (Array.isArray(resp.data) && resp.data[0]) {
+      const { lat, lon } = resp.data[0];
+      const result = toLL(lat, lon);
       geocodeCache.set(cacheKey, result);
       return result;
     }
-
-    // Try with a simpler address (just city and state) if full address fails
-    if (typeof address === 'object' && (address.city || address.state)) {
-      const simpleAddress = [address.city, address.state, 'India'].filter(Boolean).join(', ');
-      if (simpleAddress !== addressString) {
-        return geocodeAddress(simpleAddress);
-      }
-    }
-
-    throw new Error(`Could not find coordinates for: ${addressString}`);
-  } catch (error) {
-    console.error('Geocoding error for address:', address, 'Error:', error);
-    
-    // Provide more specific error messages
-    if (error.response) {
-      // The request was made and the server responded with a status code
-      // that falls out of the range of 2xx
-      if (error.response.status === 429) {
-        throw new Error('Too many geocoding requests. Please wait a moment and try again.');
-      }
-      throw new Error(`Geocoding service error: ${error.response.status} - ${error.response.statusText}`);
-    } else if (error.request) {
-      // The request was made but no response was received
-      throw new Error('Could not connect to the geocoding service. Please check your internet connection.');
-    } else if (error.code === 'ECONNABORTED') {
-      throw new Error('Geocoding service timed out. Please try again.');
-    }
-    
-    // Re-throw the original error if it's one of our custom errors
-    if (error.message.includes('Could not find coordinates')) {
-      throw error;
-    }
-    
-    // For any other errors, provide a generic message
-    throw new Error(`Failed to process address: ${error.message || 'Please check the address and try again.'}`);
+  } catch (nomErr) {
+    // continue to simplified retry path
   }
+
+  // 3) Try simplified address (city, state, India)
+  if (typeof address === 'object' && (address.city || address.state)) {
+    const simple = [address.city, address.state, 'India'].filter(Boolean).join(', ');
+    if (simple.toLowerCase() !== addressString.toLowerCase()) {
+      return geocodeAddress(simple);
+    }
+  }
+
+  // If we got here, both providers failed
+  throw new Error(`Could not find coordinates for: ${addressString}`);
 };
 
+// ---------- Reverse Geocoding ----------
 /**
- * Reverse geocode coordinates to get address
- * @param {number} lat - Latitude
- * @param {number} lng - Longitude
- * @returns {Promise<string>} - Formatted address
+ * Reverse geocode lat/lng -> formatted address (display_name)
  */
 export const reverseGeocode = async (lat, lng) => {
+  if (!isFiniteNum(lat) || !isFiniteNum(lng)) {
+    throw new Error('Valid latitude and longitude are required');
+  }
+
   try {
-    const response = await axios.get(NOMINATIM_URL, {
+    const resp = await axios.get(NOMINATIM_REVERSE_URL, {
       params: {
         lat,
         lon: lng,
         format: 'json',
         addressdetails: 1,
-        'accept-language': 'en'
-      }
+        'accept-language': 'en',
+      },
+      timeout: 8000,
     });
 
-    if (response.data && response.data[0]) {
-      return response.data[0].display_name;
+    // Nominatim /reverse returns an object, not an array
+    if (resp?.data?.display_name) {
+      return resp.data.display_name;
     }
-    
+
     throw new Error('No address found for the given coordinates');
   } catch (error) {
-    console.error('Reverse geocoding error:', error);
-    throw new Error('Failed to get address from coordinates');
+    // Improved, specific error messages
+    if (error.code === 'ECONNABORTED') {
+      throw new Error('Reverse geocoding timed out. Please try again.');
+    }
+    if (error.response) {
+      if (error.response.status === 429) {
+        throw new Error('Too many reverse geocoding requests. Please wait and try again.');
+      }
+      throw new Error(
+        `Reverse geocoding service error: ${error.response.status} - ${error.response.statusText}`
+      );
+    }
+    if (error.request) {
+      throw new Error('Could not connect to the reverse geocoding service.');
+    }
+    throw new Error(error.message || 'Failed to get address from coordinates');
   }
 };
