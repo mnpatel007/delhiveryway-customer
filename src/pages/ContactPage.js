@@ -29,9 +29,9 @@ const ContactPage = () => {
             const emailBody = `New Contact Form Submission\n\nName: ${formData.name}\nEmail: ${formData.email}\nPhone: ${formData.phone || 'Not provided'}\nCategory: ${formData.category}\nPriority: ${formData.priority}\nSubject: ${formData.subject}\n\nMessage:\n${formData.message}\n\n---\nSent from DelhiveryWay Contact Form`;
 
             const mailtoLink = `mailto:delhiverywayiit@gmail.com?subject=Contact Form: ${encodeURIComponent(formData.subject)}&body=${encodeURIComponent(emailBody)}`;
-            
+
             window.location.href = mailtoLink;
-            
+
             alert('Your email client will open to send the message.');
             setFormData({
                 name: '',
@@ -78,7 +78,7 @@ const ContactPage = () => {
                                 <div className="method-icon">📞</div>
                                 <div className="method-details">
                                     <h3>Phone Support</h3>
-                                    <p>+91 98765 43210</p>
+                                    <p>+91 93130 34669</p>
                                     <span>Mon-Sat, 9 AM - 8 PM</span>
                                 </div>
                             </div>
