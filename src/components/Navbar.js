@@ -74,19 +74,6 @@ const Navbar = () => {
                         <span className="link-icon">📞</span>
                         Contact
                     </Link>
-
-                    <Link
-                        to="/contact"
-                        className={`navbar-link ${isActive('/contact') ? 'active' : ''}`}
-                    >
-                        <span className="link-icon">📞</span>
-                        Contact
-                    </Link>
-
-                    {user && (
-                        <>
-                        </>
-                    )}
                 </div>
 
                 {/* User Menu */}
@@ -144,16 +131,7 @@ const Navbar = () => {
                         Home
                     </Link>
 
-                    <Link
-                        to="/contact"
-                        className={`mobile-link ${isActive('/contact') ? 'active' : ''}`}
-                        onClick={() => setIsMenuOpen(false)}
-                    >
-                        <span className="link-icon">📞</span>
-                        Contact
-                    </Link>
-
-                    {user ? (
+                    {user && (
                         <>
                             <Link
                                 to="/orders"
@@ -188,7 +166,6 @@ const Navbar = () => {
                     </Link>
 
                     {user ? (
-                        <>
 
                             <div className="mobile-user-info">
                                 <div className="user-avatar">
