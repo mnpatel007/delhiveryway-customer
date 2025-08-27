@@ -166,7 +166,7 @@ const Navbar = () => {
                     </Link>
 
                     {user ? (
-
+                        <>
                             <div className="mobile-user-info">
                                 <div className="user-avatar">
                                     {user.name?.charAt(0).toUpperCase() || 'U'}
