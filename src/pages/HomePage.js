@@ -165,21 +165,23 @@ const HomePage = () => {
     }, [fetchShops]);
 
     const filterSampleShops = () => {
-        let filtered = sampleShops;
+        let filtered = [...sampleShops]; // Create a copy of the array
 
-        // Apply category filter
-        if (selectedCategory !== 'all') {
-            filtered = filtered.filter(shop => shop.category === selectedCategory);
-        }
-
-        // Apply search filter
-        if (searchTerm) {
-            const searchLower = searchTerm.toLowerCase();
+        // Apply search filter first (if search term exists)
+        if (searchTerm.trim()) {
+            const searchLower = searchTerm.trim().toLowerCase();
             filtered = filtered.filter(shop =>
                 shop.name.toLowerCase().includes(searchLower) ||
                 shop.description.toLowerCase().includes(searchLower) ||
-                shop.category.toLowerCase().includes(searchLower)
+                shop.category.toLowerCase().includes(searchLower) ||
+                shop.address.city.toLowerCase().includes(searchLower) ||
+                shop.address.street.toLowerCase().includes(searchLower)
             );
+        }
+
+        // Then apply category filter
+        if (selectedCategory !== 'all') {
+            filtered = filtered.filter(shop => shop.category === selectedCategory);
         }
 
         return filtered;
@@ -195,7 +197,33 @@ const HomePage = () => {
 
     const handleSearch = (e) => {
         e.preventDefault();
-        // Search will be triggered by useEffect when searchTerm changes
+        // Clear any pending timeouts
+        if (window.searchTimeout) {
+            clearTimeout(window.searchTimeout);
+        }
+        // Trigger search immediately on form submit
+        fetchShops();
+    };
+
+    const handleSearchChange = (e) => {
+        const value = e.target.value;
+        setSearchTerm(value);
+        
+        // Clear any existing timeout
+        if (window.searchTimeout) {
+            clearTimeout(window.searchTimeout);
+        }
+        
+        // Set a new timeout to search after user stops typing (500ms delay)
+        window.searchTimeout = setTimeout(() => {
+            fetchShops();
+        }, 500);
+    };
+
+    const handleCategoryChange = (category) => {
+        setSelectedCategory(category);
+        // Trigger search when category changes
+        fetchShops();
     };
 
     const retryFetch = () => {
@@ -263,30 +291,37 @@ const HomePage = () => {
                                 type="text"
                                 placeholder="Search for shops, products, or categories..."
                                 value={searchTerm}
-                                onChange={(e) => {
-                                    setSearchTerm(e.target.value);
-                                    // Trigger search after a short delay
-                                    clearTimeout(window.searchTimeout);
-                                    window.searchTimeout = setTimeout(() => {
-                                        fetchShops();
-                                    }, 500);
-                                }}
+                                onChange={handleSearchChange}
                                 className="search-input"
                                 ref={searchInputRef}
+                                aria-label="Search shops"
                             />
-                            <span className="search-icon">🔍</span>
+                            {searchTerm && (
+                                <button 
+                                    type="button" 
+                                    className="clear-search-btn"
+                                    onClick={() => {
+                                        setSearchTerm('');
+                                        fetchShops();
+                                    }}
+                                    aria-label="Clear search"
+                                >
+                                    ✕
+                                </button>
+                            )}
+                            <button type="submit" className="search-btn" aria-label="Search">
+                                <span className="search-icon">🔍</span>
+                            </button>
                         </div>
-                        <button type="submit" className="search-btn">
-                            Search
-                        </button>
                     </form>
 
                     <div className="category-filters">
                         {categories.map(category => (
                             <button
                                 key={category}
-                                onClick={() => setSelectedCategory(category)}
+                                onClick={() => handleCategoryChange(category)}
                                 className={`category-btn ${selectedCategory === category ? 'active' : ''}`}
+                                aria-pressed={selectedCategory === category}
                             >
                                 {category === 'all' ? 'All Categories' :
                                     category.charAt(0).toUpperCase() + category.slice(1)}
