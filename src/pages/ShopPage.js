@@ -313,12 +313,13 @@ const ShopPage = () => {
                                     <span className="meta-text">{products.length} products</span>
                                 </div>
 
-                                {shop.deliveryFee !== undefined && (
+                                {/* Hide delivery fee on shop page as requested */}
+                                {/* {shop.deliveryFee !== undefined && (
                                     <div className="meta-item">
                                         <span className="meta-icon">🚚</span>
                                         <span className="meta-text">{shop.deliveryFee === 0 ? 'Free delivery' : `₹${shop.deliveryFee} delivery`}</span>
                                     </div>
-                                )}
+                                )} */}
                             </div>
                         </div>
                     </div>

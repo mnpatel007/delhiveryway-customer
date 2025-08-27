@@ -389,18 +389,19 @@ const HomePage = () => {
                                                 </span>
                                             </div>
 
-                                            <div className="shop-location">
-                                                📍 {shop.address?.city}, {shop.address?.state}
+                                            <div className="shop-location" title={`${shop.address?.street || ''}${shop.address?.street ? ', ' : ''}${shop.address?.city || ''}${shop.address?.city ? ', ' : ''}${shop.address?.state || ''}${shop.address?.zipCode ? ' ' + shop.address?.zipCode : ''}`}>
+                                                📍 {(shop.address?.street && `${shop.address.street}, `) || ''}{shop.address?.city}{shop.address?.state ? `, ${shop.address.state}` : ''}{shop.address?.zipCode ? ` ${shop.address.zipCode}` : ''}
                                             </div>
 
-                                            {shop.deliveryFee !== undefined && (
+                                            {/* Hide delivery fee on listing as requested */}
+                                            {/* {shop.deliveryFee !== undefined && (
                                                 <div className="delivery-fee">
                                                     {shop.deliveryFee === 0
                                                         ? 'Free Delivery'
                                                         : `₹${shop.deliveryFee} delivery`
                                                     }
                                                 </div>
-                                            )}
+                                            )} */}
 
                                             {shop.productCount !== undefined && (
                                                 <div className="product-count">
