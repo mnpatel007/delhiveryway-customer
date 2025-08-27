@@ -75,6 +75,14 @@ const Navbar = () => {
                         Contact
                     </Link>
 
+                    <Link
+                        to="/contact"
+                        className={`navbar-link ${isActive('/contact') ? 'active' : ''}`}
+                    >
+                        <span className="link-icon">📞</span>
+                        Contact
+                    </Link>
+
                     {user && (
                         <>
                         </>
@@ -134,6 +142,15 @@ const Navbar = () => {
                     >
                         <span className="link-icon">🏠</span>
                         Home
+                    </Link>
+
+                    <Link
+                        to="/contact"
+                        className={`mobile-link ${isActive('/contact') ? 'active' : ''}`}
+                        onClick={() => setIsMenuOpen(false)}
+                    >
+                        <span className="link-icon">📞</span>
+                        Contact
                     </Link>
 
                     {user ? (

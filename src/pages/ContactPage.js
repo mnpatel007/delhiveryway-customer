@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { toast } from 'react-toastify';
 import './ContactPage.css';
 
 const ContactPage = () => {
@@ -30,7 +29,7 @@ const ContactPage = () => {
             // Simulate API call
             await new Promise(resolve => setTimeout(resolve, 1500));
             
-            toast.success('Your message has been sent successfully! We\'ll get back to you within 24 hours.');
+            alert('Your message has been sent successfully! We\'ll get back to you within 24 hours.');
             setFormData({
                 name: '',
                 email: '',
@@ -41,7 +40,7 @@ const ContactPage = () => {
                 priority: 'medium'
             });
         } catch (error) {
-            toast.error('Failed to send message. Please try again.');
+            alert('Failed to send message. Please try again.');
         } finally {
             setIsSubmitting(false);
         }
