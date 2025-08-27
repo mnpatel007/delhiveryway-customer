@@ -66,6 +66,19 @@ const Navbar = () => {
                             </Link>
                         </>
                     )}
+
+                    <Link
+                        to="/contact"
+                        className={`navbar-link ${isActive('/contact') ? 'active' : ''}`}
+                    >
+                        <span className="link-icon">📞</span>
+                        Contact
+                    </Link>
+
+                    {user && (
+                        <>
+                        </>
+                    )}
                 </div>
 
                 {/* User Menu */}
@@ -145,6 +158,20 @@ const Navbar = () => {
                                     <span className="cart-badge">{cartItemCount}</span>
                                 )}
                             </Link>
+                        </>
+                    )}
+
+                    <Link
+                        to="/contact"
+                        className={`mobile-link ${isActive('/contact') ? 'active' : ''}`}
+                        onClick={() => setIsMenuOpen(false)}
+                    >
+                        <span className="link-icon">📞</span>
+                        Contact
+                    </Link>
+
+                    {user ? (
+                        <>
 
                             <div className="mobile-user-info">
                                 <div className="user-avatar">

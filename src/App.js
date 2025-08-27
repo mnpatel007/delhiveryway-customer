@@ -20,6 +20,7 @@ import CheckoutPage from './pages/FinalCheckoutPage';
 import OrderConfirmationPage from './pages/OrderConfirmationPage';
 import RevisedOrderPage from './pages/RevisedOrderPage';
 import OrderHistoryPage from './pages/OrderHistoryPage';
+import ContactPage from './pages/ContactPage';
 
 import VerifyEmail from './pages/VerifyEmail';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
@@ -112,6 +113,7 @@ const AppContent = () => {
             <Route path="/order-confirmation/:orderId" element={<PrivateRoute><OrderConfirmationPage /></PrivateRoute>} />
             <Route path="/revised-order/:orderId" element={<PrivateRoute><RevisedOrderPage /></PrivateRoute>} />
             <Route path="/orders" element={<PrivateRoute><OrderHistoryPage /></PrivateRoute>} />
+            <Route path="/contact" element={<ContactPage />} />
 
             <Route path="/verify-email" element={<VerifyEmail />} />
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
