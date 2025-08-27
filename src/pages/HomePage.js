@@ -195,7 +195,7 @@ const HomePage = () => {
 
     const handleSearch = (e) => {
         e.preventDefault();
-        fetchShops();
+        // Search will be triggered by useEffect when searchTerm changes
     };
 
     const retryFetch = () => {
@@ -209,17 +209,8 @@ const HomePage = () => {
         fetchShops();
     };
 
-    // Filter shops based on search and category
-    const filteredShops = shops.filter(shop => {
-        const matchesSearch = !searchTerm ||
-            shop.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            shop.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            shop.category.toLowerCase().includes(searchTerm.toLowerCase());
-
-        const matchesCategory = selectedCategory === 'all' || shop.category === selectedCategory;
-
-        return matchesSearch && matchesCategory;
-    });
+    // Use shops directly since filtering is already done in fetchShops
+    const filteredShops = shops;
 
     if (loading) {
         return (
@@ -272,7 +263,14 @@ const HomePage = () => {
                                 type="text"
                                 placeholder="Search for shops, products, or categories..."
                                 value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
+                                onChange={(e) => {
+                                    setSearchTerm(e.target.value);
+                                    // Trigger search after a short delay
+                                    clearTimeout(window.searchTimeout);
+                                    window.searchTimeout = setTimeout(() => {
+                                        fetchShops();
+                                    }, 500);
+                                }}
                                 className="search-input"
                                 ref={searchInputRef}
                             />
@@ -287,7 +285,11 @@ const HomePage = () => {
                         {categories.map(category => (
                             <button
                                 key={category}
-                                onClick={() => setSelectedCategory(category)}
+                                onClick={() => {
+                                    setSelectedCategory(category);
+                                    // Trigger search immediately for category change
+                                    setTimeout(() => fetchShops(), 100);
+                                }}
                                 className={`category-btn ${selectedCategory === category ? 'active' : ''}`}
                             >
                                 {category === 'all' ? 'All Categories' :
