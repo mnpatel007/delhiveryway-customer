@@ -26,10 +26,13 @@ const ContactPage = () => {
         setIsSubmitting(true);
 
         try {
-            // Simulate API call
-            await new Promise(resolve => setTimeout(resolve, 1500));
+            const emailBody = `New Contact Form Submission\n\nName: ${formData.name}\nEmail: ${formData.email}\nPhone: ${formData.phone || 'Not provided'}\nCategory: ${formData.category}\nPriority: ${formData.priority}\nSubject: ${formData.subject}\n\nMessage:\n${formData.message}\n\n---\nSent from DelhiveryWay Contact Form`;
+
+            const mailtoLink = `mailto:delhiverywayiit@gmail.com?subject=Contact Form: ${encodeURIComponent(formData.subject)}&body=${encodeURIComponent(emailBody)}`;
             
-            alert('Your message has been sent successfully! We\'ll get back to you within 24 hours.');
+            window.location.href = mailtoLink;
+            
+            alert('Your email client will open to send the message.');
             setFormData({
                 name: '',
                 email: '',
@@ -40,7 +43,7 @@ const ContactPage = () => {
                 priority: 'medium'
             });
         } catch (error) {
-            alert('Failed to send message. Please try again.');
+            alert('Failed to open email client. Please email us directly at delhiverywayiit@gmail.com');
         } finally {
             setIsSubmitting(false);
         }
@@ -66,7 +69,7 @@ const ContactPage = () => {
                                 <div className="method-icon">📧</div>
                                 <div className="method-details">
                                     <h3>Email Support</h3>
-                                    <p>support@delhiveryway.com</p>
+                                    <p>delhiverywayiit@gmail.com</p>
                                     <span>Response within 24 hours</span>
                                 </div>
                             </div>
@@ -121,7 +124,7 @@ const ContactPage = () => {
                     <div className="contact-form-section">
                         <form className="contact-form" onSubmit={handleSubmit}>
                             <h2>Send us a Message</h2>
-                            
+
                             <div className="form-row">
                                 <div className="form-group">
                                     <label htmlFor="name">Full Name *</label>
@@ -224,8 +227,8 @@ const ContactPage = () => {
                                 ></textarea>
                             </div>
 
-                            <button 
-                                type="submit" 
+                            <button
+                                type="submit"
                                 className="submit-btn"
                                 disabled={isSubmitting}
                             >
