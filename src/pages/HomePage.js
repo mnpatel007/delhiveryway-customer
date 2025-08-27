@@ -285,11 +285,7 @@ const HomePage = () => {
                         {categories.map(category => (
                             <button
                                 key={category}
-                                onClick={() => {
-                                    setSelectedCategory(category);
-                                    // Trigger search immediately for category change
-                                    setTimeout(() => fetchShops(), 100);
-                                }}
+                                onClick={() => setSelectedCategory(category)}
                                 className={`category-btn ${selectedCategory === category ? 'active' : ''}`}
                             >
                                 {category === 'all' ? 'All Categories' :
