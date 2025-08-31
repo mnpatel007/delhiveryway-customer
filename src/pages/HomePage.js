@@ -391,15 +391,14 @@ const HomePage = () => {
                                                 📍 {(shop.address?.street && `${shop.address.street}, `) || ''}{shop.address?.city}{shop.address?.state ? `, ${shop.address.state}` : ''}{shop.address?.zipCode ? ` ${shop.address.zipCode}` : ''}
                                             </div>
 
-                                            {/* Hide delivery fee on listing as requested */}
-                                            {/* {shop.deliveryFee !== undefined && (
+                                            {shop.deliveryFee !== undefined && (
                                                 <div className="delivery-fee">
                                                     {shop.deliveryFee === 0
-                                                        ? 'Free Delivery'
-                                                        : `₹${shop.deliveryFee} delivery`
+                                                        ? '🚚 Free Delivery'
+                                                        : `🚚 ₹${shop.deliveryFee} delivery`
                                                     }
                                                 </div>
-                                            )} */}
+                                            )}
 
                                             {shop.productCount !== undefined && (
                                                 <div className="product-count">

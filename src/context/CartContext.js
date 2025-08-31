@@ -256,37 +256,15 @@ export const CartProvider = ({ children }) => {
 
     const getDeliveryFee = () => {
         try {
-            // Get customer's location from localStorage or use default
-            const customerLocation = JSON.parse(localStorage.getItem('customerLocation')) || null;
-            const shopLocation = selectedShop?.address?.coordinates;
-            
-            if (!customerLocation || !shopLocation) {
-                return 30; // Default fee if location data is missing
+            // Use shop's fixed delivery fee set by admin
+            if (selectedShop && selectedShop.deliveryFee !== undefined) {
+                return parseFloat(selectedShop.deliveryFee) || 0;
             }
             
-            // Calculate distance in km
-            const distance = calculateDistance(
-                shopLocation.lat,
-                shopLocation.lng,
-                customerLocation.lat,
-                customerLocation.lng
-            );
-            
-            // Calculate delivery fee based on distance
-            const baseFee = 30; // Base fee for up to 2km
-            const perKmRate = 15; // Additional fee per km after 2km
-            const maxFee = 200; // Maximum delivery fee cap
-            
-            if (distance <= 2) {
-                return baseFee;
-            } else if (distance <= 10) {
-                return Math.min(baseFee + ((distance - 2) * perKmRate), maxFee);
-            } else {
-                // For distances over 10km, add a premium
-                return Math.min(baseFee + (8 * perKmRate) + ((distance - 10) * 20), maxFee);
-            }
+            // Default fee if shop delivery fee is not set
+            return 30;
         } catch (error) {
-            console.error('❌ Error calculating delivery fee:', error);
+            console.error('❌ Error getting delivery fee:', error);
             return 30; // Default fee in case of error
         }
     };
