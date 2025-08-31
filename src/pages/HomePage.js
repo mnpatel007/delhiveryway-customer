@@ -254,52 +254,7 @@ const HomePage = () => {
                 </div>
             </div>
 
-            {/* Search Section */}
-            <div className="search-section">
-                <div className="search-content">
-                    <form onSubmit={handleSearch} className="search-form">
-                        <div className="search-container">
-                            <input
-                                type="text"
-                                placeholder="Search for shops, products, or categories..."
-                                value={searchTerm}
-                                onChange={(e) => {
-                                    setSearchTerm(e.target.value);
-                                    // Trigger search after a short delay
-                                    clearTimeout(window.searchTimeout);
-                                    window.searchTimeout = setTimeout(() => {
-                                        fetchShops();
-                                    }, 500);
-                                }}
-                                className="search-input"
-                                ref={searchInputRef}
-                            />
-                            <span className="search-icon">🔍</span>
-                        </div>
-                        <button type="submit" className="search-btn">
-                            Search
-                        </button>
-                    </form>
 
-                    <div className="category-filters">
-                        {categories.map(category => (
-                            <button
-                                key={category}
-                                onClick={() => setSelectedCategory(category)}
-                                className={`category-btn ${selectedCategory === category ? 'active' : ''}`}
-                            >
-                                {category === 'all' ? 'All Categories' :
-                                    category.charAt(0).toUpperCase() + category.slice(1)}
-                            </button>
-                        ))}
-                        {(searchTerm || selectedCategory !== 'all') && (
-                            <button onClick={clearSearch} className="clear-filters-btn">
-                                Clear Filters
-                            </button>
-                        )}
-                    </div>
-                </div>
-            </div>
 
             {/* Shops Section */}
             <div className="shops-section">
