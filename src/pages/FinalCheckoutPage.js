@@ -80,10 +80,10 @@ const FinalCheckoutPage = () => {
                 state: deliveryAddress.state,
                 zipCode: deliveryAddress.zipCode
             });
-            
+
             console.log('Geocoded coordinates:', coordinates);
             setIsGeocoding(false);
-            
+
             // Format the full address for display
             const fullAddress = [
                 deliveryAddress.street,
@@ -126,7 +126,7 @@ const FinalCheckoutPage = () => {
             if (response.data.success) {
                 // Clear cart after successful order placement
                 clearCart();
-                
+
                 // Navigate to order confirmation page
                 navigate(`/order-confirmation/${response.data.data.order._id}`, {
                     state: { orderNumber: response.data.data.order.orderNumber }
@@ -137,10 +137,10 @@ const FinalCheckoutPage = () => {
 
         } catch (err) {
             console.error('Order placement error:', err);
-            const errorMessage = isGeocoding 
+            const errorMessage = isGeocoding
                 ? `Error processing address: ${err.message || 'Could not determine location coordinates'}`
                 : (err.response?.data?.message || 'Failed to place order. Please try again.');
-                
+
             setGeocodingError(errorMessage);
             alert(errorMessage);
         } finally {
@@ -165,15 +165,15 @@ const FinalCheckoutPage = () => {
                         <p>Please add some items to your cart before proceeding to checkout.</p>
                     </div>
                     <div className="checkout-actions">
-                        <button 
-                            className="btn btn-primary" 
+                        <button
+                            className="btn btn-primary"
                             onClick={handleConfirmOrder}
                             disabled={loading || isGeocoding}
                         >
-                            {isGeocoding 
-                                ? 'Locating your address...' 
-                                : loading 
-                                    ? 'Placing Order...' 
+                            {isGeocoding
+                                ? 'Locating your address...'
+                                : loading
+                                    ? 'Placing Order...'
                                     : 'Confirm Order'}
                         </button>
                         {geocodingError && (
@@ -319,10 +319,6 @@ const FinalCheckoutPage = () => {
                             <div className="total-row">
                                 <span>Delivery Fee</span>
                                 <span>{formatPrice(orderSummary.deliveryFee)}</span>
-                            </div>
-                            <div className="total-row">
-                                <span>Taxes (5%)</span>
-                                <span>{formatPrice(orderSummary.taxes)}</span>
                             </div>
                             <div className="summary-divider"></div>
                             <div className="total-row total-grand">

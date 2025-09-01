@@ -101,16 +101,12 @@ const RevisedOrderPage = () => {
             ? safeNumber(order?.orderValue?.deliveryFee)
             : safeNumber(order?.deliveryFee);
 
-    const taxRate =
-        safeNumber(order?.orderValue?.taxRate, undefined) !== undefined
-            ? safeNumber(order?.orderValue?.taxRate)
-            : 0.05; // default 5%
+    // No taxes - removed as per requirements
+    const originalTaxes = 0;
+    const revisedTaxes = 0;
 
-    const originalTaxes = Math.round(originalSubtotal * taxRate);
-    const revisedTaxes = Math.round(revisedSubtotal * taxRate);
-
-    const originalTotal = originalSubtotal + deliveryFee + originalTaxes;
-    const revisedTotal = revisedSubtotal + deliveryFee + revisedTaxes;
+    const originalTotal = originalSubtotal + deliveryFee;
+    const revisedTotal = revisedSubtotal + deliveryFee;
 
     // --- Actions ----------------------------------------------------------------
     const handleApproveRevision = async () => {
@@ -354,10 +350,6 @@ const RevisedOrderPage = () => {
                             <div className="summary-row">
                                 <span>Delivery Fee</span>
                                 <span>{formatPrice(deliveryFee)}</span>
-                            </div>
-                            <div className="summary-row">
-                                <span>Taxes ({Math.round(taxRate * 100)}%)</span>
-                                <span>{formatPrice(revisedTaxes)}</span>
                             </div>
                             <div className="summary-divider"></div>
                             <div className="summary-row total-row">

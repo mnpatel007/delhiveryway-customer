@@ -246,11 +246,11 @@ export const CartProvider = ({ children }) => {
         const R = 6371; // Earth's radius in km
         const dLat = (lat2 - lat1) * Math.PI / 180;
         const dLon = (lon2 - lon1) * Math.PI / 180;
-        const a = 
-            Math.sin(dLat/2) * Math.sin(dLat/2) +
-            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
-            Math.sin(dLon/2) * Math.sin(dLon/2);
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        const a =
+            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+            Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         return R * c; // Distance in km
     };
 
@@ -260,7 +260,7 @@ export const CartProvider = ({ children }) => {
             if (selectedShop && selectedShop.deliveryFee !== undefined) {
                 return parseFloat(selectedShop.deliveryFee) || 0;
             }
-            
+
             // Default fee if shop delivery fee is not set
             return 30;
         } catch (error) {
@@ -270,21 +270,16 @@ export const CartProvider = ({ children }) => {
     };
 
     const getTaxes = () => {
-        try {
-            const subtotal = getCartSubtotal();
-            return Math.round(subtotal * 0.05 * 100) / 100; // 5% tax
-        } catch (error) {
-            console.error('❌ Error calculating taxes:', error);
-            return 0;
-        }
+        // No taxes - removed as per requirements
+        return 0;
     };
 
     const getGrandTotal = () => {
         try {
             const subtotal = getCartSubtotal();
             const deliveryFee = getDeliveryFee();
-            const taxes = getTaxes();
-            return Math.round((subtotal + deliveryFee + taxes) * 100) / 100;
+            // No taxes - only subtotal + delivery fee
+            return Math.round((subtotal + deliveryFee) * 100) / 100;
         } catch (error) {
             console.error('❌ Error calculating grand total:', error);
             return 0;
