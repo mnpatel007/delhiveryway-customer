@@ -198,13 +198,24 @@ const OrderHistoryPage = () => {
 
     const calculateOrderTotal = (order) => {
         try {
-            // Use actual order total if available
+            // Use revised order total if available (for revised orders)
+            if (order.revisedOrderValue && order.revisedOrderValue.total) {
+                return parseFloat(order.revisedOrderValue.total);
+            }
+
+            // Use original order total if available
+            if (order.orderValue && order.orderValue.total) {
+                return parseFloat(order.orderValue.total);
+            }
+
+            // Fallback to legacy fields
             if (order.totalAmount || order.finalAmount || order.amount) {
                 return parseFloat(order.totalAmount || order.finalAmount || order.amount);
             }
 
             if (!order.items || !Array.isArray(order.items)) return 0;
 
+            // Calculate from items (no taxes as per requirements)
             const itemTotal = order.items.reduce((sum, item) => {
                 const product = item.productId || item.product || item;
                 const price = parseFloat(product.price || item.price || 0);
@@ -212,12 +223,9 @@ const OrderHistoryPage = () => {
                 return sum + (price * quantity);
             }, 0);
 
-            const gst = itemTotal * 0.05;
-            const platformFee = itemTotal * 0.029;
-            const tax = gst + platformFee;
-            const deliveryCharge = 30;
+            const deliveryCharge = order.deliveryFee || 30;
 
-            return itemTotal + tax + deliveryCharge;
+            return itemTotal + deliveryCharge;
         } catch (error) {
             console.error('Error calculating order total:', error);
             return 0;
@@ -415,10 +423,36 @@ const OrderHistoryPage = () => {
                                     )}
 
                                     <div className="order-total-breakdown">
-                                        <div className="total-row grand-total">
-                                            <strong>Grand Total</strong>
-                                            <strong>₹{grandTotal.toFixed(2)}</strong>
-                                        </div>
+                                        {(() => {
+                                            // Get order values for breakdown
+                                            const orderValues = order.revisedOrderValue || order.orderValue;
+
+                                            if (orderValues) {
+                                                return (
+                                                    <>
+                                                        <div className="total-row">
+                                                            <span>Items</span>
+                                                            <span>₹{orderValues.subtotal?.toFixed(2) || '0.00'}</span>
+                                                        </div>
+                                                        <div className="total-row">
+                                                            <span>Delivery Fee</span>
+                                                            <span>₹{orderValues.deliveryFee?.toFixed(2) || '0.00'}</span>
+                                                        </div>
+                                                        <div className="total-row grand-total">
+                                                            <strong>Grand Total</strong>
+                                                            <strong>₹{grandTotal.toFixed(2)}</strong>
+                                                        </div>
+                                                    </>
+                                                );
+                                            } else {
+                                                return (
+                                                    <div className="total-row grand-total">
+                                                        <strong>Grand Total</strong>
+                                                        <strong>₹{grandTotal.toFixed(2)}</strong>
+                                                    </div>
+                                                );
+                                            }
+                                        })()}
                                     </div>
                                 </div>
                             </div>

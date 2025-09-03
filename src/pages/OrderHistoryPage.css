@@ -310,3 +310,29 @@
 .review-revision-btn:hover {
     background-color: #e55a2b;
 }
+
+.orde r-total-breakdown {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #eee;
+}
+
+.total-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    font-size: 14px;
+}
+
+.total-row.grand-total {
+    border-top: 1px solid #ddd;
+    margin-top: 0.5rem;
+    padding-top: 0.75rem;
+    font-size: 16px;
+    color: #2c3e50;
+}
+
+.total-row.grand-total strong {
+    color: #27ae60;
+}
