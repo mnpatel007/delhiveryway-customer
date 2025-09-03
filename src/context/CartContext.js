@@ -278,7 +278,7 @@ export const CartProvider = ({ children }) => {
         try {
             const subtotal = getCartSubtotal();
             const deliveryFee = getDeliveryFee();
-            // No taxes - only subtotal + delivery fee
+            // ONLY subtotal + delivery fee - NO TAXES, NO OTHER FEES
             return Math.round((subtotal + deliveryFee) * 100) / 100;
         } catch (error) {
             console.error('❌ Error calculating grand total:', error);
@@ -299,7 +299,7 @@ export const CartProvider = ({ children }) => {
         try {
             const subtotal = getCartSubtotal();
             const deliveryFee = getDeliveryFee();
-            const taxes = getTaxes();
+            const taxes = 0; // NO TAXES
             const total = getGrandTotal();
 
             return {
