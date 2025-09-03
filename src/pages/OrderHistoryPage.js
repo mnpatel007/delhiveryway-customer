@@ -13,10 +13,10 @@ const OrderHistoryPage = () => {
 
     const handleBillApproval = async (orderId) => {
         try {
-            const result = await apiCall(() => 
+            const result = await apiCall(() =>
                 api.put(`/orders/${orderId}/approve-bill`)
             );
-            
+
             if (result.success) {
                 // Update the order status in local state
                 setOrders(prevOrders =>
@@ -46,11 +46,11 @@ const OrderHistoryPage = () => {
                     console.log('API result:', result);
                     console.log('result.data:', result.data);
                     console.log('result.data.data:', result.data.data);
-                    
+
                     // The backend returns { success: true, data: { data: [...], pagination: {...} } }
                     const ordersArray = result.data.data || result.data || [];
                     console.log('Extracted orders array:', ordersArray);
-                    
+
                     const sortedOrders = Array.isArray(ordersArray)
                         ? ordersArray.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
                         : [];
@@ -142,7 +142,7 @@ const OrderHistoryPage = () => {
 
     const getStatusColor = (status) => {
         if (!status) return '';
-        
+
         switch (status.toLowerCase()) {
             case 'pending': return 'status-pending';
             case 'pending_shopper': return 'status-pending';
@@ -150,6 +150,9 @@ const OrderHistoryPage = () => {
             case 'shopper_at_shop': return 'status-preparing';
             case 'shopping_in_progress': return 'status-preparing';
             case 'shopping': return 'status-preparing';
+            case 'shopper_revised_order': return 'status-ready';
+            case 'customer_reviewing_revision': return 'status-ready';
+            case 'customer_approved_revision': return 'status-confirmed';
             case 'final_shopping': return 'status-preparing';
             case 'bill_uploaded': return 'status-ready';
             case 'bill_sent': return 'status-ready';
@@ -167,7 +170,7 @@ const OrderHistoryPage = () => {
 
     const getStatusDisplayName = (status) => {
         if (!status) return 'Unknown';
-        
+
         switch (status.toLowerCase()) {
             case 'pending': return 'Pending';
             case 'pending_shopper': return 'Finding Personal Shopper';
@@ -176,6 +179,9 @@ const OrderHistoryPage = () => {
             case 'shopping_in_progress': return 'Shopping in Progress';
             case 'shopping': return 'Shopping in Progress';
             case 'final_shopping': return 'Finalizing Purchase';
+            case 'shopper_revised_order': return 'Order Revised - Please Review';
+            case 'customer_reviewing_revision': return 'Order Revised - Please Review';
+            case 'customer_approved_revision': return 'Revision Approved';
             case 'bill_uploaded': return 'Bill Uploaded - Awaiting Approval';
             case 'bill_sent': return 'Bill Sent for Approval';
             case 'bill_approved': return 'Bill Approved - Preparing Delivery';
@@ -196,21 +202,21 @@ const OrderHistoryPage = () => {
             if (order.totalAmount || order.finalAmount || order.amount) {
                 return parseFloat(order.totalAmount || order.finalAmount || order.amount);
             }
-            
+
             if (!order.items || !Array.isArray(order.items)) return 0;
-            
+
             const itemTotal = order.items.reduce((sum, item) => {
                 const product = item.productId || item.product || item;
                 const price = parseFloat(product.price || item.price || 0);
                 const quantity = parseInt(item.quantity || 1);
                 return sum + (price * quantity);
             }, 0);
-            
+
             const gst = itemTotal * 0.05;
             const platformFee = itemTotal * 0.029;
             const tax = gst + platformFee;
             const deliveryCharge = 30;
-            
+
             return itemTotal + tax + deliveryCharge;
         } catch (error) {
             console.error('Error calculating order total:', error);
@@ -265,7 +271,7 @@ const OrderHistoryPage = () => {
                                 const product = item.productId || item.product || item;
                                 const shopId = product.shopId?._id || product.shopId;
                                 const shopName = product.shopId?.name || 'Unknown Shop';
-                                
+
                                 if (!grouped[shopId]) {
                                     grouped[shopId] = {
                                         shopName,
@@ -287,9 +293,21 @@ const OrderHistoryPage = () => {
                                     <div className={`order-status ${getStatusColor(order.status)}`}>
                                         {getStatusDisplayName(order.status)}
                                     </div>
+                                    {(order.status === 'customer_reviewing_revision' || order.status === 'shopper_revised_order') && (
+                                        <div className="revision-actions">
+                                            <button
+                                                className="review-revision-btn"
+                                                onClick={() => {
+                                                    window.location.href = `/revised-order/${order._id}`;
+                                                }}
+                                            >
+                                                Review Changes
+                                            </button>
+                                        </div>
+                                    )}
                                     {order.status === 'bill_uploaded' && (
                                         <div className="bill-actions">
-                                            <button 
+                                            <button
                                                 className="view-bill-btn"
                                                 onClick={() => {
                                                     const billUrl = order.billImage || order.billPhoto || order.bill || order.actualBill?.photo;
@@ -303,8 +321,8 @@ const OrderHistoryPage = () => {
                                                             newWindow.document.write(`<img src="${billUrl}" style="max-width: 100%; height: auto;" />`);
                                                         } else {
                                                             // If it's a relative path, prepend the API base URL
-                                                            const fullUrl = billUrl.startsWith('http') 
-                                                                ? billUrl 
+                                                            const fullUrl = billUrl.startsWith('http')
+                                                                ? billUrl
                                                                 : `http://localhost:5000${billUrl}`;
                                                             console.log('Opening URL:', fullUrl);
                                                             window.open(fullUrl, '_blank');
@@ -316,7 +334,7 @@ const OrderHistoryPage = () => {
                                             >
                                                 View Bill
                                             </button>
-                                            <button 
+                                            <button
                                                 className="approve-bill-btn"
                                                 onClick={() => handleBillApproval(order._id)}
                                             >
@@ -365,7 +383,7 @@ const OrderHistoryPage = () => {
                                             const product = item.productId || item.product || item;
                                             const price = parseFloat(product.price || item.price || 0);
                                             const quantity = parseInt(item.quantity || 1);
-                                            
+
                                             return (
                                                 <div key={i} className="order-item">
                                                     <div className="item-details">

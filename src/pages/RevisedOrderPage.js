@@ -97,16 +97,24 @@ const RevisedOrderPage = () => {
     const revisedSubtotal = useMemo(() => getRevisedSubtotal(order), [order]);
 
     const deliveryFee =
-        safeNumber(order?.orderValue?.deliveryFee, undefined) !== undefined
-            ? safeNumber(order?.orderValue?.deliveryFee)
-            : safeNumber(order?.deliveryFee);
+        safeNumber(order?.revisedOrderValue?.deliveryFee, undefined) !== undefined
+            ? safeNumber(order?.revisedOrderValue?.deliveryFee)
+            : safeNumber(order?.orderValue?.deliveryFee, undefined) !== undefined
+                ? safeNumber(order?.orderValue?.deliveryFee)
+                : safeNumber(order?.deliveryFee);
 
     // No taxes - removed as per requirements
     const originalTaxes = 0;
     const revisedTaxes = 0;
 
-    const originalTotal = originalSubtotal + deliveryFee;
-    const revisedTotal = revisedSubtotal + deliveryFee;
+    // Use backend calculated totals if available, otherwise calculate from items
+    const originalTotal = safeNumber(order?.orderValue?.total, undefined) !== undefined
+        ? safeNumber(order?.orderValue?.total)
+        : originalSubtotal + deliveryFee;
+
+    const revisedTotal = safeNumber(order?.revisedOrderValue?.total, undefined) !== undefined
+        ? safeNumber(order?.revisedOrderValue?.total)
+        : revisedSubtotal + deliveryFee;
 
     // --- Actions ----------------------------------------------------------------
     const handleApproveRevision = async () => {
