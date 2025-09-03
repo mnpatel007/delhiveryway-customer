@@ -63,7 +63,7 @@ const RevisedOrderPage = () => {
             setError('');
             try {
                 // Use the API route with /api prefix consistently
-                const response = await api.get(`/api/orders/${orderId}`);
+                const response = await api.get(`/orders/${orderId}`);
 
                 // Support both shapes:
                 // 1) { success: true, data: { order: {...} } }
@@ -121,7 +121,7 @@ const RevisedOrderPage = () => {
         try {
             setApproving(true);
             // Use a single consistent endpoint and method
-            const response = await api.post(`/api/orders/${orderId}/approve-revision`);
+            const response = await api.post(`/orders/${orderId}/approve-revision`);
             if (response?.data?.success === false) {
                 throw new Error(response?.data?.message || 'Failed to approve revision');
             }
