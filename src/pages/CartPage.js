@@ -221,6 +221,10 @@ const CartPage = () => {
                                     <span>{formatPrice(orderSummary.deliveryFee)}</span>
                                 </div>
 
+                                <div className="summary-row">
+                                    <span>Taxes (5%)</span>
+                                    <span>{formatPrice(orderSummary.taxes)}</span>
+                                </div>
 
                                 <div className="summary-divider"></div>
 

@@ -32,8 +32,6 @@ const ShopPage = () => {
                 console.log('🏪 Shop API response:', shopResult);
 
                 if (shopResult.success) {
-                    console.log('🏪 Shop data received:', shopResult.data);
-                    console.log('🏪 Shop deliveryFee:', shopResult.data?.deliveryFee);
                     setShop(shopResult.data);
                 } else {
                     console.error('Failed to fetch shop:', shopResult.message);
@@ -190,17 +188,12 @@ const ShopPage = () => {
 
     const handleAddToCart = (product) => {
         try {
-            console.log('🛒 Adding product to cart:', product.name);
-            console.log('🛒 Current shop data:', shop);
-            console.log('🛒 Shop deliveryFee:', shop?.deliveryFee);
-
             // Ensure product has complete shop data including delivery fee
             const productWithShopData = {
                 ...product,
                 shopId: shop // Pass the complete shop object with delivery fee
             };
 
-            console.log('🛒 Product with shop data:', productWithShopData);
             const success = addToCart(productWithShopData, 1);
             if (success) {
                 setToast(`✅ ${product.name} added to cart`);

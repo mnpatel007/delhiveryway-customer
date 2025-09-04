@@ -121,16 +121,8 @@ const FinalCheckoutPage = () => {
             }));
 
             // Place order without payment
-            console.log('🛒 Placing order with shop data:', selectedShop);
-            console.log('🛒 Shop ID being sent:', selectedShop._id);
-            console.log('🛒 Shop ID type:', typeof selectedShop._id);
-
-            // Ensure we have a valid shop ID string
-            const shopId = typeof selectedShop._id === 'string' ? selectedShop._id : selectedShop._id?.toString();
-            console.log('🛒 Final shop ID:', shopId);
-
             const response = await api.post('/orders', {
-                shopId: shopId,
+                shopId: selectedShop._id,
                 items: formattedItems,
                 deliveryAddress: {
                     street: deliveryAddress.street,
