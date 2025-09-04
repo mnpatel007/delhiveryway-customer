@@ -75,8 +75,19 @@ export const CartProvider = ({ children }) => {
                 return false;
             }
 
+            // Extract actual shop ID strings for comparison
+            const currentShopId = typeof selectedShop?._id === 'string' ? selectedShop._id : selectedShop?._id?._id;
+            const newShopId = typeof productShopId === 'string' ? productShopId : productShopId?._id;
+
+            console.log('🛒 Shop comparison:', {
+                currentShopId: currentShopId,
+                newShopId: newShopId,
+                currentShopName: selectedShop?.name,
+                newShopName: product.shopId?.name
+            });
+
             // Check if product is from a different shop
-            if (selectedShop && selectedShop._id !== productShopId) {
+            if (selectedShop && currentShopId && newShopId && currentShopId !== newShopId) {
                 const confirmSwitch = window.confirm(
                     `You have items from ${selectedShop.name} in your cart. Adding items from a different shop will clear your current cart. Continue?`
                 );
@@ -90,14 +101,20 @@ export const CartProvider = ({ children }) => {
             }
 
             // Set or update selected shop
-            if (!selectedShop || selectedShop._id !== productShopId) {
+            if (!selectedShop || !currentShopId || currentShopId !== newShopId) {
                 let shopData;
                 if (product.shopId && typeof product.shopId === 'object') {
-                    shopData = product.shopId;
+                    // Ensure the shop data has the correct structure
+                    shopData = {
+                        ...product.shopId,
+                        _id: newShopId, // Use the extracted shop ID
+                        name: product.shopId.name || 'Shop',
+                        deliveryFee: product.shopId.deliveryFee || 30
+                    };
                 } else {
                     // Fallback with proper delivery fee
                     shopData = {
-                        _id: productShopId,
+                        _id: newShopId,
                         name: 'Shop',
                         deliveryFee: 30 // Default delivery fee
                     };

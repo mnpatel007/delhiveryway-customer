@@ -121,8 +121,22 @@ const FinalCheckoutPage = () => {
             }));
 
             // Place order without payment
+            console.log('🛒 Selected shop:', selectedShop);
+
+            // Extract the actual shop ID from the shop object
+            let shopId;
+            if (typeof selectedShop._id === 'string') {
+                shopId = selectedShop._id;
+            } else if (selectedShop._id && selectedShop._id._id) {
+                shopId = selectedShop._id._id;
+            } else {
+                throw new Error('Invalid shop ID format');
+            }
+
+            console.log('🛒 Extracted shop ID:', shopId);
+
             const response = await api.post('/orders', {
-                shopId: selectedShop._id,
+                shopId: shopId,
                 items: formattedItems,
                 deliveryAddress: {
                     street: deliveryAddress.street,
