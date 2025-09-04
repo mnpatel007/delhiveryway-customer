@@ -30,7 +30,9 @@
     gap: 2rem;
 }
 
-.shipping-section, .payment-section, .order-summary-section {
+.shipping-section,
+.payment-section,
+.order-summary-section {
     background: white;
     border-radius: 12px;
     padding: 1.5rem;
@@ -65,12 +67,35 @@
     border-radius: 8px;
     font-size: 1rem;
     transition: border-color 0.2s, box-shadow 0.2s;
+    color: #000000 !important;
+    background-color: #ffffff !important;
+    -webkit-text-fill-color: #000000 !important;
 }
 
 .form-control:focus {
     outline: none;
     border-color: #6366f1;
     box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.form-control::placeholder {
+    color: #666666 !important;
+    opacity: 1 !important;
+    -webkit-text-fill-color: #666666 !important;
+}
+
+.form-control::-webkit-input-placeholder {
+    color: #666666 !important;
+    -webkit-text-fill-color: #666666 !important;
+}
+
+.form-control::-moz-placeholder {
+    color: #666666 !important;
+    opacity: 1 !important;
+}
+
+.form-control:-ms-input-placeholder {
+    color: #666666 !important;
 }
 
 /* Order Summary Styles */
@@ -180,21 +205,21 @@
     .checkout-content {
         grid-template-columns: 1fr;
     }
-    
+
     .checkout-header h1 {
         font-size: 1.75rem;
     }
-    
+
     .section-title {
         font-size: 1.1rem;
     }
-    
+
     .order-item {
         flex-direction: column;
         align-items: flex-start;
         gap: 0.5rem;
     }
-    
+
     .product-price {
         margin-left: auto;
     }
@@ -216,4 +241,121 @@
     border-radius: 8px;
     margin-bottom: 1.5rem;
     border: 1px solid #fecaca;
+}
+
+/* Phone Input Group Styles */
+.phone-input-group {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.country-code-select {
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: white;
+    font-size: 0.9rem;
+    min-width: 100px;
+    cursor: pointer;
+    color: #000000 !important;
+    -webkit-text-fill-color: #000000 !important;
+}
+
+.country-code-select:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.phone-input {
+    flex: 1;
+    color: #000000 !important;
+    background-color: #ffffff !important;
+    -webkit-text-fill-color: #000000 !important;
+}
+
+.phone-input::placeholder {
+    color: #666666 !important;
+    opacity: 1 !important;
+    -webkit-text-fill-color: #666666 !important;
+}
+
+/* Additional input styling for better visibility across all devices */
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+input[type="number"],
+select,
+textarea {
+    color: #000000 !important;
+    background-color: #ffffff !important;
+    -webkit-text-fill-color: #000000 !important;
+    -webkit-opacity: 1 !important;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="tel"]:focus,
+input[type="number"]:focus,
+select:focus,
+textarea:focus {
+    color: #000000 !important;
+    -webkit-text-fill-color: #000000 !important;
+}
+
+input[type="text"]::placeholder,
+input[type="email"]::placeholder,
+input[type="tel"]::placeholder,
+input[type="number"]::placeholder,
+textarea::placeholder {
+    color: #666666 !important;
+    opacity: 1 !important;
+    -webkit-text-fill-color: #666666 !important;
+}
+
+input[type="text"]::-webkit-input-placeholder,
+input[type="email"]::-webkit-input-placeholder,
+input[type="tel"]::-webkit-input-placeholder,
+input[type="number"]::-webkit-input-placeholder,
+textarea::-webkit-input-placeholder {
+    color: #666666 !important;
+    -webkit-text-fill-color: #666666 !important;
+}
+
+input[type="text"]::-moz-placeholder,
+input[type="email"]::-moz-placeholder,
+input[type="tel"]::-moz-placeholder,
+input[type="number"]::-moz-placeholder,
+textarea::-moz-placeholder {
+    color: #666666 !important;
+    opacity: 1 !important;
+}
+
+input[type="text"]:-ms-input-placeholder,
+input[type="email"]:-ms-input-placeholder,
+input[type="tel"]:-ms-input-placeholder,
+input[type="number"]:-ms-input-placeholder,
+textarea:-ms-input-placeholder {
+    color: #666666 !important;
+}
+
+/* Form group label styling */
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #333 !important;
+}
+
+.form-group label::after {
+    content: '';
+}
+
+.form-group label[for*="required"]::after,
+label:has(+ input[required])::after,
+label:contains("*")::after {
+    content: '';
+    color: #e74c3c;
+    margin-left: 4px;
 }

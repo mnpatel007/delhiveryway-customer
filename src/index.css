@@ -288,7 +288,8 @@ a:focus {
   background-color: white;
   transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
   font-family: var(--font-sans);
-  color: var(--gray-900);
+  color: #000000 !important;
+  -webkit-text-fill-color: #000000 !important;
   min-height: 44px;
   box-shadow: none;
 }
@@ -628,4 +629,55 @@ input,
 select,
 textarea {
   transition: all var(--transition-fast);
+}
+
+/* Global in
+put styling for better visibility across all devices and browsers */
+input,
+select,
+textarea {
+  color: #000000 !important;
+  background-color: #ffffff !important;
+  -webkit-text-fill-color: #000000 !important;
+  -webkit-opacity: 1 !important;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  color: #000000 !important;
+  -webkit-text-fill-color: #000000 !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #666666 !important;
+  opacity: 1 !important;
+  -webkit-text-fill-color: #666666 !important;
+}
+
+input::-webkit-input-placeholder,
+textarea::-webkit-input-placeholder {
+  color: #666666 !important;
+  -webkit-text-fill-color: #666666 !important;
+}
+
+input::-moz-placeholder,
+textarea::-moz-placeholder {
+  color: #666666 !important;
+  opacity: 1 !important;
+}
+
+input:-ms-input-placeholder,
+textarea:-ms-input-placeholder {
+  color: #666666 !important;
+}
+
+/* Ensure autocomplete doesn't override colors */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-text-fill-color: #000000 !important;
+  -webkit-box-shadow: 0 0 0 30px white inset !important;
 }
