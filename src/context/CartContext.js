@@ -91,9 +91,18 @@ export const CartProvider = ({ children }) => {
 
             // Set or update selected shop
             if (!selectedShop || selectedShop._id !== productShopId) {
-                const shopData = product.shopId && typeof product.shopId === 'object'
-                    ? product.shopId
-                    : { _id: productShopId, name: 'Shop' };
+                let shopData;
+                if (product.shopId && typeof product.shopId === 'object') {
+                    shopData = product.shopId;
+                } else {
+                    // Fallback with proper delivery fee
+                    shopData = {
+                        _id: productShopId,
+                        name: 'Shop',
+                        deliveryFee: 30 // Default delivery fee
+                    };
+                }
+                console.log('🛒 Setting selected shop:', shopData);
                 setSelectedShop(shopData);
             }
 

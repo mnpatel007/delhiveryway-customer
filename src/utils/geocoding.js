@@ -1,5 +1,13 @@
 import axios from 'axios';
 
+// Create a separate axios instance for geocoding without authorization headers
+const geocodingAxios = axios.create({
+  timeout: 8000,
+  headers: {
+    'Content-Type': 'application/json',
+  }
+});
+
 // ====== Config ======
 const GOOGLE_MAPS_API_KEY = 'AIzaSyBTM8risurfzxPDibLQTKHOA9DSr89S6FA';
 const NOMINATIM_SEARCH_URL = 'https://nominatim.openstreetmap.org/search';
@@ -50,7 +58,7 @@ export const geocodeAddress = async (address) => {
 
   // 1) Try Google Geocoding API
   try {
-    const resp = await axios.get(GOOGLE_GEOCODE_URL, {
+    const resp = await geocodingAxios.get(GOOGLE_GEOCODE_URL, {
       params: {
         address: addressString,
         key: GOOGLE_MAPS_API_KEY,
@@ -82,7 +90,7 @@ export const geocodeAddress = async (address) => {
 
   // 2) Fallback to Nominatim (OpenStreetMap)
   try {
-    const resp = await axios.get(NOMINATIM_SEARCH_URL, {
+    const resp = await geocodingAxios.get(NOMINATIM_SEARCH_URL, {
       params: {
         q: addressString,
         format: 'json',
@@ -128,7 +136,7 @@ export const reverseGeocode = async (lat, lng) => {
   }
 
   try {
-    const resp = await axios.get(NOMINATIM_REVERSE_URL, {
+    const resp = await geocodingAxios.get(NOMINATIM_REVERSE_URL, {
       params: {
         lat,
         lon: lng,
