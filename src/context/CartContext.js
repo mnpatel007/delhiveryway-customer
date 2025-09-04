@@ -116,18 +116,21 @@ export const CartProvider = ({ children }) => {
                 let shopData;
                 if (product.shopId && typeof product.shopId === 'object') {
                     // Use the complete shop object from product
+                    console.log('🛒 Product shop data before processing:', product.shopId);
+                    console.log('🛒 Product shop deliveryFee:', product.shopId.deliveryFee);
+
                     shopData = {
                         ...product.shopId,
                         _id: product.shopId._id || productShopId,
                         name: product.shopId.name || 'Shop',
-                        deliveryFee: product.shopId.deliveryFee || 0
+                        deliveryFee: product.shopId.deliveryFee !== undefined ? product.shopId.deliveryFee : 30 // Default to 30 if not set
                     };
                 } else {
                     // Fallback if shop data is not complete
                     shopData = {
                         _id: productShopId,
                         name: 'Shop',
-                        deliveryFee: 0
+                        deliveryFee: 30 // Default delivery fee
                     };
                 }
                 console.log('🛒 Setting selected shop:', shopData);
@@ -295,13 +298,15 @@ export const CartProvider = ({ children }) => {
         try {
             console.log('🚚 Getting delivery fee for shop:', selectedShop?.name);
             console.log('🚚 Shop delivery fee:', selectedShop?.deliveryFee);
+            console.log('🚚 Shop delivery fee type:', typeof selectedShop?.deliveryFee);
             console.log('🚚 Full shop object:', selectedShop);
 
             // Use shop's fixed delivery fee set by admin
             if (selectedShop && selectedShop.deliveryFee !== undefined && selectedShop.deliveryFee !== null) {
-                const fee = parseFloat(selectedShop.deliveryFee) || 0;
-                console.log('🚚 Using shop delivery fee:', fee);
-                return fee;
+                const fee = parseFloat(selectedShop.deliveryFee);
+                console.log('🚚 Parsed delivery fee:', fee);
+                // Return the fee even if it's 0 (free delivery)
+                return isNaN(fee) ? 30 : fee;
             }
 
             // Default fee if shop delivery fee is not set
