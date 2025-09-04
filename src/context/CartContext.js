@@ -75,10 +75,29 @@ export const CartProvider = ({ children }) => {
                 return false;
             }
 
+            console.log('🛒 Adding product to cart:', product.name);
+            console.log('🛒 Product shop ID:', productShopId);
+            console.log('🛒 Current selected shop:', selectedShop);
+            console.log('🛒 Product shop data:', product.shopId);
+            console.log('🛒 Product shop data type:', typeof product.shopId);
+            console.log('🛒 Product shop data keys:', product.shopId ? Object.keys(product.shopId) : 'null');
+
             // Check if product is from a different shop
-            if (selectedShop && selectedShop._id !== productShopId) {
+            // Only trigger cart clearing if we have valid shop IDs and they're actually different
+            const hasValidShopData = selectedShop && selectedShop._id && productShopId;
+            const isDifferentShop = hasValidShopData && selectedShop._id !== productShopId;
+
+            console.log('🛒 Shop comparison:', {
+                selectedShopId: selectedShop?._id,
+                productShopId: productShopId,
+                hasValidShopData: hasValidShopData,
+                isDifferentShop: isDifferentShop
+            });
+
+            if (isDifferentShop) {
+                const shopName = selectedShop.name || 'Unknown Shop';
                 const confirmSwitch = window.confirm(
-                    `You have items from ${selectedShop.name} in your cart. Adding items from a different shop will clear your current cart. Continue?`
+                    `You have items from ${shopName} in your cart. Adding items from a different shop will clear your current cart. Continue?`
                 );
 
                 if (!confirmSwitch) {
@@ -90,10 +109,28 @@ export const CartProvider = ({ children }) => {
             }
 
             // Set or update selected shop
-            if (!selectedShop || selectedShop._id !== productShopId) {
-                const shopData = product.shopId && typeof product.shopId === 'object'
-                    ? product.shopId
-                    : { _id: productShopId, name: 'Shop' };
+            const needsShopUpdate = !selectedShop || !selectedShop._id || selectedShop._id !== productShopId;
+            console.log('🛒 Needs shop update:', needsShopUpdate);
+
+            if (needsShopUpdate) {
+                let shopData;
+                if (product.shopId && typeof product.shopId === 'object') {
+                    // Use the complete shop object from product
+                    shopData = {
+                        ...product.shopId,
+                        _id: product.shopId._id || productShopId,
+                        name: product.shopId.name || 'Shop',
+                        deliveryFee: product.shopId.deliveryFee || 0
+                    };
+                } else {
+                    // Fallback if shop data is not complete
+                    shopData = {
+                        _id: productShopId,
+                        name: 'Shop',
+                        deliveryFee: 0
+                    };
+                }
+                console.log('🛒 Setting selected shop:', shopData);
                 setSelectedShop(shopData);
             }
 
