@@ -76,7 +76,16 @@ export const CartProvider = ({ children }) => {
             }
 
             // Extract actual shop ID strings for comparison
-            const currentShopId = typeof selectedShop?._id === 'string' ? selectedShop._id : selectedShop?._id?._id;
+            let currentShopId;
+            if (selectedShop?.data?.shop?._id) {
+                // Structure: {success: true, data: {shop: {_id: "...", ...}}}
+                currentShopId = selectedShop.data.shop._id;
+            } else if (typeof selectedShop?._id === 'string') {
+                currentShopId = selectedShop._id;
+            } else if (selectedShop?._id?._id) {
+                currentShopId = selectedShop._id._id;
+            }
+
             const newShopId = typeof productShopId === 'string' ? productShopId : productShopId?._id;
 
             console.log('🛒 Shop comparison:', {
@@ -284,17 +293,28 @@ export const CartProvider = ({ children }) => {
         try {
             console.log('🚚 Getting delivery fee for shop:', selectedShop?.name);
             console.log('🚚 Shop delivery fee:', selectedShop?.deliveryFee);
+            console.log('🚚 Full shop object:', selectedShop);
 
-            // Use shop's fixed delivery fee set by admin
-            if (selectedShop && selectedShop.deliveryFee !== undefined) {
-                const fee = parseFloat(selectedShop.deliveryFee) || 0;
-                console.log('🚚 Using shop delivery fee:', fee);
-                return fee;
+            // Handle different shop data structures
+            let deliveryFee;
+
+            if (selectedShop.data && selectedShop.data.shop && selectedShop.data.shop.deliveryFee !== undefined) {
+                // Structure: {success: true, data: {shop: {deliveryFee: 50, ...}}}
+                deliveryFee = selectedShop.data.shop.deliveryFee;
+                console.log('🚚 Using nested shop delivery fee:', deliveryFee);
+            } else if (selectedShop && selectedShop.deliveryFee !== undefined) {
+                // Structure: {deliveryFee: 50, ...}
+                deliveryFee = selectedShop.deliveryFee;
+                console.log('🚚 Using direct shop delivery fee:', deliveryFee);
+            } else {
+                // Default fee if shop delivery fee is not set
+                console.log('🚚 Using default delivery fee: 30');
+                return 30;
             }
 
-            // Default fee if shop delivery fee is not set
-            console.log('🚚 Using default delivery fee: 30');
-            return 30;
+            const fee = parseFloat(deliveryFee) || 0;
+            console.log('🚚 Final delivery fee:', fee);
+            return fee;
         } catch (error) {
             console.error('❌ Error getting delivery fee:', error);
             return 30; // Default fee in case of error

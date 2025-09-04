@@ -125,11 +125,19 @@ const FinalCheckoutPage = () => {
 
             // Extract the actual shop ID from the shop object
             let shopId;
-            if (typeof selectedShop._id === 'string') {
+
+            // Handle different shop data structures
+            if (selectedShop.data && selectedShop.data.shop && selectedShop.data.shop._id) {
+                // Structure: {success: true, data: {shop: {_id: "...", ...}}}
+                shopId = selectedShop.data.shop._id;
+            } else if (typeof selectedShop._id === 'string') {
+                // Structure: {_id: "...", ...}
                 shopId = selectedShop._id;
             } else if (selectedShop._id && selectedShop._id._id) {
+                // Structure: {_id: {_id: "...", ...}}
                 shopId = selectedShop._id._id;
             } else {
+                console.error('🛒 Invalid shop structure:', selectedShop);
                 throw new Error('Invalid shop ID format');
             }
 
