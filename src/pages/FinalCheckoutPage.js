@@ -27,8 +27,9 @@ const FinalCheckoutPage = () => {
         state: '',
         zipCode: '',
         instructions: '',
-        contactName: user?.name || '',
-        contactPhone: user?.phone || ''
+        contactName: user?.name || user?.user?.name || '',
+        contactPhone: user?.phone || user?.user?.phone || '',
+        countryCode: '+91' // Default to India
     });
     const [isGeocoding, setIsGeocoding] = useState(false);
     const [geocodingError, setGeocodingError] = useState('');
@@ -62,9 +63,26 @@ const FinalCheckoutPage = () => {
     };
 
     const handleConfirmOrder = async () => {
-        // Validate delivery address
+        // Validate delivery address and contact information
         if (!deliveryAddress.street.trim() || !deliveryAddress.city.trim() || !deliveryAddress.state.trim()) {
             alert('Please fill in all required address fields (Street, City, State)');
+            return;
+        }
+
+        if (!deliveryAddress.contactName.trim()) {
+            alert('Please enter a contact name');
+            return;
+        }
+
+        if (!deliveryAddress.contactPhone.trim()) {
+            alert('Please enter a contact phone number');
+            return;
+        }
+
+        // Validate phone number (should be 10 digits)
+        const phoneRegex = /^[0-9]{10}$/;
+        if (!phoneRegex.test(deliveryAddress.contactPhone.replace(/\s+/g, ''))) {
+            alert('Please enter a valid 10-digit phone number');
             return;
         }
 
@@ -117,8 +135,8 @@ const FinalCheckoutPage = () => {
                     },
                     formattedAddress: fullAddress,
                     instructions: deliveryAddress.instructions,
-                    contactName: deliveryAddress.contactName,
-                    contactPhone: deliveryAddress.contactPhone
+                    contactName: deliveryAddress.contactName.trim(),
+                    contactPhone: `${deliveryAddress.countryCode}${deliveryAddress.contactPhone.replace(/\s+/g, '')}`
                 },
                 paymentMethod: 'cash' // Default to cash on delivery
             });
@@ -258,24 +276,45 @@ const FinalCheckoutPage = () => {
                             </div>
                             <div className="form-row">
                                 <div className="form-group">
-                                    <label>Contact Name</label>
+                                    <label>Contact Name *</label>
                                     <input
                                         type="text"
                                         value={deliveryAddress.contactName}
                                         onChange={(e) => handleAddressChange('contactName', e.target.value)}
-                                        placeholder="Contact person name"
+                                        placeholder="Enter contact person name"
                                         className="form-input"
+                                        required
                                     />
                                 </div>
                                 <div className="form-group">
-                                    <label>Contact Phone</label>
-                                    <input
-                                        type="tel"
-                                        value={deliveryAddress.contactPhone}
-                                        onChange={(e) => handleAddressChange('contactPhone', e.target.value)}
-                                        placeholder="Contact phone number"
-                                        className="form-input"
-                                    />
+                                    <label>Contact Phone *</label>
+                                    <div className="phone-input-group">
+                                        <select
+                                            value={deliveryAddress.countryCode}
+                                            onChange={(e) => handleAddressChange('countryCode', e.target.value)}
+                                            className="country-code-select"
+                                        >
+                                            <option value="+91">🇮🇳 +91</option>
+                                            <option value="+1">🇺🇸 +1</option>
+                                            <option value="+44">🇬🇧 +44</option>
+                                            <option value="+61">🇦🇺 +61</option>
+                                            <option value="+971">🇦🇪 +971</option>
+                                            <option value="+65">🇸🇬 +65</option>
+                                        </select>
+                                        <input
+                                            type="tel"
+                                            value={deliveryAddress.contactPhone}
+                                            onChange={(e) => {
+                                                // Only allow numbers and limit to 10 digits
+                                                const value = e.target.value.replace(/\D/g, '').slice(0, 10);
+                                                handleAddressChange('contactPhone', value);
+                                            }}
+                                            placeholder="Enter 10-digit phone number"
+                                            className="form-input phone-input"
+                                            maxLength="10"
+                                            required
+                                        />
+                                    </div>
                                 </div>
                             </div>
                             <div className="form-row">
@@ -331,7 +370,15 @@ const FinalCheckoutPage = () => {
                     <button
                         className="place-order-btn"
                         onClick={handleConfirmOrder}
-                        disabled={loading || !deliveryAddress.street.trim() || !deliveryAddress.city.trim() || !deliveryAddress.state.trim()}
+                        disabled={
+                            loading ||
+                            !deliveryAddress.street.trim() ||
+                            !deliveryAddress.city.trim() ||
+                            !deliveryAddress.state.trim() ||
+                            !deliveryAddress.contactName.trim() ||
+                            !deliveryAddress.contactPhone.trim() ||
+                            deliveryAddress.contactPhone.length !== 10
+                        }
                     >
                         {loading ? 'Placing Order...' : '✅ Confirm Order'}
                     </button>
