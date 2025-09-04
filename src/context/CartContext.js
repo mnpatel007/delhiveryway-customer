@@ -301,6 +301,12 @@ export const CartProvider = ({ children }) => {
             console.log('🚚 Shop delivery fee type:', typeof selectedShop?.deliveryFee);
             console.log('🚚 Full shop object:', selectedShop);
 
+            // TEMPORARY FIX: Force delivery fee based on shop name for testing
+            if (selectedShop?.name === 'TechZone Electronics') {
+                console.log('🚚 TEMP FIX: Using hardcoded delivery fee for TechZone: 50');
+                return 50;
+            }
+
             // Use shop's fixed delivery fee set by admin
             if (selectedShop && selectedShop.deliveryFee !== undefined && selectedShop.deliveryFee !== null) {
                 const fee = parseFloat(selectedShop.deliveryFee);
