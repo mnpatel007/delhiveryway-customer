@@ -256,12 +256,18 @@ export const CartProvider = ({ children }) => {
 
     const getDeliveryFee = () => {
         try {
+            console.log('🚚 Getting delivery fee for shop:', selectedShop?.name);
+            console.log('🚚 Shop delivery fee:', selectedShop?.deliveryFee);
+
             // Use shop's fixed delivery fee set by admin
             if (selectedShop && selectedShop.deliveryFee !== undefined) {
-                return parseFloat(selectedShop.deliveryFee) || 0;
+                const fee = parseFloat(selectedShop.deliveryFee) || 0;
+                console.log('🚚 Using shop delivery fee:', fee);
+                return fee;
             }
 
             // Default fee if shop delivery fee is not set
+            console.log('🚚 Using default delivery fee: 30');
             return 30;
         } catch (error) {
             console.error('❌ Error getting delivery fee:', error);

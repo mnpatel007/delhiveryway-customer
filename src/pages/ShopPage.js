@@ -188,7 +188,13 @@ const ShopPage = () => {
 
     const handleAddToCart = (product) => {
         try {
-            const success = addToCart(product, 1);
+            // Ensure product has complete shop data including delivery fee
+            const productWithShopData = {
+                ...product,
+                shopId: shop // Pass the complete shop object with delivery fee
+            };
+
+            const success = addToCart(productWithShopData, 1);
             if (success) {
                 setToast(`✅ ${product.name} added to cart`);
             } else {
