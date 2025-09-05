@@ -117,14 +117,14 @@ export const CartProvider = ({ children }) => {
                     shopData = {
                         ...product.shopId,
                         _id: newShopId, // Use the extracted shop ID
-                        name: product.shopId.name || 'Shop',
-                        deliveryFee: product.shopId.deliveryFee || 30
+                        name: product.shopId.name || product.shopId.data?.shop?.name || 'Unknown Shop',
+                        deliveryFee: product.shopId.deliveryFee || product.shopId.data?.shop?.deliveryFee || 30
                     };
                 } else {
                     // Fallback with proper delivery fee
                     shopData = {
                         _id: newShopId,
-                        name: 'Shop',
+                        name: 'Unknown Shop',
                         deliveryFee: 30 // Default delivery fee
                     };
                 }

@@ -63,8 +63,13 @@ html {
 
 .checkout-header p {
     font-size: 1.15rem;
-    color: #555;
-    font-weight: 500;
+    color: #2c3e50;
+    font-weight: 600;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 10px 20px;
+    border-radius: 8px;
+    margin: 10px 0;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 /* Content: User Details, Address, Order Summary */
@@ -494,8 +499,13 @@ html {
 }
 
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 .error-state h2 {
@@ -642,25 +652,25 @@ html {
     .form-row {
         flex-direction: column;
     }
-    
+
     .form-group {
         min-width: unset;
     }
-    
+
     .info-grid {
         grid-template-columns: 1fr;
     }
-    
+
     .confirmation-actions {
         flex-direction: column;
     }
-    
+
     .detail-row {
         flex-direction: column;
         align-items: flex-start;
         gap: 5px;
     }
-    
+
     .detail-comparison {
         align-self: flex-end;
     }
