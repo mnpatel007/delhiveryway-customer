@@ -46,6 +46,17 @@ html {
     color: #2c3e50 !important;
 }
 
+/* Additional section headers that might appear faded */
+.checkout-container .section-title,
+.checkout-container .section-header,
+.checkout-container .order-section h3,
+.checkout-container .items-section h3,
+.checkout-container .next-section h3 {
+    color: #2c3e50 !important;
+    font-weight: 700 !important;
+    text-shadow: none !important;
+}
+
 /* Wrapper Card */
 .checkout-wrapper {
     background-color: var(--card-background);
@@ -428,6 +439,43 @@ html {
 .confirmation-section .info-value {
     color: #2c3e50 !important;
     font-weight: 600;
+}
+
+/* Order Items and What's Next sections */
+.order-items-section h3,
+.whats-next-section h3 {
+    margin-top: 0;
+    font-weight: 700;
+    font-size: 1.4rem;
+    color: #2c3e50 !important;
+    margin-bottom: 1rem;
+    border-bottom: 2px solid #007bff;
+    padding-bottom: 0.3rem;
+    text-shadow: none;
+}
+
+.order-items-section,
+.whats-next-section {
+    color: #2c3e50 !important;
+}
+
+.order-items-section *,
+.whats-next-section * {
+    color: inherit;
+}
+
+.order-items-section .item-name,
+.order-items-section .item-quantity,
+.order-items-section .item-price,
+.whats-next-section .step-title,
+.whats-next-section .step-description {
+    color: #2c3e50 !important;
+    font-weight: 600;
+}
+
+.order-items-section .item-details,
+.whats-next-section .step-details {
+    color: #495057 !important;
 }
 
 .info-grid {
