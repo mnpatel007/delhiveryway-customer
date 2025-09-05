@@ -29,6 +29,23 @@ html {
     padding: 3rem 1rem 5rem 1rem;
 }
 
+/* Force proper text colors for order confirmation */
+.checkout-container h1,
+.checkout-container h2,
+.checkout-container h3,
+.checkout-container h4,
+.checkout-container h5,
+.checkout-container h6 {
+    color: #2c3e50 !important;
+    text-shadow: none !important;
+}
+
+.checkout-container p,
+.checkout-container span,
+.checkout-container div {
+    color: #2c3e50 !important;
+}
+
 /* Wrapper Card */
 .checkout-wrapper {
     background-color: var(--card-background);
@@ -382,6 +399,35 @@ html {
     background: #f8f9fa;
     border-radius: 15px;
     border: 1px solid #e9ecef;
+}
+
+.confirmation-section h3 {
+    margin-top: 0;
+    font-weight: 700;
+    font-size: 1.4rem;
+    color: #2c3e50 !important;
+    margin-bottom: 1rem;
+    border-bottom: 2px solid #007bff;
+    padding-bottom: 0.3rem;
+    text-shadow: none;
+}
+
+.confirmation-section {
+    color: #2c3e50 !important;
+}
+
+.confirmation-section * {
+    color: inherit;
+}
+
+.confirmation-section .info-label {
+    color: #495057 !important;
+    font-weight: 600;
+}
+
+.confirmation-section .info-value {
+    color: #2c3e50 !important;
+    font-weight: 600;
 }
 
 .info-grid {
