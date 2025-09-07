@@ -354,6 +354,79 @@ export const SocketProvider = ({ children }) => {
                 showBrowserNotification('🚚 Delivery Partner Assigned!', `${data.deliveryPartner?.name || 'A delivery partner'} will deliver your order`);
             });
 
+            // Listen for order accepted by shopper
+            newSocket.on('orderAccepted', (data) => {
+                console.log('✅ Order accepted by shopper:', data);
+
+                addNotification({
+                    id: Date.now(),
+                    type: 'order_accepted',
+                    title: '✅ Order Accepted!',
+                    message: `Your order has been accepted by ${data.shopperName || 'a personal shopper'}. They will start shopping soon.`,
+                    timestamp: new Date().toISOString()
+                });
+
+                playNotificationSound();
+                showBrowserNotification(
+                    '✅ Order Accepted!',
+                    `Your order has been accepted by ${data.shopperName || 'a personal shopper'}`
+                );
+            });
+
+            // Listen for order revised by shopper
+            newSocket.on('orderRevised', (data) => {
+                console.log('📝 Order revised by shopper:', data);
+
+                addNotification({
+                    id: Date.now(),
+                    type: 'order_revised',
+                    title: '📝 Order Revision Required',
+                    message: `Your order has been revised by the shopper. Please review the changes and approve or reject them.`,
+                    timestamp: new Date().toISOString()
+                });
+
+                playNotificationSound();
+                showBrowserNotification(
+                    '📝 Order Revision Required',
+                    'Your order has been revised. Please review the changes.'
+                );
+            });
+
+            // Listen for shopper location updates
+            newSocket.on('shopperLocationUpdate', (data) => {
+                console.log('📍 Shopper location update:', data);
+
+                addNotification({
+                    id: Date.now(),
+                    type: 'shopper_location',
+                    title: '📍 Shopper Location Update',
+                    message: data.message || 'Your shopper has updated their location.',
+                    timestamp: new Date().toISOString()
+                });
+
+                // Don't play sound for location updates to avoid spam
+                // playNotificationSound();
+            });
+
+            // Listen for shopper actions
+            newSocket.on('shopperAction', (data) => {
+                console.log('🛒 Shopper action:', data);
+
+                addNotification({
+                    id: Date.now(),
+                    type: 'shopper_action',
+                    title: '🛒 Shopper Update',
+                    message: data.message || 'Your shopper has taken an action on your order.',
+                    timestamp: new Date().toISOString()
+                });
+
+                playNotificationSound();
+                showBrowserNotification(
+                    '🛒 Shopper Update',
+                    data.message || 'Your shopper has taken an action on your order.'
+                );
+            });
+
             setSocket(newSocket);
 
             return () => {
