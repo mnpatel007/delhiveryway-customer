@@ -35,8 +35,9 @@ const ShopPage = () => {
                     console.log('✅ Shop data loaded successfully:', shopResult.data);
                     // Extract the shop object from the nested data structure
                     const shopData = shopResult.data?.shop || shopResult.data;
+                    console.log('✅ Shop object extracted:', shopData);
+                    console.log('✅ Shop name from API:', shopData?.name);
                     setShop(shopData);
-                    console.log('✅ Shop object set:', shopData);
                 } else {
                     console.error('Failed to fetch shop:', shopResult.message);
                     setShop(null);
@@ -129,6 +130,21 @@ const ShopPage = () => {
                 console.log('📦 Final products array:', productsData);
                 setProducts(productsData);
                 setFilteredProducts(productsData);
+
+                // If shop data doesn't have a name, try to get it from the first product
+                if (shop && (!shop.name || shop.name === 'Loading...') && productsData.length > 0) {
+                    const firstProduct = productsData[0];
+                    if (firstProduct.shopId && firstProduct.shopId.name) {
+                        console.log('🔄 Updating shop name from product data:', firstProduct.shopId.name);
+                        const updatedShop = {
+                            ...shop,
+                            name: firstProduct.shopId.name
+                        };
+                        setShop(updatedShop);
+                        // Also update the cart context
+                        setSelectedShop(updatedShop);
+                    }
+                }
 
             } catch (err) {
                 console.error('❌ Error fetching data:', err);
