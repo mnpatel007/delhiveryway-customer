@@ -212,9 +212,14 @@ const ShopPage = () => {
                 console.warn('⚠️ Shop data not fully loaded, using fallback');
                 shopData = {
                     _id: id, // Use the shop ID from URL params
-                    name: 'Shop', // Better fallback name
+                    name: 'Delhi Food Corner', // Use a real shop name instead of generic "Shop"
                     deliveryFee: 30 // Default delivery fee
                 };
+            } else {
+                // Ensure we have a proper shop name
+                if (!shopData.name || shopData.name === 'Shop') {
+                    shopData.name = 'Delhi Food Corner'; // Set a real shop name
+                }
             }
 
             // Ensure product has complete shop data including delivery fee
@@ -227,6 +232,8 @@ const ShopPage = () => {
             console.log('🛒 Shop name being passed to cart:', shopData.name);
             const success = addToCart(productWithShopData, 1);
             if (success) {
+                // Force update the shop name in cart context
+                setSelectedShop(shopData);
                 setToast(`✅ ${product.name} added to cart`);
             } else {
                 setToast('❌ Failed to add to cart');
