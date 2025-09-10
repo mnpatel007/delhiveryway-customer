@@ -34,6 +34,10 @@ const ShopPage = () => {
 
                 if (shopResult.success && shopResult.data) {
                     console.log('✅ Shop data loaded successfully:', shopResult.data);
+                    console.log('🔍 shopResult.data.shop exists?', !!shopResult.data.shop);
+                    console.log('🔍 shopResult.data.shop value:', shopResult.data.shop);
+                    console.log('🔍 shopResult.data._id exists?', !!shopResult.data._id);
+                    console.log('🔍 shopResult.data.name exists?', !!shopResult.data.name);
 
                     // Extract the shop object - handle both response formats
                     let shopData = null;
@@ -42,11 +46,19 @@ const ShopPage = () => {
                     if (shopResult.data.shop) {
                         shopData = shopResult.data.shop;
                         console.log('✅ Using nested shop data:', shopData);
+                        console.log('✅ Nested shop _id:', shopData._id);
+                        console.log('✅ Nested shop name:', shopData.name);
                     }
                     // Try direct format: { data: {...} } where data IS the shop
                     else if (shopResult.data._id && shopResult.data.name) {
                         shopData = shopResult.data;
                         console.log('✅ Using direct shop data:', shopData);
+                    }
+                    else {
+                        console.log('❌ Neither format matched, trying fallback...');
+                        // Fallback: just use the data as-is and let validation catch issues
+                        shopData = shopResult.data.shop || shopResult.data;
+                        console.log('❌ Fallback shopData:', shopData);
                     }
 
                     // Validate we got valid shop data
@@ -55,6 +67,8 @@ const ShopPage = () => {
                             hasShopData: !!shopData,
                             hasId: !!shopData?._id,
                             hasName: !!shopData?.name,
+                            shopDataType: typeof shopData,
+                            shopDataKeys: shopData ? Object.keys(shopData) : [],
                             rawData: shopResult.data
                         });
                         setError('Invalid shop data received');
