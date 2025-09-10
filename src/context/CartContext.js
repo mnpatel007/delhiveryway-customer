@@ -86,7 +86,8 @@ export const CartProvider = ({ children }) => {
             }
 
             console.log('🔍 Product shop ID extracted:', productShopId);
-            console.log('🔍 Product shopId object:', product.shopId);
+            console.log('🔍 Product shopId:', product.shopId);
+            console.log('🔍 Product shopData:', product.shopData);
 
             if (!productShopId) {
                 console.error('❌ Could not extract shop ID from product:', product);
@@ -120,23 +121,30 @@ export const CartProvider = ({ children }) => {
                 stringComparison: `"${currentShopId}" !== "${productShopId}" = ${String(currentShopId) !== String(productShopId)}`
             });
 
-            // If different shop and cart has items, automatically clear cart and show alert
+            // If different shop and cart has items, ask for confirmation
             if (isDifferentShop && cartItems.length > 0) {
-                console.log('🚨 DIFFERENT SHOP DETECTED! Auto-clearing cart...');
+                console.log('🚨 DIFFERENT SHOP DETECTED! Showing confirmation...');
 
                 const currentShopName = selectedShop?.name || 'Current Shop';
-                const newShopName = product.shopId?.name || 'New Shop';
+                const newShopName = product.shopData?.name || product.shopId?.name || 'New Shop';
 
-                // CLEAR EVERYTHING IMMEDIATELY
+                // Show confirmation dialog
+                const confirmMessage = `You have ${cartItems.length} items from "${currentShopName}" in your cart.\n\nAdding items from "${newShopName}" will clear your current cart.\n\nDo you want to continue?`;
+
+                const userConfirmed = window.confirm(confirmMessage);
+
+                if (!userConfirmed) {
+                    console.log('🛒 User cancelled shop switch');
+                    return false;
+                }
+
+                console.log('🛒 User confirmed shop switch - clearing cart...');
+
+                // Clear cart and shop
                 setCartItems([]);
-                localStorage.removeItem('customerCart');
                 setSelectedShop(null);
-                localStorage.removeItem('selectedShop');
 
-                console.log('✅ Cart and shop cleared!');
-
-                // Show alert
-                alert(`Your cart has been cleared as you have selected items from other shops.`);
+                console.log('✅ Cart cleared! Proceeding with new shop...');
             } else if (selectedShop && currentShopId && productShopId && String(currentShopId).trim() === String(productShopId).trim()) {
                 console.log('🛒 SAME SHOP DETECTED - Adding to existing cart');
             } else {
@@ -150,7 +158,10 @@ export const CartProvider = ({ children }) => {
 
             // Set the new shop
             let shopData;
-            if (product.shopId && typeof product.shopId === 'object') {
+            if (product.shopData) {
+                // Use the complete shop data from ShopPage
+                shopData = product.shopData;
+            } else if (product.shopId && typeof product.shopId === 'object') {
                 shopData = {
                     ...product.shopId,
                     _id: productShopId,

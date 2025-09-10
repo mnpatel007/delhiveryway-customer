@@ -308,7 +308,8 @@ const ShopPage = () => {
             // Ensure product has complete shop data including delivery fee
             const productWithShopData = {
                 ...product,
-                shopId: shopData // Pass the shop data with proper name
+                shopId: shop._id, // Pass just the shop ID as string
+                shopData: shopData // Pass full shop data separately
             };
 
             console.log('🛒 Product with shop data:', productWithShopData);
