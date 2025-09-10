@@ -158,20 +158,20 @@ export const CartProvider = ({ children }) => {
                     shopData = {
                         ...product.shopId,
                         _id: newShopId, // Use the extracted shop ID
-                        name: product.shopId.name || product.shopId.data?.shop?.name || 'Delhi Food Corner',
+                        name: product.shopId.name || product.shopId.data?.shop?.name || 'Loading...',
                         deliveryFee: product.shopId.deliveryFee || product.shopId.data?.shop?.deliveryFee || 30
                     };
                 } else {
                     // Fallback with proper delivery fee
                     shopData = {
                         _id: newShopId,
-                        name: 'Delhi Food Corner',
+                        name: 'Loading...',
                         deliveryFee: 30 // Default delivery fee
                     };
                 }
                 console.log('🛒 Setting selected shop:', shopData);
                 setSelectedShop(shopData);
-            } else if (selectedShop && (selectedShop.name === 'Shop' || selectedShop.name === 'Delhi Food Corner') && product.shopId?.name) {
+            } else if (selectedShop && (selectedShop.name === 'Shop' || selectedShop.name === 'Loading...') && product.shopId?.name) {
                 // Update shop name if it's still the fallback but we have a real name
                 console.log('🛒 Updating shop name from fallback to real name:', product.shopId.name);
                 setSelectedShop({

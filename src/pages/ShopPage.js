@@ -212,14 +212,9 @@ const ShopPage = () => {
                 console.warn('⚠️ Shop data not fully loaded, using fallback');
                 shopData = {
                     _id: id, // Use the shop ID from URL params
-                    name: 'Delhi Food Corner', // Use a real shop name instead of generic "Shop"
+                    name: 'Loading...', // Show loading state instead of wrong name
                     deliveryFee: 30 // Default delivery fee
                 };
-            } else {
-                // Ensure we have a proper shop name
-                if (!shopData.name || shopData.name === 'Shop') {
-                    shopData.name = 'Delhi Food Corner'; // Set a real shop name
-                }
             }
 
             // Ensure product has complete shop data including delivery fee
