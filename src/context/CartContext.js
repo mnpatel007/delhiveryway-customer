@@ -140,7 +140,12 @@ export const CartProvider = ({ children }) => {
 
                 console.log('🛒 User confirmed shop switch - clearing cart...');
 
-                // Clear cart before proceeding
+                // Clear both cart and shop from localStorage
+                localStorage.removeItem('customerCart');
+
+                // We don't remove selectedShop from localStorage here because we'll set it to the new shop
+
+                // Force clear cart in memory before proceeding
                 setCartItems([]);
 
                 // Don't set selectedShop to null here, we'll set it to the new shop below
@@ -177,49 +182,69 @@ export const CartProvider = ({ children }) => {
             }
 
             console.log('🛒 Setting selected shop:', shopData);
-            // Always set the selected shop to the new shop data
-            setSelectedShop(shopData);
+            // Set the selected shop to the new shop data
+            // For shop switches, we'll set it again in the timeout to ensure it's properly updated
+            if (!isDifferentShop || cartItems.length === 0) {
+                console.log('🏪 Setting shop immediately:', shopData.name);
+                setSelectedShop(shopData);
+            }
 
-            // Add item to cart
-            setCartItems(prevItems => {
-                // If we're switching shops, prevItems should already be empty
-                // But let's make sure we're starting with a clean cart if it's a different shop
-                if (isDifferentShop) {
-                    console.log('📦 Adding first item from new shop:', product.name);
-                    return [{
+            // Add item to cart with a small delay if we're switching shops
+            // This ensures React state updates properly
+            if (isDifferentShop && cartItems.length > 0) {
+                // For different shop with items, use setTimeout to ensure cart is cleared first
+                // Use a longer timeout to ensure the cart is properly cleared first
+                setTimeout(() => {
+                    console.log('⏱️ Adding item after shop switch with delay');
+
+                    // Create a completely new cart with just this item
+                    // This is more reliable than checking cartItems.length which might be stale
+                    console.log('� Creating fresh cart with new shop item');
+                    localStorage.removeItem('customerCart');
+
+                    // Set the shop again to ensure it's properly updated
+                    console.log('🏪 Setting shop in timeout:', shopData.name);
+                    setSelectedShop(shopData);
+
+                    // Now set the cart items
+                    setCartItems([{
+                        ...product,
+                        quantity,
+                        notes,
+                        addedAt: new Date().toISOString()
+                    }]);
+                }, 200);
+                return true;
+            } else {
+                // Normal case - same shop or empty cart
+                setCartItems(prevItems => {
+                    const existingItem = prevItems.find(item => item._id === product._id);
+
+                    if (existingItem) {
+                        console.log('📦 Updating existing item quantity:', product.name);
+                        return prevItems.map(item =>
+                            item._id === product._id
+                                ? {
+                                    ...item,
+                                    quantity: item.quantity + quantity,
+                                    notes: notes || item.notes,
+                                    updatedAt: new Date().toISOString()
+                                }
+                                : item
+                        );
+                    }
+
+                    console.log('📦 Adding new item to cart:', product.name);
+                    return [...prevItems, {
                         ...product,
                         quantity,
                         notes,
                         addedAt: new Date().toISOString()
                     }];
-                }
+                });
 
-                const existingItem = prevItems.find(item => item._id === product._id);
-
-                if (existingItem) {
-                    console.log('📦 Updating existing item quantity:', product.name);
-                    return prevItems.map(item =>
-                        item._id === product._id
-                            ? {
-                                ...item,
-                                quantity: item.quantity + quantity,
-                                notes: notes || item.notes,
-                                updatedAt: new Date().toISOString()
-                            }
-                            : item
-                    );
-                }
-
-                console.log('📦 Adding new item to cart:', product.name);
-                return [...prevItems, {
-                    ...product,
-                    quantity,
-                    notes,
-                    addedAt: new Date().toISOString()
-                }];
-            });
-
-            return true;
+                return true;
+            }
         } catch (error) {
             console.error('❌ Error adding to cart:', error);
             return false;
