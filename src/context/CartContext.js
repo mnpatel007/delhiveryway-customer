@@ -27,7 +27,8 @@ export const CartProvider = ({ children }) => {
         try {
             const savedShop = localStorage.getItem('selectedShop');
             const parsed = savedShop ? JSON.parse(savedShop) : null;
-            console.log('🏪 Selected shop restored:', parsed?.name || 'None');
+            console.log('🏪 Selected shop restored from localStorage:', parsed?.name || 'None');
+            console.log('🏪 Full shop object from localStorage:', parsed);
             return parsed;
         } catch (error) {
             console.error('❌ Error loading selected shop from localStorage:', error);
@@ -139,6 +140,7 @@ export const CartProvider = ({ children }) => {
                 console.log('🛒 User confirmed shop switch, clearing cart...');
                 // Clear cart and switch shop
                 setCartItems([]);
+                setSelectedShop(null); // Use original function internally
 
                 // Show a brief notification that cart was cleared
                 if (typeof window !== 'undefined' && window.alert) {
@@ -158,23 +160,23 @@ export const CartProvider = ({ children }) => {
                     shopData = {
                         ...product.shopId,
                         _id: newShopId, // Use the extracted shop ID
-                        name: product.shopId.name || product.shopId.data?.shop?.name || 'Loading...',
-                        deliveryFee: product.shopId.deliveryFee || product.shopId.data?.shop?.deliveryFee || 30
+                        name: product.shopId.name || 'Shop', // Use 'Shop' as fallback instead of 'Loading...'
+                        deliveryFee: product.shopId.deliveryFee || 30
                     };
                 } else {
                     // Fallback with proper delivery fee
                     shopData = {
                         _id: newShopId,
-                        name: 'Loading...',
+                        name: 'Shop', // Use 'Shop' as fallback instead of 'Loading...'
                         deliveryFee: 30 // Default delivery fee
                     };
                 }
                 console.log('🛒 Setting selected shop:', shopData);
-                setSelectedShop(shopData);
+                setSelectedShop(shopData); // Use original function internally
             } else if (selectedShop && (selectedShop.name === 'Shop' || selectedShop.name === 'Loading...') && product.shopId?.name) {
                 // Update shop name if it's still the fallback but we have a real name
                 console.log('🛒 Updating shop name from fallback to real name:', product.shopId.name);
-                setSelectedShop({
+                setSelectedShop({ // Use original function internally
                     ...selectedShop,
                     name: product.shopId.name
                 });
@@ -226,7 +228,7 @@ export const CartProvider = ({ children }) => {
 
                 // Clear selected shop if cart becomes empty
                 if (newItems.length === 0) {
-                    setSelectedShop(null);
+                    setSelectedShop(null); // Use original function internally
                 }
 
                 return newItems;
@@ -300,7 +302,7 @@ export const CartProvider = ({ children }) => {
     const clearCart = () => {
         try {
             setCartItems([]);
-            setSelectedShop(null);
+            setSelectedShop(null); // Use original function internally
             localStorage.removeItem('customerCart');
             localStorage.removeItem('selectedShop');
             console.log('🗑️ Cart cleared completely');
@@ -426,10 +428,16 @@ export const CartProvider = ({ children }) => {
         }
     };
 
+    // Wrapper function to log shop updates
+    const setSelectedShopWithLogging = (shopData) => {
+        console.log('🏪 Setting selected shop:', shopData?.name || 'null', shopData);
+        setSelectedShop(shopData);
+    };
+
     const value = {
         cartItems,
         selectedShop,
-        setSelectedShop,
+        setSelectedShop: setSelectedShopWithLogging,
         addToCart,
         removeFromCart,
         updateQuantity,

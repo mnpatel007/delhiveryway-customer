@@ -30,18 +30,38 @@ const ShopPage = () => {
                 // Fetch shop details
                 const shopResult = await apiCall(shopsAPI.getById, id);
                 console.log('🏪 Shop API response:', shopResult);
+                console.log('🏪 Shop API response data:', JSON.stringify(shopResult.data, null, 2));
 
-                if (shopResult.success) {
+                if (shopResult.success && shopResult.data) {
                     console.log('✅ Shop data loaded successfully:', shopResult.data);
                     // Extract the shop object from the nested data structure
-                    const shopData = shopResult.data?.shop || shopResult.data;
+                    let shopData;
+                    if (shopResult.data.shop) {
+                        // API returns: { success: true, data: { shop: {...} } }
+                        shopData = shopResult.data.shop;
+                    } else if (shopResult.data._id) {
+                        // API returns: { success: true, data: {...} } (direct shop object)
+                        shopData = shopResult.data;
+                    } else {
+                        console.error('❌ Unexpected shop data structure:', shopResult.data);
+                        setError('Invalid shop data received');
+                        return;
+                    }
+
                     console.log('✅ Shop object extracted:', shopData);
                     console.log('✅ Shop name from API:', shopData?.name);
+
+                    if (!shopData.name) {
+                        console.error('❌ Shop data missing name field:', shopData);
+                        setError('Shop data is incomplete');
+                        return;
+                    }
+
                     setShop(shopData);
                 } else {
                     console.error('Failed to fetch shop:', shopResult.message);
                     setShop(null);
-                    setError('Failed to load shop details');
+                    setError(shopResult.message || 'Failed to load shop details');
                     return;
                 }
 
@@ -208,7 +228,7 @@ const ShopPage = () => {
 
     // Update selected shop in cart context when shop data loads
     useEffect(() => {
-        if (shop && shop._id) {
+        if (shop && shop._id && shop.name && shop.name !== 'Loading...') {
             console.log('🔄 Shop data loaded, updating cart context:', shop.name);
             setSelectedShop(shop);
         }
@@ -222,28 +242,33 @@ const ShopPage = () => {
             console.log('🛒 Shop deliveryFee:', shop?.deliveryFee);
             console.log('🛒 Loading state:', loading);
 
-            // Use the loaded shop data or create a fallback
-            let shopData = shop;
-            if (!shop || !shop._id) {
-                console.warn('⚠️ Shop data not fully loaded, using fallback');
-                shopData = {
-                    _id: id, // Use the shop ID from URL params
-                    name: 'Loading...', // Show loading state instead of wrong name
-                    deliveryFee: 30 // Default delivery fee
-                };
+            // Only proceed if we have proper shop data
+            if (!shop || !shop._id || !shop.name || shop.name === 'Loading...') {
+                console.warn('⚠️ Shop data not fully loaded, cannot add to cart yet');
+                setToast('⏳ Please wait for shop data to load...');
+                setTimeout(() => setToast(''), 3000);
+                return;
             }
+
+            // Use the loaded shop data with proper name
+            const shopData = {
+                ...shop,
+                _id: shop._id,
+                name: shop.name,
+                deliveryFee: shop.deliveryFee || 30
+            };
 
             // Ensure product has complete shop data including delivery fee
             const productWithShopData = {
                 ...product,
-                shopId: shopData // Pass the shop data (loaded or fallback)
+                shopId: shopData // Pass the shop data with proper name
             };
 
             console.log('🛒 Product with shop data:', productWithShopData);
             console.log('🛒 Shop name being passed to cart:', shopData.name);
             const success = addToCart(productWithShopData, 1);
             if (success) {
-                // Force update the shop name in cart context
+                // Update the cart context with proper shop data
                 setSelectedShop(shopData);
                 setToast(`✅ ${product.name} added to cart`);
             } else {
@@ -352,7 +377,14 @@ const ShopPage = () => {
                         </div>
 
                         <div className="shop-details">
-                            <h1 className="shop-name">{shop.name}</h1>
+                            <h1 className="shop-name">
+                                {shop.name}
+                                {process.env.NODE_ENV === 'development' && (
+                                    <small style={{ display: 'block', fontSize: '12px', color: 'rgba(255,255,255,0.7)' }}>
+                                        Debug: "{shop.name}" (ID: {shop._id})
+                                    </small>
+                                )}
+                            </h1>
                             <p className="shop-description">{shop.description || 'Welcome to our shop!'}</p>
 
                             <div className="shop-meta">
