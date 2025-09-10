@@ -104,8 +104,9 @@ export const CartProvider = ({ children }) => {
             console.log('🔍 Current shop ID:', currentShopId);
             console.log('🔍 Selected shop object:', selectedShop);
 
-            // Check if we're switching shops
-            const isDifferentShop = selectedShop && currentShopId && productShopId && currentShopId !== productShopId;
+            // Check if we're switching shops - be more strict about the comparison
+            const isDifferentShop = selectedShop && currentShopId && productShopId &&
+                String(currentShopId).trim() !== String(productShopId).trim();
 
             console.log('🛒 Shop comparison:', {
                 currentShopId: currentShopId,
@@ -150,14 +151,21 @@ export const CartProvider = ({ children }) => {
 
                 console.log('🛒 User confirmed shop switch, clearing cart and switching shops...');
 
-                // Clear the cart first
+                // FORCE CLEAR THE CART IMMEDIATELY
                 setCartItems([]);
+                localStorage.removeItem('customerCart');
 
                 // Clear selected shop temporarily
                 setSelectedShop(null);
+                localStorage.removeItem('selectedShop');
 
                 // Show notification
                 console.log(`✅ Cart cleared! Switching to "${newShopName}"`);
+
+                // Add a small delay to ensure state is cleared
+                setTimeout(() => {
+                    console.log('🔄 Cart cleared, proceeding with new item...');
+                }, 100);
             } else {
                 console.log('🛒 Same shop or no existing shop, proceeding...', {
                     isDifferentShop,
@@ -167,7 +175,7 @@ export const CartProvider = ({ children }) => {
             }
 
             // Set or update selected shop
-            if (!selectedShop || !currentShopId || currentShopId !== productShopId) {
+            if (!selectedShop || !currentShopId || String(currentShopId).trim() !== String(productShopId).trim()) {
                 let shopData;
                 if (product.shopId && typeof product.shopId === 'object') {
                     // Use the shop data from the product
@@ -189,31 +197,43 @@ export const CartProvider = ({ children }) => {
                 setSelectedShop(shopData);
             }
 
-            setCartItems(prevItems => {
-                const existingItem = prevItems.find(item => item._id === product._id);
-
-                if (existingItem) {
-                    console.log('📦 Updating existing item quantity:', product.name);
-                    return prevItems.map(item =>
-                        item._id === product._id
-                            ? {
-                                ...item,
-                                quantity: item.quantity + quantity,
-                                notes: notes || item.notes,
-                                updatedAt: new Date().toISOString()
-                            }
-                            : item
-                    );
-                }
-
-                console.log('📦 Adding new item to cart:', product.name);
-                return [...prevItems, {
+            // Check if we just cleared the cart due to shop switch
+            if (isDifferentShop && cartItems.length > 0) {
+                console.log('🔄 Shop switch detected, adding item to empty cart...');
+                // Add the item to an empty cart
+                setCartItems([{
                     ...product,
                     quantity,
                     notes,
                     addedAt: new Date().toISOString()
-                }];
-            });
+                }]);
+            } else {
+                setCartItems(prevItems => {
+                    const existingItem = prevItems.find(item => item._id === product._id);
+
+                    if (existingItem) {
+                        console.log('📦 Updating existing item quantity:', product.name);
+                        return prevItems.map(item =>
+                            item._id === product._id
+                                ? {
+                                    ...item,
+                                    quantity: item.quantity + quantity,
+                                    notes: notes || item.notes,
+                                    updatedAt: new Date().toISOString()
+                                }
+                                : item
+                        );
+                    }
+
+                    console.log('📦 Adding new item to cart:', product.name);
+                    return [...prevItems, {
+                        ...product,
+                        quantity,
+                        notes,
+                        addedAt: new Date().toISOString()
+                    }];
+                });
+            }
 
             return true;
         } catch (error) {
@@ -441,6 +461,20 @@ export const CartProvider = ({ children }) => {
         setSelectedShop(shopData);
     };
 
+    // Debug function to check cart state
+    const debugCartState = () => {
+        console.log('🔍 CART DEBUG STATE:', {
+            cartItemsCount: cartItems.length,
+            selectedShopName: selectedShop?.name,
+            selectedShopId: selectedShop?._id,
+            cartItems: cartItems.map(item => ({
+                name: item.name,
+                shopId: item.shopId?._id || item.shopId,
+                shopName: item.shopId?.name || 'Unknown'
+            }))
+        });
+    };
+
     const value = {
         cartItems,
         selectedShop,
@@ -455,7 +489,8 @@ export const CartProvider = ({ children }) => {
         getTaxes,
         getGrandTotal,
         getCartItemsCount,
-        getOrderSummary
+        getOrderSummary,
+        debugCartState
     };
 
     return (
