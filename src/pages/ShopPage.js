@@ -39,7 +39,7 @@ const ShopPage = () => {
 
                     // Extract the shop object from the nested data structure
                     let shopData;
-                    if (shopResult.data.shop) {
+                    if (shopResult.data.shop && shopResult.data.shop._id) {
                         // API returns: { success: true, data: { shop: {...} } }
                         shopData = shopResult.data.shop;
                         console.log('✅ Using shopResult.data.shop');
