@@ -17,7 +17,7 @@ const ShopPage = () => {
     const [selectedCategory, setSelectedCategory] = useState('all');
     const [sortBy, setSortBy] = useState('name');
     const [viewMode, setViewMode] = useState('grid');
-    const { addToCart, selectedShop, setSelectedShop, cartItems } = useContext(CartContext);
+    const { addToCart, selectedShop, setSelectedShop, cartItems, clearCart } = useContext(CartContext);
 
     useEffect(() => {
         const fetchShopAndProducts = async () => {
@@ -414,6 +414,96 @@ const ShopPage = () => {
                         <span>←</span> Back to Shops
                     </button>
 
+                    {/* Debug Panel */}
+                    <div style={{
+                        position: 'fixed',
+                        top: '20px',
+                        right: '20px',
+                        background: 'rgba(0,0,0,0.9)',
+                        padding: '15px',
+                        borderRadius: '8px',
+                        color: 'white',
+                        fontSize: '12px',
+                        zIndex: 9999,
+                        border: '2px solid #007bff',
+                        minWidth: '200px'
+                    }}>
+                        <div style={{ marginBottom: '10px', fontWeight: 'bold' }}>🔧 DEBUG PANEL</div>
+                        <div style={{ marginBottom: '5px' }}>Cart Items: {cartItems.length}</div>
+                        <div style={{ marginBottom: '5px' }}>Selected Shop: {selectedShop?.name || 'None'}</div>
+                        <div style={{ marginBottom: '10px' }}>Current Shop: {shop?.name || 'Loading...'}</div>
+
+                        <button
+                            onClick={() => {
+                                console.log('🔍 DEBUG CART STATE:');
+                                console.log('Selected Shop:', selectedShop);
+                                console.log('Cart Items:', cartItems);
+                                console.log('Cart Items Count:', cartItems.length);
+                                if (cartItems.length > 0) {
+                                    console.log('First Cart Item Shop ID:', cartItems[0].shopId?._id || cartItems[0].shopId);
+                                    console.log('Current Shop ID:', shop._id);
+                                    console.log('Are they different?', (cartItems[0].shopId?._id || cartItems[0].shopId) !== shop._id);
+                                }
+                                alert('Check console for debug info');
+                            }}
+                            style={{
+                                padding: '8px 12px',
+                                fontSize: '12px',
+                                background: '#007bff',
+                                border: 'none',
+                                borderRadius: '4px',
+                                color: 'white',
+                                cursor: 'pointer',
+                                marginRight: '5px',
+                                marginBottom: '5px'
+                            }}
+                        >
+                            Debug Cart
+                        </button>
+                        <button
+                            onClick={() => {
+                                console.log('🧹 CLEARING CART...');
+                                clearCart();
+                                console.log('✅ Cart cleared!');
+                                alert('Cart cleared!');
+                            }}
+                            style={{
+                                padding: '8px 12px',
+                                fontSize: '12px',
+                                background: '#dc3545',
+                                border: 'none',
+                                borderRadius: '4px',
+                                color: 'white',
+                                cursor: 'pointer',
+                                marginBottom: '5px'
+                            }}
+                        >
+                            Clear Cart
+                        </button>
+                        <br />
+                        <button
+                            onClick={() => {
+                                // Test adding an item
+                                if (products.length > 0) {
+                                    const testProduct = products[0];
+                                    console.log('🧪 TESTING ADD TO CART:', testProduct.name);
+                                    addToCart(testProduct, 1);
+                                }
+                            }}
+                            style={{
+                                padding: '8px 12px',
+                                fontSize: '12px',
+                                background: '#28a745',
+                                border: 'none',
+                                borderRadius: '4px',
+                                color: 'white',
+                                cursor: 'pointer'
+                            }}
+                        >
+                            Test Add Item
+                        </button>
+                    </div>
+
                     <div className="shop-main-info">
                         <div className="shop-avatar">
                             {shop.images && shop.images.length > 0 ? (
@@ -431,33 +521,31 @@ const ShopPage = () => {
                                         Debug: "{shop.name}" (ID: {shop._id})
                                     </small>
                                 )}
-                                {process.env.NODE_ENV === 'development' && (
-                                    <button
-                                        onClick={() => {
-                                            console.log('🔍 DEBUG CART STATE:');
-                                            console.log('Selected Shop:', selectedShop);
-                                            console.log('Cart Items:', cartItems);
-                                            console.log('Cart Items Count:', cartItems.length);
-                                            if (cartItems.length > 0) {
-                                                console.log('First Cart Item Shop ID:', cartItems[0].shopId?._id || cartItems[0].shopId);
-                                                console.log('Current Shop ID:', shop._id);
-                                                console.log('Are they different?', (cartItems[0].shopId?._id || cartItems[0].shopId) !== shop._id);
-                                            }
-                                        }}
-                                        style={{
-                                            marginLeft: '10px',
-                                            padding: '5px 10px',
-                                            fontSize: '10px',
-                                            background: 'rgba(255,255,255,0.2)',
-                                            border: '1px solid rgba(255,255,255,0.3)',
-                                            borderRadius: '4px',
-                                            color: 'white',
-                                            cursor: 'pointer'
-                                        }}
-                                    >
-                                        Debug Cart
-                                    </button>
-                                )}
+                                <button
+                                    onClick={() => {
+                                        console.log('🔍 DEBUG CART STATE:');
+                                        console.log('Selected Shop:', selectedShop);
+                                        console.log('Cart Items:', cartItems);
+                                        console.log('Cart Items Count:', cartItems.length);
+                                        if (cartItems.length > 0) {
+                                            console.log('First Cart Item Shop ID:', cartItems[0].shopId?._id || cartItems[0].shopId);
+                                            console.log('Current Shop ID:', shop._id);
+                                            console.log('Are they different?', (cartItems[0].shopId?._id || cartItems[0].shopId) !== shop._id);
+                                        }
+                                    }}
+                                    style={{
+                                        marginLeft: '10px',
+                                        padding: '5px 10px',
+                                        fontSize: '10px',
+                                        background: 'rgba(255,255,255,0.2)',
+                                        border: '1px solid rgba(255,255,255,0.3)',
+                                        borderRadius: '4px',
+                                        color: 'white',
+                                        cursor: 'pointer'
+                                    }}
+                                >
+                                    Debug Cart
+                                </button>
                             </h1>
                             <p className="shop-description">{shop.description || 'Welcome to our shop!'}</p>
 
