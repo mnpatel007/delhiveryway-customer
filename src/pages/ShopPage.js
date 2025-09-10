@@ -192,16 +192,17 @@ const ShopPage = () => {
 
     // Update selected shop in cart context when shop data loads
     useEffect(() => {
-        if (shop && shop._id && (!selectedShop || selectedShop._id !== shop._id)) {
-            console.log('🔄 Updating selected shop in cart context:', shop.name);
+        if (shop && shop._id) {
+            console.log('🔄 Shop data loaded, updating cart context:', shop.name);
             setSelectedShop(shop);
         }
-    }, [shop, selectedShop, setSelectedShop]);
+    }, [shop, setSelectedShop]);
 
     const handleAddToCart = (product) => {
         try {
             console.log('🛒 Adding product to cart:', product.name);
             console.log('🛒 Current shop data:', shop);
+            console.log('🛒 Shop name:', shop?.name);
             console.log('🛒 Shop deliveryFee:', shop?.deliveryFee);
             console.log('🛒 Loading state:', loading);
 
@@ -223,6 +224,7 @@ const ShopPage = () => {
             };
 
             console.log('🛒 Product with shop data:', productWithShopData);
+            console.log('🛒 Shop name being passed to cart:', shopData.name);
             const success = addToCart(productWithShopData, 1);
             if (success) {
                 setToast(`✅ ${product.name} added to cart`);
