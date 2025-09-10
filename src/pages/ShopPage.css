@@ -292,6 +292,8 @@
     font-weight: 800;
     margin: 0 0 1rem 0;
     line-height: 1.2;
+    color: white;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .shop-description {
@@ -700,10 +702,7 @@
 }
 
 .product-name-main {
-    background: linear-gradient(135deg, #ffffff, #f8fafc);
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    color: var(--text-primary);
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     font-weight: 900;
     letter-spacing: 0.5px;
@@ -716,10 +715,7 @@
 /* Dark mode adjustments for better contrast */
 @media (prefers-color-scheme: dark) {
     .product-name-main {
-        background: linear-gradient(135deg, #ffffff, #e2e8f0);
-        background-clip: text;
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
+        color: var(--text-primary);
         text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
     }
 }
