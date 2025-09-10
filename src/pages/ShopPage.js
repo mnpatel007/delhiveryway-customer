@@ -34,16 +34,23 @@ const ShopPage = () => {
 
                 if (shopResult.success && shopResult.data) {
                     console.log('✅ Shop data loaded successfully:', shopResult.data);
+                    console.log('🔍 Checking shopResult.data.shop:', shopResult.data.shop);
+                    console.log('🔍 Checking shopResult.data._id:', shopResult.data._id);
+
                     // Extract the shop object from the nested data structure
                     let shopData;
                     if (shopResult.data.shop) {
                         // API returns: { success: true, data: { shop: {...} } }
                         shopData = shopResult.data.shop;
+                        console.log('✅ Using shopResult.data.shop');
                     } else if (shopResult.data._id) {
                         // API returns: { success: true, data: {...} } (direct shop object)
                         shopData = shopResult.data;
+                        console.log('✅ Using shopResult.data directly');
                     } else {
                         console.error('❌ Unexpected shop data structure:', shopResult.data);
+                        console.error('❌ shopResult.data.shop exists?', !!shopResult.data.shop);
+                        console.error('❌ shopResult.data._id exists?', !!shopResult.data._id);
                         setError('Invalid shop data received');
                         return;
                     }
@@ -51,7 +58,7 @@ const ShopPage = () => {
                     console.log('✅ Shop object extracted:', shopData);
                     console.log('✅ Shop name from API:', shopData?.name);
 
-                    if (!shopData.name) {
+                    if (!shopData || !shopData.name) {
                         console.error('❌ Shop data missing name field:', shopData);
                         setError('Shop data is incomplete');
                         return;
