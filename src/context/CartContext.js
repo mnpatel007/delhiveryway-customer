@@ -87,8 +87,6 @@ export const CartProvider = ({ children }) => {
 
             console.log('🔍 Product shop ID extracted:', productShopId);
             console.log('🔍 Product shopId object:', product.shopId);
-            console.log('🔍 Product shopId type:', typeof product.shopId);
-            console.log('🔍 Product shopId keys:', product.shopId ? Object.keys(product.shopId) : 'null');
 
             if (!productShopId) {
                 console.error('❌ Could not extract shop ID from product:', product);
@@ -104,44 +102,27 @@ export const CartProvider = ({ children }) => {
             console.log('🔍 Current shop ID:', currentShopId);
             console.log('🔍 Selected shop object:', selectedShop);
 
-            // Check if we're switching shops - be more strict about the comparison
+            // SIMPLIFIED LOGIC: Check if we're switching shops
             const isDifferentShop = selectedShop && currentShopId && productShopId &&
                 String(currentShopId).trim() !== String(productShopId).trim();
 
-            console.log('🛒 Shop comparison:', {
+            console.log('🛒 SIMPLIFIED SHOP COMPARISON:', {
                 currentShopId: currentShopId,
                 productShopId: productShopId,
-                currentShopName: selectedShop?.name,
-                newShopName: product.shopId?.name,
                 isDifferentShop: isDifferentShop,
-                hasSelectedShop: !!selectedShop,
                 cartItemsCount: cartItems.length,
-                shopIdComparison: `${currentShopId} !== ${productShopId} = ${currentShopId !== productShopId}`
-            });
-
-            console.log('🛒 Detailed shop comparison:', {
-                selectedShopExists: !!selectedShop,
-                currentShopIdExists: !!currentShopId,
-                productShopIdExists: !!productShopId,
-                shopIdsEqual: currentShopId === productShopId,
-                cartHasItems: cartItems.length > 0,
                 shouldShowDialog: isDifferentShop && cartItems.length > 0
             });
 
-            // Check if product is from a different shop and we have items in cart
+            // If different shop and cart has items, show confirmation
             if (isDifferentShop && cartItems.length > 0) {
-                console.log('🚨 DIFFERENT SHOP DETECTED! SHOULD SHOW CONFIRMATION DIALOG!');
+                console.log('🚨 DIFFERENT SHOP DETECTED!');
 
-                // Get shop names for the dialog
-                const currentShopName = selectedShop?.name || 'Unknown Shop';
+                const currentShopName = selectedShop?.name || 'Current Shop';
                 const newShopName = product.shopId?.name || 'New Shop';
 
-                console.log('🚨 Current shop:', currentShopName, 'New shop:', newShopName);
-
-                // Show confirmation dialog
                 const confirmMessage = `🛒 SHOP CHANGE REQUIRED\n\nYou have ${cartItems.length} items from "${currentShopName}" in your cart.\n\nAdding items from "${newShopName}" will clear your current cart.\n\nDo you want to continue?`;
 
-                console.log('🚨 SHOWING CONFIRMATION DIALOG:', confirmMessage);
                 const confirmSwitch = window.confirm(confirmMessage);
 
                 if (!confirmSwitch) {
@@ -149,91 +130,63 @@ export const CartProvider = ({ children }) => {
                     return false;
                 }
 
-                console.log('🛒 User confirmed shop switch, clearing cart and switching shops...');
+                console.log('🛒 User confirmed shop switch, clearing cart...');
 
-                // FORCE CLEAR THE CART IMMEDIATELY
+                // CLEAR EVERYTHING IMMEDIATELY
                 setCartItems([]);
                 localStorage.removeItem('customerCart');
-
-                // Clear selected shop temporarily
                 setSelectedShop(null);
                 localStorage.removeItem('selectedShop');
 
-                // Show notification
-                console.log(`✅ Cart cleared! Switching to "${newShopName}"`);
+                console.log('✅ Cart and shop cleared!');
+            }
 
-                // Add a small delay to ensure state is cleared
-                setTimeout(() => {
-                    console.log('🔄 Cart cleared, proceeding with new item...');
-                }, 100);
+            // Set the new shop
+            let shopData;
+            if (product.shopId && typeof product.shopId === 'object') {
+                shopData = {
+                    ...product.shopId,
+                    _id: productShopId,
+                    name: product.shopId.name || 'Shop',
+                    deliveryFee: product.shopId.deliveryFee || 30
+                };
             } else {
-                console.log('🛒 Same shop or no existing shop, proceeding...', {
-                    isDifferentShop,
-                    cartItemsLength: cartItems.length,
-                    reason: !isDifferentShop ? 'Same shop' : 'Empty cart'
-                });
+                shopData = {
+                    _id: productShopId,
+                    name: 'Shop',
+                    deliveryFee: 30
+                };
             }
 
-            // Set or update selected shop
-            if (!selectedShop || !currentShopId || String(currentShopId).trim() !== String(productShopId).trim()) {
-                let shopData;
-                if (product.shopId && typeof product.shopId === 'object') {
-                    // Use the shop data from the product
-                    shopData = {
-                        ...product.shopId,
-                        _id: productShopId,
-                        name: product.shopId.name || 'Shop',
-                        deliveryFee: product.shopId.deliveryFee || 30
-                    };
-                } else {
-                    // Fallback shop data
-                    shopData = {
-                        _id: productShopId,
-                        name: 'Shop',
-                        deliveryFee: 30
-                    };
+            console.log('🛒 Setting selected shop:', shopData);
+            setSelectedShop(shopData);
+
+            // Add item to cart
+            setCartItems(prevItems => {
+                const existingItem = prevItems.find(item => item._id === product._id);
+
+                if (existingItem) {
+                    console.log('📦 Updating existing item quantity:', product.name);
+                    return prevItems.map(item =>
+                        item._id === product._id
+                            ? {
+                                ...item,
+                                quantity: item.quantity + quantity,
+                                notes: notes || item.notes,
+                                updatedAt: new Date().toISOString()
+                            }
+                            : item
+                    );
                 }
-                console.log('🛒 Setting selected shop:', shopData);
-                setSelectedShop(shopData);
-            }
 
-            // Check if we just cleared the cart due to shop switch
-            if (isDifferentShop && cartItems.length > 0) {
-                console.log('🔄 Shop switch detected, adding item to empty cart...');
-                // Add the item to an empty cart
-                setCartItems([{
+                console.log('📦 Adding new item to cart:', product.name);
+                return [...prevItems, {
                     ...product,
                     quantity,
                     notes,
                     addedAt: new Date().toISOString()
-                }]);
-            } else {
-                setCartItems(prevItems => {
-                    const existingItem = prevItems.find(item => item._id === product._id);
-
-                    if (existingItem) {
-                        console.log('📦 Updating existing item quantity:', product.name);
-                        return prevItems.map(item =>
-                            item._id === product._id
-                                ? {
-                                    ...item,
-                                    quantity: item.quantity + quantity,
-                                    notes: notes || item.notes,
-                                    updatedAt: new Date().toISOString()
-                                }
-                                : item
-                        );
-                    }
-
-                    console.log('📦 Adding new item to cart:', product.name);
-                    return [...prevItems, {
-                        ...product,
-                        quantity,
-                        notes,
-                        addedAt: new Date().toISOString()
-                    }];
-                });
-            }
+                }];
+            });
 
             return true;
         } catch (error) {

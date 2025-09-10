@@ -431,6 +431,33 @@ const ShopPage = () => {
                                         Debug: "{shop.name}" (ID: {shop._id})
                                     </small>
                                 )}
+                                {process.env.NODE_ENV === 'development' && (
+                                    <button
+                                        onClick={() => {
+                                            console.log('🔍 DEBUG CART STATE:');
+                                            console.log('Selected Shop:', selectedShop);
+                                            console.log('Cart Items:', cartItems);
+                                            console.log('Cart Items Count:', cartItems.length);
+                                            if (cartItems.length > 0) {
+                                                console.log('First Cart Item Shop ID:', cartItems[0].shopId?._id || cartItems[0].shopId);
+                                                console.log('Current Shop ID:', shop._id);
+                                                console.log('Are they different?', (cartItems[0].shopId?._id || cartItems[0].shopId) !== shop._id);
+                                            }
+                                        }}
+                                        style={{
+                                            marginLeft: '10px',
+                                            padding: '5px 10px',
+                                            fontSize: '10px',
+                                            background: 'rgba(255,255,255,0.2)',
+                                            border: '1px solid rgba(255,255,255,0.3)',
+                                            borderRadius: '4px',
+                                            color: 'white',
+                                            cursor: 'pointer'
+                                        }}
+                                    >
+                                        Debug Cart
+                                    </button>
+                                )}
                             </h1>
                             <p className="shop-description">{shop.description || 'Welcome to our shop!'}</p>
 
