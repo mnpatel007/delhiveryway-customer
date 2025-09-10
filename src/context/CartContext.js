@@ -63,6 +63,14 @@ export const CartProvider = ({ children }) => {
 
     const addToCart = (product, quantity = 1, notes = '') => {
         try {
+            console.log('🚀 ADD TO CART CALLED:', {
+                productName: product?.name,
+                productId: product?._id,
+                currentCartItems: cartItems.length,
+                selectedShopName: selectedShop?.name,
+                selectedShopId: selectedShop?._id
+            });
+
             // Validate product data
             if (!product || !product._id) {
                 console.error('❌ Invalid product data:', product);
@@ -109,15 +117,17 @@ export const CartProvider = ({ children }) => {
 
             // Check if product is from a different shop and we have items in cart
             if (isDifferentShop && cartItems.length > 0) {
-                console.log('🛒 Different shop detected! Showing confirmation dialog...');
+                console.log('🚨 DIFFERENT SHOP DETECTED! SHOULD SHOW CONFIRMATION DIALOG!');
+                console.log('🚨 Current shop:', currentShopName, 'New shop:', product.shopId?.name);
 
                 // Get shop names for the dialog
                 const currentShopName = selectedShop?.name || 'Unknown Shop';
                 const newShopName = product.shopId?.name || 'New Shop';
 
                 // Show confirmation dialog
-                const confirmMessage = `You have items from "${currentShopName}" in your cart.\n\nAdding items from "${newShopName}" will clear your current cart.\n\nDo you want to continue?`;
+                const confirmMessage = `🛒 SHOP CHANGE REQUIRED\n\nYou have ${cartItems.length} items from "${currentShopName}" in your cart.\n\nAdding items from "${newShopName}" will clear your current cart.\n\nDo you want to continue?`;
 
+                console.log('🚨 SHOWING CONFIRMATION DIALOG:', confirmMessage);
                 const confirmSwitch = window.confirm(confirmMessage);
 
                 if (!confirmSwitch) {
@@ -135,13 +145,12 @@ export const CartProvider = ({ children }) => {
 
                 // Show notification
                 console.log(`✅ Cart cleared! Switching to "${newShopName}"`);
-
-                // Small delay to ensure state is updated
-                setTimeout(() => {
-                    console.log('🔄 Proceeding with adding item to new shop...');
-                }, 50);
             } else {
-                console.log('🛒 Same shop or no existing shop, proceeding...');
+                console.log('🛒 Same shop or no existing shop, proceeding...', {
+                    isDifferentShop,
+                    cartItemsLength: cartItems.length,
+                    reason: !isDifferentShop ? 'Same shop' : 'Empty cart'
+                });
             }
 
             // Set or update selected shop
