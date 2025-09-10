@@ -461,7 +461,9 @@ const ShopPage = () => {
                                 <div className="product-content">
                                     <div className="product-header">
                                         <h3 className="product-name">
-                                            {product.name || 'Unnamed Product'}
+                                            <span className="product-name-main">
+                                                {product.name || 'Unnamed Product'}
+                                            </span>
                                         </h3>
 
                                         {product.description ? (
