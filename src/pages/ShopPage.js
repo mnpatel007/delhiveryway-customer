@@ -32,6 +32,7 @@ const ShopPage = () => {
                 console.log('🏪 Shop API response:', shopResult);
 
                 if (shopResult.success) {
+                    console.log('✅ Shop data loaded successfully:', shopResult.data);
                     setShop(shopResult.data);
                 } else {
                     console.error('Failed to fetch shop:', shopResult.message);
@@ -191,6 +192,21 @@ const ShopPage = () => {
             console.log('🛒 Adding product to cart:', product.name);
             console.log('🛒 Current shop data:', shop);
             console.log('🛒 Shop deliveryFee:', shop?.deliveryFee);
+            console.log('🛒 Loading state:', loading);
+
+            // Check if still loading
+            if (loading) {
+                console.error('❌ Still loading shop data');
+                setToast('❌ Please wait, loading shop data...');
+                return;
+            }
+
+            // Check if shop data is loaded
+            if (!shop || !shop._id) {
+                console.error('❌ Shop data not loaded yet');
+                setToast('❌ Shop data not loaded. Please wait...');
+                return;
+            }
 
             // Ensure product has complete shop data including delivery fee
             const productWithShopData = {
@@ -514,10 +530,10 @@ const ShopPage = () => {
                                         <button
                                             onClick={() => handleAddToCart(product)}
                                             className="add-to-cart-btn"
-                                            disabled={!product.inStock}
+                                            disabled={!product.inStock || loading || !shop || !shop._id}
                                         >
                                             <span className="cart-icon">🛒</span>
-                                            {product.inStock ? 'Add to Cart' : 'Out of Stock'}
+                                            {loading ? 'Loading...' : !shop || !shop._id ? 'Loading...' : product.inStock ? 'Add to Cart' : 'Out of Stock'}
                                         </button>
                                     </div>
                                 </div>

@@ -74,6 +74,16 @@ export const CartProvider = ({ children }) => {
                 productShopId = product.shopId;
             } else if (product.shopId?._id) {
                 productShopId = product.shopId._id;
+            } else if (product.shopId && Object.keys(product.shopId).length > 0) {
+                // If shopId is an object but doesn't have _id, try to find it
+                console.warn('⚠️ ShopId object missing _id field:', product.shopId);
+                // Try to extract from the shop object structure
+                if (product.shopId.id) {
+                    productShopId = product.shopId.id;
+                } else {
+                    console.error('❌ Product missing valid shopId:', product);
+                    return false;
+                }
             } else {
                 console.error('❌ Product missing shopId:', product);
                 return false;
