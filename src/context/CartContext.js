@@ -68,14 +68,18 @@ export const CartProvider = ({ children }) => {
                 return false;
             }
 
-            // Get shop ID from product
-            const productShopId = product.shopId?._id || product.shopId;
-            if (!productShopId) {
+            // Get shop ID from product - handle both string and object formats
+            let productShopId;
+            if (typeof product.shopId === 'string') {
+                productShopId = product.shopId;
+            } else if (product.shopId?._id) {
+                productShopId = product.shopId._id;
+            } else {
                 console.error('❌ Product missing shopId:', product);
                 return false;
             }
 
-            // Extract actual shop ID strings for comparison
+            // Extract current shop ID for comparison
             let currentShopId;
             if (selectedShop?.data?.shop?._id) {
                 // Structure: {success: true, data: {shop: {_id: "...", ...}}}
@@ -86,27 +90,48 @@ export const CartProvider = ({ children }) => {
                 currentShopId = selectedShop._id._id;
             }
 
-            const newShopId = typeof productShopId === 'string' ? productShopId : productShopId?._id;
+            const newShopId = productShopId;
 
             console.log('🛒 Shop comparison:', {
                 currentShopId: currentShopId,
                 newShopId: newShopId,
                 currentShopName: selectedShop?.name,
-                newShopName: product.shopId?.name
+                newShopName: product.shopId?.name,
+                areDifferent: currentShopId && newShopId && currentShopId !== newShopId
             });
 
             // Check if product is from a different shop
             if (selectedShop && currentShopId && newShopId && currentShopId !== newShopId) {
+                console.log('🛒 Different shop detected! Showing confirmation dialog...');
+
+                // Create a more user-friendly confirmation dialog
+                const shopName = selectedShop.name || 'the current shop';
+                const newShopName = product.shopId?.name || 'the new shop';
+
                 const confirmSwitch = window.confirm(
-                    `You have items from ${selectedShop.name} in your cart. Adding items from a different shop will clear your current cart. Continue?`
+                    `🛒 Shop Change Required\n\n` +
+                    `You have items from "${shopName}" in your cart.\n\n` +
+                    `Adding items from "${newShopName}" will clear your current cart and switch to the new shop.\n\n` +
+                    `Do you want to continue?`
                 );
 
                 if (!confirmSwitch) {
+                    console.log('🛒 User cancelled shop switch');
                     return false;
                 }
 
+                console.log('🛒 User confirmed shop switch, clearing cart...');
                 // Clear cart and switch shop
                 setCartItems([]);
+
+                // Show a brief notification that cart was cleared
+                if (typeof window !== 'undefined' && window.alert) {
+                    setTimeout(() => {
+                        alert(`✅ Cart cleared! Now shopping at "${product.shopId?.name || 'the new shop'}"`);
+                    }, 100);
+                }
+            } else {
+                console.log('🛒 Same shop or no existing shop, proceeding...');
             }
 
             // Set or update selected shop
