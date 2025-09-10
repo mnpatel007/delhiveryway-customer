@@ -34,31 +34,50 @@ const ShopPage = () => {
 
                 if (shopResult.success && shopResult.data) {
                     console.log('✅ Shop data loaded successfully:', shopResult.data);
+                    console.log('🔍 shopResult.data type:', typeof shopResult.data);
+                    console.log('🔍 shopResult.data keys:', Object.keys(shopResult.data));
                     console.log('🔍 shopResult.data.shop exists?', !!shopResult.data.shop);
                     console.log('🔍 shopResult.data.shop value:', shopResult.data.shop);
                     console.log('🔍 shopResult.data._id exists?', !!shopResult.data._id);
                     console.log('🔍 shopResult.data.name exists?', !!shopResult.data.name);
 
-                    // Extract the shop object - handle both response formats
+                    // Let's see what keys are actually available
+                    console.log('🔍 Available keys in shopResult.data:', Object.keys(shopResult.data));
+
+                    // Check if there are nested objects
+                    Object.keys(shopResult.data).forEach(key => {
+                        const value = shopResult.data[key];
+                        console.log(`🔍 Key "${key}":`, typeof value, value && typeof value === 'object' ? Object.keys(value) : value);
+                    });
+
+                    // Extract the shop object - be more flexible with the structure
                     let shopData = null;
 
-                    // Try nested format first: { data: { shop: {...} } }
-                    if (shopResult.data.shop) {
-                        shopData = shopResult.data.shop;
-                        console.log('✅ Using nested shop data:', shopData);
-                        console.log('✅ Nested shop _id:', shopData._id);
-                        console.log('✅ Nested shop name:', shopData.name);
+                    // Try to find shop data in various possible locations
+                    const possiblePaths = [
+                        shopResult.data.shop,           // { data: { shop: {...} } }
+                        shopResult.data.data?.shop,     // { data: { data: { shop: {...} } } }
+                        shopResult.data,                // { data: {...} } (direct shop)
+                        shopResult.data.data            // { data: { data: {...} } } (nested data)
+                    ];
+
+                    for (let i = 0; i < possiblePaths.length; i++) {
+                        const candidate = possiblePaths[i];
+                        console.log(`🔍 Trying path ${i}:`, candidate);
+
+                        if (candidate && candidate._id && candidate.name) {
+                            shopData = candidate;
+                            console.log(`✅ Found valid shop data at path ${i}:`, {
+                                id: shopData._id,
+                                name: shopData.name
+                            });
+                            break;
+                        }
                     }
-                    // Try direct format: { data: {...} } where data IS the shop
-                    else if (shopResult.data._id && shopResult.data.name) {
+
+                    if (!shopData) {
+                        console.log('❌ No valid shop data found in any path, using raw data...');
                         shopData = shopResult.data;
-                        console.log('✅ Using direct shop data:', shopData);
-                    }
-                    else {
-                        console.log('❌ Neither format matched, trying fallback...');
-                        // Fallback: just use the data as-is and let validation catch issues
-                        shopData = shopResult.data.shop || shopResult.data;
-                        console.log('❌ Fallback shopData:', shopData);
                     }
 
                     // Validate we got valid shop data
