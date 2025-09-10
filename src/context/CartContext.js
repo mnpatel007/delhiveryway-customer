@@ -140,10 +140,10 @@ export const CartProvider = ({ children }) => {
 
                 console.log('🛒 User confirmed shop switch - clearing cart...');
 
-                // Clear cart and shop
+                // Clear cart before proceeding
                 setCartItems([]);
-                setSelectedShop(null);
 
+                // Don't set selectedShop to null here, we'll set it to the new shop below
                 console.log('✅ Cart cleared! Proceeding with new shop...');
             } else if (selectedShop && currentShopId && productShopId && String(currentShopId).trim() === String(productShopId).trim()) {
                 console.log('🛒 SAME SHOP DETECTED - Adding to existing cart');
@@ -177,10 +177,23 @@ export const CartProvider = ({ children }) => {
             }
 
             console.log('🛒 Setting selected shop:', shopData);
+            // Always set the selected shop to the new shop data
             setSelectedShop(shopData);
 
             // Add item to cart
             setCartItems(prevItems => {
+                // If we're switching shops, prevItems should already be empty
+                // But let's make sure we're starting with a clean cart if it's a different shop
+                if (isDifferentShop) {
+                    console.log('📦 Adding first item from new shop:', product.name);
+                    return [{
+                        ...product,
+                        quantity,
+                        notes,
+                        addedAt: new Date().toISOString()
+                    }];
+                }
+
                 const existingItem = prevItems.find(item => item._id === product._id);
 
                 if (existingItem) {
