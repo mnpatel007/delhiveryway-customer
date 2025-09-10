@@ -87,6 +87,8 @@ export const CartProvider = ({ children }) => {
 
             console.log('🔍 Product shop ID extracted:', productShopId);
             console.log('🔍 Product shopId object:', product.shopId);
+            console.log('🔍 Product shopId type:', typeof product.shopId);
+            console.log('🔍 Product shopId keys:', product.shopId ? Object.keys(product.shopId) : 'null');
 
             if (!productShopId) {
                 console.error('❌ Could not extract shop ID from product:', product);
@@ -112,17 +114,28 @@ export const CartProvider = ({ children }) => {
                 newShopName: product.shopId?.name,
                 isDifferentShop: isDifferentShop,
                 hasSelectedShop: !!selectedShop,
-                cartItemsCount: cartItems.length
+                cartItemsCount: cartItems.length,
+                shopIdComparison: `${currentShopId} !== ${productShopId} = ${currentShopId !== productShopId}`
+            });
+
+            console.log('🛒 Detailed shop comparison:', {
+                selectedShopExists: !!selectedShop,
+                currentShopIdExists: !!currentShopId,
+                productShopIdExists: !!productShopId,
+                shopIdsEqual: currentShopId === productShopId,
+                cartHasItems: cartItems.length > 0,
+                shouldShowDialog: isDifferentShop && cartItems.length > 0
             });
 
             // Check if product is from a different shop and we have items in cart
             if (isDifferentShop && cartItems.length > 0) {
                 console.log('🚨 DIFFERENT SHOP DETECTED! SHOULD SHOW CONFIRMATION DIALOG!');
-                console.log('🚨 Current shop:', currentShopName, 'New shop:', product.shopId?.name);
 
                 // Get shop names for the dialog
                 const currentShopName = selectedShop?.name || 'Unknown Shop';
                 const newShopName = product.shopId?.name || 'New Shop';
+
+                console.log('🚨 Current shop:', currentShopName, 'New shop:', newShopName);
 
                 // Show confirmation dialog
                 const confirmMessage = `🛒 SHOP CHANGE REQUIRED\n\nYou have ${cartItems.length} items from "${currentShopName}" in your cart.\n\nAdding items from "${newShopName}" will clear your current cart.\n\nDo you want to continue?`;
