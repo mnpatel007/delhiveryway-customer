@@ -34,37 +34,44 @@ const ShopPage = () => {
 
                 if (shopResult.success && shopResult.data) {
                     console.log('✅ Shop data loaded successfully:', shopResult.data);
-                    console.log('🔍 Checking shopResult.data.shop:', shopResult.data.shop);
-                    console.log('🔍 Checking shopResult.data._id:', shopResult.data._id);
 
-                    // Extract the shop object from the nested data structure
-                    let shopData;
-                    if (shopResult.data.shop && shopResult.data.shop._id) {
-                        // API returns: { success: true, data: { shop: {...} } }
+                    // Extract the shop object - handle both response formats
+                    let shopData = null;
+
+                    // Try nested format first: { data: { shop: {...} } }
+                    if (shopResult.data.shop) {
                         shopData = shopResult.data.shop;
-                        console.log('✅ Using shopResult.data.shop');
-                    } else if (shopResult.data._id) {
-                        // API returns: { success: true, data: {...} } (direct shop object)
+                        console.log('✅ Using nested shop data:', shopData);
+                    }
+                    // Try direct format: { data: {...} } where data IS the shop
+                    else if (shopResult.data._id && shopResult.data.name) {
                         shopData = shopResult.data;
-                        console.log('✅ Using shopResult.data directly');
-                    } else {
-                        console.error('❌ Unexpected shop data structure:', shopResult.data);
-                        console.error('❌ shopResult.data.shop exists?', !!shopResult.data.shop);
-                        console.error('❌ shopResult.data._id exists?', !!shopResult.data._id);
+                        console.log('✅ Using direct shop data:', shopData);
+                    }
+
+                    // Validate we got valid shop data
+                    if (!shopData || !shopData._id || !shopData.name) {
+                        console.error('❌ Invalid shop data structure:', {
+                            hasShopData: !!shopData,
+                            hasId: !!shopData?._id,
+                            hasName: !!shopData?.name,
+                            rawData: shopResult.data
+                        });
                         setError('Invalid shop data received');
                         return;
                     }
 
-                    console.log('✅ Shop object extracted:', shopData);
-                    console.log('✅ Shop name from API:', shopData?.name);
-
-                    if (!shopData || !shopData.name) {
-                        console.error('❌ Shop data missing name field:', shopData);
-                        setError('Shop data is incomplete');
-                        return;
-                    }
+                    console.log('✅ Shop extracted successfully:', {
+                        id: shopData._id,
+                        name: shopData.name,
+                        description: shopData.description
+                    });
 
                     setShop(shopData);
+
+                    // Immediately update cart context with proper shop data
+                    console.log('🔄 Immediately updating cart context with shop:', shopData.name);
+                    setSelectedShop(shopData);
                 } else {
                     console.error('Failed to fetch shop:', shopResult.message);
                     setShop(null);
