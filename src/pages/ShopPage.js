@@ -17,7 +17,7 @@ const ShopPage = () => {
     const [selectedCategory, setSelectedCategory] = useState('all');
     const [sortBy, setSortBy] = useState('name');
     const [viewMode, setViewMode] = useState('grid');
-    const { addToCart } = useContext(CartContext);
+    const { addToCart, selectedShop, setSelectedShop } = useContext(CartContext);
 
     useEffect(() => {
         const fetchShopAndProducts = async () => {
@@ -33,7 +33,10 @@ const ShopPage = () => {
 
                 if (shopResult.success) {
                     console.log('✅ Shop data loaded successfully:', shopResult.data);
-                    setShop(shopResult.data);
+                    // Extract the shop object from the nested data structure
+                    const shopData = shopResult.data?.shop || shopResult.data;
+                    setShop(shopData);
+                    console.log('✅ Shop object set:', shopData);
                 } else {
                     console.error('Failed to fetch shop:', shopResult.message);
                     setShop(null);
@@ -187,6 +190,14 @@ const ShopPage = () => {
         setFilteredProducts(filtered);
     }, [products, searchTerm, selectedCategory, sortBy]);
 
+    // Update selected shop in cart context when shop data loads
+    useEffect(() => {
+        if (shop && shop._id && (!selectedShop || selectedShop._id !== shop._id)) {
+            console.log('🔄 Updating selected shop in cart context:', shop.name);
+            setSelectedShop(shop);
+        }
+    }, [shop, selectedShop, setSelectedShop]);
+
     const handleAddToCart = (product) => {
         try {
             console.log('🛒 Adding product to cart:', product.name);
@@ -194,13 +205,13 @@ const ShopPage = () => {
             console.log('🛒 Shop deliveryFee:', shop?.deliveryFee);
             console.log('🛒 Loading state:', loading);
 
-            // Create a basic shop object if shop data is not loaded yet
+            // Use the loaded shop data or create a fallback
             let shopData = shop;
             if (!shop || !shop._id) {
                 console.warn('⚠️ Shop data not fully loaded, using fallback');
                 shopData = {
                     _id: id, // Use the shop ID from URL params
-                    name: 'Loading Shop...',
+                    name: 'Shop', // Better fallback name
                     deliveryFee: 30 // Default delivery fee
                 };
             }

@@ -422,6 +422,7 @@ export const CartProvider = ({ children }) => {
     const value = {
         cartItems,
         selectedShop,
+        setSelectedShop,
         addToCart,
         removeFromCart,
         updateQuantity,
