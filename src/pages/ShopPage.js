@@ -520,7 +520,8 @@ const ShopPage = () => {
                                 border: 'none',
                                 borderRadius: '4px',
                                 color: 'black',
-                                cursor: 'pointer'
+                                cursor: 'pointer',
+                                marginTop: '5px'
                             }}
                         >
                             Force Clear

@@ -120,23 +120,12 @@ export const CartProvider = ({ children }) => {
                 stringComparison: `"${currentShopId}" !== "${productShopId}" = ${String(currentShopId) !== String(productShopId)}`
             });
 
-            // If different shop and cart has items, show confirmation
+            // If different shop and cart has items, automatically clear cart and show alert
             if (isDifferentShop && cartItems.length > 0) {
-                console.log('🚨 DIFFERENT SHOP DETECTED!');
+                console.log('🚨 DIFFERENT SHOP DETECTED! Auto-clearing cart...');
 
                 const currentShopName = selectedShop?.name || 'Current Shop';
                 const newShopName = product.shopId?.name || 'New Shop';
-
-                const confirmMessage = `🛒 SHOP CHANGE REQUIRED\n\nYou have ${cartItems.length} items from "${currentShopName}" in your cart.\n\nAdding items from "${newShopName}" will clear your current cart.\n\nDo you want to continue?`;
-
-                const confirmSwitch = window.confirm(confirmMessage);
-
-                if (!confirmSwitch) {
-                    console.log('🛒 User cancelled shop switch');
-                    return false;
-                }
-
-                console.log('🛒 User confirmed shop switch, clearing cart...');
 
                 // CLEAR EVERYTHING IMMEDIATELY
                 setCartItems([]);
@@ -145,6 +134,9 @@ export const CartProvider = ({ children }) => {
                 localStorage.removeItem('selectedShop');
 
                 console.log('✅ Cart and shop cleared!');
+
+                // Show alert
+                alert(`Your cart has been cleared as you have selected items from other shops.`);
             } else if (selectedShop && currentShopId && productShopId && String(currentShopId).trim() === String(productShopId).trim()) {
                 console.log('🛒 SAME SHOP DETECTED - Adding to existing cart');
             } else {
