@@ -17,7 +17,7 @@ const ShopPage = () => {
     const [selectedCategory, setSelectedCategory] = useState('all');
     const [sortBy, setSortBy] = useState('name');
     const [viewMode, setViewMode] = useState('grid');
-    const { addToCart, selectedShop, setSelectedShop } = useContext(CartContext);
+    const { addToCart, selectedShop, setSelectedShop, cartItems } = useContext(CartContext);
 
     useEffect(() => {
         const fetchShopAndProducts = async () => {
