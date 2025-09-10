@@ -109,9 +109,15 @@ export const CartProvider = ({ children }) => {
             console.log('🛒 SIMPLIFIED SHOP COMPARISON:', {
                 currentShopId: currentShopId,
                 productShopId: productShopId,
+                currentShopIdType: typeof currentShopId,
+                productShopIdType: typeof productShopId,
+                currentShopIdLength: currentShopId ? currentShopId.length : 0,
+                productShopIdLength: productShopId ? productShopId.length : 0,
                 isDifferentShop: isDifferentShop,
                 cartItemsCount: cartItems.length,
-                shouldShowDialog: isDifferentShop && cartItems.length > 0
+                shouldShowDialog: isDifferentShop && cartItems.length > 0,
+                comparison: `${currentShopId} !== ${productShopId} = ${currentShopId !== productShopId}`,
+                stringComparison: `"${currentShopId}" !== "${productShopId}" = ${String(currentShopId) !== String(productShopId)}`
             });
 
             // If different shop and cart has items, show confirmation
@@ -139,6 +145,15 @@ export const CartProvider = ({ children }) => {
                 localStorage.removeItem('selectedShop');
 
                 console.log('✅ Cart and shop cleared!');
+            } else if (selectedShop && currentShopId && productShopId && String(currentShopId).trim() === String(productShopId).trim()) {
+                console.log('🛒 SAME SHOP DETECTED - Adding to existing cart');
+            } else {
+                console.log('🛒 NO SHOP COMPARISON POSSIBLE:', {
+                    hasSelectedShop: !!selectedShop,
+                    hasCurrentShopId: !!currentShopId,
+                    hasProductShopId: !!productShopId,
+                    reason: !selectedShop ? 'No selected shop' : !currentShopId ? 'No current shop ID' : 'No product shop ID'
+                });
             }
 
             // Set the new shop

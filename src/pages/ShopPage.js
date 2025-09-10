@@ -497,10 +497,33 @@ const ShopPage = () => {
                                 border: 'none',
                                 borderRadius: '4px',
                                 color: 'white',
-                                cursor: 'pointer'
+                                cursor: 'pointer',
+                                marginRight: '5px',
+                                marginBottom: '5px'
                             }}
                         >
                             Test Add Item
+                        </button>
+                        <button
+                            onClick={() => {
+                                // Force clear cart and reset shop
+                                console.log('🧹 FORCE CLEARING EVERYTHING...');
+                                clearCart();
+                                setSelectedShop(null);
+                                console.log('✅ Everything cleared!');
+                                alert('Cart and shop cleared!');
+                            }}
+                            style={{
+                                padding: '8px 12px',
+                                fontSize: '12px',
+                                background: '#ffc107',
+                                border: 'none',
+                                borderRadius: '4px',
+                                color: 'black',
+                                cursor: 'pointer'
+                            }}
+                        >
+                            Force Clear
                         </button>
                     </div>
 
