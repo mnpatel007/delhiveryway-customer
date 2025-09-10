@@ -89,6 +89,12 @@ export const CartProvider = ({ children }) => {
                 return false;
             }
 
+            // Validate that we have a valid shop ID
+            if (!productShopId || productShopId === 'undefined' || productShopId === 'null') {
+                console.error('❌ Invalid shop ID:', productShopId);
+                return false;
+            }
+
             // Extract current shop ID for comparison
             let currentShopId;
             if (selectedShop?.data?.shop?._id) {

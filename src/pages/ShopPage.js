@@ -194,24 +194,21 @@ const ShopPage = () => {
             console.log('🛒 Shop deliveryFee:', shop?.deliveryFee);
             console.log('🛒 Loading state:', loading);
 
-            // Check if still loading
-            if (loading) {
-                console.error('❌ Still loading shop data');
-                setToast('❌ Please wait, loading shop data...');
-                return;
-            }
-
-            // Check if shop data is loaded
+            // Create a basic shop object if shop data is not loaded yet
+            let shopData = shop;
             if (!shop || !shop._id) {
-                console.error('❌ Shop data not loaded yet');
-                setToast('❌ Shop data not loaded. Please wait...');
-                return;
+                console.warn('⚠️ Shop data not fully loaded, using fallback');
+                shopData = {
+                    _id: id, // Use the shop ID from URL params
+                    name: 'Loading Shop...',
+                    deliveryFee: 30 // Default delivery fee
+                };
             }
 
             // Ensure product has complete shop data including delivery fee
             const productWithShopData = {
                 ...product,
-                shopId: shop // Pass the complete shop object with delivery fee
+                shopId: shopData // Pass the shop data (loaded or fallback)
             };
 
             console.log('🛒 Product with shop data:', productWithShopData);
@@ -530,10 +527,10 @@ const ShopPage = () => {
                                         <button
                                             onClick={() => handleAddToCart(product)}
                                             className="add-to-cart-btn"
-                                            disabled={!product.inStock || loading || !shop || !shop._id}
+                                            disabled={!product.inStock}
                                         >
                                             <span className="cart-icon">🛒</span>
-                                            {loading ? 'Loading...' : !shop || !shop._id ? 'Loading...' : product.inStock ? 'Add to Cart' : 'Out of Stock'}
+                                            {product.inStock ? 'Add to Cart' : 'Out of Stock'}
                                         </button>
                                     </div>
                                 </div>
