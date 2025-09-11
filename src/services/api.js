@@ -170,6 +170,11 @@ export const paymentAPI = {
     getSession: (sessionId) => api.get(`/payment/session/${sessionId}`),
 };
 
+// Contact API
+export const contactAPI = {
+    send: (data) => api.post('/contact', data),
+};
+
 // Utility functions for better error handling
 export const handleApiError = (error) => {
     // Network error

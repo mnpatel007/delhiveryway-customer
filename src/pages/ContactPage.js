@@ -1,15 +1,13 @@
 import React, { useState } from 'react';
 import './ContactPage.css';
+import { contactAPI } from '../services/api';
 
 const ContactPage = () => {
     const [formData, setFormData] = useState({
         name: '',
         email: '',
-        phone: '',
         subject: '',
-        category: 'general',
-        message: '',
-        priority: 'medium'
+        message: ''
     });
     const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -23,27 +21,29 @@ const ContactPage = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (!formData.name.trim() || !formData.email.trim() || !formData.message.trim()) {
+            alert('Please fill in your name, email, and message.');
+            return;
+        }
         setIsSubmitting(true);
 
         try {
-            const emailBody = `New Contact Form Submission\n\nName: ${formData.name}\nEmail: ${formData.email}\nPhone: ${formData.phone || 'Not provided'}\nCategory: ${formData.category}\nPriority: ${formData.priority}\nSubject: ${formData.subject}\n\nMessage:\n${formData.message}\n\n---\nSent from DelhiveryWay Contact Form`;
-
-            const mailtoLink = `mailto:delhiverywayiit@gmail.com?subject=Contact Form: ${encodeURIComponent(formData.subject)}&body=${encodeURIComponent(emailBody)}`;
-
-            window.location.href = mailtoLink;
-
-            alert('Your email client will open to send the message.');
-            setFormData({
-                name: '',
-                email: '',
-                phone: '',
-                subject: '',
-                category: 'general',
-                message: '',
-                priority: 'medium'
+            const res = await contactAPI.send({
+                name: formData.name.trim(),
+                email: formData.email.trim(),
+                subject: formData.subject.trim(),
+                message: formData.message.trim(),
             });
+
+            if (res?.data?.success || res?.success) {
+                alert('✅ Message sent successfully. We will get back to you soon.');
+                setFormData({ name: '', email: '', subject: '', message: '' });
+            } else {
+                const msg = res?.data?.message || res?.message || 'Failed to send your message. Please try again later.';
+                alert(`❌ ${msg}`);
+            }
         } catch (error) {
-            alert('Failed to open email client. Please email us directly at delhiverywayiit@gmail.com');
+            alert('❌ Failed to send your message. Please try again later.');
         } finally {
             setIsSubmitting(false);
         }
@@ -54,7 +54,7 @@ const ContactPage = () => {
             <div className="contact-hero">
                 <div className="contact-hero-content">
                     <h1>Contact Us</h1>
-                    <p>We're here to help! Get in touch with our support team.</p>
+                    <p>We typically respond within 24 hours.</p>
                 </div>
             </div>
 
@@ -62,60 +62,15 @@ const ContactPage = () => {
                 <div className="contact-content">
                     <div className="contact-info">
                         <h2>Get in Touch</h2>
-                        <p>Have questions, concerns, or feedback? We'd love to hear from you!</p>
+                        <p>For any queries or support, reach us at:</p>
 
                         <div className="contact-methods">
                             <div className="contact-method">
                                 <div className="method-icon">📧</div>
                                 <div className="method-details">
                                     <h3>Email Support</h3>
-                                    <p>delhiverywayiit@gmail.com</p>
+                                    <p>meetnp007@gmail.com</p>
                                     <span>Response within 24 hours</span>
-                                </div>
-                            </div>
-
-                            <div className="contact-method">
-                                <div className="method-icon">📞</div>
-                                <div className="method-details">
-                                    <h3>Phone Support</h3>
-                                    <p>+91 93130 34669</p>
-                                    <span>Mon-Sat, 9 AM - 8 PM</span>
-                                </div>
-                            </div>
-
-                            <div className="contact-method">
-                                <div className="method-icon">💬</div>
-                                <div className="method-details">
-                                    <h3>Live Chat</h3>
-                                    <p>Available on website</p>
-                                    <span>Mon-Sat, 9 AM - 8 PM</span>
-                                </div>
-                            </div>
-
-                            <div className="contact-method">
-                                <div className="method-icon">📍</div>
-                                <div className="method-details">
-                                    <h3>Office Address</h3>
-                                    <p>123 Business District<br />New Delhi, India 110001</p>
-                                    <span>Visit by appointment</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="faq-section">
-                            <h3>Quick Help</h3>
-                            <div className="faq-items">
-                                <div className="faq-item">
-                                    <strong>Order Issues:</strong> Track orders, delivery problems, refunds
-                                </div>
-                                <div className="faq-item">
-                                    <strong>Account Help:</strong> Login issues, profile updates, password reset
-                                </div>
-                                <div className="faq-item">
-                                    <strong>Payment Support:</strong> Payment failures, billing questions
-                                </div>
-                                <div className="faq-item">
-                                    <strong>Shop Inquiries:</strong> Partner with us, shop registration
                                 </div>
                             </div>
                         </div>
@@ -154,63 +109,15 @@ const ContactPage = () => {
 
                             <div className="form-row">
                                 <div className="form-group">
-                                    <label htmlFor="phone">Phone Number</label>
-                                    <input
-                                        type="tel"
-                                        id="phone"
-                                        name="phone"
-                                        value={formData.phone}
-                                        onChange={handleInputChange}
-                                        placeholder="Enter your phone number"
-                                    />
-                                </div>
-                                <div className="form-group">
-                                    <label htmlFor="category">Category *</label>
-                                    <select
-                                        id="category"
-                                        name="category"
-                                        value={formData.category}
-                                        onChange={handleInputChange}
-                                        required
-                                    >
-                                        <option value="general">General Inquiry</option>
-                                        <option value="order">Order Support</option>
-                                        <option value="payment">Payment Issue</option>
-                                        <option value="account">Account Help</option>
-                                        <option value="technical">Technical Issue</option>
-                                        <option value="partnership">Partnership</option>
-                                        <option value="complaint">Complaint</option>
-                                        <option value="feedback">Feedback</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div className="form-row">
-                                <div className="form-group">
-                                    <label htmlFor="subject">Subject *</label>
+                                    <label htmlFor="subject">Subject</label>
                                     <input
                                         type="text"
                                         id="subject"
                                         name="subject"
                                         value={formData.subject}
                                         onChange={handleInputChange}
-                                        required
                                         placeholder="Brief description of your inquiry"
                                     />
-                                </div>
-                                <div className="form-group">
-                                    <label htmlFor="priority">Priority</label>
-                                    <select
-                                        id="priority"
-                                        name="priority"
-                                        value={formData.priority}
-                                        onChange={handleInputChange}
-                                    >
-                                        <option value="low">Low</option>
-                                        <option value="medium">Medium</option>
-                                        <option value="high">High</option>
-                                        <option value="urgent">Urgent</option>
-                                    </select>
                                 </div>
                             </div>
 
