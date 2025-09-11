@@ -69,7 +69,7 @@ const ContactPage = () => {
                                 <div className="method-icon">📧</div>
                                 <div className="method-details">
                                     <h3>Email Support</h3>
-                                    <p>meetnp007@gmail.com</p>
+                                    <p>delhiveryway@gmail.com</p>
                                     <span>Response within 24 hours</span>
                                 </div>
                             </div>
