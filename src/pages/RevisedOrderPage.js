@@ -20,6 +20,7 @@ const RevisedOrderPage = () => {
     const [order, setOrder] = useState(null);
     const [loading, setLoading] = useState(true);
     const [approving, setApproving] = useState(false);
+    const [cancelling, setCancelling] = useState(false);
     const [error, setError] = useState('');
 
     // --- Helpers ----------------------------------------------------------------
@@ -120,12 +121,10 @@ const RevisedOrderPage = () => {
     const handleApproveRevision = async () => {
         try {
             setApproving(true);
-            // Use a single consistent endpoint and method
             const response = await api.post(`/orders/${orderId}/approve-revision`);
             if (response?.data?.success === false) {
                 throw new Error(response?.data?.message || 'Failed to approve revision');
             }
-
             navigate(`/orders/${orderId}`, {
                 state: {
                     message:
@@ -136,6 +135,23 @@ const RevisedOrderPage = () => {
             console.error('Error approving revision:', err);
             setError(err?.message || 'Failed to approve order changes');
             setApproving(false);
+        }
+    };
+
+    const handleCancelOrder = async () => {
+        try {
+            const confirmMsg = 'Are you sure you want to cancel this order? Your shopper will be notified.';
+            if (!window.confirm(confirmMsg)) return;
+            setCancelling(true);
+            const response = await api.put(`/orders/${orderId}/cancel`, { reason: 'Customer cancelled during revised order review' });
+            if (response?.data?.success === false) {
+                throw new Error(response?.data?.message || 'Failed to cancel order');
+            }
+            navigate('/orders', { state: { message: 'Order cancelled successfully.' } });
+        } catch (err) {
+            console.error('Error cancelling order:', err);
+            setError(err?.message || 'Failed to cancel order');
+            setCancelling(false);
         }
     };
 
@@ -377,6 +393,13 @@ const RevisedOrderPage = () => {
                     <div className="confirmation-actions">
                         <button className="btn btn-secondary" onClick={() => navigate('/orders')}>
                             View All Orders
+                        </button>
+                        <button
+                            className="btn btn-danger"
+                            onClick={handleCancelOrder}
+                            disabled={cancelling}
+                        >
+                            {cancelling ? 'Cancelling...' : 'Cancel Order'}
                         </button>
                         <button
                             className="btn btn-primary"
