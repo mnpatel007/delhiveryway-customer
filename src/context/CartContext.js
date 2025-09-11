@@ -63,13 +63,6 @@ export const CartProvider = ({ children }) => {
 
     const addToCart = (product, quantity = 1, notes = '') => {
         try {
-            console.log('🚀 ADD TO CART CALLED:', {
-                productName: product?.name,
-                productId: product?._id,
-                currentCartItems: cartItems.length,
-                selectedShopName: selectedShop?.name,
-                selectedShopId: selectedShop?._id
-            });
 
             // Validate product data
             if (!product || !product._id) {
@@ -85,9 +78,6 @@ export const CartProvider = ({ children }) => {
                 productShopId = product.shopId._id;
             }
 
-            console.log('🔍 Product shop ID extracted:', productShopId);
-            console.log('🔍 Product shopId:', product.shopId);
-            console.log('🔍 Product shopData:', product.shopData);
 
             if (!productShopId) {
                 console.error('❌ Could not extract shop ID from product:', product);
@@ -100,65 +90,23 @@ export const CartProvider = ({ children }) => {
                 currentShopId = selectedShop._id;
             }
 
-            console.log('🔍 Current shop ID:', currentShopId);
-            console.log('🔍 Selected shop object:', selectedShop);
 
             // SIMPLIFIED LOGIC: Check if we're switching shops
             const isDifferentShop = selectedShop && currentShopId && productShopId &&
                 String(currentShopId).trim() !== String(productShopId).trim();
 
-            console.log('🛒 SIMPLIFIED SHOP COMPARISON:', {
-                currentShopId: currentShopId,
-                productShopId: productShopId,
-                currentShopIdType: typeof currentShopId,
-                productShopIdType: typeof productShopId,
-                currentShopIdLength: currentShopId ? currentShopId.length : 0,
-                productShopIdLength: productShopId ? productShopId.length : 0,
-                isDifferentShop: isDifferentShop,
-                cartItemsCount: cartItems.length,
-                shouldShowDialog: isDifferentShop && cartItems.length > 0,
-                comparison: `${currentShopId} !== ${productShopId} = ${currentShopId !== productShopId}`,
-                stringComparison: `"${currentShopId}" !== "${productShopId}" = ${String(currentShopId) !== String(productShopId)}`
-            });
 
-            // If different shop and cart has items, ask for confirmation
+            // If different shop and cart has items, automatically clear cart
             if (isDifferentShop && cartItems.length > 0) {
-                console.log('🚨 DIFFERENT SHOP DETECTED! Showing confirmation...');
 
-                const currentShopName = selectedShop?.name || 'Current Shop';
-                const newShopName = product.shopData?.name || product.shopId?.name || 'New Shop';
-
-                // Show confirmation dialog
-                const confirmMessage = `You have ${cartItems.length} items from "${currentShopName}" in your cart.\n\nAdding items from "${newShopName}" will clear your current cart.\n\nDo you want to continue?`;
-
-                const userConfirmed = window.confirm(confirmMessage);
-
-                if (!userConfirmed) {
-                    console.log('🛒 User cancelled shop switch');
-                    return false;
-                }
-
-                console.log('🛒 User confirmed shop switch - clearing cart...');
-
-                // Clear both cart and shop from localStorage
-                localStorage.removeItem('customerCart');
-
-                // We don't remove selectedShop from localStorage here because we'll set it to the new shop
-
-                // Force clear cart in memory before proceeding
+                // CLEAR EVERYTHING IMMEDIATELY
                 setCartItems([]);
+                localStorage.removeItem('customerCart');
+                setSelectedShop(null);
+                localStorage.removeItem('selectedShop');
 
-                // Don't set selectedShop to null here, we'll set it to the new shop below
-                console.log('✅ Cart cleared! Proceeding with new shop...');
-            } else if (selectedShop && currentShopId && productShopId && String(currentShopId).trim() === String(productShopId).trim()) {
-                console.log('🛒 SAME SHOP DETECTED - Adding to existing cart');
-            } else {
-                console.log('🛒 NO SHOP COMPARISON POSSIBLE:', {
-                    hasSelectedShop: !!selectedShop,
-                    hasCurrentShopId: !!currentShopId,
-                    hasProductShopId: !!productShopId,
-                    reason: !selectedShop ? 'No selected shop' : !currentShopId ? 'No current shop ID' : 'No product shop ID'
-                });
+                // Show alert
+                alert('Your cart has been cleared as you have selected items from other shops.');
             }
 
             // Set the new shop
