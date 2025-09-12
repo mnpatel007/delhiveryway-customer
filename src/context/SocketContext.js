@@ -371,6 +371,11 @@ export const SocketProvider = ({ children }) => {
                     '✅ Order Accepted!',
                     `Your order has been accepted by ${data.shopperName || 'a personal shopper'}`
                 );
+
+                // Gentle in-page prompt
+                setTimeout(() => {
+                    alert('✅ Your shopper accepted the order. We\'ll keep you posted at each step.');
+                }, 500);
             });
 
             // Listen for order revised by shopper
@@ -390,6 +395,15 @@ export const SocketProvider = ({ children }) => {
                     '📝 Order Revision Required',
                     'Your order has been revised. Please review the changes.'
                 );
+
+                // Optional: prompt to view revised order page
+                setTimeout(() => {
+                    if (window.confirm('Your order has been revised. Would you like to review the changes now?')) {
+                        if (data.orderId) {
+                            window.location.href = `/revised-order/${data.orderId}`;
+                        }
+                    }
+                }, 500);
             });
 
             // Listen for shopper location updates
