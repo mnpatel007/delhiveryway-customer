@@ -175,6 +175,20 @@ export const contactAPI = {
     send: (data) => api.post('/contact', data),
 };
 
+// Generic API call helper used by pages like Signup
+// Usage: const result = await apiCall(authAPI.signup, payload)
+export const apiCall = async (requestFn, payload) => {
+    try {
+        const res = await requestFn(payload);
+        // Normalize common response shapes
+        if (res?.data) return res.data;
+        return { success: true, data: res };
+    } catch (error) {
+        const parsed = handleApiError(error);
+        return { success: false, message: parsed.message, error: parsed };
+    }
+};
+
 // Utility functions for better error handling
 export const handleApiError = (error) => {
     // Network error

@@ -7,6 +7,7 @@ const SignupPage = () => {
     const [formData, setFormData] = useState({
         name: '',
         email: '',
+        phone: '',
         password: '',
         confirmPassword: ''
     });
@@ -44,6 +45,13 @@ const SignupPage = () => {
             newErrors.email = 'Email is required';
         } else if (!emailRegex.test(formData.email)) {
             newErrors.email = 'Invalid email format';
+        }
+
+        const phoneRegex = /^[0-9]{10}$/;
+        if (!formData.phone.trim()) {
+            newErrors.phone = 'Phone number is required';
+        } else if (!phoneRegex.test(formData.phone)) {
+            newErrors.phone = 'Enter a valid 10-digit phone number';
         }
 
         if (!formData.password) {
@@ -221,6 +229,25 @@ const SignupPage = () => {
 
                             <div className="input-group">
                                 <div className="input-wrapper">
+                                    <div className="input-icon">📱</div>
+                                    <input
+                                        type="tel"
+                                        name="phone"
+                                        placeholder="Enter your 10-digit phone number"
+                                        value={formData.phone}
+                                        onChange={handleChange}
+                                        className={`modern-input ${errors.phone ? 'error' : ''}`}
+                                        required
+                                        maxLength={10}
+                                        pattern="[0-9]{10}"
+                                        inputMode="numeric"
+                                    />
+                                </div>
+                                {errors.phone && <span className="error-text">{errors.phone}</span>}
+                            </div>
+
+                            <div className="input-group">
+                                <div className="input-wrapper">
                                     <div className="input-icon">🔒</div>
                                     <input
                                         type={showPassword ? "text" : "password"}
@@ -259,26 +286,26 @@ const SignupPage = () => {
                                     </div>
                                 )}
 
-                                <div className="password-requirements">
-                                    <h4>Password Requirements:</h4>
-                                    <ul>
-                                        <li className={formData.password.length >= 8 ? 'met' : 'unmet'}>
-                                            At least 8 characters
-                                        </li>
-                                        <li className={/[A-Z]/.test(formData.password) ? 'met' : 'unmet'}>
-                                            One uppercase letter
-                                        </li>
-                                        <li className={/[a-z]/.test(formData.password) ? 'met' : 'unmet'}>
-                                            One lowercase letter
-                                        </li>
-                                        <li className={/\d/.test(formData.password) ? 'met' : 'unmet'}>
-                                            One number
-                                        </li>
-                                        <li className={/[@$!%*?&]/.test(formData.password) ? 'met' : 'unmet'}>
-                                            One special character (@$!%*?&)
-                                        </li>
-                                    </ul>
-                                </div>
+                                    <div className="password-requirements">
+                                        <h4>Password Requirements:</h4>
+                                        <ul>
+                                            <li className={formData.password.length >= 8 ? 'met' : 'unmet'}>
+                                                At least 8 characters
+                                            </li>
+                                            <li className={/[A-Z]/.test(formData.password) ? 'met' : 'unmet'}>
+                                                One uppercase letter
+                                            </li>
+                                            <li className={/[a-z]/.test(formData.password) ? 'met' : 'unmet'}>
+                                                One lowercase letter
+                                            </li>
+                                            <li className={/\d/.test(formData.password) ? 'met' : 'unmet'}>
+                                                One number
+                                            </li>
+                                            <li className={/[@$!%*?&]/.test(formData.password) ? 'met' : 'unmet'}>
+                                                One special character (@$!%*?&)
+                                            </li>
+                                        </ul>
+                                    </div>
                             </div>
 
                             <div className="input-group">
