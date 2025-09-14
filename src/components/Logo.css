@@ -96,7 +96,7 @@
 .logo-white .logo-text {
     color: #ffffff;
     font-weight: 800;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .logo-dark .logo-text {
@@ -130,7 +130,8 @@
     transform: scale(1.05);
 }
 
-.logo:hover .logo-text {
+/* Navbar specific hover handled in Navbar.css */
+.logo:not(.navbar .logo):hover .logo-text {
     color: #6366f1;
 }
 
