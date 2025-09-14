@@ -49,7 +49,7 @@
 .home-header {
     background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
     color: white;
-    padding: 4rem 2rem 3rem;
+    padding: 2rem 2rem 2rem;
     position: relative;
     overflow: hidden;
 }
@@ -73,9 +73,9 @@
 }
 
 .home-header h1 {
-    font-size: 3.5rem;
-    font-weight: 800;
-    margin: 0 0 1rem 0;
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin: 0 0 0.5rem 0;
     background: linear-gradient(45deg, #fff, #f0f0f0);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -89,13 +89,18 @@
 }
 
 .header-logo {
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
     display: flex;
     justify-content: center;
 }
 
 .header-logo .logo {
     color: white;
+}
+
+.header-logo .logo-img {
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .error-banner {
@@ -509,11 +514,11 @@
 
 @media (max-width: 768px) {
     .home-header {
-        padding: 3rem 1rem 2rem;
+        padding: 1.5rem 1rem 1.5rem;
     }
 
     .home-header h1 {
-        font-size: 2.5rem;
+        font-size: 2rem;
     }
 
     .search-section {
@@ -565,11 +570,11 @@
 
 @media (max-width: 480px) {
     .home-header h1 {
-        font-size: 2rem;
+        font-size: 1.75rem;
     }
 
     .home-header p {
-        font-size: 1.1rem;
+        font-size: 1rem;
     }
 
     .section-header h2 {

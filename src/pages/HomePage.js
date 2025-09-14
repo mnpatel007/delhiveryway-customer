@@ -246,7 +246,7 @@ const HomePage = () => {
             <div className="home-header">
                 <div className="header-content">
                     <div className="header-logo">
-                        <Logo size="xlarge" showText={true} />
+                        <Logo size="large" showText={true} variant="white" />
                     </div>
                     <h1>Welcome to DelhiveryWay</h1>
                     {user && <p>Hello, {user.name}! Find shops near you.</p>}
