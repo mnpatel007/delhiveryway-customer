@@ -7,29 +7,36 @@ export const SocketContext = createContext();
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
 
 // Play notification sound - moved outside component to avoid dependency issues
-const playNotificationSound = () => {
-    try {
-        // Try to play MP3 file first
-        const audio = new Audio('/notification.mp3');
-        audio.volume = 0.5;
-        audio.play().catch(error => {
-            console.log('MP3 not available, generating sound:', error);
-            // Fallback: Generate a simple notification sound using Web Audio API
-            generateNotificationSound();
-        });
-    } catch (error) {
-        console.log('Audio not available:', error);
-        generateNotificationSound();
+const playNotificationSound = (isUrgent = false) => {
+    const playCount = isUrgent ? 3 : 1; // Play multiple times for urgent notifications
+    const volume = isUrgent ? 0.8 : 0.5;
+    
+    for (let i = 0; i < playCount; i++) {
+        setTimeout(() => {
+            try {
+                // Try to play MP3 file first
+                const audio = new Audio('/notification.mp3');
+                audio.volume = volume;
+                audio.play().catch(error => {
+                    console.log('MP3 not available, generating sound:', error);
+                    // Fallback: Generate a simple notification sound using Web Audio API
+                    generateNotificationSound(isUrgent);
+                });
+            } catch (error) {
+                console.log('Audio not available:', error);
+                generateNotificationSound(isUrgent);
+            }
+        }, i * 500); // 500ms between repeats
     }
 };
 
 // Generate notification sound using Web Audio API
-const generateNotificationSound = () => {
+const generateNotificationSound = (isUrgent = false) => {
     try {
         const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
         // Create a simple notification sound (two-tone beep)
-        const playTone = (frequency, duration, delay = 0) => {
+        const playTone = (frequency, duration, delay = 0, volume = 0.3) => {
             setTimeout(() => {
                 const oscillator = audioContext.createOscillator();
                 const gainNode = audioContext.createGain();
@@ -38,9 +45,9 @@ const generateNotificationSound = () => {
                 gainNode.connect(audioContext.destination);
 
                 oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
-                oscillator.type = 'sine';
+                oscillator.type = isUrgent ? 'square' : 'sine'; // Square wave for urgent notifications
 
-                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                gainNode.gain.setValueAtTime(volume, audioContext.currentTime);
                 gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
 
                 oscillator.start(audioContext.currentTime);
@@ -48,9 +55,18 @@ const generateNotificationSound = () => {
             }, delay);
         };
 
-        // Play two-tone notification
-        playTone(800, 0.2, 0);     // First tone
-        playTone(600, 0.3, 250);   // Second tone
+        if (isUrgent) {
+            // Urgent notification: longer, more prominent sound
+            const volume = 0.5;
+            playTone(1000, 0.3, 0, volume);     // First high tone
+            playTone(800, 0.3, 200, volume);    // Second tone
+            playTone(1000, 0.3, 400, volume);   // Third high tone
+            playTone(600, 0.4, 600, volume);    // Final low tone
+        } else {
+            // Regular notification: simple two-tone
+            playTone(800, 0.2, 0, 0.3);     // First tone
+            playTone(600, 0.3, 250, 0.3);   // Second tone
+        }
 
     } catch (error) {
         console.log('Web Audio API not available:', error);
@@ -62,6 +78,7 @@ export const SocketProvider = ({ children }) => {
     const [socket, setSocket] = useState(null);
     const [isConnected, setIsConnected] = useState(false);
     const [notifications, setNotifications] = useState([]);
+    const [pendingAlerts, setPendingAlerts] = useState([]);
 
     const [, setLastActivity] = useState(Date.now());
 
@@ -110,6 +127,42 @@ export const SocketProvider = ({ children }) => {
 
         return () => clearInterval(heartbeat);
     }, [socket, isConnected, user]);
+
+    // Periodic alert system for important notifications
+    useEffect(() => {
+        const alertInterval = setInterval(() => {
+            if (pendingAlerts.length > 0) {
+                const alert = pendingAlerts[0];
+                
+                // Show alert for critical notifications
+                if (['shopping_completed', 'order_revised', 'payment_confirmed', 'order_cancelled', 'shopper_response'].includes(alert.type)) {
+                    const shouldShow = window.confirm(`${alert.title}\n\n${alert.message}\n\nDismiss this alert?`);
+                    if (shouldShow) {
+                        setPendingAlerts(prev => prev.slice(1)); // Remove this alert
+                    }
+                } else {
+                    // For less critical notifications, just show and remove
+                    alert(`${alert.title}\n\n${alert.message}`);
+                    setPendingAlerts(prev => prev.slice(1));
+                }
+            }
+        }, 15000); // Check every 15 seconds
+
+        return () => clearInterval(alertInterval);
+    }, [pendingAlerts]);
+
+    // Enhanced notification system with fallback alerts
+    useEffect(() => {
+        // Clear old alerts that are more than 5 minutes old
+        const cleanupInterval = setInterval(() => {
+            setPendingAlerts(prev => prev.filter(alert => {
+                const alertAge = Date.now() - new Date(alert.timestamp).getTime();
+                return alertAge < 5 * 60 * 1000; // Keep alerts for 5 minutes
+            }));
+        }, 60000); // Cleanup every minute
+
+        return () => clearInterval(cleanupInterval);
+    }, []);
 
 
 
@@ -164,8 +217,9 @@ export const SocketProvider = ({ children }) => {
                 // Handle specific status updates
                 handleStatusUpdate(data);
 
-                // Play notification sound
-                playNotificationSound();
+                // Play notification sound (urgent for critical statuses)
+                const isUrgent = ['picked_up', 'delivered', 'cancelled'].includes(data.status);
+                playNotificationSound(isUrgent);
 
                 // Show browser notification
                 showBrowserNotification(
@@ -220,73 +274,50 @@ export const SocketProvider = ({ children }) => {
                     timestamp: new Date().toISOString()
                 });
 
-                playNotificationSound();
+                playNotificationSound(true); // Urgent for final checkout
                 showBrowserNotification('Final Checkout Update', `Your final checkout has been ${data.status}`);
             });
 
-            // Listen for vendor responses
-            newSocket.on('vendorResponse', (data) => {
-                console.log('🏪 Vendor response:', data);
+            // Listen for shopper responses (when shopper accepts order)
+            newSocket.on('shopperResponse', (data) => {
+                console.log('👥 Shopper response:', data);
 
                 addNotification({
                     id: Date.now(),
-                    type: 'vendor_response',
-                    title: 'Vendor Response',
-                    message: data.accepted ? 'Your order has been accepted!' : `Order rejected: ${data.reason}`,
+                    type: 'shopper_response',
+                    title: 'Shopper Response',
+                    message: data.accepted ? 'A personal shopper has accepted your order!' : `Order rejected: ${data.reason}`,
                     timestamp: new Date().toISOString()
                 });
 
                 playNotificationSound();
                 showBrowserNotification(
-                    'Vendor Response',
-                    data.accepted ? 'Your order has been accepted!' : `Order rejected: ${data.reason}`
+                    'Shopper Response',
+                    data.accepted ? 'A personal shopper has accepted your order!' : `Order rejected: ${data.reason}`
                 );
             });
 
-            // Listen for vendor confirmed order (for final checkout)
-            newSocket.on('vendorConfirmedOrder', (data) => {
-                console.log('✅ Vendor confirmed order for final checkout:', data);
-
-                // Store the final version for /final-checkout
-                localStorage.setItem('finalCheckoutOrder', JSON.stringify(data));
+            // Listen for shopper final confirmation (when shopping is complete)
+            newSocket.on('shopperCompletedShopping', (data) => {
+                console.log('✅ Shopper completed shopping:', data);
 
                 addNotification({
                     id: Date.now(),
-                    type: 'final_checkout_ready',
-                    title: '🎉 Ready for Final Checkout!',
-                    message: 'Vendor has confirmed your order. You can now proceed to final checkout.',
+                    type: 'shopping_completed',
+                    title: '🎉 Shopping Complete!',
+                    message: 'Your personal shopper has completed shopping and is ready for delivery.',
                     timestamp: new Date().toISOString()
                 });
 
-                playNotificationSound();
+                playNotificationSound(true); // Urgent for shopping completion
                 showBrowserNotification(
-                    '🎉 Ready for Final Checkout!',
-                    'Vendor has confirmed your order. Click to proceed to final checkout.'
+                    '🎉 Shopping Complete!',
+                    'Your personal shopper has completed shopping and is ready for delivery.'
                 );
 
-                // Auto-redirect to final checkout based on current page
+                // Show completion alert
                 setTimeout(() => {
-                    const currentPath = window.location.pathname;
-
-                    // If user is on awaiting vendor page, redirect automatically
-                    if (currentPath === '/awaiting-vendor' || currentPath.includes('awaiting')) {
-                        console.log('🔄 User on awaiting vendor page, auto-redirecting to final checkout...');
-                        window.location.href = '/final-checkout';
-                    }
-                    // If user is on other pages, show confirmation dialog
-                    else {
-                        const userConfirmed = window.confirm('🎉 Your order has been confirmed by the vendor!\n\nWould you like to proceed to final checkout now?');
-                        if (userConfirmed) {
-                            window.location.href = '/final-checkout';
-                        } else {
-                            // User declined, optionally cancel the order
-                            const shouldCancel = window.confirm('Would you like to cancel this order instead?');
-                            if (shouldCancel) {
-                                // TODO: Implement order cancellation
-                                console.log('User chose to cancel order after declining final checkout');
-                            }
-                        }
-                    }
+                    alert('🎉 Great news! Your personal shopper has completed shopping and is ready for delivery!\n\nYou will receive updates about the delivery soon.');
                 }, 2000);
             });
 
@@ -302,7 +333,7 @@ export const SocketProvider = ({ children }) => {
                     timestamp: new Date().toISOString()
                 });
 
-                playNotificationSound();
+                playNotificationSound(true); // Urgent for cancellation
                 showBrowserNotification('❌ Order Cancelled', `Reason: ${data.reason || 'No reason provided'}`);
 
                 // Show prominent alert
@@ -323,7 +354,7 @@ export const SocketProvider = ({ children }) => {
                     timestamp: new Date().toISOString()
                 });
 
-                playNotificationSound();
+                playNotificationSound(true); // Urgent for payment confirmation
                 showBrowserNotification('💳 Payment Successful!', `Payment of ₹${data.amount} processed successfully`);
 
                 // Clear any stored checkout data
@@ -390,7 +421,7 @@ export const SocketProvider = ({ children }) => {
                     timestamp: new Date().toISOString()
                 });
 
-                playNotificationSound();
+                playNotificationSound(true); // Urgent for order revision
                 showBrowserNotification(
                     '📝 Order Revision Required',
                     'Your order has been revised. Please review the changes.'
@@ -520,6 +551,27 @@ export const SocketProvider = ({ children }) => {
 
             return [cleanNotification, ...prev.slice(0, 49)]; // Keep last 50 notifications
         });
+
+        // Add to pending alerts for critical notifications
+        if (['shopping_completed', 'order_revised', 'payment_confirmed', 'order_cancelled', 'order_accepted', 'shopper_response'].includes(notification.type)) {
+            setPendingAlerts(prev => {
+                const exists = prev.some(alert => 
+                    alert.id === notification.id ||
+                    (alert.message === notification.message && alert.title === notification.title)
+                );
+                
+                if (!exists) {
+                    return [...prev, {
+                        id: notification.id,
+                        type: notification.type,
+                        title: notification.title,
+                        message: notification.message,
+                        timestamp: notification.timestamp
+                    }];
+                }
+                return prev;
+            });
+        }
     };
 
     // Remove notification

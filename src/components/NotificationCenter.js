@@ -13,8 +13,13 @@ const NotificationCenter = () => {
 
     // Handle notification click
     const handleNotificationClick = (notification) => {
-        if (notification.type === 'final_checkout_ready') {
-            navigate('/final-checkout');
+        if (notification.type === 'shopping_completed') {
+            navigate('/orders'); // Navigate to orders page to see delivery updates
+        } else if (notification.type === 'order_revised') {
+            // Navigate to revised order page if orderId is available
+            if (notification.orderId) {
+                navigate(`/revised-order/${notification.orderId}`);
+            }
         }
     };
 
@@ -41,7 +46,7 @@ const NotificationCenter = () => {
                     {notifications.map((notification) => (
                         <div
                             key={notification.id}
-                            className={`notification-item ${notification.type} ${notification.type === 'final_checkout_ready' ? 'clickable' : ''}`}
+                            className={`notification-item ${notification.type} ${['shopping_completed', 'order_revised'].includes(notification.type) ? 'clickable' : ''}`}
                             onClick={() => handleNotificationClick(notification)}
                         >
                             <div className="notification-content">
@@ -54,9 +59,14 @@ const NotificationCenter = () => {
                                 <div className="notification-time">
                                     {new Date(notification.timestamp).toLocaleTimeString()}
                                 </div>
-                                {notification.type === 'final_checkout_ready' && (
+                                {notification.type === 'shopping_completed' && (
                                     <div className="notification-action">
-                                        Click to proceed to checkout →
+                                        Click to view delivery status →
+                                    </div>
+                                )}
+                                {notification.type === 'order_revised' && (
+                                    <div className="notification-action">
+                                        Click to review changes →
                                     </div>
                                 )}
                             </div>
