@@ -2,6 +2,7 @@ import React, { useContext, useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import { CartContext } from '../context/CartContext';
+import Logo from './Logo';
 import './Navbar.css';
 
 const Navbar = () => {
@@ -30,8 +31,7 @@ const Navbar = () => {
             <div className="navbar-container">
                 {/* Logo */}
                 <Link to="/" className="navbar-logo">
-                    <div className="logo-icon">🚚</div>
-                    <span className="logo-text">DelhiveryWay</span>
+                    <Logo size="medium" showText={true} />
                 </Link>
 
                 {/* Desktop Navigation */}

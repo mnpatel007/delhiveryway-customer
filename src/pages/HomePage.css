@@ -88,6 +88,16 @@
     margin: 0 0 2rem 0;
 }
 
+.header-logo {
+    margin-bottom: 1.5rem;
+    display: flex;
+    justify-content: center;
+}
+
+.header-logo .logo {
+    color: white;
+}
+
 .error-banner {
     background: rgba(239, 68, 68, 0.1);
     backdrop-filter: blur(10px);

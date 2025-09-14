@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useContext, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
+import Logo from '../components/Logo';
 import axios from 'axios';
 import './HomePage.css';
 
@@ -216,7 +217,7 @@ const HomePage = () => {
         return (
             <div className="home-container">
                 <div className="loading-state">
-                    <div className="loading-spinner"></div>
+                    <Logo size="large" showText={true} className="loading" />
                     <h3>Loading shops...</h3>
                     <p>Please wait while we fetch the latest shops</p>
                 </div>
@@ -228,7 +229,7 @@ const HomePage = () => {
         return (
             <div className="home-container">
                 <div className="error-state">
-                    <div className="error-icon">🏪</div>
+                    <Logo size="large" showText={true} />
                     <h2>Oops! Something went wrong</h2>
                     <p>{error}</p>
                     <button onClick={retryFetch} className="btn btn-primary">
@@ -244,6 +245,9 @@ const HomePage = () => {
             {/* Header Section */}
             <div className="home-header">
                 <div className="header-content">
+                    <div className="header-logo">
+                        <Logo size="xlarge" showText={true} />
+                    </div>
                     <h1>Welcome to DelhiveryWay</h1>
                     {user && <p>Hello, {user.name}! Find shops near you.</p>}
                     {error && (
