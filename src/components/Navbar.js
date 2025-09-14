@@ -31,7 +31,7 @@ const Navbar = () => {
             <div className="navbar-container">
                 {/* Logo */}
                 <Link to="/" className="navbar-logo">
-                    <Logo size="medium" showText={true} />
+                    <Logo size="large" showText={true} />
                 </Link>
 
                 {/* Desktop Navigation */}

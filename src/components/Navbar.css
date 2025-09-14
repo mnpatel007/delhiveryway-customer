@@ -17,7 +17,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    height: 4rem;
+    height: 5rem;
 }
 
 /* Logo */
@@ -28,13 +28,33 @@
     text-decoration: none;
     color: #1e293b;
     font-weight: 700;
-    font-size: 1.25rem;
+    font-size: 1.5rem;
     transition: all 0.3s ease;
+    padding: 0.5rem 0;
 }
 
 .navbar-logo:hover {
     color: #6366f1;
     transform: scale(1.02);
+}
+
+/* Navbar Logo Specific Styling */
+.navbar-logo .logo {
+    gap: 0.5rem;
+}
+
+.navbar-logo .logo-img {
+    border: 2px solid rgba(99, 102, 241, 0.2);
+    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.15);
+}
+
+.navbar-logo .logo-text {
+    font-weight: 800;
+    font-size: 1.4rem;
+    background: linear-gradient(135deg, #6366f1, #4f46e5);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
 .logo-icon {
