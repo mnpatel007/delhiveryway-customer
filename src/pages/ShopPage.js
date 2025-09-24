@@ -162,23 +162,25 @@ const ShopPage = () => {
                     }
 
                     console.log('✅ Products loaded successfully:', productsData.length);
-                    console.log('📦 Raw products data:', productsData);
+                    // console.log('📦 Raw products data:', productsData);
 
-                    // Log individual product details for debugging
-                    productsData.forEach((product, index) => {
-                        console.log(`📦 Product ${index + 1}:`, {
-                            id: product._id,
-                            name: product.name,
-                            description: product.description,
-                            price: product.price,
-                            category: product.category,
-                            stockQuantity: product.stockQuantity,
-                            unit: product.unit,
-                            tags: product.tags,
-                            images: product.images,
-                            inStock: product.inStock
+                    // Log individual product details for debugging (disabled in production)
+                    if (process.env.NODE_ENV === 'development') {
+                        productsData.forEach((product, index) => {
+                            console.log(`📦 Product ${index + 1}:`, {
+                                id: product._id,
+                                name: product.name,
+                                description: product.description,
+                                price: product.price,
+                                category: product.category,
+                                stockQuantity: product.stockQuantity,
+                                unit: product.unit,
+                                tags: product.tags,
+                                images: product.images,
+                                inStock: product.inStock
+                            });
                         });
-                    });
+                    }
                 } else {
                     console.warn('⚠️ API returned no products');
                     console.log('❌ Product result:', productResult);
@@ -280,6 +282,89 @@ const ShopPage = () => {
             setSelectedShop(shop);
         }
     }, [shop, setSelectedShop]);
+
+    // Helper function to check if shop is currently open
+    const isShopOpen = (shop) => {
+        if (!shop?.operatingHours) return true; // Default to open if no hours defined
+
+        const now = new Date();
+        const dayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+        const day = dayNames[now.getDay()];
+        const currentTime = now.toTimeString().slice(0, 5);
+
+        const todayHours = shop.operatingHours[day];
+        if (!todayHours || todayHours.closed) return false;
+
+        if (!todayHours.open || !todayHours.close) return true;
+
+        return currentTime >= todayHours.open && currentTime <= todayHours.close;
+    };
+
+    // Helper function to get shop status message
+    const getShopStatusMessage = (shop) => {
+        if (!shop?.operatingHours) return { isOpen: true, message: 'Open' };
+
+        const now = new Date();
+        const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        const day = dayNames[now.getDay()];
+        const currentTime = now.toTimeString().slice(0, 5);
+
+        const todayHours = shop.operatingHours[day.toLowerCase()];
+
+        if (!todayHours || todayHours.closed) {
+            return {
+                isOpen: false,
+                message: `Closed on ${day}s`,
+                nextOpen: getNextOpenTime(shop, now)
+            };
+        }
+
+        if (!todayHours.open || !todayHours.close) {
+            return { isOpen: true, message: 'Open' };
+        }
+
+        const isOpen = currentTime >= todayHours.open && currentTime <= todayHours.close;
+
+        if (isOpen) {
+            return {
+                isOpen: true,
+                message: `Open until ${todayHours.close}`,
+                closingTime: todayHours.close
+            };
+        } else if (currentTime < todayHours.open) {
+            return {
+                isOpen: false,
+                message: `Opens at ${todayHours.open}`,
+                openingTime: todayHours.open
+            };
+        } else {
+            return {
+                isOpen: false,
+                message: `Closed (was open until ${todayHours.close})`,
+                nextOpen: getNextOpenTime(shop, now)
+            };
+        }
+    };
+
+    // Helper function to get next opening time
+    const getNextOpenTime = (shop, currentDate) => {
+        const dayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+        const dayNamesDisplay = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+        for (let i = 1; i <= 7; i++) {
+            const nextDay = new Date(currentDate);
+            nextDay.setDate(nextDay.getDate() + i);
+            const dayIndex = nextDay.getDay();
+            const dayName = dayNames[dayIndex];
+            const dayHours = shop.operatingHours?.[dayName];
+
+            if (dayHours && !dayHours.closed && dayHours.open) {
+                return `${dayNamesDisplay[dayIndex]} at ${dayHours.open}`;
+            }
+        }
+
+        return 'Check shop hours';
+    };
 
     const handleAddToCart = (product) => {
         try {
@@ -440,6 +525,19 @@ const ShopPage = () => {
                                     <span className="meta-text">{products.length} products</span>
                                 </div>
 
+                                {/* Shop Hours Status - CRITICAL INFORMATION */}
+                                {(() => {
+                                    const status = getShopStatusMessage(shop);
+                                    return (
+                                        <div className={`meta-item shop-status ${status.isOpen ? 'open' : 'closed'}`}>
+                                            <span className="meta-icon">{status.isOpen ? '🟢' : '🔴'}</span>
+                                            <span className="meta-text shop-hours-text">
+                                                {status.message}
+                                            </span>
+                                        </div>
+                                    );
+                                })()}
+
                                 {/* Hide delivery fee on shop page as requested */}
                                 {/* {shop.deliveryFee !== undefined && (
                                     <div className="meta-item">
@@ -524,7 +622,7 @@ const ShopPage = () => {
                     </span>
                 </div>
 
-                {/* Temporary Debug Section */}
+                {/* Debug Section - Development Only */}
                 {process.env.NODE_ENV === 'development' && (
                     <div className="debug-section" style={{ background: '#f5f5f5', padding: '1rem', margin: '1rem 0', borderRadius: '8px', fontSize: '12px' }}>
                         <h4>🔍 Debug Info:</h4>
