@@ -8,6 +8,7 @@ import { SocketProvider, useSocket } from './context/SocketContext';
 import ErrorBoundary from './components/ErrorBoundary';
 import Navbar from './components/Navbar';
 import NotificationCenter from './components/NotificationCenter';
+import NoticeAlert from './components/NoticeAlert';
 
 import SocketDebugPanel from './components/SocketDebugPanel';
 import HomePage from './pages/HomePage';
@@ -88,6 +89,7 @@ const Layout = ({ children }) => {
 
       {!shouldHideNavbar && <Navbar />}
       {!shouldHideNavbar && <NotificationCenter />}
+      {!shouldHideNavbar && <NoticeAlert />}
       <SocketDebugPanel />
       {children}
     </>

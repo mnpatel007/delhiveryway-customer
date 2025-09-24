@@ -10,7 +10,7 @@ const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000'
 const playNotificationSound = (isUrgent = false) => {
     const playCount = isUrgent ? 3 : 1; // Play multiple times for urgent notifications
     const volume = isUrgent ? 0.8 : 0.5;
-    
+
     for (let i = 0; i < playCount; i++) {
         setTimeout(() => {
             try {
@@ -133,7 +133,7 @@ export const SocketProvider = ({ children }) => {
         const alertInterval = setInterval(() => {
             if (pendingAlerts.length > 0) {
                 const alert = pendingAlerts[0];
-                
+
                 // Show alert for critical notifications
                 if (['shopping_completed', 'order_revised', 'payment_confirmed', 'order_cancelled', 'shopper_response'].includes(alert.type)) {
                     const shouldShow = window.confirm(`${alert.title}\n\n${alert.message}\n\nDismiss this alert?`);
@@ -472,6 +472,104 @@ export const SocketProvider = ({ children }) => {
                 );
             });
 
+            // Listen for refreshed notices (every 15 minutes)
+            newSocket.on('refreshNotice', (data) => {
+                console.log('🔄 Notice refresh received:', data);
+
+                // Clear any existing dismissals for this notice to show it again
+                const dismissed = JSON.parse(localStorage.getItem('dismissedNotices') || '[]');
+                const updatedDismissed = dismissed.filter(id => id !== data.id);
+                localStorage.setItem('dismissedNotices', JSON.stringify(updatedDismissed));
+
+                // Play notification sound based on priority
+                const isUrgent = data.priority === 'urgent' || data.priority === 'high';
+                playNotificationSound(isUrgent);
+
+                // Show browser notification for refresh
+                if (window.Notification && Notification.permission === 'granted') {
+                    const notification = new Notification(`🔄 REMINDER: ${data.title}`, {
+                        body: `${data.message}\n\n(This is a periodic reminder)`,
+                        icon: '/logo192.png',
+                        tag: `notice-refresh-${data.id}`,
+                        requireInteraction: isUrgent,
+                        silent: false
+                    });
+
+                    if (data.priority !== 'urgent') {
+                        setTimeout(() => notification.close(), 12000);
+                    }
+                }
+
+                // Add to pending alerts
+                setPendingAlerts(prev => [...prev, {
+                    type: 'notice-refresh',
+                    title: `🔄 REMINDER: ${data.title}`,
+                    message: data.message,
+                    priority: data.priority,
+                    timestamp: Date.now()
+                }]);
+            });
+
+            // Listen for new notices from admin
+            newSocket.on('newNotice', (data) => {
+                console.log('🚨 IMPORTANT NOTICE RECEIVED:', data);
+                console.log('🚨 Socket connected:', newSocket.connected);
+
+                // Play notification sound based on priority (multiple times for urgent)
+                const isUrgent = data.priority === 'urgent' || data.priority === 'high';
+                const playCount = isUrgent ? 3 : 2;
+
+                for (let i = 0; i < playCount; i++) {
+                    setTimeout(() => {
+                        playNotificationSound(isUrgent);
+                    }, i * 800);
+                }
+
+                // Show browser notification if permission granted
+                if (window.Notification && Notification.permission === 'granted') {
+                    const notification = new Notification(`🚨 IMPORTANT: ${data.title}`, {
+                        body: data.message,
+                        icon: '/logo192.png',
+                        tag: `notice-${data.id}`,
+                        requireInteraction: true, // Always require interaction for notices
+                        silent: false
+                    });
+
+                    // Keep urgent notices open longer
+                    if (data.priority !== 'urgent') {
+                        setTimeout(() => notification.close(), 15000);
+                    }
+                }
+
+                // IMMEDIATE ALERT for high priority notices
+                if (isUrgent) {
+                    setTimeout(() => {
+                        alert(`🚨 URGENT NOTICE 🚨\n\n${data.title}\n\n${data.message}\n\nThis is an important announcement from DelhiveryWay!`);
+                    }, 1000);
+                }
+
+                // Add to pending alerts for periodic display
+                setPendingAlerts(prev => [...prev, {
+                    type: 'notice',
+                    title: `🚨 ${data.title}`,
+                    message: data.message,
+                    priority: data.priority,
+                    timestamp: Date.now()
+                }]);
+
+                // Flash the page title for attention
+                const originalTitle = document.title;
+                let flashCount = 0;
+                const flashInterval = setInterval(() => {
+                    document.title = flashCount % 2 === 0 ? `🚨 NOTICE: ${data.title}` : originalTitle;
+                    flashCount++;
+                    if (flashCount >= 10) {
+                        clearInterval(flashInterval);
+                        document.title = originalTitle;
+                    }
+                }, 1000);
+            });
+
             setSocket(newSocket);
 
             return () => {
@@ -555,11 +653,11 @@ export const SocketProvider = ({ children }) => {
         // Add to pending alerts for critical notifications
         if (['shopping_completed', 'order_revised', 'payment_confirmed', 'order_cancelled', 'order_accepted', 'shopper_response'].includes(notification.type)) {
             setPendingAlerts(prev => {
-                const exists = prev.some(alert => 
+                const exists = prev.some(alert =>
                     alert.id === notification.id ||
                     (alert.message === notification.message && alert.title === notification.title)
                 );
-                
+
                 if (!exists) {
                     return [...prev, {
                         id: notification.id,
