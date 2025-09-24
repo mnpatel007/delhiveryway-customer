@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { apiCall, api } from '../services/api';
+import { useSocket } from '../context/SocketContext';
 import './NoticeAlert.css';
 
 const NoticeAlert = () => {
     const [notices, setNotices] = useState([]);
     const [dismissedNotices, setDismissedNotices] = useState([]);
     const [loading, setLoading] = useState(true);
+    const { socket } = useSocket();
 
     useEffect(() => {
         fetchActiveNotices();
@@ -14,6 +16,22 @@ const NoticeAlert = () => {
         const dismissed = JSON.parse(localStorage.getItem('dismissedNotices') || '[]');
         setDismissedNotices(dismissed);
     }, []);
+
+    // Listen for new notices via socket
+    useEffect(() => {
+        if (socket) {
+            const handleNewNotice = (data) => {
+                console.log('📢 NoticeAlert: New notice received, refreshing...');
+                fetchActiveNotices(); // Refresh the notices list
+            };
+
+            socket.on('newNotice', handleNewNotice);
+
+            return () => {
+                socket.off('newNotice', handleNewNotice);
+            };
+        }
+    }, [socket]);
 
     const fetchActiveNotices = async () => {
         try {
