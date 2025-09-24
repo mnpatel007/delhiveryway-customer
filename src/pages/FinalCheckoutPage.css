@@ -359,3 +359,136 @@ label:contains("*")::after {
     color: #e74c3c;
     margin-left: 4px;
 }
+
+/* Orde
+r Acceptance Time Section */
+.acceptance-time-section {
+    margin-bottom: 2rem;
+}
+
+.acceptance-time-card {
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+    border: 2px solid #0ea5e9;
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 12px rgba(14, 165, 233, 0.15);
+}
+
+.acceptance-time-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.time-icon {
+    font-size: 1.5rem;
+}
+
+.acceptance-time-header h3 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #0c4a6e;
+}
+
+.acceptance-time-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+}
+
+.estimated-time {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.time-value {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #0ea5e9;
+    margin-bottom: 0.25rem;
+}
+
+.time-label {
+    font-size: 0.875rem;
+    color: #64748b;
+    text-align: center;
+}
+
+.queue-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.queue-count {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #f59e0b;
+    margin-bottom: 0.25rem;
+}
+
+.queue-label {
+    font-size: 0.875rem;
+    color: #64748b;
+    text-align: center;
+}
+
+.acceptance-time-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 8px;
+    border-left: 3px solid #0ea5e9;
+}
+
+.note-icon {
+    font-size: 1rem;
+    margin-top: 0.125rem;
+}
+
+.acceptance-time-note p {
+    margin: 0;
+    font-size: 0.875rem;
+    color: #475569;
+    line-height: 1.4;
+}
+
+/* Loading state for acceptance time */
+.acceptance-time-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    color: #64748b;
+}
+
+/* Responsive design for acceptance time */
+@media (max-width: 768px) {
+    .acceptance-time-content {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+
+    .acceptance-time-card {
+        padding: 1rem;
+    }
+
+    .time-value {
+        font-size: 1.5rem;
+    }
+
+    .queue-count {
+        font-size: 1.25rem;
+    }
+}

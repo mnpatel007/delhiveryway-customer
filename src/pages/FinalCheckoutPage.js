@@ -33,6 +33,8 @@ const FinalCheckoutPage = () => {
     });
     const [isGeocoding, setIsGeocoding] = useState(false);
     const [geocodingError, setGeocodingError] = useState('');
+    const [acceptanceTime, setAcceptanceTime] = useState(null);
+    const [loadingAcceptanceTime, setLoadingAcceptanceTime] = useState(false);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -52,6 +54,43 @@ const FinalCheckoutPage = () => {
 
         fetchShops();
     }, []);
+
+    // Fetch order acceptance time when selectedShop changes
+    useEffect(() => {
+        const fetchAcceptanceTime = async () => {
+            if (!selectedShop || !selectedShop._id) return;
+
+            try {
+                setLoadingAcceptanceTime(true);
+
+                // Extract shop ID from different possible structures
+                const shopId = selectedShop.data?.shop?._id || selectedShop._id;
+
+                const response = await api.get(`/orders/acceptance-time/${shopId}`);
+
+                if (response.data.success) {
+                    setAcceptanceTime(response.data.data);
+                }
+            } catch (error) {
+                console.error('Error fetching acceptance time:', error);
+                // Set default values if API fails
+                setAcceptanceTime({
+                    pendingOrdersCount: 0,
+                    estimatedMinutes: 5,
+                    estimatedTime: '5 minutes'
+                });
+            } finally {
+                setLoadingAcceptanceTime(false);
+            }
+        };
+
+        fetchAcceptanceTime();
+
+        // Refresh acceptance time every 30 seconds
+        const interval = setInterval(fetchAcceptanceTime, 30000);
+
+        return () => clearInterval(interval);
+    }, [selectedShop]);
 
     // Get order summary from cart context
     const orderSummary = getOrderSummary();
@@ -353,6 +392,38 @@ const FinalCheckoutPage = () => {
                             </div>
                         </div>
                     </div>
+
+                    {/* Order Acceptance Time Estimate */}
+                    {loadingAcceptanceTime ? (
+                        <div className="acceptance-time-section">
+                            <div className="acceptance-time-loading">
+                                <span>⏳ Calculating order acceptance time...</span>
+                            </div>
+                        </div>
+                    ) : acceptanceTime && (
+                        <div className="acceptance-time-section">
+                            <div className="acceptance-time-card">
+                                <div className="acceptance-time-header">
+                                    <span className="time-icon">⏱️</span>
+                                    <h3>Order Acceptance Time</h3>
+                                </div>
+                                <div className="acceptance-time-content">
+                                    <div className="estimated-time">
+                                        <span className="time-value">{acceptanceTime.estimatedTime}</span>
+                                        <span className="time-label">Estimated acceptance time</span>
+                                    </div>
+                                    <div className="queue-info">
+                                        <span className="queue-count">{acceptanceTime.pendingOrdersCount}</span>
+                                        <span className="queue-label">orders ahead of you</span>
+                                    </div>
+                                </div>
+                                <div className="acceptance-time-note">
+                                    <span className="note-icon">💡</span>
+                                    <p>This is an estimate based on current order queue. Your order will be accepted by a personal shopper within this timeframe.</p>
+                                </div>
+                            </div>
+                        </div>
+                    )}
 
                     <div className="checkout-order-summary">
                         <h3>Order Summary</h3>
