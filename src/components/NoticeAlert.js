@@ -9,6 +9,8 @@ const NoticeAlert = () => {
     const [loading, setLoading] = useState(true);
     const { socket } = useSocket();
 
+    console.log('📢 NoticeAlert component rendered');
+
     useEffect(() => {
         fetchActiveNotices();
 
@@ -50,12 +52,18 @@ const NoticeAlert = () => {
 
     const fetchActiveNotices = async () => {
         try {
+            console.log('📢 NoticeAlert: Fetching active notices...');
             const response = await api.get('/notices/active');
+            console.log('📢 NoticeAlert: API response:', response.data);
+
             if (response.data.success) {
+                console.log('📢 NoticeAlert: Setting notices:', response.data.data);
                 setNotices(response.data.data);
+            } else {
+                console.log('📢 NoticeAlert: API returned success=false');
             }
         } catch (error) {
-            console.error('Error fetching notices:', error);
+            console.error('📢 NoticeAlert: Error fetching notices:', error);
         } finally {
             setLoading(false);
         }

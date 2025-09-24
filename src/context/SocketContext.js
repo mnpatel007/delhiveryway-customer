@@ -513,6 +513,7 @@ export const SocketProvider = ({ children }) => {
             // Listen for new notices from admin
             newSocket.on('newNotice', (data) => {
                 console.log('🚨 IMPORTANT NOTICE RECEIVED:', data);
+                console.log('🚨 Socket connected:', newSocket.connected);
 
                 // Play notification sound based on priority (multiple times for urgent)
                 const isUrgent = data.priority === 'urgent' || data.priority === 'high';
