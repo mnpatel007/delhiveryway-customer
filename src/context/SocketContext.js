@@ -472,6 +472,44 @@ export const SocketProvider = ({ children }) => {
                 );
             });
 
+            // Listen for refreshed notices (every 15 minutes)
+            newSocket.on('refreshNotice', (data) => {
+                console.log('🔄 Notice refresh received:', data);
+
+                // Clear any existing dismissals for this notice to show it again
+                const dismissed = JSON.parse(localStorage.getItem('dismissedNotices') || '[]');
+                const updatedDismissed = dismissed.filter(id => id !== data.id);
+                localStorage.setItem('dismissedNotices', JSON.stringify(updatedDismissed));
+
+                // Play notification sound based on priority
+                const isUrgent = data.priority === 'urgent' || data.priority === 'high';
+                playNotificationSound(isUrgent);
+
+                // Show browser notification for refresh
+                if (window.Notification && Notification.permission === 'granted') {
+                    const notification = new Notification(`🔄 REMINDER: ${data.title}`, {
+                        body: `${data.message}\n\n(This is a periodic reminder)`,
+                        icon: '/logo192.png',
+                        tag: `notice-refresh-${data.id}`,
+                        requireInteraction: isUrgent,
+                        silent: false
+                    });
+
+                    if (data.priority !== 'urgent') {
+                        setTimeout(() => notification.close(), 12000);
+                    }
+                }
+
+                // Add to pending alerts
+                setPendingAlerts(prev => [...prev, {
+                    type: 'notice-refresh',
+                    title: `🔄 REMINDER: ${data.title}`,
+                    message: data.message,
+                    priority: data.priority,
+                    timestamp: Date.now()
+                }]);
+            });
+
             // Listen for new notices from admin
             newSocket.on('newNotice', (data) => {
                 console.log('🚨 IMPORTANT NOTICE RECEIVED:', data);

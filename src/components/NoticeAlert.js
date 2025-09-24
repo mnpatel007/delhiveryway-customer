@@ -25,10 +25,25 @@ const NoticeAlert = () => {
                 fetchActiveNotices(); // Refresh the notices list
             };
 
+            const handleRefreshNotice = (data) => {
+                console.log('🔄 NoticeAlert: Notice refresh received, clearing dismissals and refreshing...');
+
+                // Clear dismissal for this specific notice
+                const dismissed = JSON.parse(localStorage.getItem('dismissedNotices') || '[]');
+                const updatedDismissed = dismissed.filter(id => id !== data.id);
+                localStorage.setItem('dismissedNotices', JSON.stringify(updatedDismissed));
+                setDismissedNotices(updatedDismissed);
+
+                // Refresh the notices list
+                fetchActiveNotices();
+            };
+
             socket.on('newNotice', handleNewNotice);
+            socket.on('refreshNotice', handleRefreshNotice);
 
             return () => {
                 socket.off('newNotice', handleNewNotice);
+                socket.off('refreshNotice', handleRefreshNotice);
             };
         }
     }, [socket]);
