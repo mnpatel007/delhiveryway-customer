@@ -474,38 +474,61 @@ export const SocketProvider = ({ children }) => {
 
             // Listen for new notices from admin
             newSocket.on('newNotice', (data) => {
-                console.log('📢 New notice received:', data);
+                console.log('🚨 IMPORTANT NOTICE RECEIVED:', data);
 
-                // Play notification sound based on priority
+                // Play notification sound based on priority (multiple times for urgent)
                 const isUrgent = data.priority === 'urgent' || data.priority === 'high';
-                playNotificationSound(isUrgent);
+                const playCount = isUrgent ? 3 : 2;
+
+                for (let i = 0; i < playCount; i++) {
+                    setTimeout(() => {
+                        playNotificationSound(isUrgent);
+                    }, i * 800);
+                }
 
                 // Show browser notification if permission granted
                 if (window.Notification && Notification.permission === 'granted') {
-                    const notification = new Notification(data.title, {
+                    const notification = new Notification(`🚨 IMPORTANT: ${data.title}`, {
                         body: data.message,
                         icon: '/logo192.png',
                         tag: `notice-${data.id}`,
-                        requireInteraction: data.priority === 'urgent'
+                        requireInteraction: true, // Always require interaction for notices
+                        silent: false
                     });
 
-                    // Auto close after 10 seconds unless urgent
+                    // Keep urgent notices open longer
                     if (data.priority !== 'urgent') {
-                        setTimeout(() => notification.close(), 10000);
+                        setTimeout(() => notification.close(), 15000);
                     }
-                } else {
-                    // Fallback alert for browsers without notification support
-                    alert(`📢 ${data.title}\n\n${data.message}`);
+                }
+
+                // IMMEDIATE ALERT for high priority notices
+                if (isUrgent) {
+                    setTimeout(() => {
+                        alert(`🚨 URGENT NOTICE 🚨\n\n${data.title}\n\n${data.message}\n\nThis is an important announcement from DelhiveryWay!`);
+                    }, 1000);
                 }
 
                 // Add to pending alerts for periodic display
                 setPendingAlerts(prev => [...prev, {
                     type: 'notice',
-                    title: `📢 ${data.title}`,
+                    title: `🚨 ${data.title}`,
                     message: data.message,
                     priority: data.priority,
                     timestamp: Date.now()
                 }]);
+
+                // Flash the page title for attention
+                const originalTitle = document.title;
+                let flashCount = 0;
+                const flashInterval = setInterval(() => {
+                    document.title = flashCount % 2 === 0 ? `🚨 NOTICE: ${data.title}` : originalTitle;
+                    flashCount++;
+                    if (flashCount >= 10) {
+                        clearInterval(flashInterval);
+                        document.title = originalTitle;
+                    }
+                }, 1000);
             });
 
             setSocket(newSocket);
