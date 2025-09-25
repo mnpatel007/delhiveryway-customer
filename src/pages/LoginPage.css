@@ -405,6 +405,7 @@
     right: 0;
     height: 1px;
     background: #e1e5e9;
+    z-index: 1;
 }
 
 .divider span {
@@ -413,6 +414,9 @@
     color: #9ca3af;
     font-size: 14px;
     font-weight: 500;
+    position: relative;
+    z-index: 2;
+    display: inline-block;
 }
 
 /* Social Login */
@@ -514,5 +518,8 @@
 
     .divider span {
         background: #1a1a1a;
+        position: relative;
+        z-index: 2;
+        display: inline-block;
     }
 }
