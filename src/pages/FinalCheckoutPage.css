@@ -291,6 +291,7 @@ textarea {
     color: #000000 !important;
     background-color: #ffffff !important;
     -webkit-text-fill-color: #000000 !important;
+    opacity: 1 !important;
     -webkit-opacity: 1 !important;
 }
 
