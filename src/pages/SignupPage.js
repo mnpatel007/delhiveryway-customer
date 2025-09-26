@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authAPI, apiCall } from '../services/api';
+import SignupDebug from '../components/SignupDebug';
 import './SignupPage.css';
 
 const SignupPage = () => {
