@@ -510,9 +510,16 @@ export const SocketProvider = ({ children }) => {
                 }]);
             });
 
-            // Listen for new notices from admin
+            // Listen for new notices from admin (real-time)
+            newSocket.on('new-notice', (data) => {
+                console.log('📢 Received new notice:', data);
+                // Trigger notice refresh in components
+                window.dispatchEvent(new CustomEvent('new-notice', { detail: data }));
+            });
+
+            // Keep backward compatibility for old notice events
             newSocket.on('newNotice', (data) => {
-                console.log('🚨 IMPORTANT NOTICE RECEIVED:', data);
+                console.log('🚨 IMPORTANT NOTICE RECEIVED (legacy):', data);
                 console.log('🚨 Socket connected:', newSocket.connected);
 
                 // Play notification sound based on priority (multiple times for urgent)

@@ -17,6 +17,28 @@ const NoticeAlert = () => {
         // Load dismissed notices from localStorage
         const dismissed = JSON.parse(localStorage.getItem('dismissedNotices') || '[]');
         setDismissedNotices(dismissed);
+
+        // Listen for new notices in real-time
+        const handleNewNotice = (event) => {
+            const { notice } = event.detail;
+            // Only handle one-time notices here
+            if (notice.displayType === 'one-time') {
+                const dismissedNotices = JSON.parse(localStorage.getItem('dismissedNotices') || '[]');
+                if (!dismissedNotices.includes(notice._id)) {
+                    setNotices(prev => {
+                        // Check if notice already exists
+                        const exists = prev.some(n => n._id === notice._id);
+                        if (!exists) {
+                            return [...prev, notice];
+                        }
+                        return prev;
+                    });
+                }
+            }
+        };
+
+        window.addEventListener('new-notice', handleNewNotice);
+        return () => window.removeEventListener('new-notice', handleNewNotice);
     }, []);
 
     // Listen for new notices via socket
@@ -57,8 +79,13 @@ const NoticeAlert = () => {
             console.log('📢 NoticeAlert: API response:', response.data);
 
             if (response.data.success) {
-                console.log('📢 NoticeAlert: Setting notices:', response.data.data);
-                setNotices(response.data.data);
+                const notices = response.data.data || [];
+                // Filter only one-time notices
+                const oneTimeNotices = notices.filter(notice =>
+                    notice.displayType === 'one-time' || !notice.displayType // backward compatibility
+                );
+                console.log('📢 NoticeAlert: Setting one-time notices:', oneTimeNotices);
+                setNotices(oneTimeNotices);
             } else {
                 console.log('📢 NoticeAlert: API returned success=false');
             }

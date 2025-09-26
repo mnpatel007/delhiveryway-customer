@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useContext, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
+import PermanentNotices from '../components/PermanentNotices';
 import Logo from '../components/Logo';
 import axios from 'axios';
 import './HomePage.css';
@@ -242,6 +243,7 @@ const HomePage = () => {
 
     return (
         <div className="home-container">
+            <PermanentNotices />
             {/* Header Section */}
             <div className="home-header">
                 <div className="header-content">
