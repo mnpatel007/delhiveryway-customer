@@ -287,10 +287,12 @@ const ShopPage = () => {
     const isShopOpen = (shop) => {
         if (!shop?.operatingHours) return true; // Default to open if no hours defined
 
+        // Get current time in IST (Indian Standard Time)
         const now = new Date();
+        const istTime = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Kolkata" }));
         const dayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
-        const day = dayNames[now.getDay()];
-        const currentTime = now.toTimeString().slice(0, 5);
+        const day = dayNames[istTime.getDay()];
+        const currentTime = istTime.toTimeString().slice(0, 5);
 
         const todayHours = shop.operatingHours[day];
         if (!todayHours || todayHours.closed) return false;
@@ -304,10 +306,12 @@ const ShopPage = () => {
     const getShopStatusMessage = (shop) => {
         if (!shop?.operatingHours) return { isOpen: true, message: 'Open' };
 
+        // Get current time in IST (Indian Standard Time)
         const now = new Date();
+        const istTime = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Kolkata" }));
         const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-        const day = dayNames[now.getDay()];
-        const currentTime = now.toTimeString().slice(0, 5);
+        const day = dayNames[istTime.getDay()];
+        const currentTime = istTime.toTimeString().slice(0, 5);
 
         const todayHours = shop.operatingHours[day.toLowerCase()];
 
