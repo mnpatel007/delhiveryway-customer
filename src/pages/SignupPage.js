@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authAPI, apiCall } from '../services/api';
+import SignupDebug from '../components/SignupDebug';
 import './SignupPage.css';
 
 const SignupPage = () => {
@@ -286,26 +287,26 @@ const SignupPage = () => {
                                     </div>
                                 )}
 
-                                    <div className="password-requirements">
-                                        <h4>Password Requirements:</h4>
-                                        <ul>
-                                            <li className={formData.password.length >= 8 ? 'met' : 'unmet'}>
-                                                At least 8 characters
-                                            </li>
-                                            <li className={/[A-Z]/.test(formData.password) ? 'met' : 'unmet'}>
-                                                One uppercase letter
-                                            </li>
-                                            <li className={/[a-z]/.test(formData.password) ? 'met' : 'unmet'}>
-                                                One lowercase letter
-                                            </li>
-                                            <li className={/\d/.test(formData.password) ? 'met' : 'unmet'}>
-                                                One number
-                                            </li>
-                                            <li className={/[@$!%*?&]/.test(formData.password) ? 'met' : 'unmet'}>
-                                                One special character (@$!%*?&)
-                                            </li>
-                                        </ul>
-                                    </div>
+                                <div className="password-requirements">
+                                    <h4>Password Requirements:</h4>
+                                    <ul>
+                                        <li className={formData.password.length >= 8 ? 'met' : 'unmet'}>
+                                            At least 8 characters
+                                        </li>
+                                        <li className={/[A-Z]/.test(formData.password) ? 'met' : 'unmet'}>
+                                            One uppercase letter
+                                        </li>
+                                        <li className={/[a-z]/.test(formData.password) ? 'met' : 'unmet'}>
+                                            One lowercase letter
+                                        </li>
+                                        <li className={/\d/.test(formData.password) ? 'met' : 'unmet'}>
+                                            One number
+                                        </li>
+                                        <li className={/[@$!%*?&]/.test(formData.password) ? 'met' : 'unmet'}>
+                                            One special character (@$!%*?&)
+                                        </li>
+                                    </ul>
+                                </div>
                             </div>
 
                             <div className="input-group">
