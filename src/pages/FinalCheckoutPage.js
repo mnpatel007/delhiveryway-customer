@@ -28,7 +28,7 @@ const FinalCheckoutPage = () => {
         zipCode: '',
         instructions: '',
         contactName: user?.name || user?.user?.name || '',
-        contactPhone: user?.phone || user?.user?.phone || '',
+        contactPhone: '', // Always start empty to make it compulsory
         countryCode: '+91' // Default to India
     });
     const [isGeocoding, setIsGeocoding] = useState(false);
@@ -36,6 +36,24 @@ const FinalCheckoutPage = () => {
     const [acceptanceTime, setAcceptanceTime] = useState(null);
     const [loadingAcceptanceTime, setLoadingAcceptanceTime] = useState(false);
     const navigate = useNavigate();
+
+    // Clean up user data and ensure phone field is empty if invalid
+    useEffect(() => {
+        if (user) {
+            const userPhone = user?.phone || user?.user?.phone || '';
+            // Only use user phone if it's a valid 10-digit number and not a placeholder
+            const isValidPhone = /^[0-9]{10}$/.test(userPhone) &&
+                userPhone !== '0000000000' &&
+                userPhone !== '1111111111' &&
+                userPhone !== '1234567890';
+
+            setDeliveryAddress(prev => ({
+                ...prev,
+                contactName: user?.name || user?.user?.name || '',
+                contactPhone: isValidPhone ? userPhone : '' // Only use if valid, otherwise empty
+            }));
+        }
+    }, [user]);
 
     useEffect(() => {
         const fetchShops = async () => {
@@ -108,20 +126,35 @@ const FinalCheckoutPage = () => {
             return;
         }
 
+        // Enhanced validation for contact name
         if (!deliveryAddress.contactName.trim()) {
-            alert('Please enter a contact name');
+            alert('❌ Contact Name is required. Please enter the name of the person who will receive the order.');
             return;
         }
 
+        if (deliveryAddress.contactName.trim().length < 2) {
+            alert('❌ Contact Name must be at least 2 characters long.');
+            return;
+        }
+
+        // Enhanced validation for contact phone
         if (!deliveryAddress.contactPhone.trim()) {
-            alert('Please enter a contact phone number');
+            alert('❌ Contact Phone Number is required. Please enter a valid phone number for delivery coordination.');
             return;
         }
 
-        // Validate phone number (should be 10 digits)
+        // Validate phone number (should be exactly 10 digits)
         const phoneRegex = /^[0-9]{10}$/;
-        if (!phoneRegex.test(deliveryAddress.contactPhone.replace(/\s+/g, ''))) {
-            alert('Please enter a valid 10-digit phone number');
+        const cleanPhone = deliveryAddress.contactPhone.replace(/\s+/g, '');
+
+        if (!phoneRegex.test(cleanPhone)) {
+            alert('❌ Please enter a valid 10-digit phone number (numbers only, no spaces or special characters).');
+            return;
+        }
+
+        // Additional phone validation - check for common invalid patterns
+        if (cleanPhone === '0000000000' || cleanPhone === '1111111111' || cleanPhone === '1234567890') {
+            alert('❌ Please enter a valid phone number. The number you entered appears to be invalid.');
             return;
         }
 
@@ -337,18 +370,24 @@ const FinalCheckoutPage = () => {
                             </div>
                             <div className="form-row">
                                 <div className="form-group">
-                                    <label>Contact Name *</label>
+                                    <label>Contact Name <span style={{ color: '#ff4444', fontWeight: 'bold' }}>*</span></label>
                                     <input
                                         type="text"
                                         value={deliveryAddress.contactName}
                                         onChange={(e) => handleAddressChange('contactName', e.target.value)}
-                                        placeholder="Enter contact person name"
-                                        className="form-input"
+                                        placeholder="Enter contact person name (Required)"
+                                        className={`form-input ${!deliveryAddress.contactName.trim() ? 'required-field' : ''}`}
                                         required
+                                        minLength="2"
                                     />
+                                    {!deliveryAddress.contactName.trim() && (
+                                        <small style={{ color: '#ff4444', fontSize: '12px', marginTop: '4px', display: 'block' }}>
+                                            ⚠️ Contact name is required for delivery
+                                        </small>
+                                    )}
                                 </div>
                                 <div className="form-group">
-                                    <label>Contact Phone *</label>
+                                    <label>Contact Phone <span style={{ color: '#ff4444', fontWeight: 'bold' }}>*</span></label>
                                     <div className="phone-input-group">
                                         <select
                                             value={deliveryAddress.countryCode}
@@ -370,12 +409,19 @@ const FinalCheckoutPage = () => {
                                                 const value = e.target.value.replace(/\D/g, '').slice(0, 10);
                                                 handleAddressChange('contactPhone', value);
                                             }}
-                                            placeholder="Enter 10-digit phone number"
-                                            className="form-input phone-input"
+                                            placeholder="Enter 10-digit phone number (Required)"
+                                            className={`form-input phone-input ${!deliveryAddress.contactPhone.trim() || deliveryAddress.contactPhone.length !== 10 ? 'required-field' : ''}`}
                                             maxLength="10"
                                             required
                                         />
                                     </div>
+                                    {(!deliveryAddress.contactPhone.trim() || deliveryAddress.contactPhone.length !== 10) && (
+                                        <small style={{ color: '#ff4444', fontSize: '12px', marginTop: '4px', display: 'block' }}>
+                                            ⚠️ {!deliveryAddress.contactPhone.trim()
+                                                ? 'Phone number is required for delivery coordination'
+                                                : `Phone number must be exactly 10 digits (currently ${deliveryAddress.contactPhone.length})`}
+                                        </small>
+                                    )}
                                 </div>
                             </div>
                             <div className="form-row">
