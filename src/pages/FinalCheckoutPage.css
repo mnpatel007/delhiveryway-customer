@@ -361,7 +361,6 @@ label:contains("*")::after {
     margin-left: 4px;
 }
 
-/* Order Acceptance Time Section */
 .acceptance-time-section {
     margin-bottom: 2rem;
 }
@@ -491,6 +490,7 @@ label:contains("*")::after {
     .queue-count {
         font-size: 1.25rem;
     }
+
 }
 
 /* Required Field Styling */
@@ -573,4 +573,3 @@ label:contains("*")::after {
         min-width: auto;
         width: 100%;
     }
-}
