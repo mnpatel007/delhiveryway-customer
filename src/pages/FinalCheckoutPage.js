@@ -28,7 +28,7 @@ const FinalCheckoutPage = () => {
         zipCode: '',
         instructions: '',
         contactName: user?.name || user?.user?.name || '',
-        contactPhone: user?.phone || user?.user?.phone || '',
+        contactPhone: '', // Always start empty to make it compulsory
         countryCode: '+91' // Default to India
     });
     const [isGeocoding, setIsGeocoding] = useState(false);
@@ -36,6 +36,24 @@ const FinalCheckoutPage = () => {
     const [acceptanceTime, setAcceptanceTime] = useState(null);
     const [loadingAcceptanceTime, setLoadingAcceptanceTime] = useState(false);
     const navigate = useNavigate();
+
+    // Clean up user data and ensure phone field is empty if invalid
+    useEffect(() => {
+        if (user) {
+            const userPhone = user?.phone || user?.user?.phone || '';
+            // Only use user phone if it's a valid 10-digit number and not a placeholder
+            const isValidPhone = /^[0-9]{10}$/.test(userPhone) &&
+                userPhone !== '0000000000' &&
+                userPhone !== '1111111111' &&
+                userPhone !== '1234567890';
+
+            setDeliveryAddress(prev => ({
+                ...prev,
+                contactName: user?.name || user?.user?.name || '',
+                contactPhone: isValidPhone ? userPhone : '' // Only use if valid, otherwise empty
+            }));
+        }
+    }, [user]);
 
     useEffect(() => {
         const fetchShops = async () => {
