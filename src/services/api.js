@@ -128,7 +128,6 @@ export const shopsAPI = {
 export const productsAPI = {
     getByShop: (shopId, params = {}) => {
         const defaultParams = {
-            limit: 100,
             active: true,
             ...params
         };
