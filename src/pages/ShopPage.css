@@ -695,9 +695,9 @@
     font-weight: 800;
     color: var(--text-primary);
     margin: 0 0 0.75rem 0;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    overflow: hidden;
+    line-height: 1.3;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
     position: relative;
 }
 
@@ -992,7 +992,7 @@
 
     .product-name {
         font-size: 1.3rem;
-        white-space: normal;
+        line-height: 1.3;
     }
 
     .product-name-main {
