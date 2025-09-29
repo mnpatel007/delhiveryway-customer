@@ -299,7 +299,13 @@ const OrderHistoryPage = () => {
                                         {formatDate(order.createdAt)}
                                     </div>
                                     <div className={`order-status ${getStatusColor(order.status)}`}>
-                                        {getStatusDisplayName(order.status)}
+                                        {order.status === 'cancelled' ? (
+                                            order.cancelledBy === 'admin' ? 'Order cancelled by admin' :
+                                            order.cancelledBy === 'shopper' || order.reason ? `Cancelled: ${order.reason}` :
+                                            'Order cancelled'
+                                        ) : (
+                                            getStatusDisplayName(order.status)
+                                        )}
                                     </div>
                                     {(order.status === 'customer_reviewing_revision' || order.status === 'shopper_revised_order') && (
                                         <div className="revision-actions">
@@ -350,25 +356,7 @@ const OrderHistoryPage = () => {
                                             </button>
                                         </div>
                                     )}
-                                    {order.status === 'cancelled' && (
-                                        <div className="order-reason">
-                                            {order.cancelledBy === 'admin' ? (
-                                                <div className="cancellation-info admin-cancelled">
-                                                    <strong>Order cancelled by admin</strong>
-                                                    {order.reason && <div className="reason-text">{order.reason}</div>}
-                                                </div>
-                                            ) : order.cancelledBy === 'shopper' || order.reason ? (
-                                                <div className="cancellation-info shopper-cancelled">
-                                                    <strong>Order cancelled by shopper</strong>
-                                                    <div className="reason-text">Reason: {order.reason}</div>
-                                                </div>
-                                            ) : (
-                                                <div className="cancellation-info">
-                                                    <strong>Order cancelled</strong>
-                                                </div>
-                                            )}
-                                        </div>
-                                    )}
+
                                 </div>
 
                                 <div className="order-details">
