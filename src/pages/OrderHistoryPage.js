@@ -318,6 +318,15 @@ const OrderHistoryPage = () => {
                                                     }
                                                     return 'Shopper cancelled: No reason provided';
                                                 } else {
+                                                    // Check timeline to determine who cancelled
+                                                    const cancelTimeline = order.timeline?.find(t => t.status === 'cancelled' && t.updatedBy);
+                                                    if (cancelTimeline) {
+                                                        if (cancelTimeline.updatedBy === 'admin') {
+                                                            return 'Order cancelled by admin';
+                                                        } else if (cancelTimeline.updatedBy === 'shopper') {
+                                                            return 'Order cancelled by shopper';
+                                                        }
+                                                    }
                                                     return 'Order cancelled';
                                                 }
                                             })()
