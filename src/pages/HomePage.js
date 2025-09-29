@@ -143,9 +143,31 @@ const HomePage = () => {
             }
 
             if (shopsData.length > 0) {
-                setShops(shopsData);
+                // Sort shops: highest orders first (absolute priority), then open shops before closed shops
+                const sortedShops = shopsData.sort((a, b) => {
+                    // First priority: Order count (highest first) - ABSOLUTE PRIORITY
+                    const aOrders = a.orderCount || a.totalOrders || 0;
+                    const bOrders = b.orderCount || b.totalOrders || 0;
+                    if (aOrders !== bOrders) {
+                        return bOrders - aOrders; // Higher orders first
+                    }
+                    
+                    // Second priority: Open status (open shops first)
+                    const aOpen = a.isOpenNow || isShopOpen(a);
+                    const bOpen = b.isOpenNow || isShopOpen(b);
+                    if (aOpen !== bOpen) {
+                        return bOpen - aOpen; // Open (true) comes before closed (false)
+                    }
+                    
+                    // Third priority: Rating (highest first)
+                    const aRating = a.rating?.average || 0;
+                    const bRating = b.rating?.average || 0;
+                    return bRating - aRating;
+                });
+                
+                setShops(sortedShops);
                 setError('');
-                console.log('✅ Shops loaded successfully:', shopsData.length);
+                console.log('✅ Shops loaded and sorted successfully:', sortedShops.length);
             } else {
                 console.log('⚠️ No shops from API, using sample data');
                 setShops(filterSampleShops());
@@ -166,6 +188,23 @@ const HomePage = () => {
         fetchShops();
     }, [fetchShops]);
 
+    // Helper function to check if shop is currently open
+    const isShopOpen = (shop) => {
+        if (!shop?.operatingHours) return true; // Default to open if no hours defined
+
+        const now = new Date();
+        const istTime = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Kolkata" }));
+        const dayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+        const day = dayNames[istTime.getDay()];
+        const currentTime = istTime.toTimeString().slice(0, 5);
+
+        const todayHours = shop.operatingHours[day];
+        if (!todayHours || todayHours.closed) return false;
+        if (!todayHours.open || !todayHours.close) return true;
+
+        return currentTime >= todayHours.open && currentTime <= todayHours.close;
+    };
+
     const filterSampleShops = () => {
         let filtered = sampleShops;
 
@@ -183,6 +222,25 @@ const HomePage = () => {
                 shop.category.toLowerCase().includes(searchLower)
             );
         }
+
+        // Sort sample shops same way as API shops
+        filtered.sort((a, b) => {
+            const aOrders = a.orderCount || 0;
+            const bOrders = b.orderCount || 0;
+            if (aOrders !== bOrders) {
+                return bOrders - aOrders;
+            }
+            
+            const aOpen = a.isOpenNow;
+            const bOpen = b.isOpenNow;
+            if (aOpen !== bOpen) {
+                return bOpen ? 1 : -1;
+            }
+            
+            const aRating = a.rating?.average || 0;
+            const bRating = b.rating?.average || 0;
+            return bRating - aRating;
+        });
 
         return filtered;
     };
