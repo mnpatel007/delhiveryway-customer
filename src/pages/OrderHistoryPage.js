@@ -299,7 +299,40 @@ const OrderHistoryPage = () => {
                                         {formatDate(order.createdAt)}
                                     </div>
                                     <div className={`order-status ${getStatusColor(order.status)}`}>
-                                        {getStatusDisplayName(order.status)}
+                                        {order.status === 'cancelled' ? (
+                                            (() => {
+                                                if (order.cancelledBy === 'admin') {
+                                                    return 'Order cancelled by admin';
+                                                } else if (order.cancelledBy === 'customer') {
+                                                    return order.cancellationReason || 'Order cancelled by customer';
+                                                } else if (order.reason) {
+                                                    return `Shopper cancelled: ${order.reason}`;
+                                                } else if (order.cancellationReason) {
+                                                    return order.cancellationReason;
+                                                } else if (order.cancelledBy === 'shopper') {
+                                                    // Extract reason from timeline
+                                                    const cancelTimeline = order.timeline?.find(t => t.status === 'cancelled' && t.note?.includes('Order cancelled by shopper:'));
+                                                    if (cancelTimeline) {
+                                                        const reason = cancelTimeline.note.replace('Order cancelled by shopper: ', '');
+                                                        return `Shopper cancelled: ${reason}`;
+                                                    }
+                                                    return 'Shopper cancelled: No reason provided';
+                                                } else {
+                                                    // Check timeline to determine who cancelled
+                                                    const cancelTimeline = order.timeline?.find(t => t.status === 'cancelled' && t.updatedBy);
+                                                    if (cancelTimeline) {
+                                                        if (cancelTimeline.updatedBy === 'admin') {
+                                                            return 'Order cancelled by admin';
+                                                        } else if (cancelTimeline.updatedBy === 'shopper') {
+                                                            return 'Order cancelled by shopper';
+                                                        }
+                                                    }
+                                                    return 'Order cancelled';
+                                                }
+                                            })()
+                                        ) : (
+                                            getStatusDisplayName(order.status)
+                                        )}
                                     </div>
                                     {(order.status === 'customer_reviewing_revision' || order.status === 'shopper_revised_order') && (
                                         <div className="revision-actions">
@@ -350,11 +383,7 @@ const OrderHistoryPage = () => {
                                             </button>
                                         </div>
                                     )}
-                                    {order.status === 'cancelled' && order.reason && (
-                                        <div className="order-reason">
-                                            <strong>Reason:</strong> {order.reason}
-                                        </div>
-                                    )}
+
                                 </div>
 
                                 <div className="order-details">
