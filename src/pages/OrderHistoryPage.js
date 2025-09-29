@@ -309,8 +309,16 @@ const OrderHistoryPage = () => {
                                                     return `Shopper cancelled: ${order.reason}`;
                                                 } else if (order.cancellationReason) {
                                                     return order.cancellationReason;
+                                                } else if (order.cancelledBy === 'shopper') {
+                                                    // Extract reason from timeline
+                                                    const cancelTimeline = order.timeline?.find(t => t.status === 'cancelled' && t.note?.includes('Order cancelled by shopper:'));
+                                                    if (cancelTimeline) {
+                                                        const reason = cancelTimeline.note.replace('Order cancelled by shopper: ', '');
+                                                        return `Shopper cancelled: ${reason}`;
+                                                    }
+                                                    return 'Shopper cancelled: No reason provided';
                                                 } else {
-                                                    return 'Order cancelled by shopper';
+                                                    return 'Order cancelled';
                                                 }
                                             })()
                                         ) : (
