@@ -336,3 +336,39 @@
 .total-row.grand-total strong {
     color: #27ae60;
 }
+
+/* Cancellation Reason Styles */
+.order-reason {
+    margin-top: 10px;
+}
+
+.cancellation-info {
+    padding: 12px;
+    border-radius: 8px;
+    border-left: 4px solid #dc3545;
+    background-color: #f8d7da;
+}
+
+.cancellation-info.admin-cancelled {
+    border-left-color: #6c757d;
+    background-color: #e2e3e5;
+    color: #383d41;
+}
+
+.cancellation-info.shopper-cancelled {
+    border-left-color: #dc3545;
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.cancellation-info strong {
+    display: block;
+    margin-bottom: 4px;
+    font-weight: 600;
+}
+
+.reason-text {
+    font-size: 14px;
+    font-style: italic;
+    opacity: 0.9;
+}
