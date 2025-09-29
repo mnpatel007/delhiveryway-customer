@@ -301,19 +301,14 @@ const OrderHistoryPage = () => {
                                     <div className={`order-status ${getStatusColor(order.status)}`}>
                                         {order.status === 'cancelled' ? (
                                             (() => {
-                                                console.log('Cancelled order data:', {
-                                                    cancelledBy: order.cancelledBy,
-                                                    reason: order.reason,
-                                                    cancellationReason: order.cancellationReason,
-                                                    orderData: order
-                                                });
-                                                
                                                 if (order.cancelledBy === 'admin') {
                                                     return 'Order cancelled by admin';
+                                                } else if (order.cancelledBy === 'customer') {
+                                                    return order.cancellationReason || 'Order cancelled by customer';
                                                 } else if (order.reason) {
-                                                    return `Cancelled: ${order.reason}`;
+                                                    return `Shopper cancelled: ${order.reason}`;
                                                 } else if (order.cancellationReason) {
-                                                    return `Cancelled: ${order.cancellationReason}`;
+                                                    return order.cancellationReason;
                                                 } else {
                                                     return 'Order cancelled by shopper';
                                                 }
