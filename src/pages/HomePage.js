@@ -143,20 +143,20 @@ const HomePage = () => {
             }
 
             if (shopsData.length > 0) {
-                // Sort shops: highest orders first, then open shops before closed shops
+                // Sort shops: highest orders first (absolute priority), then open shops before closed shops
                 const sortedShops = shopsData.sort((a, b) => {
-                    // First priority: Order count (highest first)
-                    const aOrders = a.orderCount || 0;
-                    const bOrders = b.orderCount || 0;
+                    // First priority: Order count (highest first) - ABSOLUTE PRIORITY
+                    const aOrders = a.orderCount || a.totalOrders || 0;
+                    const bOrders = b.orderCount || b.totalOrders || 0;
                     if (aOrders !== bOrders) {
-                        return bOrders - aOrders;
+                        return bOrders - aOrders; // Higher orders first
                     }
                     
                     // Second priority: Open status (open shops first)
                     const aOpen = a.isOpenNow || isShopOpen(a);
                     const bOpen = b.isOpenNow || isShopOpen(b);
                     if (aOpen !== bOpen) {
-                        return bOpen ? 1 : -1;
+                        return bOpen - aOpen; // Open (true) comes before closed (false)
                     }
                     
                     // Third priority: Rating (highest first)
