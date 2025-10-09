@@ -88,7 +88,7 @@ const SignupPage = () => {
             });
 
             if (result.success) {
-                setSuccessMessage('✅ Account created successfully! Please check your email to verify your account before logging in.');
+                setSuccessMessage('✅ Account created successfully! Please check your email to verify your account before logging in.\n\n📧 IMPORTANT: If you don\'t see the email, please check your spam/junk folder!');
                 setErrors({});
                 setFormData({ name: '', email: '', password: '', confirmPassword: '' });
 
