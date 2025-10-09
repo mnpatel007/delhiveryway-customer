@@ -85,7 +85,7 @@
 .signup-subtitle { font-size: 16px; color:#666; margin:0; font-weight:400; }
 
 /* Banners */
-.success-banner { display:flex; align-items:center; gap:12px; background: linear-gradient(135deg,#10b981,#059669); color:white; padding:14px 18px; border-radius:12px; margin: 16px 0; box-shadow: 0 4px 15px rgba(16,185,129,0.3); }
+.success-banner { display:flex; align-items:center; gap:12px; background: linear-gradient(135deg,#10b981,#059669); color:white; padding:14px 18px; border-radius:12px; margin: 16px 0; box-shadow: 0 4px 15px rgba(16,185,129,0.3); white-space: pre-line; }
 .error-banner { display:flex; align-items:center; gap:12px; background: linear-gradient(135deg,#ff6b6b,#ee5a52); color:white; padding:14px 18px; border-radius:12px; margin: 16px 0; box-shadow: 0 4px 15px rgba(255,107,107,0.3); }
 
 /* Inputs */
