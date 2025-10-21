@@ -17,6 +17,7 @@ const ShopPage = () => {
     const [selectedCategory, setSelectedCategory] = useState('all');
     const [sortBy, setSortBy] = useState('name');
     const [viewMode, setViewMode] = useState('grid');
+    const [showMenu, setShowMenu] = useState(false);
     const { addToCart, selectedShop, setSelectedShop } = useContext(CartContext);
 
     useEffect(() => {
@@ -550,10 +551,149 @@ const ShopPage = () => {
                                     </div>
                                 )} */}
                             </div>
+
+                            {/* View Menu button */}
+                            <div style={{ marginTop: '12px' }}>
+                                <button
+                                    onClick={() => setShowMenu(true)}
+                                    className="view-menu-btn"
+                                    style={{
+                                        background: '#0d6efd',
+                                        color: '#fff',
+                                        border: 'none',
+                                        padding: '10px 16px',
+                                        borderRadius: '8px',
+                                        cursor: 'pointer',
+                                        fontWeight: 600
+                                    }}
+                                >
+                                    📖 View Menu
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
+
+            {/* Full-screen Menu Overlay */}
+            {showMenu && (
+                <div
+                    className="menu-overlay"
+                    style={{
+                        position: 'fixed',
+                        inset: 0,
+                        background: 'rgba(0,0,0,0.4)',
+                        zIndex: 9998,
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'flex-start',
+                        overflowY: 'auto'
+                    }}
+                    onClick={(e) => {
+                        // close only when backdrop clicked
+                        if (e.target.classList.contains('menu-overlay')) setShowMenu(false);
+                    }}
+                >
+                    <div
+                        className="menu-panel"
+                        style={{
+                            background: '#fff',
+                            width: 'min(900px, 92vw)',
+                            margin: '40px 16px',
+                            borderRadius: '12px',
+                            boxShadow: '0 12px 32px rgba(0,0,0,0.2)'
+                        }}
+                    >
+                        <div style={{
+                            position: 'sticky', top: 0, zIndex: 1,
+                            background: '#ffffffee', backdropFilter: 'saturate(180%) blur(6px)',
+                            display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                            padding: '14px 16px', borderBottom: '1px solid #eee', borderTopLeftRadius: '12px', borderTopRightRadius: '12px'
+                        }}>
+                            <div style={{ fontWeight: 800, fontSize: '18px' }}>
+                                {shop?.name || 'Menu'} · {products.length} items
+                            </div>
+                            <div>
+                                <button
+                                    onClick={() => setShowMenu(false)}
+                                    style={{
+                                        background: 'transparent',
+                                        color: '#333',
+                                        border: '1px solid #ddd',
+                                        padding: '8px 12px',
+                                        borderRadius: '8px',
+                                        cursor: 'pointer',
+                                        fontWeight: 600
+                                    }}
+                                >
+                                    ✕ Close
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Simple one-page menu list */}
+                        <div style={{ padding: '8px 0 12px' }}>
+                            {products.length === 0 ? (
+                                <div style={{ padding: '24px', textAlign: 'center', color: '#666' }}>No items available.</div>
+                            ) : (
+                                <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
+                                    {products.map((item) => (
+                                        <li key={item._id} style={{
+                                            display: 'grid',
+                                            gridTemplateColumns: '72px 1fr auto',
+                                            gap: '12px',
+                                            padding: '12px 16px',
+                                            borderBottom: '1px solid #f0f0f0',
+                                            alignItems: 'center'
+                                        }}>
+                                            <div style={{ width: 72, height: 72, borderRadius: 8, background: '#fafafa', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                                                {item.images && item.images[0] ? (
+                                                    <img src={item.images[0]} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                                ) : (
+                                                    <span style={{ fontSize: 24 }}>📦</span>
+                                                )}
+                                            </div>
+
+                                            <div>
+                                                <div style={{ fontWeight: 700 }}>{item.name}</div>
+                                                {item.description && (
+                                                    <div style={{ fontSize: 13, color: '#666', marginTop: 4 }}>
+                                                        {item.description}
+                                                    </div>
+                                                )}
+                                                <div style={{ display: 'flex', gap: 10, marginTop: 6, fontSize: 12, color: '#555' }}>
+                                                    {item.category && <span>🏷️ {item.category}</span>}
+                                                    {item.stockQuantity !== undefined && <span>📦 {item.stockQuantity} {item.unit || 'units'}</span>}
+                                                </div>
+                                            </div>
+
+                                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 8 }}>
+                                                <div style={{ fontWeight: 800, color: '#111' }}>₹{(item.price || 0).toFixed(2)}</div>
+                                                <button
+                                                    onClick={() => handleAddToCart(item)}
+                                                    disabled={!item.inStock}
+                                                    style={{
+                                                        background: item.inStock ? '#198754' : '#adb5bd',
+                                                        color: '#fff',
+                                                        border: 'none',
+                                                        padding: '8px 10px',
+                                                        borderRadius: '8px',
+                                                        cursor: item.inStock ? 'pointer' : 'not-allowed',
+                                                        fontWeight: 700,
+                                                        minWidth: 110
+                                                    }}
+                                                >
+                                                    {item.inStock ? 'Add' : 'Out of stock'}
+                                                </button>
+                                            </div>
+                                        </li>
+                                    ))}
+                                </ul>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Shop Controls Section */}
             <div className="shop-controls">
