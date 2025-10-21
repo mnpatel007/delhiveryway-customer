@@ -552,24 +552,7 @@ const ShopPage = () => {
                                 )} */}
                             </div>
 
-                            {/* View Menu button */}
-                            <div style={{ marginTop: '12px' }}>
-                                <button
-                                    onClick={() => setShowMenu(true)}
-                                    className="view-menu-btn"
-                                    style={{
-                                        background: '#0d6efd',
-                                        color: '#fff',
-                                        border: 'none',
-                                        padding: '10px 16px',
-                                        borderRadius: '8px',
-                                        cursor: 'pointer',
-                                        fontWeight: 600
-                                    }}
-                                >
-                                    📖 View Menu
-                                </button>
-                            </div>
+                            {/* View Menu button moved to controls section */}
                         </div>
                     </div>
                 </div>
@@ -736,7 +719,23 @@ const ShopPage = () => {
                         </div>
                     </div>
 
-                    <div className="view-controls">
+                    <div className="view-controls" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        {/* View Menu button placed to the left of Grid/List */}
+                        <button
+                            onClick={() => setShowMenu(true)}
+                            className="view-menu-btn"
+                            style={{
+                                background: '#0d6efd',
+                                color: '#fff',
+                                border: 'none',
+                                padding: '10px 14px',
+                                borderRadius: '8px',
+                                cursor: 'pointer',
+                                fontWeight: 600
+                            }}
+                        >
+                            📖 View Menu
+                        </button>
                         <button
                             onClick={() => setViewMode('grid')}
                             className={`view-btn ${viewMode === 'grid' ? 'active' : ''}`}
