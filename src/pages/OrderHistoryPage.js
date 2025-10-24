@@ -467,6 +467,12 @@ const OrderHistoryPage = () => {
                                                             <span>Delivery Fee</span>
                                                             <span>₹{orderValues.deliveryFee?.toFixed(2) || '0.00'}</span>
                                                         </div>
+                                                        {orderValues.taxes > 0 && (
+                                                            <div className="total-row">
+                                                                <span>Taxes</span>
+                                                                <span>₹{orderValues.taxes?.toFixed(2) || '0.00'}</span>
+                                                            </div>
+                                                        )}
                                                         <div className="total-row grand-total">
                                                             <strong>Grand Total</strong>
                                                             <strong>₹{grandTotal.toFixed(2)}</strong>

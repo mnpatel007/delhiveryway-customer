@@ -229,7 +229,7 @@ const CartPage = () => {
                                 </div>
 
                                 <div className="summary-row">
-                                    <span>Taxes (5%)</span>
+                                    <span>Taxes ({selectedShop?.hasTax ? `${selectedShop.taxRate}%` : '0%'})</span>
                                     <span>{formatPrice(orderSummary.taxes)}</span>
                                 </div>
 
