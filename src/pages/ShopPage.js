@@ -385,7 +385,9 @@ const ShopPage = () => {
                 ...shop,
                 _id: shop._id,
                 name: shop.name,
-                deliveryFee: shop.deliveryFee || 30
+                deliveryFee: shop.deliveryFee || 30,
+                hasTax: shop.hasTax || false,
+                taxRate: shop.taxRate || 5
             };
 
             // Ensure product has complete shop data including delivery fee

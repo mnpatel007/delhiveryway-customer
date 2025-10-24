@@ -330,16 +330,32 @@ export const CartProvider = ({ children }) => {
     };
 
     const getTaxes = () => {
-        // No taxes - removed as per requirements
-        return 0;
+        try {
+            if (!selectedShop || !selectedShop.hasTax || !selectedShop.taxRate) {
+                return 0;
+            }
+
+            const subtotal = getCartSubtotal();
+            const taxAmount = Math.round((subtotal * selectedShop.taxRate) / 100);
+            console.log('💰 Tax calculation:', {
+                subtotal,
+                taxRate: selectedShop.taxRate,
+                taxAmount
+            });
+            return taxAmount;
+        } catch (error) {
+            console.error('❌ Error calculating taxes:', error);
+            return 0;
+        }
     };
 
     const getGrandTotal = () => {
         try {
             const subtotal = getCartSubtotal();
             const deliveryFee = getDeliveryFee();
-            // ONLY subtotal + delivery fee - NO TAXES, NO OTHER FEES
-            return Math.round((subtotal + deliveryFee) * 100) / 100;
+            const taxes = getTaxes();
+            // subtotal + delivery fee + taxes
+            return Math.round((subtotal + deliveryFee + taxes) * 100) / 100;
         } catch (error) {
             console.error('❌ Error calculating grand total:', error);
             return 0;
@@ -359,7 +375,7 @@ export const CartProvider = ({ children }) => {
         try {
             const subtotal = getCartSubtotal();
             const deliveryFee = getDeliveryFee();
-            const taxes = 0; // NO TAXES
+            const taxes = getTaxes();
             const total = getGrandTotal();
 
             return {
