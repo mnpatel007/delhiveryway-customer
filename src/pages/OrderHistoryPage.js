@@ -295,8 +295,13 @@ const OrderHistoryPage = () => {
                         return (
                             <div key={order._id} className="order-card">
                                 <div className="order-header">
-                                    <div className="order-date">
-                                        {formatDate(order.createdAt)}
+                                    <div className="order-info">
+                                        <div className="order-number">
+                                            Order #{order.orderNumber || order._id?.slice(-8) || 'N/A'}
+                                        </div>
+                                        <div className="order-date">
+                                            {formatDate(order.createdAt)}
+                                        </div>
                                     </div>
                                     <div className={`order-status ${getStatusColor(order.status)}`}>
                                         {order.status === 'cancelled' ? (
