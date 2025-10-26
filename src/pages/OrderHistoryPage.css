@@ -143,6 +143,18 @@
     border-bottom: 1px solid #eee;
 }
 
+.order-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.order-number {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
 .order-date {
     color: #6c757d;
 }
@@ -286,6 +298,14 @@
         flex-direction: column;
         align-items: flex-start;
         gap: 0.5rem;
+    }
+
+    .order-info {
+        width: 100%;
+    }
+
+    .order-number {
+        font-size: 1rem;
     }
 }
 
