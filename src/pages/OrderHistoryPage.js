@@ -1,12 +1,12 @@
-import React, { useEffect, useState, useContext } from 'react';
-import { AuthContext } from '../context/AuthContext';
+import React, { useEffect, useState } from 'react';
+import { useAuth } from '../context/AuthContext';
 import { ordersAPI, apiCall, api } from '../services/api';
 import io from 'socket.io-client';
 import config from '../config/config';
 import './OrderHistoryPage.css';
 
 const OrderHistoryPage = () => {
-    const { user } = useContext(AuthContext);
+    const { user } = useAuth();
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);

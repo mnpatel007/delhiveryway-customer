@@ -1,12 +1,12 @@
-import React, { useContext, useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { AuthContext } from '../context/AuthContext';
+import { useAuth } from '../context/AuthContext';
 import { CartContext } from '../context/CartContext';
 import Logo from './Logo';
 import './Navbar.css';
 
 const Navbar = () => {
-    const { user, logout } = useContext(AuthContext);
+    const { user, logout } = useAuth();
     const { cartItems } = useContext(CartContext);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const navigate = useNavigate();

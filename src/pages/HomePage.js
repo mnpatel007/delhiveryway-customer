@@ -1,6 +1,6 @@
-import React, { useEffect, useState, useContext, useCallback, useRef } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AuthContext } from '../context/AuthContext';
+import { useAuth } from '../context/AuthContext';
 import PermanentNotices from '../components/PermanentNotices';
 import Logo from '../components/Logo';
 import axios from 'axios';
@@ -16,7 +16,7 @@ const HomePage = () => {
     const [categories] = useState(['all', 'grocery', 'pharmacy', 'electronics', 'clothing', 'restaurant']);
 
     const navigate = useNavigate();
-    const { user } = useContext(AuthContext);
+    const { user } = useAuth();
     const searchInputRef = useRef(null);
 
     // Sample shops as fallback
@@ -151,20 +151,20 @@ const HomePage = () => {
                     if (aOrders !== bOrders) {
                         return bOrders - aOrders;
                     }
-                    
+
                     // Second priority: Open status (open shops first)
                     const aOpen = a.isOpenNow || isShopOpen(a);
                     const bOpen = b.isOpenNow || isShopOpen(b);
                     if (aOpen !== bOpen) {
                         return bOpen - aOpen;
                     }
-                    
+
                     // Third priority: Number of items (highest first)
                     const aItems = a.productCount || 0;
                     const bItems = b.productCount || 0;
                     return bItems - aItems;
                 });
-                
+
                 setShops(sortedShops);
                 setError('');
                 console.log('✅ Shops loaded and sorted successfully:', sortedShops.length);
@@ -230,13 +230,13 @@ const HomePage = () => {
             if (aOrders !== bOrders) {
                 return bOrders - aOrders;
             }
-            
+
             const aOpen = a.isOpenNow;
             const bOpen = b.isOpenNow;
             if (aOpen !== bOpen) {
                 return bOpen ? 1 : -1;
             }
-            
+
             const aItems = a.productCount || 0;
             const bItems = b.productCount || 0;
             return bItems - aItems;

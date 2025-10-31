@@ -1,12 +1,12 @@
-import React, { useState, useEffect, useContext } from 'react';
-import { SocketContext } from '../context/SocketContext';
-import { AuthContext } from '../context/AuthContext';
+import React, { useState, useEffect } from 'react';
+import { useSocket } from '../context/SocketContext';
+import { useAuth } from '../context/AuthContext';
 import config from '../config/config';
 import './SocketDebugPanel.css';
 
 const SocketDebugPanel = () => {
-    const { socket, isConnected, notifications } = useContext(SocketContext);
-    const { user } = useContext(AuthContext);
+    const { socket, isConnected, notifications } = useSocket();
+    const { user } = useAuth();
     const [isOpen, setIsOpen] = useState(false);
     const [apiStatus, setApiStatus] = useState('unknown');
     const [lastApiCheck, setLastApiCheck] = useState(null);
@@ -216,6 +216,19 @@ const SocketDebugPanel = () => {
                             }}
                         >
                             🗑️ Clear Storage & Reload
+                        </button>
+                        <button
+                            className="debug-action-btn"
+                            onClick={() => {
+                                import('../utils/testNotifications').then(({ testNotifications, testBrowserNotifications }) => {
+                                    testNotifications(socket, (notif) => {
+                                        console.log('Test notification added:', notif);
+                                    });
+                                    testBrowserNotifications();
+                                });
+                            }}
+                        >
+                            🧪 Test Notifications
                         </button>
                     </div>
                 </div>
