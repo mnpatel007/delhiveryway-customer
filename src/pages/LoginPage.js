@@ -1,5 +1,5 @@
-import React, { useState, useContext } from 'react';
-import { AuthContext } from '../context/AuthContext';
+import React, { useState } from 'react';
+import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { authAPI, apiCall } from '../services/api';
 import { jwtDecode } from 'jwt-decode';
@@ -9,7 +9,7 @@ import './LoginPage.css';
 const clientId = '117679354054-t7tsl5najnu2kab80ffls6flkau21idl.apps.googleusercontent.com';
 
 const LoginPage = () => {
-    const { login } = useContext(AuthContext);
+    const { login } = useAuth();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');

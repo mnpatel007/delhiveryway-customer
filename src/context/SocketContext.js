@@ -1,8 +1,16 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import io from 'socket.io-client';
-import { AuthContext } from './AuthContext';
+import { useAuth } from './AuthContext';
 
 export const SocketContext = createContext();
+
+export const useSocket = () => {
+    const context = useContext(SocketContext);
+    if (!context) {
+        throw new Error('useSocket must be used within a SocketProvider');
+    }
+    return context;
+};
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
 
@@ -74,7 +82,7 @@ const generateNotificationSound = (isUrgent = false) => {
 };
 
 export const SocketProvider = ({ children }) => {
-    const { user } = useContext(AuthContext);
+    const { user } = useAuth();
     const [socket, setSocket] = useState(null);
     const [isConnected, setIsConnected] = useState(false);
     const [notifications, setNotifications] = useState([]);
@@ -118,7 +126,7 @@ export const SocketProvider = ({ children }) => {
             if (socket && isConnected) {
                 socket.emit('heartbeat', {
                     timestamp: Date.now(),
-                    userId: user?.user?._id,
+                    userId: user?._id,
                     userType: 'customer'
                 });
                 console.log('💓 Customer heartbeat sent');
@@ -169,8 +177,9 @@ export const SocketProvider = ({ children }) => {
 
 
     useEffect(() => {
-        if (user?.user?._id) {
+        if (user?._id) {
             console.log('🔌 Initializing customer socket connection...');
+            console.log('👤 Customer ID:', user._id);
 
             // Initialize socket connection
             const newSocket = io(BACKEND_URL, {
@@ -184,10 +193,9 @@ export const SocketProvider = ({ children }) => {
                 console.log('🟢 Customer socket connected:', newSocket.id);
                 setIsConnected(true);
 
-
                 // Register as customer
-                newSocket.emit('registerCustomer', user.user._id);
-                console.log('📝 Registered as customer:', user.user._id);
+                newSocket.emit('registerCustomer', user._id);
+                console.log('📝 Registered as customer:', user._id);
             });
 
             newSocket.on('disconnect', (reason) => {
@@ -517,6 +525,22 @@ export const SocketProvider = ({ children }) => {
                 window.dispatchEvent(new CustomEvent('new-notice', { detail: data }));
             });
 
+            // Test response handlers
+            newSocket.on('testResponse', (data) => {
+                console.log('🧪 Test response received:', data);
+                addNotification({
+                    id: Date.now(),
+                    type: 'test_response',
+                    title: '✅ Test Response',
+                    message: data.message || 'Test response received from server',
+                    timestamp: new Date().toISOString()
+                });
+            });
+
+            newSocket.on('heartbeatResponse', (data) => {
+                console.log('💓 Heartbeat response received:', data);
+            });
+
             // Keep backward compatibility for old notice events
             newSocket.on('newNotice', (data) => {
                 console.log('🚨 IMPORTANT NOTICE RECEIVED (legacy):', data);
@@ -586,7 +610,7 @@ export const SocketProvider = ({ children }) => {
                 setIsConnected(false);
             };
         }
-    }, [user?.user?._id]);
+    }, [user?._id]);
 
     // Get user-friendly status messages
     const getStatusMessage = (status, data) => {
@@ -769,12 +793,4 @@ export const SocketProvider = ({ children }) => {
             {children}
         </SocketContext.Provider>
     );
-};
-
-export const useSocket = () => {
-    const context = useContext(SocketContext);
-    if (!context) {
-        throw new Error('useSocket must be used within a SocketProvider');
-    }
-    return context;
 };

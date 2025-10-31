@@ -1,13 +1,13 @@
-import React, { useEffect, useContext, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { CartContext } from '../context/CartContext';
-import { AuthContext } from '../context/AuthContext';
+import { useAuth } from '../context/AuthContext';
 import { useLocation } from 'react-router-dom';
 import api from '../services/api';
 import './OrderSuccessPage.css';
 
 const OrderSuccessPage = () => {
     const { clearCart } = useContext(CartContext);
-    const { user } = useContext(AuthContext);
+    const { user } = useAuth();
 
     const location = useLocation();
     const [orderDetails, setOrderDetails] = useState(null);

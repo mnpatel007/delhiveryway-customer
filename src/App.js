@@ -1,7 +1,7 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { clearProblematicStorage } from './utils/clearStorage';
-import { AuthProvider, AuthContext } from './context/AuthContext';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 import { SocketProvider, useSocket } from './context/SocketContext';
 
@@ -30,7 +30,7 @@ import ResetPasswordPage from './pages/ResetPasswordPage';
 
 // Private route
 const PrivateRoute = ({ children }) => {
-  const { user } = useContext(AuthContext);
+  const { user } = useAuth();
   return user ? children : <Navigate to="/login" />;
 };
 

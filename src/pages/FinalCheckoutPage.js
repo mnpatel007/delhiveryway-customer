@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { AuthContext } from '../context/AuthContext';
+import { useAuth } from '../context/AuthContext';
 import { CartContext } from '../context/CartContext';
 import { useNavigate } from 'react-router-dom';
 import { shopsAPI, apiCall, api } from '../services/api';
@@ -17,7 +17,7 @@ const formatPrice = (price) => {
 };
 
 const FinalCheckoutPage = () => {
-    const { user } = useContext(AuthContext);
+    const { user } = useAuth();
     const { cartItems, selectedShop, getOrderSummary, clearCart } = useContext(CartContext);
     const [loading, setLoading] = useState(false);
     const [shops, setShops] = useState([]);
