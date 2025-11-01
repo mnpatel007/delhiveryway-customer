@@ -217,19 +217,6 @@ const SocketDebugPanel = () => {
                         >
                             🗑️ Clear Storage & Reload
                         </button>
-                        <button
-                            className="debug-action-btn"
-                            onClick={() => {
-                                import('../utils/testNotifications').then(({ testNotifications, testBrowserNotifications }) => {
-                                    testNotifications(socket, (notif) => {
-                                        console.log('Test notification added:', notif);
-                                    });
-                                    testBrowserNotifications();
-                                });
-                            }}
-                        >
-                            🧪 Test Notifications
-                        </button>
                     </div>
                 </div>
             </div>
