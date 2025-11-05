@@ -19,7 +19,15 @@ const formatPrice = (price) => {
 
 const FinalCheckoutPage = () => {
     const { user } = useAuth();
-    const { cartItems, selectedShop, getOrderSummary, clearCart } = useContext(CartContext);
+    const {
+        cartItems,
+        selectedShop,
+        getOrderSummary,
+        clearCart,
+        calculateRealTimeDeliveryFee,
+        isCalculatingDeliveryFee,
+        deliveryCalculationDetails
+    } = useContext(CartContext);
     const [loading, setLoading] = useState(false);
     const [shops, setShops] = useState([]);
     const [deliveryAddress, setDeliveryAddress] = useState({
