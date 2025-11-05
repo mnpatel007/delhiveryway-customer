@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { calculateDeliveryFee, getCurrentLocation, getCustomerLocation } from '../utils/deliveryCalculator';
 
 const CartContext = createContext();
 
@@ -36,6 +37,10 @@ export const CartProvider = ({ children }) => {
         }
     });
 
+    const [calculatedDeliveryFee, setCalculatedDeliveryFee] = useState(null);
+    const [deliveryCalculationDetails, setDeliveryCalculationDetails] = useState(null);
+    const [isCalculatingDeliveryFee, setIsCalculatingDeliveryFee] = useState(false);
+
     // Save cart to localStorage whenever it changes
     useEffect(() => {
         try {
@@ -58,6 +63,16 @@ export const CartProvider = ({ children }) => {
             }
         } catch (error) {
             console.error('❌ Error saving selected shop to localStorage:', error);
+        }
+    }, [selectedShop]);
+
+    // Calculate delivery fee when shop changes or on load
+    useEffect(() => {
+        if (selectedShop && selectedShop._id) {
+            console.log('🚚 Shop changed, calculating delivery fee for:', selectedShop.name);
+            calculateRealTimeDeliveryFee();
+        } else {
+            setCalculatedDeliveryFee(null);
         }
     }, [selectedShop]);
 
@@ -284,6 +299,49 @@ export const CartProvider = ({ children }) => {
         }
     };
 
+    // Calculate real-time delivery fee based on current location
+    const calculateRealTimeDeliveryFee = async () => {
+        if (!selectedShop || !selectedShop._id) {
+            console.log('🚚 No selected shop for delivery fee calculation');
+            return null;
+        }
+
+        setIsCalculatingDeliveryFee(true);
+
+        try {
+            // Get current location
+            let location = await getCurrentLocation();
+
+            if (!location) {
+                // Fallback to saved location
+                location = getCustomerLocation();
+            }
+
+            if (!location) {
+                console.log('🚚 No location available for delivery fee calculation');
+                setIsCalculatingDeliveryFee(false);
+                return null;
+            }
+
+            console.log('🚚 Calculating delivery fee for shop:', selectedShop.name, 'with location:', location);
+
+            // Calculate delivery fee using the API
+            const result = await calculateDeliveryFee(selectedShop._id, location);
+
+            console.log('🚚 Calculated delivery fee result:', result);
+            setCalculatedDeliveryFee(result.deliveryFee);
+            setDeliveryCalculationDetails(result.calculation);
+            setIsCalculatingDeliveryFee(false);
+
+            return result;
+
+        } catch (error) {
+            console.error('❌ Error calculating real-time delivery fee:', error);
+            setIsCalculatingDeliveryFee(false);
+            return null;
+        }
+    };
+
     // Calculate distance between two coordinates using Haversine formula
     const calculateDistance = (lat1, lon1, lat2, lon2) => {
         const R = 6371; // Earth's radius in km
@@ -299,11 +357,16 @@ export const CartProvider = ({ children }) => {
 
     const getDeliveryFee = () => {
         try {
-            console.log('🚚 Getting delivery fee for shop:', selectedShop?.name);
-            console.log('🚚 Shop delivery fee:', selectedShop?.deliveryFee);
-            console.log('🚚 Full shop object:', selectedShop);
+            // Use calculated delivery fee if available
+            if (calculatedDeliveryFee !== null) {
+                console.log('🚚 Using calculated delivery fee:', calculatedDeliveryFee);
+                return calculatedDeliveryFee;
+            }
 
-            // Handle different shop data structures
+            console.log('🚚 Getting fallback delivery fee for shop:', selectedShop?.name);
+            console.log('🚚 Shop delivery fee:', selectedShop?.deliveryFee);
+
+            // Handle different shop data structures as fallback
             let deliveryFee;
 
             if (selectedShop.data && selectedShop.data.shop && selectedShop.data.shop.deliveryFee !== undefined) {
@@ -321,7 +384,7 @@ export const CartProvider = ({ children }) => {
             }
 
             const fee = parseFloat(deliveryFee) || 0;
-            console.log('🚚 Final delivery fee:', fee);
+            console.log('🚚 Final fallback delivery fee:', fee);
             return fee;
         } catch (error) {
             console.error('❌ Error getting delivery fee:', error);
@@ -437,7 +500,11 @@ export const CartProvider = ({ children }) => {
         getGrandTotal,
         getCartItemsCount,
         getOrderSummary,
-        debugCartState
+        debugCartState,
+        calculatedDeliveryFee,
+        deliveryCalculationDetails,
+        isCalculatingDeliveryFee,
+        calculateRealTimeDeliveryFee
     };
 
     return (
