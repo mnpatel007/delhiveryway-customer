@@ -525,6 +525,22 @@ export const SocketProvider = ({ children }) => {
                 window.dispatchEvent(new CustomEvent('new-notice', { detail: data }));
             });
 
+            // Test response handlers
+            newSocket.on('testResponse', (data) => {
+                console.log('🧪 Test response received:', data);
+                addNotification({
+                    id: Date.now(),
+                    type: 'test_response',
+                    title: '✅ Test Response',
+                    message: data.message || 'Test response received from server',
+                    timestamp: new Date().toISOString()
+                });
+            });
+
+            newSocket.on('heartbeatResponse', (data) => {
+                console.log('💓 Heartbeat response received:', data);
+            });
+
             // Keep backward compatibility for old notice events
             newSocket.on('newNotice', (data) => {
                 console.log('🚨 IMPORTANT NOTICE RECEIVED (legacy):', data);
