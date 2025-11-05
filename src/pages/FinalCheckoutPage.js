@@ -676,6 +676,21 @@ const FinalCheckoutPage = () => {
                                 />
                             </div>
                         </div>
+                        
+                        {/* Calculate Delivery Fee Button - Only show for distance-based shops */}
+                        {deliveryAddress.street.trim() && deliveryAddress.city.trim() && deliveryAddress.state.trim() && !deliveryAddress.coordinates && selectedShop && selectedShop.deliveryFeeMode === 'distance' && (
+                            <div className="form-row" style={{ marginTop: '1rem' }}>
+                                <button
+                                    type="button"
+                                    onClick={geocodeCurrentAddress}
+                                    disabled={isGeocoding}
+                                    className="btn btn-primary"
+                                    style={{ width: '100%', padding: '0.75rem' }}
+                                >
+                                    {isGeocoding ? '🗺️ Calculating Delivery Fee...' : '🗺️ Calculate Delivery Fee'}
+                                </button>
+                            </div>
+                        )}
                     </div>
                 </div>
 
@@ -735,36 +750,9 @@ const FinalCheckoutPage = () => {
                             <span>{formatPrice(orderSummary.subtotal)}</span>
                         </div>
                         <div className="total-row">
-                            <span>Delivery Fee {selectedShop?.deliveryFeeMode === 'distance' && isCalculatingDeliveryFee && '(Calculating...)'}</span>
-                            <span>{selectedShop?.deliveryFeeMode === 'distance' && isCalculatingDeliveryFee ? '...' : formatPrice(orderSummary.deliveryFee)}</span>
+                            <span>Delivery Fee</span>
+                            <span>{formatPrice(orderSummary.deliveryFee)}</span>
                         </div>
-                        {deliveryCalculationDetails && selectedShop?.deliveryFeeMode === 'distance' && (
-                            <div className="delivery-calculation-details" style={{
-                                fontSize: '0.85rem',
-                                color: '#666',
-                                marginTop: '0.5rem',
-                                padding: '0.75rem',
-                                backgroundColor: '#f8f9fa',
-                                borderRadius: '8px',
-                                border: '1px solid #e9ecef'
-                            }}>
-                                <div style={{ fontWeight: '600', marginBottom: '0.5rem', color: '#333' }}>
-                                    📍 Delivery Calculation:
-                                </div>
-                                <div>
-                                    🚚 Your address is <strong>{deliveryCalculationDetails.distanceKm}km</strong> away from {selectedShop?.name || 'the shop'}
-                                </div>
-                                <div style={{ marginTop: '0.25rem' }}>
-                                    📏 Distance: {deliveryCalculationDetails.distance}m = {deliveryCalculationDetails.segments} segments of 500m each
-                                </div>
-                                <div style={{ marginTop: '0.25rem' }}>
-                                    💰 Calculation: {deliveryCalculationDetails.segments} segments × ₹{selectedShop?.feePerKm || 6} = ₹{deliveryCalculationDetails.totalFee}
-                                </div>
-                                <div style={{ marginTop: '0.25rem', fontSize: '0.8rem', fontStyle: 'italic' }}>
-                                    {deliveryCalculationDetails.message}
-                                </div>
-                            </div>
-                        )}
                         <div className="summary-divider"></div>
                         <div className="total-row total-grand">
                             <span><strong>Total Amount</strong></span>
