@@ -136,6 +136,23 @@ const FinalCheckoutPage = () => {
         }
     }, [deliveryAddress.coordinates, calculateRealTimeDeliveryFee]);
 
+    // Auto-geocode address when user stops typing (debounced)
+    useEffect(() => {
+        const { street, city, state } = deliveryAddress;
+
+        // Only geocode if we have the essential address parts and haven't geocoded this address yet
+        if (street && city && state && !deliveryAddress.coordinates && !isGeocoding && !hasGeocodedAddress) {
+            console.log('🗺️ Starting auto-geocoding for:', { street, city, state });
+
+            const timeoutId = setTimeout(() => {
+                geocodeCurrentAddress();
+                setHasGeocodedAddress(true);
+            }, 3000); // Wait 3 seconds after user stops typing
+
+            return () => clearTimeout(timeoutId);
+        }
+    }, [deliveryAddress.street, deliveryAddress.city, deliveryAddress.state, deliveryAddress.zipCode]);
+
     // Get order summary from cart context
     const orderSummary = getOrderSummary();
 
@@ -381,42 +398,9 @@ const FinalCheckoutPage = () => {
             setIsGeocoding(true);
             setGeocodingError('');
 
-            // Use fallback coordinates based on city first to avoid wrong geocoding
-            let fallbackCoords = null;
-            const cityLower = city.toLowerCase();
-            const stateLower = state.toLowerCase();
-
-            if (cityLower.includes('indore') || stateLower.includes('madhya')) {
-                fallbackCoords = { lat: 22.7196, lng: 75.8577 }; // Indore center
-            } else if (cityLower.includes('mumbai') || cityLower.includes('bombay')) {
-                fallbackCoords = { lat: 19.0760, lng: 72.8777 }; // Mumbai center
-            } else if (cityLower.includes('delhi')) {
-                fallbackCoords = { lat: 28.6139, lng: 77.2090 }; // Delhi center
-            } else if (cityLower.includes('bangalore') || cityLower.includes('bengaluru')) {
-                fallbackCoords = { lat: 12.9716, lng: 77.5946 }; // Bangalore center
-            } else if (cityLower.includes('pune')) {
-                fallbackCoords = { lat: 18.5204, lng: 73.8567 }; // Pune center
-            } else if (cityLower.includes('hyderabad')) {
-                fallbackCoords = { lat: 17.3850, lng: 78.4867 }; // Hyderabad center
-            } else if (cityLower.includes('chennai')) {
-                fallbackCoords = { lat: 13.0827, lng: 80.2707 }; // Chennai center
-            } else if (cityLower.includes('kolkata')) {
-                fallbackCoords = { lat: 22.5726, lng: 88.3639 }; // Kolkata center
-            }
-
-            if (fallbackCoords) {
-                console.log('🔧 Using fallback coordinates for', city, ':', fallbackCoords);
-                setDeliveryAddress(prev => ({
-                    ...prev,
-                    coordinates: fallbackCoords
-                }));
-                setGeocodingError('');
-                return;
-            }
-
-            // If no fallback found, try geocoding API
             const fullAddress = `${street}, ${city}, ${state}${zipCode ? ', ' + zipCode : ''}, India`;
-            console.log('🗺️ Geocoding address:', fullAddress);
+            console.log('🗺️ Auto-geocoding address:', { street, city, state, zipCode });
+            console.log('🗺️ Full address string:', fullAddress);
 
             const coordinates = await geocodeAddress({
                 street,
@@ -425,13 +409,53 @@ const FinalCheckoutPage = () => {
                 zipCode
             });
 
-            // Validate coordinates
+            console.log('📍 Got coordinates:', coordinates);
+            console.log('📍 Coordinates validation:', {
+                lat: coordinates.lat,
+                lng: coordinates.lng,
+                isValidLat: coordinates.lat >= -90 && coordinates.lat <= 90,
+                isValidLng: coordinates.lng >= -180 && coordinates.lng <= 180,
+                isInIndia: coordinates.lat >= 6 && coordinates.lat <= 37 && coordinates.lng >= 68 && coordinates.lng <= 97
+            });
+
+            // Validate coordinates before setting
             if (!coordinates.lat || !coordinates.lng ||
                 coordinates.lat < 6 || coordinates.lat > 37 ||
                 coordinates.lng < 68 || coordinates.lng > 97) {
+
+                console.error('❌ Invalid coordinates received:', coordinates);
+                console.error('❌ Address that failed:', { street, city, state, zipCode });
+
+                // For testing: Use fallback coordinates based on city
+                let fallbackCoords = null;
+                const cityLower = city.toLowerCase();
+                const stateLower = state.toLowerCase();
+
+                if (cityLower.includes('indore') || stateLower.includes('madhya')) {
+                    fallbackCoords = { lat: 22.7196, lng: 75.8577 }; // Indore center
+                } else if (cityLower.includes('mumbai') || cityLower.includes('bombay')) {
+                    fallbackCoords = { lat: 19.0760, lng: 72.8777 }; // Mumbai center
+                } else if (cityLower.includes('delhi')) {
+                    fallbackCoords = { lat: 28.6139, lng: 77.2090 }; // Delhi center
+                } else if (cityLower.includes('bangalore') || cityLower.includes('bengaluru')) {
+                    fallbackCoords = { lat: 12.9716, lng: 77.5946 }; // Bangalore center
+                }
+
+                if (fallbackCoords) {
+                    console.log('🔧 Using fallback coordinates for', city, ':', fallbackCoords);
+
+                    setDeliveryAddress(prev => ({
+                        ...prev,
+                        coordinates: fallbackCoords
+                    }));
+                    setGeocodingError('');
+                    return;
+                }
+
                 throw new Error(`Invalid coordinates for India: ${coordinates.lat}, ${coordinates.lng}`);
             }
 
+            // Update delivery address with coordinates
             setDeliveryAddress(prev => ({
                 ...prev,
                 coordinates: {
@@ -453,13 +477,16 @@ const FinalCheckoutPage = () => {
     const handleAddressChange = (field, value) => {
         setDeliveryAddress(prev => ({
             ...prev,
-            [field]: value,
-            // Clear coordinates when address changes
-            coordinates: ['street', 'city', 'state', 'zipCode'].includes(field) ? null : prev.coordinates
+            [field]: value
         }));
 
+        // Clear previous coordinates when address changes
         if (['street', 'city', 'state', 'zipCode'].includes(field)) {
-            setHasGeocodedAddress(false);
+            setDeliveryAddress(prev => ({
+                ...prev,
+                coordinates: null
+            }));
+            setHasGeocodedAddress(false); // Reset geocoding flag
         }
     };
 
@@ -683,22 +710,6 @@ const FinalCheckoutPage = () => {
                                 />
                             </div>
                         </div>
-                        
-                        {/* Calculate Delivery Fee Button - Only show for shops without fixed delivery fee */}
-                        {deliveryAddress.street.trim() && deliveryAddress.city.trim() && deliveryAddress.state.trim() && !deliveryAddress.coordinates && selectedShop && !selectedShop.hasFixedDeliveryFee && (
-                            <div className="form-row" style={{ marginTop: '1rem' }}>
-                                <button
-                                    type="button"
-                                    onClick={geocodeCurrentAddress}
-                                    disabled={isGeocoding}
-                                    className="btn btn-primary"
-                                    style={{ width: '100%', padding: '0.75rem' }}
-                                >
-                                    {isGeocoding ? '🗺️ Calculating Delivery Fee...' : '🗺️ Calculate Delivery Fee'}
-                                </button>
-                            </div>
-                        )}
-
                     </div>
                 </div>
 
@@ -761,7 +772,47 @@ const FinalCheckoutPage = () => {
                             <span>Delivery Fee {isCalculatingDeliveryFee && '(Calculating...)'}</span>
                             <span>{isCalculatingDeliveryFee ? '...' : formatPrice(orderSummary.deliveryFee)}</span>
                         </div>
-
+                        {deliveryCalculationDetails && selectedShop?.deliveryFeeMode === 'distance' && (
+                            <div className="delivery-calculation-details" style={{
+                                fontSize: '0.85rem',
+                                color: '#666',
+                                marginTop: '0.5rem',
+                                padding: '0.75rem',
+                                backgroundColor: '#f8f9fa',
+                                borderRadius: '8px',
+                                border: '1px solid #e9ecef'
+                            }}>
+                                <div style={{ fontWeight: '600', marginBottom: '0.5rem', color: '#333' }}>
+                                    📍 Delivery Calculation:
+                                </div>
+                                <div>
+                                    🚚 Your address is <strong>{deliveryCalculationDetails.distanceKm}km</strong> away from {selectedShop?.name || 'the shop'}
+                                </div>
+                                <div style={{ marginTop: '0.25rem' }}>
+                                    📏 Distance: {deliveryCalculationDetails.distance}m = {deliveryCalculationDetails.segments} segments of 500m each
+                                </div>
+                                <div style={{ marginTop: '0.25rem' }}>
+                                    💰 Calculation: {deliveryCalculationDetails.segments} segments × ₹{selectedShop?.feePerKm || 6} = ₹{deliveryCalculationDetails.totalFee}
+                                </div>
+                                <div style={{ marginTop: '0.25rem', fontSize: '0.8rem', fontStyle: 'italic' }}>
+                                    {deliveryCalculationDetails.message}
+                                </div>
+                            </div>
+                        )}
+                        {selectedShop?.deliveryFeeMode === 'fixed' && (
+                            <div style={{
+                                fontSize: '0.85rem',
+                                color: '#666',
+                                marginTop: '0.5rem',
+                                padding: '0.5rem',
+                                backgroundColor: '#f0f8ff',
+                                borderRadius: '6px',
+                                border: '1px solid #e3f2fd',
+                                textAlign: 'center'
+                            }}>
+                                📦 Fixed delivery fee: ₹{selectedShop?.deliveryFee || 30} (same for all locations)
+                            </div>
+                        )}
                         <div className="summary-divider"></div>
                         <div className="total-row total-grand">
                             <span><strong>Total Amount</strong></span>
