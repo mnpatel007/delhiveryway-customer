@@ -11,6 +11,7 @@ const ActiveOrdersWidget = () => {
     const [activeOrders, setActiveOrders] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [updateTimeout, setUpdateTimeout] = useState(null);
 
     const fetchActiveOrders = async () => {
         if (!user) {
@@ -64,14 +65,35 @@ const ActiveOrdersWidget = () => {
         const handleOrderUpdate = (data) => {
             console.log('Socket order update received:', data);
 
-            // Update the specific order in the active orders list
-            setActiveOrders(prevOrders =>
-                prevOrders.map(order =>
-                    order._id === data.orderId
-                        ? { ...order, status: data.status }
-                        : order
-                )
-            );
+            try {
+                // Validate the incoming data
+                if (!data || !data.orderId) {
+                    console.warn('Invalid socket data received:', data);
+                    return;
+                }
+
+                // Update the specific order in the active orders list
+                setActiveOrders(prevOrders => {
+                    const updatedOrders = prevOrders.map(order => {
+                        if (order._id === data.orderId) {
+                            // Only update fields that are provided in the socket data
+                            const updatedOrder = { ...order };
+                            if (data.status) updatedOrder.status = data.status;
+                            if (data.personalShopperId) updatedOrder.personalShopperId = data.personalShopperId;
+                            if (data.estimatedDeliveryTime) updatedOrder.estimatedDeliveryTime = data.estimatedDeliveryTime;
+
+                            console.log('Updated order:', updatedOrder);
+                            return updatedOrder;
+                        }
+                        return order;
+                    });
+
+                    return updatedOrders;
+                });
+            } catch (error) {
+                console.error('Error handling socket order update:', error);
+                // Don't crash the component, just log the error
+            }
         };
 
         // Listen for various order update events
@@ -83,6 +105,11 @@ const ActiveOrdersWidget = () => {
             socket.off('orderStatusUpdate', handleOrderUpdate);
             socket.off('orderUpdate', handleOrderUpdate);
             socket.off('shopperAction', handleOrderUpdate);
+
+            // Clear any pending timeouts
+            if (updateTimeout) {
+                clearTimeout(updateTimeout);
+            }
         };
     }, [socket, user]);
 
@@ -139,7 +166,24 @@ const ActiveOrdersWidget = () => {
     }
 
     if (error) {
-        return null; // Silently fail for better UX
+        // Show a retry button instead of silently failing
+        return (
+            <div className="active-orders-widget error-state">
+                <div className="widget-header">
+                    <h3>📦 Your Active Orders</h3>
+                    <button
+                        className="refresh-btn"
+                        onClick={fetchActiveOrders}
+                        title="Try again"
+                    >
+                        🔄 Try Again
+                    </button>
+                </div>
+                <div className="error-message">
+                    <p>Something went wrong loading your orders.</p>
+                </div>
+            </div>
+        );
     }
 
     return (
@@ -159,38 +203,51 @@ const ActiveOrdersWidget = () => {
             </div>
 
             <div className="active-orders-list">
-                {activeOrders.slice(0, 3).map(order => (
-                    <div key={order._id} className="active-order-item">
-                        <div className="order-info">
-                            <div className="order-header">
-                                <span className="order-number">
-                                    Order #{order.orderNumber || order._id?.slice(-8)}
-                                </span>
-                                <span
-                                    className="order-status-badge"
-                                    style={{ backgroundColor: getStatusColor(order.status) }}
-                                >
-                                    {getStatusDisplayName(order.status)}
-                                </span>
-                            </div>
+                {activeOrders.slice(0, 3).map(order => {
+                    // Add safety checks for each order
+                    if (!order || !order._id) {
+                        console.warn('Invalid order data:', order);
+                        return null;
+                    }
 
-                            <div className="order-details">
-                                <span className="order-time">
-                                    {new Date(order.createdAt).toLocaleString()}
-                                </span>
-                                {order.shopId && (
-                                    <span className="order-shop">
-                                        🏪 {order.shopId.name}
-                                    </span>
-                                )}
-                            </div>
-                        </div>
+                    try {
+                        return (
+                            <div key={order._id} className="active-order-item">
+                                <div className="order-info">
+                                    <div className="order-header">
+                                        <span className="order-number">
+                                            Order #{order.orderNumber || order._id?.slice(-8) || 'Unknown'}
+                                        </span>
+                                        <span
+                                            className="order-status-badge"
+                                            style={{ backgroundColor: getStatusColor(order.status || 'pending') }}
+                                        >
+                                            {getStatusDisplayName(order.status || 'pending')}
+                                        </span>
+                                    </div>
 
-                        <div className="order-actions">
-                            <InquiryButton order={order} />
-                        </div>
-                    </div>
-                ))}
+                                    <div className="order-details">
+                                        <span className="order-time">
+                                            {order.createdAt ? new Date(order.createdAt).toLocaleString() : 'Unknown time'}
+                                        </span>
+                                        {order.shopId && order.shopId.name && (
+                                            <span className="order-shop">
+                                                🏪 {order.shopId.name}
+                                            </span>
+                                        )}
+                                    </div>
+                                </div>
+
+                                <div className="order-actions">
+                                    <InquiryButton order={order} />
+                                </div>
+                            </div>
+                        );
+                    } catch (orderError) {
+                        console.error('Error rendering order:', orderError, order);
+                        return null;
+                    }
+                }).filter(Boolean)}
             </div>
 
             {activeOrders.length > 3 && (

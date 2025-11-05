@@ -277,3 +277,20 @@
 .refresh-btn:active {
     transform: scale(0.95);
 }
+
+/* Erro
+r state styling */
+.active-orders-widget.error-state {
+    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+}
+
+.error-message {
+    padding: 15px;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 14px;
+}
+
+.error-message p {
+    margin: 0;
+}
