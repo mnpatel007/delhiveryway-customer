@@ -546,59 +546,18 @@ const FinalCheckoutPage = () => {
                     <div className="checkout-address">
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
                             <h3>Delivery Address</h3>
-                            {selectedShop?.deliveryFeeMode === 'distance' && (
-                                <button
-                                    type="button"
-                                    onClick={getCurrentGPSLocation}
-                                    disabled={isGeocoding}
-                                    className="btn btn-primary"
-                                    style={{ fontSize: '0.9rem', padding: '0.5rem 1rem' }}
-                                >
-                                    {isGeocoding ? '📍 Getting Location...' : '📍 Get My Location'}
-                                </button>
-                            )}
+                            <button
+                                type="button"
+                                onClick={getCurrentGPSLocation}
+                                disabled={isGeocoding}
+                                className="btn btn-primary"
+                                style={{ fontSize: '0.9rem', padding: '0.5rem 1rem' }}
+                            >
+                                {isGeocoding ? '📍 Getting Location...' : '📍 Get My Location'}
+                            </button>
                         </div>
                     </div>
-                    {geocodingError && (
-                        <div className="error-message" style={{ marginBottom: '1rem', color: 'red', fontSize: '0.9rem' }}>
-                            {geocodingError}
-                        </div>
-                    )}
-                    {deliveryAddress.coordinates && selectedShop?.deliveryFeeMode === 'distance' && (
-                        <div className="location-info" style={{ marginBottom: '1rem', padding: '0.75rem', backgroundColor: '#e8f5e8', borderRadius: '8px', border: '1px solid #4caf50' }}>
-                            <div style={{ color: 'green', fontSize: '0.9rem', marginBottom: '0.5rem' }}>
-                                ✅ Location detected! Delivery fee calculated.
-                            </div>
-                            <div style={{ fontSize: '0.85rem', color: '#666', marginBottom: '0.5rem' }}>
-                                📍 Coordinates: {deliveryAddress.coordinates.lat.toFixed(6)}, {deliveryAddress.coordinates.lng.toFixed(6)}
-                                {deliveryAddress.coordinates.accuracy && (
-                                    <span style={{ marginLeft: '0.5rem', color: '#ff9800' }}>
-                                        (±{Math.round(deliveryAddress.coordinates.accuracy)}m accuracy)
-                                    </span>
-                                )}
-                            </div>
-                            <div style={{ fontSize: '0.8rem', color: deliveryAddress.coordinates.lat >= 6 && deliveryAddress.coordinates.lat <= 37 && deliveryAddress.coordinates.lng >= 68 && deliveryAddress.coordinates.lng <= 97 ? 'green' : 'red' }}>
-                                {deliveryAddress.coordinates.lat >= 6 && deliveryAddress.coordinates.lat <= 37 && deliveryAddress.coordinates.lng >= 68 && deliveryAddress.coordinates.lng <= 97
-                                    ? '✅ Coordinates are within India'
-                                    : '❌ WARNING: Coordinates are outside India! This will cause wrong delivery fees.'}
-                            </div>
-                            <div style={{ fontSize: '0.8rem', color: '#888', marginBottom: '0.5rem' }}>
-                                ⚠️ If this location seems inaccurate, please manually edit the address above for precise delivery.
-                            </div>
-                            <div style={{ fontSize: '0.8rem' }}>
-                                💡 <strong>For exact location:</strong>{' '}
-                                <a
-                                    href="https://www.google.com/maps"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    style={{ color: '#1976d2', textDecoration: 'underline' }}
-                                >
-                                    Open Google Maps
-                                </a>
-                                {' '}→ Right-click your exact location → Copy coordinates → Use "🎯 Adjust Location" button
-                            </div>
-                        </div>
-                    )}
+
                     <div className="address-form">
                         <div className="form-row">
                             <div className="form-group">
@@ -776,8 +735,8 @@ const FinalCheckoutPage = () => {
                             <span>{formatPrice(orderSummary.subtotal)}</span>
                         </div>
                         <div className="total-row">
-                            <span>Delivery Fee {isCalculatingDeliveryFee && '(Calculating...)'}</span>
-                            <span>{isCalculatingDeliveryFee ? '...' : formatPrice(orderSummary.deliveryFee)}</span>
+                            <span>Delivery Fee {selectedShop?.deliveryFeeMode === 'distance' && isCalculatingDeliveryFee && '(Calculating...)'}</span>
+                            <span>{selectedShop?.deliveryFeeMode === 'distance' && isCalculatingDeliveryFee ? '...' : formatPrice(orderSummary.deliveryFee)}</span>
                         </div>
                         {deliveryCalculationDetails && selectedShop?.deliveryFeeMode === 'distance' && (
                             <div className="delivery-calculation-details" style={{
@@ -804,20 +763,6 @@ const FinalCheckoutPage = () => {
                                 <div style={{ marginTop: '0.25rem', fontSize: '0.8rem', fontStyle: 'italic' }}>
                                     {deliveryCalculationDetails.message}
                                 </div>
-                            </div>
-                        )}
-                        {selectedShop?.deliveryFeeMode === 'fixed' && (
-                            <div style={{
-                                fontSize: '0.85rem',
-                                color: '#666',
-                                marginTop: '0.5rem',
-                                padding: '0.5rem',
-                                backgroundColor: '#f0f8ff',
-                                borderRadius: '6px',
-                                border: '1px solid #e3f2fd',
-                                textAlign: 'center'
-                            }}>
-                                📦 Fixed delivery fee: ₹{selectedShop?.deliveryFee || 30} (same for all locations)
                             </div>
                         )}
                         <div className="summary-divider"></div>
