@@ -91,12 +91,78 @@ export const getDeliveryFeeDisplay = (shop, calculatedFee = null) => {
 };
 
 /**
+ * Get customer's current location using browser geolocation API
+ * @returns {Promise<object|null>} Customer location {lat, lng} or null
+ */
+export const getCurrentLocation = () => {
+    return new Promise((resolve) => {
+        if (!navigator.geolocation) {
+            console.log('Geolocation is not supported by this browser');
+            resolve(null);
+            return;
+        }
+
+        const options = {
+            enableHighAccuracy: true, // Use GPS for maximum accuracy
+            timeout: 10000, // 10 seconds timeout
+            maximumAge: 300000 // Cache for 5 minutes
+        };
+
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                const location = {
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude,
+                    accuracy: position.coords.accuracy
+                };
+
+                console.log('📍 Got current location:', location);
+
+                // Save to localStorage for future use
+                localStorage.setItem('currentLocation', JSON.stringify({
+                    ...location,
+                    timestamp: Date.now()
+                }));
+
+                resolve(location);
+            },
+            (error) => {
+                console.error('Error getting location:', error);
+
+                // Try to get from localStorage as fallback
+                const fallbackLocation = getCustomerLocation();
+                if (fallbackLocation) {
+                    console.log('📍 Using fallback location from localStorage');
+                    resolve(fallbackLocation);
+                } else {
+                    resolve(null);
+                }
+            },
+            options
+        );
+    });
+};
+
+/**
  * Check if customer location is available from localStorage or context
  * @returns {object|null} Customer location {lat, lng} or null
  */
 export const getCustomerLocation = () => {
     try {
-        // Try to get from localStorage first
+        // First try current location (most accurate)
+        const currentLocation = localStorage.getItem('currentLocation');
+        if (currentLocation) {
+            const location = JSON.parse(currentLocation);
+            // Check if location is not older than 30 minutes
+            if (location.timestamp && (Date.now() - location.timestamp) < 1800000) {
+                return {
+                    lat: location.lat,
+                    lng: location.lng
+                };
+            }
+        }
+
+        // Fallback to saved delivery address
         const savedAddress = localStorage.getItem('deliveryAddress');
         if (savedAddress) {
             const address = JSON.parse(savedAddress);
@@ -108,7 +174,6 @@ export const getCustomerLocation = () => {
             }
         }
 
-        // Could also check other sources like user profile, etc.
         return null;
     } catch (error) {
         console.error('Error getting customer location:', error);

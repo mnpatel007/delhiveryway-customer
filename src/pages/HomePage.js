@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import PermanentNotices from '../components/PermanentNotices';
 import ActiveOrdersWidget from '../components/ActiveOrdersWidget';
 import Logo from '../components/Logo';
-import { calculateDeliveryFeesBulk, getDeliveryFeeDisplay, getCustomerLocation } from '../utils/deliveryCalculator';
+import { calculateDeliveryFeesBulk, getDeliveryFeeDisplay, getCustomerLocation, getCurrentLocation } from '../utils/deliveryCalculator';
 import axios from 'axios';
 import './HomePage.css';
 
@@ -16,6 +16,8 @@ const HomePage = () => {
     const [selectedCategory, setSelectedCategory] = useState('all');
     const [deliveryFees, setDeliveryFees] = useState({});
     const [customerLocation, setCustomerLocation] = useState(null);
+    const [locationPermission, setLocationPermission] = useState('prompt'); // 'granted', 'denied', 'prompt'
+    const [gettingLocation, setGettingLocation] = useState(false);
     // eslint-disable-next-line no-unused-vars
     const [categories] = useState(['all', 'grocery', 'pharmacy', 'electronics', 'clothing', 'restaurant']);
 
@@ -173,14 +175,14 @@ const HomePage = () => {
                 setError('');
                 console.log('✅ Shops loaded and sorted successfully:', sortedShops.length);
 
-                // Calculate delivery fees if customer location is available
-                calculateDeliveryFeesForShops(sortedShops);
+                // Get location and calculate delivery fees
+                requestLocationAndCalculateFees(sortedShops);
             } else {
                 console.log('⚠️ No shops from API, using sample data');
                 const sampleShops = filterSampleShops();
                 setShops(sampleShops);
                 setError('Showing sample shops - backend may be updating');
-                calculateDeliveryFeesForShops(sampleShops);
+                requestLocationAndCalculateFees(sampleShops);
             }
 
         } catch (err) {
@@ -193,25 +195,45 @@ const HomePage = () => {
         }
     }, [selectedCategory, searchTerm]);
 
-    // Calculate delivery fees for shops based on customer location
-    const calculateDeliveryFeesForShops = useCallback(async (shopsData) => {
-        const location = getCustomerLocation();
-        setCustomerLocation(location);
-
-        if (!location || !shopsData || shopsData.length === 0) {
-            console.log('📍 No customer location or shops available for delivery fee calculation');
+    // Get user's current location for accurate delivery fees
+    const requestLocationAndCalculateFees = useCallback(async (shopsData) => {
+        if (!shopsData || shopsData.length === 0) {
+            console.log('📍 No shops available for delivery fee calculation');
             return;
         }
 
+        setGettingLocation(true);
+
         try {
-            console.log('🚚 Calculating delivery fees for', shopsData.length, 'shops');
-            const shopIds = shopsData.map(shop => shop._id).filter(id => id && id !== 'sample1' && id !== 'sample2' && id !== 'sample3' && id !== 'sample4');
+            // First try to get current location (most accurate)
+            let location = await getCurrentLocation();
+
+            if (location) {
+                setLocationPermission('granted');
+                setCustomerLocation(location);
+                console.log('📍 Using current GPS location for delivery fees');
+            } else {
+                // Fallback to saved location
+                location = getCustomerLocation();
+                if (location) {
+                    setCustomerLocation(location);
+                    console.log('📍 Using saved location for delivery fees');
+                } else {
+                    setLocationPermission('denied');
+                    console.log('📍 No location available for delivery fee calculation');
+                    return;
+                }
+            }
+
+            // Calculate delivery fees with the obtained location
+            const shopIds = shopsData.map(shop => shop._id).filter(id => id && !id.startsWith('sample'));
 
             if (shopIds.length === 0) {
                 console.log('📍 No real shops to calculate delivery fees for');
                 return;
             }
 
+            console.log('🚚 Calculating delivery fees for', shopIds.length, 'shops using location:', location);
             const feeResults = await calculateDeliveryFeesBulk(shopIds, location);
 
             const feesMap = {};
@@ -223,14 +245,56 @@ const HomePage = () => {
 
             setDeliveryFees(feesMap);
             console.log('✅ Delivery fees calculated:', feesMap);
+
         } catch (error) {
-            console.error('❌ Error calculating delivery fees:', error);
+            console.error('❌ Error getting location or calculating delivery fees:', error);
+        } finally {
+            setGettingLocation(false);
         }
     }, []);
 
     useEffect(() => {
         fetchShops();
     }, [fetchShops]);
+
+    // Automatically request location on page load for better UX
+    useEffect(() => {
+        const autoRequestLocation = async () => {
+            // Check if we already have a recent location
+            const existingLocation = getCustomerLocation();
+            if (existingLocation) {
+                setCustomerLocation(existingLocation);
+                setLocationPermission('granted');
+                return;
+            }
+
+            // Auto-request location if user hasn't denied it before
+            const locationDenied = localStorage.getItem('locationDenied');
+            if (!locationDenied) {
+                console.log('📍 Auto-requesting location for better delivery fee accuracy');
+                try {
+                    const location = await getCurrentLocation();
+                    if (location) {
+                        setCustomerLocation(location);
+                        setLocationPermission('granted');
+                        // Recalculate fees with new location if shops are already loaded
+                        if (shops.length > 0) {
+                            requestLocationAndCalculateFees(shops);
+                        }
+                    }
+                } catch (error) {
+                    console.log('📍 Auto location request failed, will show manual prompt');
+                    localStorage.setItem('locationDenied', 'true');
+                    setLocationPermission('denied');
+                }
+            } else {
+                setLocationPermission('denied');
+            }
+        };
+
+        // Small delay to let the page load first
+        setTimeout(autoRequestLocation, 1000);
+    }, [shops, requestLocationAndCalculateFees]);
 
     // Helper function to check if shop is currently open
     const isShopOpen = (shop) => {
@@ -361,13 +425,34 @@ const HomePage = () => {
                     )}
                     {!customerLocation && (
                         <div className="location-prompt">
-                            <p>📍 Set your delivery address to see accurate delivery fees</p>
-                            <button
-                                className="btn btn-secondary"
-                                onClick={() => navigate('/profile')}
-                            >
-                                Add Address
-                            </button>
+                            {gettingLocation ? (
+                                <p>📍 Getting your location for accurate delivery fees...</p>
+                            ) : locationPermission === 'denied' ? (
+                                <>
+                                    <p>📍 Enable location access for accurate delivery fees</p>
+                                    <button
+                                        className="btn btn-secondary"
+                                        onClick={() => requestLocationAndCalculateFees(shops)}
+                                    >
+                                        Enable Location
+                                    </button>
+                                </>
+                            ) : (
+                                <>
+                                    <p>📍 Allow location access to see exact delivery fees</p>
+                                    <button
+                                        className="btn btn-secondary"
+                                        onClick={() => requestLocationAndCalculateFees(shops)}
+                                    >
+                                        Get My Location
+                                    </button>
+                                </>
+                            )}
+                        </div>
+                    )}
+                    {customerLocation && (
+                        <div className="location-success">
+                            <p>📍 Location detected - showing accurate delivery fees</p>
                         </div>
                     )}
                 </div>

@@ -650,3 +650,21 @@ on Prompt */
     border-color: rgba(255, 255, 255, 0.5);
     transform: translateY(-1px);
 }
+
+/*
+ Location Success */
+.location-success {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 12px;
+    margin-top: 1rem;
+    text-align: center;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.location-success p {
+    margin: 0;
+    font-weight: 500;
+    font-size: 0.95rem;
+}
