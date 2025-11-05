@@ -541,20 +541,31 @@ const FinalCheckoutPage = () => {
                     <div className="checkout-address">
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
                             <h3>Delivery Address</h3>
-                            <button
-                                type="button"
-                                onClick={() => {
-                                    // Force geocoding of the current address
-                                    setHasGeocodedAddress(false);
-                                    setDeliveryAddress(prev => ({ ...prev, coordinates: null }));
-                                    setTimeout(() => geocodeCurrentAddress(), 500);
-                                }}
-                                disabled={isGeocoding}
-                                className="btn btn-secondary"
-                                style={{ fontSize: '0.9rem', padding: '0.5rem 1rem' }}
-                            >
-                                {isGeocoding ? '🗺️ Locating Address...' : '🗺️ Calculate Delivery Fee'}
-                            </button>
+                            <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                <button
+                                    type="button"
+                                    onClick={getCurrentGPSLocation}
+                                    disabled={isGeocoding}
+                                    className="btn btn-primary"
+                                    style={{ fontSize: '0.9rem', padding: '0.5rem 1rem' }}
+                                >
+                                    {isGeocoding ? '📍 Getting Location...' : '📍 Get My Location'}
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        // Force geocoding of the current address
+                                        setHasGeocodedAddress(false);
+                                        setDeliveryAddress(prev => ({ ...prev, coordinates: null }));
+                                        setTimeout(() => geocodeCurrentAddress(), 500);
+                                    }}
+                                    disabled={isGeocoding}
+                                    className="btn btn-secondary"
+                                    style={{ fontSize: '0.9rem', padding: '0.5rem 1rem' }}
+                                >
+                                    {isGeocoding ? '🗺️ Locating Address...' : '🗺️ Calculate Delivery Fee'}
+                                </button>
+                            </div>
                             {deliveryAddress.coordinates && (
                                 <button
                                     type="button"
