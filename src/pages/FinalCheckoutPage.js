@@ -19,7 +19,7 @@ const formatPrice = (price) => {
 
 const FinalCheckoutPage = () => {
     const { user } = useAuth();
-    const { cartItems, selectedShop, getOrderSummary, clearCart, calculateRealTimeDeliveryFee, isCalculatingDeliveryFee } = useContext(CartContext);
+    const { cartItems, selectedShop, getOrderSummary, clearCart, calculateRealTimeDeliveryFee, isCalculatingDeliveryFee, deliveryCalculationDetails } = useContext(CartContext);
     const [loading, setLoading] = useState(false);
     const [shops, setShops] = useState([]);
     const [deliveryAddress, setDeliveryAddress] = useState({
@@ -34,6 +34,7 @@ const FinalCheckoutPage = () => {
     });
     const [isGeocoding, setIsGeocoding] = useState(false);
     const [geocodingError, setGeocodingError] = useState('');
+    const [deliveryCalculation, setDeliveryCalculation] = useState(null);
     const [acceptanceTime, setAcceptanceTime] = useState(null);
     const [loadingAcceptanceTime, setLoadingAcceptanceTime] = useState(false);
     const navigate = useNavigate();
@@ -297,17 +298,58 @@ const FinalCheckoutPage = () => {
             if (location) {
                 console.log('📍 Got GPS coordinates:', location);
 
-                // Update delivery address with GPS coordinates
-                setDeliveryAddress(prev => ({
-                    ...prev,
-                    coordinates: {
-                        lat: location.lat,
-                        lng: location.lng
+                // Try to reverse geocode to get address
+                try {
+                    // Simple reverse geocoding using Nominatim (free)
+                    const response = await fetch(
+                        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${location.lat}&lon=${location.lng}&zoom=18&addressdetails=1`
+                    );
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data && data.address) {
+                            const addr = data.address;
+
+                            // Auto-fill address fields
+                            setDeliveryAddress(prev => ({
+                                ...prev,
+                                street: `${addr.house_number || ''} ${addr.road || addr.street || ''}`.trim() || 'Current Location',
+                                city: addr.city || addr.town || addr.village || addr.suburb || '',
+                                state: addr.state || addr.state_district || '',
+                                zipCode: addr.postcode || '',
+                                coordinates: {
+                                    lat: location.lat,
+                                    lng: location.lng
+                                }
+                            }));
+
+                            console.log('📍 Address auto-filled:', addr);
+                        } else {
+                            // Fallback: just set coordinates
+                            setDeliveryAddress(prev => ({
+                                ...prev,
+                                street: 'Current Location',
+                                coordinates: {
+                                    lat: location.lat,
+                                    lng: location.lng
+                                }
+                            }));
+                        }
                     }
-                }));
+                } catch (reverseError) {
+                    console.log('⚠️ Reverse geocoding failed, using coordinates only');
+                    // Still set coordinates
+                    setDeliveryAddress(prev => ({
+                        ...prev,
+                        street: 'Current Location',
+                        coordinates: {
+                            lat: location.lat,
+                            lng: location.lng
+                        }
+                    }));
+                }
 
                 setGeocodingError('');
-                alert('✅ Current location detected! Delivery fee updated.');
             } else {
                 throw new Error('Could not get current location');
             }
@@ -629,6 +671,33 @@ const FinalCheckoutPage = () => {
                                 <span>Delivery Fee {isCalculatingDeliveryFee && '(Calculating...)'}</span>
                                 <span>{isCalculatingDeliveryFee ? '...' : formatPrice(orderSummary.deliveryFee)}</span>
                             </div>
+                            {deliveryCalculationDetails && (
+                                <div className="delivery-calculation-details" style={{
+                                    fontSize: '0.85rem',
+                                    color: '#666',
+                                    marginTop: '0.5rem',
+                                    padding: '0.75rem',
+                                    backgroundColor: '#f8f9fa',
+                                    borderRadius: '8px',
+                                    border: '1px solid #e9ecef'
+                                }}>
+                                    <div style={{ fontWeight: '600', marginBottom: '0.5rem', color: '#333' }}>
+                                        📍 Delivery Calculation:
+                                    </div>
+                                    <div>
+                                        🚚 Your address is <strong>{deliveryCalculationDetails.distanceKm}km</strong> away from {selectedShop?.name || 'the shop'}
+                                    </div>
+                                    <div style={{ marginTop: '0.25rem' }}>
+                                        📏 Distance: {deliveryCalculationDetails.distance}m = {deliveryCalculationDetails.segments} segments of 500m each
+                                    </div>
+                                    <div style={{ marginTop: '0.25rem' }}>
+                                        💰 Calculation: {deliveryCalculationDetails.segments} segments × ₹{selectedShop?.feePerKm || 6} = ₹{deliveryCalculationDetails.totalFee}
+                                    </div>
+                                    <div style={{ marginTop: '0.25rem', fontSize: '0.8rem', fontStyle: 'italic' }}>
+                                        {deliveryCalculationDetails.message}
+                                    </div>
+                                </div>
+                            )}
                             <div className="summary-divider"></div>
                             <div className="total-row total-grand">
                                 <span><strong>Total Amount</strong></span>

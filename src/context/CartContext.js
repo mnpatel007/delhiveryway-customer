@@ -38,6 +38,7 @@ export const CartProvider = ({ children }) => {
     });
 
     const [calculatedDeliveryFee, setCalculatedDeliveryFee] = useState(null);
+    const [deliveryCalculationDetails, setDeliveryCalculationDetails] = useState(null);
     const [isCalculatingDeliveryFee, setIsCalculatingDeliveryFee] = useState(false);
 
     // Save cart to localStorage whenever it changes
@@ -329,9 +330,10 @@ export const CartProvider = ({ children }) => {
 
             console.log('🚚 Calculated delivery fee result:', result);
             setCalculatedDeliveryFee(result.deliveryFee);
+            setDeliveryCalculationDetails(result.calculation);
             setIsCalculatingDeliveryFee(false);
 
-            return result.deliveryFee;
+            return result;
 
         } catch (error) {
             console.error('❌ Error calculating real-time delivery fee:', error);
@@ -500,6 +502,7 @@ export const CartProvider = ({ children }) => {
         getOrderSummary,
         debugCartState,
         calculatedDeliveryFee,
+        deliveryCalculationDetails,
         isCalculatingDeliveryFee,
         calculateRealTimeDeliveryFee
     };
