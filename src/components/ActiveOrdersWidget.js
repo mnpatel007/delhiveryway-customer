@@ -1,54 +1,90 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { ordersAPI, apiCall } from '../services/api';
+import { useSocket } from '../context/SocketContext';
 import InquiryButton from './InquiryButton';
 import './ActiveOrdersWidget.css';
 
 const ActiveOrdersWidget = () => {
     const { user } = useAuth();
+    const { socket } = useSocket();
     const [activeOrders, setActiveOrders] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
+    const fetchActiveOrders = async () => {
+        if (!user) {
+            setLoading(false);
+            return;
+        }
+
+        try {
+            setLoading(true);
+            const result = await apiCall(ordersAPI.getCustomerOrders);
+
+            if (result.success) {
+                const ordersArray = result.data.data || result.data || [];
+
+                // Filter for active orders (not delivered or cancelled)
+                const activeOrdersFiltered = ordersArray.filter(order =>
+                    !['delivered', 'cancelled'].includes(order.status)
+                );
+
+                // Sort by most recent first
+                const sortedOrders = activeOrdersFiltered.sort(
+                    (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+                );
+
+                console.log('Active orders loaded:', sortedOrders);
+                sortedOrders.forEach(order => {
+                    console.log(`Order ${order.orderNumber}: Status = ${order.status}, Shop = ${order.shopId?.name}, InquiryTime = ${order.shopId?.inquiryAvailableTime}`);
+                });
+
+                setActiveOrders(sortedOrders);
+                setError(null);
+            } else {
+                setError(result.message || 'Failed to load orders');
+            }
+        } catch (err) {
+            console.error('Failed to load active orders:', err);
+            setError('Failed to load orders');
+        } finally {
+            setLoading(false);
+        }
+    };
+
     useEffect(() => {
-        const fetchActiveOrders = async () => {
-            if (!user) {
-                setLoading(false);
-                return;
-            }
-
-            try {
-                setLoading(true);
-                const result = await apiCall(ordersAPI.getCustomerOrders);
-
-                if (result.success) {
-                    const ordersArray = result.data.data || result.data || [];
-
-                    // Filter for active orders (not delivered or cancelled)
-                    const activeOrdersFiltered = ordersArray.filter(order =>
-                        !['delivered', 'cancelled'].includes(order.status)
-                    );
-
-                    // Sort by most recent first
-                    const sortedOrders = activeOrdersFiltered.sort(
-                        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-                    );
-
-                    setActiveOrders(sortedOrders);
-                    setError(null);
-                } else {
-                    setError(result.message || 'Failed to load orders');
-                }
-            } catch (err) {
-                console.error('Failed to load active orders:', err);
-                setError('Failed to load orders');
-            } finally {
-                setLoading(false);
-            }
-        };
-
         fetchActiveOrders();
     }, [user]);
+
+    // Socket listeners for real-time updates
+    useEffect(() => {
+        if (!socket || !user) return;
+
+        const handleOrderUpdate = (data) => {
+            console.log('Socket order update received:', data);
+
+            // Update the specific order in the active orders list
+            setActiveOrders(prevOrders =>
+                prevOrders.map(order =>
+                    order._id === data.orderId
+                        ? { ...order, status: data.status }
+                        : order
+                )
+            );
+        };
+
+        // Listen for various order update events
+        socket.on('orderStatusUpdate', handleOrderUpdate);
+        socket.on('orderUpdate', handleOrderUpdate);
+        socket.on('shopperAction', handleOrderUpdate);
+
+        return () => {
+            socket.off('orderStatusUpdate', handleOrderUpdate);
+            socket.off('orderUpdate', handleOrderUpdate);
+            socket.off('shopperAction', handleOrderUpdate);
+        };
+    }, [socket, user]);
 
     const getStatusDisplayName = (status) => {
         const statusMap = {
@@ -110,7 +146,16 @@ const ActiveOrdersWidget = () => {
         <div className="active-orders-widget">
             <div className="widget-header">
                 <h3>📦 Your Active Orders</h3>
-                <span className="orders-count">{activeOrders.length} active</span>
+                <div className="header-actions">
+                    <span className="orders-count">{activeOrders.length} active</span>
+                    <button
+                        className="refresh-btn"
+                        onClick={fetchActiveOrders}
+                        title="Refresh orders"
+                    >
+                        🔄
+                    </button>
+                </div>
             </div>
 
             <div className="active-orders-list">

@@ -25,6 +25,7 @@ const InquiryButton = ({ order }) => {
             const currentTime = new Date();
             const timeDiff = (currentTime - orderTime) / (1000 * 60); // minutes
             const inquiryTime = order.shopId?.inquiryAvailableTime || 15;
+            console.log(`Order ${order.orderNumber}: Using inquiry time = ${inquiryTime} minutes (from shop: ${order.shopId?.name})`);
 
             if (timeDiff >= inquiryTime) {
                 if (!inquiryAvailable) {
