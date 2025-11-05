@@ -381,9 +381,42 @@ const FinalCheckoutPage = () => {
             setIsGeocoding(true);
             setGeocodingError('');
 
+            // Use fallback coordinates based on city first to avoid wrong geocoding
+            let fallbackCoords = null;
+            const cityLower = city.toLowerCase();
+            const stateLower = state.toLowerCase();
+
+            if (cityLower.includes('indore') || stateLower.includes('madhya')) {
+                fallbackCoords = { lat: 22.7196, lng: 75.8577 }; // Indore center
+            } else if (cityLower.includes('mumbai') || cityLower.includes('bombay')) {
+                fallbackCoords = { lat: 19.0760, lng: 72.8777 }; // Mumbai center
+            } else if (cityLower.includes('delhi')) {
+                fallbackCoords = { lat: 28.6139, lng: 77.2090 }; // Delhi center
+            } else if (cityLower.includes('bangalore') || cityLower.includes('bengaluru')) {
+                fallbackCoords = { lat: 12.9716, lng: 77.5946 }; // Bangalore center
+            } else if (cityLower.includes('pune')) {
+                fallbackCoords = { lat: 18.5204, lng: 73.8567 }; // Pune center
+            } else if (cityLower.includes('hyderabad')) {
+                fallbackCoords = { lat: 17.3850, lng: 78.4867 }; // Hyderabad center
+            } else if (cityLower.includes('chennai')) {
+                fallbackCoords = { lat: 13.0827, lng: 80.2707 }; // Chennai center
+            } else if (cityLower.includes('kolkata')) {
+                fallbackCoords = { lat: 22.5726, lng: 88.3639 }; // Kolkata center
+            }
+
+            if (fallbackCoords) {
+                console.log('🔧 Using fallback coordinates for', city, ':', fallbackCoords);
+                setDeliveryAddress(prev => ({
+                    ...prev,
+                    coordinates: fallbackCoords
+                }));
+                setGeocodingError('');
+                return;
+            }
+
+            // If no fallback found, try geocoding API
             const fullAddress = `${street}, ${city}, ${state}${zipCode ? ', ' + zipCode : ''}, India`;
-            console.log('🗺️ Auto-geocoding address:', { street, city, state, zipCode });
-            console.log('🗺️ Full address string:', fullAddress);
+            console.log('🗺️ Geocoding address:', fullAddress);
 
             const coordinates = await geocodeAddress({
                 street,
@@ -392,53 +425,13 @@ const FinalCheckoutPage = () => {
                 zipCode
             });
 
-            console.log('📍 Got coordinates:', coordinates);
-            console.log('📍 Coordinates validation:', {
-                lat: coordinates.lat,
-                lng: coordinates.lng,
-                isValidLat: coordinates.lat >= -90 && coordinates.lat <= 90,
-                isValidLng: coordinates.lng >= -180 && coordinates.lng <= 180,
-                isInIndia: coordinates.lat >= 6 && coordinates.lat <= 37 && coordinates.lng >= 68 && coordinates.lng <= 97
-            });
-
-            // Validate coordinates before setting
+            // Validate coordinates
             if (!coordinates.lat || !coordinates.lng ||
                 coordinates.lat < 6 || coordinates.lat > 37 ||
                 coordinates.lng < 68 || coordinates.lng > 97) {
-
-                console.error('❌ Invalid coordinates received:', coordinates);
-                console.error('❌ Address that failed:', { street, city, state, zipCode });
-
-                // For testing: Use fallback coordinates based on city
-                let fallbackCoords = null;
-                const cityLower = city.toLowerCase();
-                const stateLower = state.toLowerCase();
-
-                if (cityLower.includes('indore') || stateLower.includes('madhya')) {
-                    fallbackCoords = { lat: 22.7196, lng: 75.8577 }; // Indore center
-                } else if (cityLower.includes('mumbai') || cityLower.includes('bombay')) {
-                    fallbackCoords = { lat: 19.0760, lng: 72.8777 }; // Mumbai center
-                } else if (cityLower.includes('delhi')) {
-                    fallbackCoords = { lat: 28.6139, lng: 77.2090 }; // Delhi center
-                } else if (cityLower.includes('bangalore') || cityLower.includes('bengaluru')) {
-                    fallbackCoords = { lat: 12.9716, lng: 77.5946 }; // Bangalore center
-                }
-
-                if (fallbackCoords) {
-                    console.log('🔧 Using fallback coordinates for', city, ':', fallbackCoords);
-
-                    setDeliveryAddress(prev => ({
-                        ...prev,
-                        coordinates: fallbackCoords
-                    }));
-                    setGeocodingError('');
-                    return;
-                }
-
                 throw new Error(`Invalid coordinates for India: ${coordinates.lat}, ${coordinates.lng}`);
             }
 
-            // Update delivery address with coordinates
             setDeliveryAddress(prev => ({
                 ...prev,
                 coordinates: {
