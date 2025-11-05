@@ -104,8 +104,8 @@ export const getCurrentLocation = () => {
 
         const options = {
             enableHighAccuracy: true, // Use GPS for maximum accuracy
-            timeout: 10000, // 10 seconds timeout
-            maximumAge: 300000 // Cache for 5 minutes
+            timeout: 15000, // 15 seconds timeout for better accuracy
+            maximumAge: 60000 // Cache for only 1 minute to get fresh location
         };
 
         navigator.geolocation.getCurrentPosition(

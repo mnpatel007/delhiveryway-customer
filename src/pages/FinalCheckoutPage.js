@@ -293,10 +293,13 @@ const FinalCheckoutPage = () => {
 
             console.log('📍 Getting current GPS location...');
 
+            // Try to get the most accurate location possible
+            console.log('📍 Attempting high-accuracy GPS location...');
             const location = await getCurrentLocation();
 
             if (location) {
                 console.log('📍 Got GPS coordinates:', location);
+                console.log('📍 Location accuracy:', location.accuracy ? `±${Math.round(location.accuracy)}m` : 'Unknown');
 
                 // Try to reverse geocode to get address
                 try {
@@ -319,7 +322,8 @@ const FinalCheckoutPage = () => {
                                 zipCode: addr.postcode || '',
                                 coordinates: {
                                     lat: location.lat,
-                                    lng: location.lng
+                                    lng: location.lng,
+                                    accuracy: location.accuracy
                                 }
                             }));
 
@@ -471,15 +475,40 @@ const FinalCheckoutPage = () => {
                     <div className="checkout-address">
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
                             <h3>Delivery Address</h3>
-                            <button
-                                type="button"
-                                onClick={getCurrentGPSLocation}
-                                disabled={isGeocoding}
-                                className="btn btn-secondary"
-                                style={{ fontSize: '0.9rem', padding: '0.5rem 1rem' }}
-                            >
-                                {isGeocoding ? '📍 Getting Location...' : '📍 Use Current Location'}
-                            </button>
+                            <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                <button
+                                    type="button"
+                                    onClick={getCurrentGPSLocation}
+                                    disabled={isGeocoding}
+                                    className="btn btn-secondary"
+                                    style={{ fontSize: '0.9rem', padding: '0.5rem 1rem' }}
+                                >
+                                    {isGeocoding ? '📍 Getting Location...' : '📍 Use Current Location'}
+                                </button>
+                                {deliveryAddress.coordinates && (
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            const newLat = prompt('Enter accurate latitude:', deliveryAddress.coordinates.lat);
+                                            const newLng = prompt('Enter accurate longitude:', deliveryAddress.coordinates.lng);
+
+                                            if (newLat && newLng && !isNaN(newLat) && !isNaN(newLng)) {
+                                                setDeliveryAddress(prev => ({
+                                                    ...prev,
+                                                    coordinates: {
+                                                        lat: parseFloat(newLat),
+                                                        lng: parseFloat(newLng)
+                                                    }
+                                                }));
+                                            }
+                                        }}
+                                        className="btn btn-outline"
+                                        style={{ fontSize: '0.9rem', padding: '0.5rem 1rem', border: '1px solid #ccc' }}
+                                    >
+                                        🎯 Adjust Location
+                                    </button>
+                                )}
+                            </div>
                         </div>
                         {geocodingError && (
                             <div className="error-message" style={{ marginBottom: '1rem', color: 'red', fontSize: '0.9rem' }}>
@@ -487,8 +516,33 @@ const FinalCheckoutPage = () => {
                             </div>
                         )}
                         {deliveryAddress.coordinates && (
-                            <div className="success-message" style={{ marginBottom: '1rem', color: 'green', fontSize: '0.9rem' }}>
-                                ✅ Location detected! Delivery fee calculated accurately.
+                            <div className="location-info" style={{ marginBottom: '1rem', padding: '0.75rem', backgroundColor: '#e8f5e8', borderRadius: '8px', border: '1px solid #4caf50' }}>
+                                <div style={{ color: 'green', fontSize: '0.9rem', marginBottom: '0.5rem' }}>
+                                    ✅ Location detected! Delivery fee calculated.
+                                </div>
+                                <div style={{ fontSize: '0.85rem', color: '#666', marginBottom: '0.5rem' }}>
+                                    📍 Coordinates: {deliveryAddress.coordinates.lat.toFixed(6)}, {deliveryAddress.coordinates.lng.toFixed(6)}
+                                    {deliveryAddress.coordinates.accuracy && (
+                                        <span style={{ marginLeft: '0.5rem', color: '#ff9800' }}>
+                                            (±{Math.round(deliveryAddress.coordinates.accuracy)}m accuracy)
+                                        </span>
+                                    )}
+                                </div>
+                                <div style={{ fontSize: '0.8rem', color: '#888', marginBottom: '0.5rem' }}>
+                                    ⚠️ If this location seems inaccurate, please manually edit the address above for precise delivery.
+                                </div>
+                                <div style={{ fontSize: '0.8rem' }}>
+                                    💡 <strong>For exact location:</strong>{' '}
+                                    <a
+                                        href="https://www.google.com/maps"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        style={{ color: '#1976d2', textDecoration: 'underline' }}
+                                    >
+                                        Open Google Maps
+                                    </a>
+                                    {' '}→ Right-click your exact location → Copy coordinates → Use "🎯 Adjust Location" button
+                                </div>
                             </div>
                         )}
                         <div className="address-form">
