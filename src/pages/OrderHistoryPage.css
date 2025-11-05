@@ -392,3 +392,60 @@
     font-style: italic;
     opacity: 0.9;
 }
+
+/* Ord
+er Inquiry Section Styles */
+.order-inquiry-section {
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+}
+
+.order-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.order-info {
+    flex: 1;
+    min-width: 200px;
+}
+
+.order-status {
+    flex-shrink: 0;
+}
+
+.order-inquiry-section {
+    flex-shrink: 0;
+}
+
+/* Responsive adjustments for inquiry button */
+@media (max-width: 768px) {
+    .order-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .order-inquiry-section {
+        align-self: flex-end;
+        margin-left: 0;
+    }
+
+    .order-info {
+        min-width: auto;
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .order-header {
+        gap: 8px;
+    }
+
+    .order-inquiry-section {
+        align-self: stretch;
+    }
+}

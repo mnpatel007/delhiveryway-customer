@@ -339,6 +339,8 @@ const OrderHistoryPage = () => {
                                             getStatusDisplayName(order.status)
                                         )}
                                     </div>
+
+
                                     {(order.status === 'customer_reviewing_revision' || order.status === 'shopper_revised_order') && (
                                         <div className="revision-actions">
                                             <button

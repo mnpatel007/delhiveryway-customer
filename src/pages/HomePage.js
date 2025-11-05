@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import PermanentNotices from '../components/PermanentNotices';
+import ActiveOrdersWidget from '../components/ActiveOrdersWidget';
 import Logo from '../components/Logo';
 import axios from 'axios';
 import './HomePage.css';
@@ -318,7 +319,8 @@ const HomePage = () => {
                 </div>
             </div>
 
-
+            {/* Active Orders Widget */}
+            <ActiveOrdersWidget />
 
             {/* Shops Section */}
             <div className="shops-section">
