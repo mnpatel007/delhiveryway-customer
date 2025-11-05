@@ -121,7 +121,7 @@ const FinalCheckoutPage = () => {
         return () => clearInterval(interval);
     }, [selectedShop]);
 
-    // Calculate delivery fee ONLY when we have valid coordinates from the address
+    // Calculate delivery fee ONLY for distance-based shops when we have valid coordinates
     useEffect(() => {
         if (deliveryAddress.coordinates &&
             deliveryAddress.coordinates.lat &&
@@ -131,18 +131,23 @@ const FinalCheckoutPage = () => {
             deliveryAddress.coordinates.lng >= 68 &&
             deliveryAddress.coordinates.lng <= 97) {
 
-            console.log('📍 Valid Indian coordinates detected, calculating delivery fee');
-            calculateRealTimeDeliveryFee();
+            // Only calculate delivery fee for distance-based shops
+            if (selectedShop?.deliveryFeeMode === 'distance') {
+                console.log('📍 Valid coordinates detected for distance-based shop, calculating delivery fee');
+                calculateRealTimeDeliveryFee();
+            } else {
+                console.log('📍 Fixed delivery fee shop - no calculation needed');
+            }
         }
-    }, [deliveryAddress.coordinates, calculateRealTimeDeliveryFee]);
+    }, [deliveryAddress.coordinates, calculateRealTimeDeliveryFee, selectedShop?.deliveryFeeMode]);
 
     // Auto-geocode address when user stops typing (debounced)
     useEffect(() => {
         const { street, city, state } = deliveryAddress;
 
-        // Only geocode if we have the essential address parts and haven't geocoded this address yet
-        if (street && city && state && !deliveryAddress.coordinates && !isGeocoding && !hasGeocodedAddress) {
-            console.log('🗺️ Starting auto-geocoding for:', { street, city, state });
+        // Only geocode for distance-based shops (fixed fee shops don't need coordinates)
+        if (street && city && state && !deliveryAddress.coordinates && !isGeocoding && !hasGeocodedAddress && selectedShop?.deliveryFeeMode === 'distance') {
+            console.log('🗺️ Starting auto-geocoding for distance-based shop:', { street, city, state });
 
             const timeoutId = setTimeout(() => {
                 geocodeCurrentAddress();
@@ -541,15 +546,17 @@ const FinalCheckoutPage = () => {
                     <div className="checkout-address">
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
                             <h3>Delivery Address</h3>
-                            <button
-                                type="button"
-                                onClick={getCurrentGPSLocation}
-                                disabled={isGeocoding}
-                                className="btn btn-primary"
-                                style={{ fontSize: '0.9rem', padding: '0.5rem 1rem' }}
-                            >
-                                {isGeocoding ? '📍 Getting Location...' : '📍 Get My Location'}
-                            </button>
+                            {selectedShop?.deliveryFeeMode === 'distance' && (
+                                <button
+                                    type="button"
+                                    onClick={getCurrentGPSLocation}
+                                    disabled={isGeocoding}
+                                    className="btn btn-primary"
+                                    style={{ fontSize: '0.9rem', padding: '0.5rem 1rem' }}
+                                >
+                                    {isGeocoding ? '📍 Getting Location...' : '📍 Get My Location'}
+                                </button>
+                            )}
                         </div>
                     </div>
                     {geocodingError && (
@@ -557,7 +564,7 @@ const FinalCheckoutPage = () => {
                             {geocodingError}
                         </div>
                     )}
-                    {deliveryAddress.coordinates && (
+                    {deliveryAddress.coordinates && selectedShop?.deliveryFeeMode === 'distance' && (
                         <div className="location-info" style={{ marginBottom: '1rem', padding: '0.75rem', backgroundColor: '#e8f5e8', borderRadius: '8px', border: '1px solid #4caf50' }}>
                             <div style={{ color: 'green', fontSize: '0.9rem', marginBottom: '0.5rem' }}>
                                 ✅ Location detected! Delivery fee calculated.
