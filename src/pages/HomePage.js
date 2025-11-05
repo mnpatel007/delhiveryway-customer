@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import PermanentNotices from '../components/PermanentNotices';
 import ActiveOrdersWidget from '../components/ActiveOrdersWidget';
 import Logo from '../components/Logo';
+import { calculateDeliveryFeesBulk, getDeliveryFeeDisplay, getCustomerLocation } from '../utils/deliveryCalculator';
 import axios from 'axios';
 import './HomePage.css';
 
@@ -13,6 +14,8 @@ const HomePage = () => {
     const [error, setError] = useState('');
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('all');
+    const [deliveryFees, setDeliveryFees] = useState({});
+    const [customerLocation, setCustomerLocation] = useState(null);
     // eslint-disable-next-line no-unused-vars
     const [categories] = useState(['all', 'grocery', 'pharmacy', 'electronics', 'clothing', 'restaurant']);
 
@@ -169,10 +172,15 @@ const HomePage = () => {
                 setShops(sortedShops);
                 setError('');
                 console.log('✅ Shops loaded and sorted successfully:', sortedShops.length);
+
+                // Calculate delivery fees if customer location is available
+                calculateDeliveryFeesForShops(sortedShops);
             } else {
                 console.log('⚠️ No shops from API, using sample data');
-                setShops(filterSampleShops());
+                const sampleShops = filterSampleShops();
+                setShops(sampleShops);
                 setError('Showing sample shops - backend may be updating');
+                calculateDeliveryFeesForShops(sampleShops);
             }
 
         } catch (err) {
@@ -184,6 +192,41 @@ const HomePage = () => {
             setLoading(false);
         }
     }, [selectedCategory, searchTerm]);
+
+    // Calculate delivery fees for shops based on customer location
+    const calculateDeliveryFeesForShops = useCallback(async (shopsData) => {
+        const location = getCustomerLocation();
+        setCustomerLocation(location);
+
+        if (!location || !shopsData || shopsData.length === 0) {
+            console.log('📍 No customer location or shops available for delivery fee calculation');
+            return;
+        }
+
+        try {
+            console.log('🚚 Calculating delivery fees for', shopsData.length, 'shops');
+            const shopIds = shopsData.map(shop => shop._id).filter(id => id && id !== 'sample1' && id !== 'sample2' && id !== 'sample3' && id !== 'sample4');
+
+            if (shopIds.length === 0) {
+                console.log('📍 No real shops to calculate delivery fees for');
+                return;
+            }
+
+            const feeResults = await calculateDeliveryFeesBulk(shopIds, location);
+
+            const feesMap = {};
+            feeResults.forEach(result => {
+                if (result.shopId && !result.error) {
+                    feesMap[result.shopId] = result.deliveryFee;
+                }
+            });
+
+            setDeliveryFees(feesMap);
+            console.log('✅ Delivery fees calculated:', feesMap);
+        } catch (error) {
+            console.error('❌ Error calculating delivery fees:', error);
+        }
+    }, []);
 
     useEffect(() => {
         fetchShops();
@@ -316,6 +359,17 @@ const HomePage = () => {
                             <p>ℹ️ {error}</p>
                         </div>
                     )}
+                    {!customerLocation && (
+                        <div className="location-prompt">
+                            <p>📍 Set your delivery address to see accurate delivery fees</p>
+                            <button
+                                className="btn btn-secondary"
+                                onClick={() => navigate('/profile')}
+                            >
+                                Add Address
+                            </button>
+                        </div>
+                    )}
                 </div>
             </div>
 
@@ -412,14 +466,21 @@ const HomePage = () => {
                                                 📍 {(shop.address?.street && `${shop.address.street}, `) || ''}{shop.address?.city}{shop.address?.state ? `, ${shop.address.state}` : ''}{shop.address?.zipCode ? ` ${shop.address.zipCode}` : ''}
                                             </div>
 
-                                            {shop.deliveryFee !== undefined && (
-                                                <div className="delivery-fee">
-                                                    {shop.deliveryFee === 0
-                                                        ? '🚚 Free Delivery'
-                                                        : `🚚 ₹${shop.deliveryFee} delivery`
+                                            <div className="delivery-fee">
+                                                {(() => {
+                                                    // Use calculated delivery fee if available
+                                                    const calculatedFee = deliveryFees[shop._id];
+                                                    if (calculatedFee !== undefined) {
+                                                        return calculatedFee === 0
+                                                            ? '🚚 Free Delivery'
+                                                            : `🚚 ₹${calculatedFee} delivery`;
                                                     }
-                                                </div>
-                                            )}
+
+                                                    // Fallback to display logic based on shop settings
+                                                    const displayText = getDeliveryFeeDisplay(shop);
+                                                    return `🚚 ${displayText}`;
+                                                })()}
+                                            </div>
 
                                             {shop.productCount !== undefined && (
                                                 <div className="product-count">
