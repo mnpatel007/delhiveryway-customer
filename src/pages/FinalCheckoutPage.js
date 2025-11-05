@@ -4,6 +4,7 @@ import { CartContext } from '../context/CartContext';
 import { useNavigate } from 'react-router-dom';
 import { shopsAPI, apiCall, api } from '../services/api';
 import { geocodeAddress } from '../utils/geocoding';
+import { getCurrentLocation } from '../utils/deliveryCalculator';
 import './FinalCheckoutPage.css';
 
 // Format price with Indian Rupee symbol and proper formatting
@@ -18,7 +19,7 @@ const formatPrice = (price) => {
 
 const FinalCheckoutPage = () => {
     const { user } = useAuth();
-    const { cartItems, selectedShop, getOrderSummary, clearCart } = useContext(CartContext);
+    const { cartItems, selectedShop, getOrderSummary, clearCart, calculateRealTimeDeliveryFee, isCalculatingDeliveryFee } = useContext(CartContext);
     const [loading, setLoading] = useState(false);
     const [shops, setShops] = useState([]);
     const [deliveryAddress, setDeliveryAddress] = useState({
@@ -109,6 +110,14 @@ const FinalCheckoutPage = () => {
 
         return () => clearInterval(interval);
     }, [selectedShop]);
+
+    // Recalculate delivery fee when delivery address coordinates change
+    useEffect(() => {
+        if (deliveryAddress.coordinates && deliveryAddress.coordinates.lat && deliveryAddress.coordinates.lng) {
+            console.log('📍 Delivery address coordinates changed, recalculating delivery fee');
+            calculateRealTimeDeliveryFee();
+        }
+    }, [deliveryAddress.coordinates, calculateRealTimeDeliveryFee]);
 
     // Get order summary from cart context
     const orderSummary = getOrderSummary();
@@ -495,8 +504,8 @@ const FinalCheckoutPage = () => {
                                 <span>{formatPrice(orderSummary.subtotal)}</span>
                             </div>
                             <div className="total-row">
-                                <span>Delivery Fee</span>
-                                <span>{formatPrice(orderSummary.deliveryFee)}</span>
+                                <span>Delivery Fee {isCalculatingDeliveryFee && '(Calculating...)'}</span>
+                                <span>{isCalculatingDeliveryFee ? '...' : formatPrice(orderSummary.deliveryFee)}</span>
                             </div>
                             <div className="summary-divider"></div>
                             <div className="total-row total-grand">
