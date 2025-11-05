@@ -136,23 +136,6 @@ const FinalCheckoutPage = () => {
         }
     }, [deliveryAddress.coordinates, calculateRealTimeDeliveryFee]);
 
-    // Auto-geocode address when user stops typing (debounced)
-    useEffect(() => {
-        const { street, city, state } = deliveryAddress;
-
-        // Only geocode if we have the essential address parts and haven't geocoded this address yet
-        if (street && city && state && !deliveryAddress.coordinates && !isGeocoding && !hasGeocodedAddress) {
-            console.log('🗺️ Starting auto-geocoding for:', { street, city, state });
-
-            const timeoutId = setTimeout(() => {
-                geocodeCurrentAddress();
-                setHasGeocodedAddress(true);
-            }, 3000); // Wait 3 seconds after user stops typing
-
-            return () => clearTimeout(timeoutId);
-        }
-    }, [deliveryAddress.street, deliveryAddress.city, deliveryAddress.state, deliveryAddress.zipCode]);
-
     // Get order summary from cart context
     const orderSummary = getOrderSummary();
 
@@ -477,16 +460,13 @@ const FinalCheckoutPage = () => {
     const handleAddressChange = (field, value) => {
         setDeliveryAddress(prev => ({
             ...prev,
-            [field]: value
+            [field]: value,
+            // Clear coordinates when address changes
+            coordinates: ['street', 'city', 'state', 'zipCode'].includes(field) ? null : prev.coordinates
         }));
 
-        // Clear previous coordinates when address changes
         if (['street', 'city', 'state', 'zipCode'].includes(field)) {
-            setDeliveryAddress(prev => ({
-                ...prev,
-                coordinates: null
-            }));
-            setHasGeocodedAddress(false); // Reset geocoding flag
+            setHasGeocodedAddress(false);
         }
     };
 
@@ -541,54 +521,15 @@ const FinalCheckoutPage = () => {
                     <div className="checkout-address">
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
                             <h3>Delivery Address</h3>
-                            <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                <button
-                                    type="button"
-                                    onClick={getCurrentGPSLocation}
-                                    disabled={isGeocoding}
-                                    className="btn btn-primary"
-                                    style={{ fontSize: '0.9rem', padding: '0.5rem 1rem' }}
-                                >
-                                    {isGeocoding ? '📍 Getting Location...' : '📍 Get My Location'}
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={() => {
-                                        // Force geocoding of the current address
-                                        setHasGeocodedAddress(false);
-                                        setDeliveryAddress(prev => ({ ...prev, coordinates: null }));
-                                        setTimeout(() => geocodeCurrentAddress(), 500);
-                                    }}
-                                    disabled={isGeocoding}
-                                    className="btn btn-secondary"
-                                    style={{ fontSize: '0.9rem', padding: '0.5rem 1rem' }}
-                                >
-                                    {isGeocoding ? '🗺️ Locating Address...' : '🗺️ Calculate Delivery Fee'}
-                                </button>
-                            </div>
-                            {deliveryAddress.coordinates && (
-                                <button
-                                    type="button"
-                                    onClick={() => {
-                                        const newLat = prompt('Enter accurate latitude:', deliveryAddress.coordinates.lat);
-                                        const newLng = prompt('Enter accurate longitude:', deliveryAddress.coordinates.lng);
-
-                                        if (newLat && newLng && !isNaN(newLat) && !isNaN(newLng)) {
-                                            setDeliveryAddress(prev => ({
-                                                ...prev,
-                                                coordinates: {
-                                                    lat: parseFloat(newLat),
-                                                    lng: parseFloat(newLng)
-                                                }
-                                            }));
-                                        }
-                                    }}
-                                    className="btn btn-outline"
-                                    style={{ fontSize: '0.9rem', padding: '0.5rem 1rem', border: '1px solid #ccc' }}
-                                >
-                                    🎯 Adjust Location
-                                </button>
-                            )}
+                            <button
+                                type="button"
+                                onClick={getCurrentGPSLocation}
+                                disabled={isGeocoding}
+                                className="btn btn-primary"
+                                style={{ fontSize: '0.9rem', padding: '0.5rem 1rem' }}
+                            >
+                                {isGeocoding ? '📍 Getting Location...' : '📍 Get My Location'}
+                            </button>
                         </div>
                     </div>
                     {geocodingError && (
@@ -749,6 +690,21 @@ const FinalCheckoutPage = () => {
                                 />
                             </div>
                         </div>
+                        
+                        {/* Calculate Delivery Fee Button - Only show when address is complete */}
+                        {deliveryAddress.street.trim() && deliveryAddress.city.trim() && deliveryAddress.state.trim() && !deliveryAddress.coordinates && (
+                            <div className="form-row" style={{ marginTop: '1rem' }}>
+                                <button
+                                    type="button"
+                                    onClick={geocodeCurrentAddress}
+                                    disabled={isGeocoding}
+                                    className="btn btn-primary"
+                                    style={{ width: '100%', padding: '0.75rem' }}
+                                >
+                                    {isGeocoding ? '🗺️ Calculating Delivery Fee...' : '🗺️ Calculate Delivery Fee'}
+                                </button>
+                            </div>
+                        )}
                     </div>
                 </div>
 
