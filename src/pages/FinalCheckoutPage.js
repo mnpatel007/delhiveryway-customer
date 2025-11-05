@@ -119,6 +119,20 @@ const FinalCheckoutPage = () => {
         }
     }, [deliveryAddress.coordinates, calculateRealTimeDeliveryFee]);
 
+    // Auto-geocode address when user stops typing (debounced)
+    useEffect(() => {
+        const { street, city, state } = deliveryAddress;
+
+        // Only geocode if we have the essential address parts
+        if (street && city && state && !deliveryAddress.coordinates) {
+            const timeoutId = setTimeout(() => {
+                geocodeCurrentAddress();
+            }, 2000); // Wait 2 seconds after user stops typing
+
+            return () => clearTimeout(timeoutId);
+        }
+    }, [deliveryAddress.street, deliveryAddress.city, deliveryAddress.state, deliveryAddress.zipCode]);
+
     // Get order summary from cart context
     const orderSummary = getOrderSummary();
 
@@ -270,11 +284,98 @@ const FinalCheckoutPage = () => {
         }
     };
 
+    // Get current GPS location
+    const getCurrentGPSLocation = async () => {
+        try {
+            setIsGeocoding(true);
+            setGeocodingError('');
+
+            console.log('📍 Getting current GPS location...');
+
+            const location = await getCurrentLocation();
+
+            if (location) {
+                console.log('📍 Got GPS coordinates:', location);
+
+                // Update delivery address with GPS coordinates
+                setDeliveryAddress(prev => ({
+                    ...prev,
+                    coordinates: {
+                        lat: location.lat,
+                        lng: location.lng
+                    }
+                }));
+
+                setGeocodingError('');
+                alert('✅ Current location detected! Delivery fee updated.');
+            } else {
+                throw new Error('Could not get current location');
+            }
+
+        } catch (error) {
+            console.error('❌ GPS location error:', error);
+            setGeocodingError('Could not get current location. Please enable location access.');
+        } finally {
+            setIsGeocoding(false);
+        }
+    };
+
+    // Auto-geocode address when user finishes typing
+    const geocodeCurrentAddress = async () => {
+        const { street, city, state, zipCode } = deliveryAddress;
+
+        // Check if we have enough address info
+        if (!street || !city || !state) {
+            return;
+        }
+
+        try {
+            setIsGeocoding(true);
+            setGeocodingError('');
+
+            console.log('🗺️ Auto-geocoding address:', { street, city, state, zipCode });
+
+            const coordinates = await geocodeAddress({
+                street,
+                city,
+                state,
+                zipCode
+            });
+
+            console.log('📍 Got coordinates:', coordinates);
+
+            // Update delivery address with coordinates
+            setDeliveryAddress(prev => ({
+                ...prev,
+                coordinates: {
+                    lat: coordinates.lat,
+                    lng: coordinates.lng
+                }
+            }));
+
+            setGeocodingError('');
+
+        } catch (error) {
+            console.error('❌ Geocoding error:', error);
+            setGeocodingError('Could not locate address. Please check and try again.');
+        } finally {
+            setIsGeocoding(false);
+        }
+    };
+
     const handleAddressChange = (field, value) => {
         setDeliveryAddress(prev => ({
             ...prev,
             [field]: value
         }));
+
+        // Clear previous coordinates when address changes
+        if (['street', 'city', 'state', 'zipCode'].includes(field)) {
+            setDeliveryAddress(prev => ({
+                ...prev,
+                coordinates: null
+            }));
+        }
     };
 
     if (cartItems.length === 0) {
@@ -326,7 +427,28 @@ const FinalCheckoutPage = () => {
                     </div>
 
                     <div className="checkout-address">
-                        <h3>Delivery Address</h3>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                            <h3>Delivery Address</h3>
+                            <button
+                                type="button"
+                                onClick={getCurrentGPSLocation}
+                                disabled={isGeocoding}
+                                className="btn btn-secondary"
+                                style={{ fontSize: '0.9rem', padding: '0.5rem 1rem' }}
+                            >
+                                {isGeocoding ? '📍 Getting Location...' : '📍 Use Current Location'}
+                            </button>
+                        </div>
+                        {geocodingError && (
+                            <div className="error-message" style={{ marginBottom: '1rem', color: 'red', fontSize: '0.9rem' }}>
+                                {geocodingError}
+                            </div>
+                        )}
+                        {deliveryAddress.coordinates && (
+                            <div className="success-message" style={{ marginBottom: '1rem', color: 'green', fontSize: '0.9rem' }}>
+                                ✅ Location detected! Delivery fee calculated accurately.
+                            </div>
+                        )}
                         <div className="address-form">
                             <div className="form-row">
                                 <div className="form-group">
