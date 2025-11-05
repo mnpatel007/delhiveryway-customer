@@ -35,6 +35,7 @@ const FinalCheckoutPage = () => {
     const [isGeocoding, setIsGeocoding] = useState(false);
     const [geocodingError, setGeocodingError] = useState('');
     const [deliveryCalculation, setDeliveryCalculation] = useState(null);
+    const [hasGeocodedAddress, setHasGeocodedAddress] = useState(false);
     const [acceptanceTime, setAcceptanceTime] = useState(null);
     const [loadingAcceptanceTime, setLoadingAcceptanceTime] = useState(false);
     const navigate = useNavigate();
@@ -124,11 +125,14 @@ const FinalCheckoutPage = () => {
     useEffect(() => {
         const { street, city, state } = deliveryAddress;
 
-        // Only geocode if we have the essential address parts
-        if (street && city && state && !deliveryAddress.coordinates) {
+        // Only geocode if we have the essential address parts and haven't geocoded this address yet
+        if (street && city && state && !deliveryAddress.coordinates && !isGeocoding && !hasGeocodedAddress) {
+            console.log('🗺️ Starting auto-geocoding for:', { street, city, state });
+
             const timeoutId = setTimeout(() => {
                 geocodeCurrentAddress();
-            }, 2000); // Wait 2 seconds after user stops typing
+                setHasGeocodedAddress(true);
+            }, 3000); // Wait 3 seconds after user stops typing
 
             return () => clearTimeout(timeoutId);
         }
@@ -389,6 +393,20 @@ const FinalCheckoutPage = () => {
             });
 
             console.log('📍 Got coordinates:', coordinates);
+            console.log('📍 Coordinates validation:', {
+                lat: coordinates.lat,
+                lng: coordinates.lng,
+                isValidLat: coordinates.lat >= -90 && coordinates.lat <= 90,
+                isValidLng: coordinates.lng >= -180 && coordinates.lng <= 180,
+                isInIndia: coordinates.lat >= 6 && coordinates.lat <= 37 && coordinates.lng >= 68 && coordinates.lng <= 97
+            });
+
+            // Validate coordinates before setting
+            if (!coordinates.lat || !coordinates.lng ||
+                coordinates.lat < 6 || coordinates.lat > 37 ||
+                coordinates.lng < 68 || coordinates.lng > 97) {
+                throw new Error(`Invalid coordinates for India: ${coordinates.lat}, ${coordinates.lng}`);
+            }
 
             // Update delivery address with coordinates
             setDeliveryAddress(prev => ({
@@ -421,6 +439,7 @@ const FinalCheckoutPage = () => {
                 ...prev,
                 coordinates: null
             }));
+            setHasGeocodedAddress(false); // Reset geocoding flag
         }
     };
 
@@ -527,6 +546,11 @@ const FinalCheckoutPage = () => {
                                             (±{Math.round(deliveryAddress.coordinates.accuracy)}m accuracy)
                                         </span>
                                     )}
+                                </div>
+                                <div style={{ fontSize: '0.8rem', color: deliveryAddress.coordinates.lat >= 6 && deliveryAddress.coordinates.lat <= 37 && deliveryAddress.coordinates.lng >= 68 && deliveryAddress.coordinates.lng <= 97 ? 'green' : 'red' }}>
+                                    {deliveryAddress.coordinates.lat >= 6 && deliveryAddress.coordinates.lat <= 37 && deliveryAddress.coordinates.lng >= 68 && deliveryAddress.coordinates.lng <= 97
+                                        ? '✅ Coordinates are within India'
+                                        : '❌ WARNING: Coordinates are outside India! This will cause wrong delivery fees.'}
                                 </div>
                                 <div style={{ fontSize: '0.8rem', color: '#888', marginBottom: '0.5rem' }}>
                                     ⚠️ If this location seems inaccurate, please manually edit the address above for precise delivery.
