@@ -34,12 +34,33 @@
     transform: none;
 }
 
+.cancel-button-fee {
+    background: rgba(255, 243, 205, 0.9);
+    color: #856404;
+    border: 1px solid rgba(255, 193, 7, 0.3);
+}
+
+.cancel-button-fee:hover {
+    background: rgba(255, 243, 205, 1);
+    border-color: rgba(255, 193, 7, 0.5);
+}
+
 .cancel-icon {
     font-size: 16px;
 }
 
 .cancel-text {
     font-size: 14px;
+}
+
+.cancel-fee-badge {
+    background: #ffc107;
+    color: #212529;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 700;
+    margin-left: 4px;
 }
 
 .cancel-pulse {
@@ -76,14 +97,15 @@
     display: inline-flex;
     flex-direction: column;
     padding: 8px 12px;
-    background: linear-gradient(135deg, #dc3545, #c82333);
+    background: linear-gradient(135deg, #28a745, #20c997);
     color: white;
-    border-radius: 6px;
+    border-radius: 8px;
     font-size: 12px;
     font-weight: 600;
-    box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
+    box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
     animation: timerPulse 2s ease-in-out infinite;
-    min-width: 120px;
+    min-width: 140px;
+    gap: 8px;
 }
 
 @keyframes timerPulse {
@@ -127,6 +149,29 @@
     background: rgba(255, 255, 255, 0.8);
     border-radius: 2px;
     transition: width 0.3s ease;
+}
+
+.cancel-button-timer {
+    padding: 6px 10px;
+    font-size: 12px;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    margin: 0;
+}
+
+.cancel-button-timer:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: none;
+    box-shadow: none;
+}
+
+.cancel-button-timer .cancel-text {
+    font-size: 12px;
+}
+
+.cancel-button-timer .cancel-icon {
+    font-size: 12px;
 }
 
 /* Mobile Responsive */
