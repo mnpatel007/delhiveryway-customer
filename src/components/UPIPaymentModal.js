@@ -46,7 +46,16 @@ const UPIPaymentModal = ({
             await onPaymentConfirm(transactionId.trim());
             setTransactionId('');
         } catch (err) {
-            setError(err.message || 'Failed to confirm payment');
+            console.error('❌ Payment confirmation error:', err);
+            let errorMessage = 'Failed to confirm payment';
+
+            if (err.response?.data?.message) {
+                errorMessage = err.response.data.message;
+            } else if (err.message) {
+                errorMessage = err.message;
+            }
+
+            setError(errorMessage);
         } finally {
             setIsSubmitting(false);
         }
