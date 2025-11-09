@@ -110,6 +110,8 @@
 @media (max-width: 768px) {
     .permanent-notices {
         top: 70px;
+        /* Lower z-index on mobile so navbar menu appears above notices */
+        z-index: 500;
     }
 
     .permanent-notice {
