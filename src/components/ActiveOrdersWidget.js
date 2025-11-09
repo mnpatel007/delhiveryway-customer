@@ -49,7 +49,8 @@ const ActiveOrdersWidget = () => {
     // Helper function to get cancellation fee info
     const getCancellationFeeInfo = (order) => {
         const isWithinFreeTime = isWithinFreeCancellationPeriod(order);
-        const deliveryFee = order.deliveryFee || 0;
+        // Get delivery fee from order value or fallback to shop delivery fee
+        const deliveryFee = order.orderValue?.deliveryFee || order.deliveryFee || order.shopId?.deliveryFee || 0;
 
         return {
             isFree: isWithinFreeTime,

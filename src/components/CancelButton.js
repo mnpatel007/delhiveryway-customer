@@ -40,7 +40,8 @@ const CancelButton = ({ order, onCancel, isCancelling = false }) => {
 
     // Determine if cancellation is free or has a fee
     const isWithinFreeTime = timeRemaining > 0;
-    const deliveryFee = order.deliveryFee || 0;
+    // Get delivery fee from order value or fallback to shop delivery fee
+    const deliveryFee = order.orderValue?.deliveryFee || order.deliveryFee || order.shopId?.deliveryFee || 0;
     const feeInfo = isWithinFreeTime
         ? { isFree: true, message: 'Free cancellation' }
         : { isFree: false, message: `₹${deliveryFee} cancellation fee` };
