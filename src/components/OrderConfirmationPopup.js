@@ -2,7 +2,12 @@ import React from 'react';
 import './OrderConfirmationPopup.css';
 
 const OrderConfirmationPopup = ({ isOpen, onConfirm, onCancel }) => {
-    if (!isOpen) return null;
+    console.log('🔥 OrderConfirmationPopup render - isOpen:', isOpen);
+    if (!isOpen) {
+        console.log('🔥 Popup not open, returning null');
+        return null;
+    }
+    console.log('🔥 Popup is open, rendering popup');
 
     return (
         <div className="order-confirmation-overlay">

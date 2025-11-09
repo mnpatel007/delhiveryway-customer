@@ -6,6 +6,7 @@ import { shopsAPI, apiCall, api } from '../services/api';
 import { geocodeAddress } from '../utils/geocoding';
 import { getCurrentLocation } from '../utils/deliveryCalculator';
 import OrderConfirmationPopup from '../components/OrderConfirmationPopup';
+import SimplePopupTest from '../components/SimplePopupTest';
 import './FinalCheckoutPage.css';
 
 // Format price with Indian Rupee symbol and proper formatting
@@ -171,7 +172,10 @@ const FinalCheckoutPage = () => {
 
     const handleInitialConfirmOrder = () => {
         // Show confirmation popup first
+        console.log('🔥 handleInitialConfirmOrder called');
+        console.log('🔥 Current showConfirmationPopup state:', showConfirmationPopup);
         setShowConfirmationPopup(true);
+        console.log('🔥 Setting showConfirmationPopup to true');
     };
 
     const handleFinalConfirmOrder = async () => {
@@ -550,6 +554,25 @@ const FinalCheckoutPage = () => {
                 <div className="checkout-header">
                     <h2>Final Checkout</h2>
                     <p>Review your order and complete your purchase.</p>
+
+                    {/* Test Components - Remove after testing */}
+                    <SimplePopupTest />
+                    <button
+                        onClick={() => {
+                            console.log('🔥 Direct test button clicked');
+                            setShowConfirmationPopup(true);
+                        }}
+                        style={{
+                            background: '#ff4444',
+                            color: 'white',
+                            padding: '10px 20px',
+                            border: 'none',
+                            borderRadius: '5px',
+                            margin: '10px 0'
+                        }}
+                    >
+                        🧪 Test OrderConfirmationPopup
+                    </button>
                 </div>
 
                 <div className="checkout-content">
