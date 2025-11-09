@@ -23,7 +23,13 @@ const Navbar = () => {
     const isActive = (path) => location.pathname === path;
 
     const toggleMenu = () => {
-        setIsMenuOpen(!isMenuOpen);
+        const newMenuState = !isMenuOpen;
+        setIsMenuOpen(newMenuState);
+
+        // Dispatch custom event for mobile menu state change
+        window.dispatchEvent(new CustomEvent('mobileMenuToggle', {
+            detail: { isOpen: newMenuState }
+        }));
     };
 
     return (

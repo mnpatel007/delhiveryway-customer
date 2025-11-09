@@ -5,6 +5,7 @@ import './PermanentNotices.css';
 const PermanentNotices = () => {
     const [permanentNotices, setPermanentNotices] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
     const fetchPermanentNotices = async () => {
         try {
@@ -25,6 +26,11 @@ const PermanentNotices = () => {
     useEffect(() => {
         fetchPermanentNotices();
 
+        // Listen for mobile menu toggle
+        const handleMobileMenuToggle = (event) => {
+            setIsMobileMenuOpen(event.detail.isOpen);
+        };
+
         // Listen for new notices
         const handleNewNotice = (event) => {
             const { notice } = event.detail;
@@ -41,10 +47,20 @@ const PermanentNotices = () => {
         };
 
         window.addEventListener('new-notice', handleNewNotice);
-        return () => window.removeEventListener('new-notice', handleNewNotice);
+        window.addEventListener('mobileMenuToggle', handleMobileMenuToggle);
+
+        return () => {
+            window.removeEventListener('new-notice', handleNewNotice);
+            window.removeEventListener('mobileMenuToggle', handleMobileMenuToggle);
+        };
     }, []);
 
     if (loading || permanentNotices.length === 0) {
+        return null;
+    }
+
+    // Hide notices when mobile menu is open
+    if (isMobileMenuOpen) {
         return null;
     }
 
