@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { ordersAPI, apiCall } from '../services/api';
+import { ordersAPI, apiCall, api } from '../services/api';
 import { useSocket } from '../context/SocketContext';
 import InquiryButton from './InquiryButton';
 import CancelButton from './CancelButton';
+import UPIPaymentModal from './UPIPaymentModal';
 import './ActiveOrdersWidget.css';
 
 const ActiveOrdersWidget = () => {
@@ -14,6 +15,8 @@ const ActiveOrdersWidget = () => {
     const [error, setError] = useState(null);
     const [updateTimeout, setUpdateTimeout] = useState(null);
     const [cancellingOrder, setCancellingOrder] = useState(null);
+    const [showUPIModal, setShowUPIModal] = useState(false);
+    const [selectedOrderForPayment, setSelectedOrderForPayment] = useState(null);
 
     // Helper function to check if order can be cancelled
     const canCancelOrder = (order) => {
@@ -232,6 +235,21 @@ const ActiveOrdersWidget = () => {
         };
     }, [socket, user]);
 
+    // Auto-show UPI modal for payment required orders (persistent across page reloads)
+    useEffect(() => {
+        if (activeOrders.length > 0 && !showUPIModal) {
+            const paymentRequiredOrder = activeOrders.find(order =>
+                (order.status === 'accepted_by_shopper' || order.status === 'awaiting_upi_payment') &&
+                order.payment?.status === 'awaiting_upi_payment'
+            );
+
+            if (paymentRequiredOrder && !selectedOrderForPayment) {
+                console.log('🏦 Auto-showing UPI modal for payment required order:', paymentRequiredOrder.orderNumber);
+                handlePayNow(paymentRequiredOrder);
+            }
+        }
+    }, [activeOrders, showUPIModal, selectedOrderForPayment]);
+
     const getStatusDisplayName = (status) => {
         const statusMap = {
             'pending_shopper': 'Finding Personal Shopper',
@@ -278,6 +296,45 @@ const ActiveOrdersWidget = () => {
             'out_for_delivery': '#6f42c1'
         };
         return colorMap[status] || '#6c757d';
+    };
+
+    const handlePayNow = (order) => {
+        const paymentData = {
+            orderId: order._id,
+            orderNumber: order.orderNumber,
+            paymentAmount: order.orderValue?.total || order.totalAmount || 0,
+            shopperUpiId: order.payment?.shopperUpiId || 'shopper@upi',
+            shopperName: order.personalShopperId?.name || 'Personal Shopper'
+        };
+        setSelectedOrderForPayment(paymentData);
+        setShowUPIModal(true);
+    };
+
+    const handlePaymentConfirm = async (transactionId) => {
+        try {
+            const response = await api.post('/orders/confirm-payment', {
+                orderId: selectedOrderForPayment.orderId,
+                upiTransactionId: transactionId
+            });
+
+            if (response.data.success) {
+                setShowUPIModal(false);
+                setSelectedOrderForPayment(null);
+                // Refresh orders to show updated status
+                fetchActiveOrders();
+                alert('✅ Payment confirmed successfully! Your shopper will now proceed with your order.');
+            } else {
+                throw new Error(response.data.message || 'Failed to confirm payment');
+            }
+        } catch (error) {
+            console.error('Payment confirmation error:', error);
+            throw error;
+        }
+    };
+
+    const handleCloseUPIModal = () => {
+        setShowUPIModal(false);
+        // Don't clear selectedOrderForPayment so user can reopen if needed
     };
 
     // Don't show widget if user is not logged in
@@ -364,6 +421,26 @@ const ActiveOrdersWidget = () => {
                                 </div>
 
                                 <div className="order-actions">
+                                    {/* Show Pay Now button for payment required orders */}
+                                    {(order.status === 'accepted_by_shopper' || order.status === 'awaiting_upi_payment') && (
+                                        <button
+                                            className="pay-now-btn"
+                                            onClick={() => handlePayNow(order)}
+                                            style={{
+                                                background: '#dc3545',
+                                                color: 'white',
+                                                border: 'none',
+                                                padding: '8px 16px',
+                                                borderRadius: '6px',
+                                                fontWeight: 'bold',
+                                                cursor: 'pointer',
+                                                marginRight: '8px',
+                                                fontSize: '12px'
+                                            }}
+                                        >
+                                            💳 Pay Now
+                                        </button>
+                                    )}
                                     <InquiryButton order={order} />
                                     <CancelButton
                                         order={order}
@@ -390,6 +467,14 @@ const ActiveOrdersWidget = () => {
                     </button>
                 </div>
             )}
+
+            {/* UPI Payment Modal */}
+            <UPIPaymentModal
+                isOpen={showUPIModal}
+                onClose={handleCloseUPIModal}
+                orderData={selectedOrderForPayment}
+                onPaymentConfirm={handlePaymentConfirm}
+            />
         </div>
     );
 };
