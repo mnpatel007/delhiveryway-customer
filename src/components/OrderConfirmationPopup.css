@@ -1,0 +1,176 @@
+.order-confirmation-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    padding: 20px;
+}
+
+.order-confirmation-popup {
+    background: white;
+    border-radius: 16px;
+    max-width: 500px;
+    width: 100%;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    animation: popupSlideIn 0.3s ease-out;
+}
+
+@keyframes popupSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-30px) scale(0.9);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.popup-header {
+    background: linear-gradient(135deg, #4CAF50, #45a049);
+    color: white;
+    padding: 20px;
+    border-radius: 16px 16px 0 0;
+    text-align: center;
+}
+
+.popup-header h3 {
+    margin: 0;
+    font-size: 1.3rem;
+    font-weight: 600;
+}
+
+.popup-content {
+    padding: 30px;
+    text-align: center;
+}
+
+.info-icon {
+    font-size: 3rem;
+    margin-bottom: 20px;
+}
+
+.popup-message h4 {
+    color: #333;
+    margin: 0 0 15px 0;
+    font-size: 1.2rem;
+}
+
+.popup-message p {
+    color: #666;
+    line-height: 1.6;
+    margin-bottom: 25px;
+    font-size: 1rem;
+}
+
+.payment-steps {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 20px;
+    margin-top: 20px;
+}
+
+.step {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    text-align: left;
+}
+
+.step:last-child {
+    margin-bottom: 0;
+}
+
+.step-number {
+    background: #4CAF50;
+    color: white;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-right: 15px;
+    flex-shrink: 0;
+}
+
+.step span:last-child {
+    color: #333;
+    font-weight: 500;
+}
+
+.popup-actions {
+    padding: 20px 30px 30px;
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+}
+
+.cancel-btn,
+.confirm-btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 140px;
+}
+
+.cancel-btn {
+    background: #f8f9fa;
+    color: #666;
+    border: 2px solid #e9ecef;
+}
+
+.cancel-btn:hover {
+    background: #e9ecef;
+    color: #333;
+}
+
+.confirm-btn {
+    background: linear-gradient(135deg, #4CAF50, #45a049);
+    color: white;
+    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+}
+
+.confirm-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(76, 175, 80, 0.4);
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+    .order-confirmation-overlay {
+        padding: 15px;
+    }
+
+    .popup-content {
+        padding: 20px;
+    }
+
+    .popup-actions {
+        flex-direction: column;
+        padding: 15px 20px 25px;
+    }
+
+    .cancel-btn,
+    .confirm-btn {
+        width: 100%;
+        min-width: auto;
+    }
+
+    .step {
+        font-size: 0.9rem;
+    }
+}

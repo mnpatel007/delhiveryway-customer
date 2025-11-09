@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { shopsAPI, apiCall, api } from '../services/api';
 import { geocodeAddress } from '../utils/geocoding';
 import { getCurrentLocation } from '../utils/deliveryCalculator';
+import OrderConfirmationPopup from '../components/OrderConfirmationPopup';
 import './FinalCheckoutPage.css';
 
 // Format price with Indian Rupee symbol and proper formatting
@@ -46,6 +47,7 @@ const FinalCheckoutPage = () => {
     const [hasGeocodedAddress, setHasGeocodedAddress] = useState(false);
     const [acceptanceTime, setAcceptanceTime] = useState(null);
     const [loadingAcceptanceTime, setLoadingAcceptanceTime] = useState(false);
+    const [showConfirmationPopup, setShowConfirmationPopup] = useState(false);
     const navigate = useNavigate();
 
     // Clean up user data and ensure phone field is empty if invalid
@@ -167,7 +169,12 @@ const FinalCheckoutPage = () => {
         return match ? match.name : 'Unknown Shop';
     };
 
-    const handleConfirmOrder = async () => {
+    const handleInitialConfirmOrder = () => {
+        // Show confirmation popup first
+        setShowConfirmationPopup(true);
+    };
+
+    const handleFinalConfirmOrder = async () => {
         // Validate delivery address and contact information
         if (!deliveryAddress.street.trim() || !deliveryAddress.city.trim() || !deliveryAddress.state.trim()) {
             alert('Please fill in all required address fields (Street, City, State)');
@@ -284,10 +291,8 @@ const FinalCheckoutPage = () => {
             });
 
             if (response.data.success) {
-                // Show payment notice
-                alert('🎉 Order placed successfully!\n\n' + response.data.paymentNotice);
-
-                // Clear cart after successful order placement
+                // Close popup and clear cart
+                setShowConfirmationPopup(false);
                 clearCart();
 
                 // Navigate to order confirmation page
@@ -310,6 +315,16 @@ const FinalCheckoutPage = () => {
             setLoading(false);
             setIsGeocoding(false);
         }
+    };
+
+    const handlePopupConfirm = () => {
+        // User confirmed they understand the payment process
+        handleFinalConfirmOrder();
+    };
+
+    const handlePopupCancel = () => {
+        // User cancelled the order
+        setShowConfirmationPopup(false);
     };
 
     // Get current GPS location
@@ -509,7 +524,7 @@ const FinalCheckoutPage = () => {
                     <div className="checkout-actions">
                         <button
                             className="btn btn-primary"
-                            onClick={handleConfirmOrder}
+                            onClick={handleInitialConfirmOrder}
                             disabled={loading || isGeocoding}
                         >
                             {isGeocoding
@@ -766,7 +781,7 @@ const FinalCheckoutPage = () => {
 
                 <button
                     className="place-order-btn"
-                    onClick={handleConfirmOrder}
+                    onClick={handleInitialConfirmOrder}
                     disabled={
                         loading ||
                         !deliveryAddress.street.trim() ||
@@ -780,6 +795,13 @@ const FinalCheckoutPage = () => {
                     {loading ? 'Placing Order...' : '✅ Confirm Order'}
                 </button>
             </div>
+
+            {/* Order Confirmation Popup */}
+            <OrderConfirmationPopup
+                isOpen={showConfirmationPopup}
+                onConfirm={handlePopupConfirm}
+                onCancel={handlePopupCancel}
+            />
         </div>
     );
 };
