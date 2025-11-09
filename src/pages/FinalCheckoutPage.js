@@ -284,6 +284,9 @@ const FinalCheckoutPage = () => {
             });
 
             if (response.data.success) {
+                // Show payment notice
+                alert('🎉 Order placed successfully!\n\n' + response.data.paymentNotice);
+
                 // Clear cart after successful order placement
                 clearCart();
 
@@ -676,7 +679,7 @@ const FinalCheckoutPage = () => {
                                 />
                             </div>
                         </div>
-                        
+
                         {/* Calculate Delivery Fee Button - Only show for distance-based shops */}
                         {deliveryAddress.street.trim() && deliveryAddress.city.trim() && deliveryAddress.state.trim() && !deliveryAddress.coordinates && selectedShop && selectedShop.deliveryFeeMode === 'distance' && (
                             <div className="form-row" style={{ marginTop: '1rem' }}>

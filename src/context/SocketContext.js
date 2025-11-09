@@ -393,6 +393,40 @@ export const SocketProvider = ({ children }) => {
                 showBrowserNotification('🚚 Delivery Partner Assigned!', `${data.deliveryPartner?.name || 'A delivery partner'} will deliver your order`);
             });
 
+            // Listen for UPI payment required
+            newSocket.on('upiPaymentRequired', (data) => {
+                console.log('🏦 UPI payment required:', data);
+
+                addNotification({
+                    id: Date.now(),
+                    type: 'upi_payment_required',
+                    title: '🏦 Payment Required',
+                    message: `Your shopper ${data.shopperName} has accepted your order. Please complete UPI payment of ₹${data.paymentAmount} to proceed.`,
+                    timestamp: new Date().toISOString(),
+                    urgent: true,
+                    orderData: data
+                });
+
+                playNotificationSound(true); // Urgent for payment requirement
+                showBrowserNotification('🏦 Payment Required', `Complete UPI payment of ₹${data.paymentAmount} to proceed with your order`);
+            });
+
+            // Listen for payment confirmation
+            newSocket.on('paymentConfirmed', (data) => {
+                console.log('✅ UPI payment confirmed:', data);
+
+                addNotification({
+                    id: Date.now(),
+                    type: 'payment_confirmed',
+                    title: '✅ Payment Confirmed!',
+                    message: `Your UPI payment has been confirmed. Your shopper will now proceed with your order.`,
+                    timestamp: new Date().toISOString()
+                });
+
+                playNotificationSound();
+                showBrowserNotification('✅ Payment Confirmed!', 'Your shopper will now proceed with your order');
+            });
+
             // Listen for order accepted by shopper
             newSocket.on('orderAccepted', (data) => {
                 console.log('✅ Order accepted by shopper:', data);
