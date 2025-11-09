@@ -551,34 +551,7 @@ const FinalCheckoutPage = () => {
                     <h2>Final Checkout</h2>
                     <p>Review your order and complete your purchase.</p>
 
-                    {/* TEMPORARY TEST - Will remove after confirming popup works */}
-                    <div style={{
-                        background: '#ff0000',
-                        color: 'white',
-                        padding: '15px',
-                        margin: '10px 0',
-                        borderRadius: '8px',
-                        textAlign: 'center'
-                    }}>
-                        <h3>🧪 POPUP TEST</h3>
-                        <button
-                            onClick={() => setShowConfirmationPopup(true)}
-                            style={{
-                                background: '#fff',
-                                color: '#ff0000',
-                                padding: '10px 20px',
-                                border: 'none',
-                                borderRadius: '5px',
-                                fontWeight: 'bold',
-                                cursor: 'pointer'
-                            }}
-                        >
-                            CLICK TO TEST POPUP
-                        </button>
-                        <p style={{ margin: '10px 0 0 0', fontSize: '12px' }}>
-                            This button tests if the popup appears. Will be removed once working.
-                        </p>
-                    </div>
+
                 </div>
 
                 <div className="checkout-content">
