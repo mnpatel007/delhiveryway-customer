@@ -26,12 +26,8 @@ const CancelButton = ({ order }) => {
         const deliveryFee = order.orderValue?.deliveryFee || order.deliveryFee || 0;
         const total = order.orderValue?.total || order.total || 0;
 
-        // Check if order has reached final stages
-        const finalStages = ['final_shopping', 'out_for_delivery', 'delivered'];
-        const isInFinalStage = finalStages.includes(order.status);
-
+        // First check if within free time - this overrides everything
         if (isWithinFreeTime) {
-            // Within 10 minutes - free cancellation regardless of status
             return {
                 type: 'free',
                 fee: 0,
@@ -39,7 +35,14 @@ const CancelButton = ({ order }) => {
                 message: 'Free cancellation',
                 description: 'Full refund will be issued'
             };
-        } else if (isInFinalStage) {
+        }
+
+        // Check order status for final stages (case insensitive and handle different formats)
+        const status = (order.status || '').toLowerCase().replace(/[_\s]/g, '');
+        const finalStages = ['finalshopping', 'outfordelivery', 'delivered'];
+        const isInFinalStage = finalStages.some(stage => status.includes(stage));
+
+        if (isInFinalStage) {
             // After final shopping starts - no refund
             return {
                 type: 'no_refund',
