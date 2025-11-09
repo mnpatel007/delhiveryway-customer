@@ -109,7 +109,18 @@ const ActiveOrdersWidget = () => {
             if (result.success) {
                 // Remove the cancelled order from active orders
                 setActiveOrders(prev => prev.filter(o => o._id !== order._id));
-                alert('Order cancelled successfully!');
+
+                // Show appropriate success message based on refund status
+                let successMessage;
+                if (feeInfo.isNoRefund) {
+                    successMessage = '❌ Order cancelled successfully!\n\nNo refund will be processed as the order was too far in progress.';
+                } else if (feeInfo.isFree) {
+                    successMessage = `✅ Order cancelled successfully!\n\n💰 Full refund of ₹${feeInfo.refundAmount} has been initiated and will reflect in your bank account in 3-5 business days.`;
+                } else {
+                    successMessage = `✅ Order cancelled successfully!\n\n💰 Refund of ₹${feeInfo.refundAmount} (after ₹${feeInfo.fee} cancellation fee) has been initiated and will reflect in your bank account in 3-5 business days.`;
+                }
+
+                alert(successMessage);
             } else {
                 alert('Failed to cancel order: ' + result.message);
             }
