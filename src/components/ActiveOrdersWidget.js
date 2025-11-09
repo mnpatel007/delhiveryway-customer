@@ -51,13 +51,34 @@ const ActiveOrdersWidget = () => {
         const isWithinFreeTime = isWithinFreeCancellationPeriod(order);
         // Get delivery fee from order value or fallback to shop delivery fee
         const deliveryFee = order.orderValue?.deliveryFee || order.deliveryFee || order.shopId?.deliveryFee || 0;
+        const orderTotal = order.orderValue?.total || 0;
+        const refundAmount = orderTotal - deliveryFee;
+
+        // Check if order is in no-refund status
+        const noRefundStatuses = ['final_shopping', 'out_for_delivery', 'picked_up', 'bill_uploaded', 'bill_approved'];
+        const isNoRefund = noRefundStatuses.includes(order.status);
+
+        if (isNoRefund) {
+            return {
+                isFree: false,
+                fee: orderTotal, // Full order amount as fee (no refund)
+                isNoRefund: true,
+                message: 'No refund available',
+                detailedMessage: 'Order is too far in progress for refund. No amount will be refunded.'
+            };
+        }
 
         return {
             isFree: isWithinFreeTime,
             fee: isWithinFreeTime ? 0 : deliveryFee,
+            isNoRefund: false,
+            refundAmount: isWithinFreeTime ? orderTotal : refundAmount,
             message: isWithinFreeTime
                 ? 'Free cancellation (within 10 minutes)'
-                : `Cancellation fee: ₹${deliveryFee} (delivery fee only)`
+                : `Cancellation fee: ₹${deliveryFee} (delivery fee only)`,
+            detailedMessage: isWithinFreeTime
+                ? `Full refund of ₹${orderTotal} will be processed.`
+                : `₹${deliveryFee} will be deducted as cancellation fee. ₹${refundAmount} will be refunded to you.`
         };
     };
 
@@ -65,9 +86,14 @@ const ActiveOrdersWidget = () => {
     const handleCancelOrder = async (order) => {
         const feeInfo = getCancellationFeeInfo(order);
 
-        const confirmMessage = feeInfo.isFree
-            ? `Cancel order #${order.orderNumber}?\n\n${feeInfo.message}`
-            : `Cancel order #${order.orderNumber}?\n\n${feeInfo.message}\n\nDo you want to proceed?`;
+        let confirmMessage;
+        if (feeInfo.isNoRefund) {
+            confirmMessage = `Cancel order #${order.orderNumber}?\n\n⚠️ ${feeInfo.message}\n${feeInfo.detailedMessage}\n\nDo you still want to proceed?`;
+        } else if (feeInfo.isFree) {
+            confirmMessage = `Cancel order #${order.orderNumber}?\n\n✅ ${feeInfo.message}\n${feeInfo.detailedMessage}`;
+        } else {
+            confirmMessage = `Cancel order #${order.orderNumber}?\n\n💰 ${feeInfo.message}\n${feeInfo.detailedMessage}\n\nDo you want to proceed?`;
+        }
 
         if (!window.confirm(confirmMessage)) {
             return;
@@ -201,6 +227,7 @@ const ActiveOrdersWidget = () => {
             'accepted_by_shopper': 'Personal Shopper Assigned',
             'shopper_at_shop': 'Shopper at Store',
             'shopping_in_progress': 'Shopping in Progress',
+            'final_shopping': 'Final Shopping',
             'shopper_revised_order': 'Order Revised - Please Review',
             'customer_reviewing_revision': 'Order Revised - Please Review',
             'customer_approved_revision': 'Revision Approved',
@@ -222,6 +249,7 @@ const ActiveOrdersWidget = () => {
             'accepted_by_shopper': '#28a745',
             'shopper_at_shop': '#17a2b8',
             'shopping_in_progress': '#fd7e14',
+            'final_shopping': '#dc3545',
             'shopper_revised_order': '#dc3545',
             'customer_reviewing_revision': '#dc3545',
             'customer_approved_revision': '#28a745',

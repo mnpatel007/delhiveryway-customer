@@ -42,9 +42,16 @@ const CancelButton = ({ order, onCancel, isCancelling = false }) => {
     const isWithinFreeTime = timeRemaining > 0;
     // Get delivery fee from order value or fallback to shop delivery fee
     const deliveryFee = order.orderValue?.deliveryFee || order.deliveryFee || order.shopId?.deliveryFee || 0;
-    const feeInfo = isWithinFreeTime
-        ? { isFree: true, message: 'Free cancellation' }
-        : { isFree: false, message: `₹${deliveryFee} cancellation fee` };
+
+    // Check if order is in no-refund status
+    const noRefundStatuses = ['final_shopping', 'out_for_delivery', 'picked_up', 'bill_uploaded', 'bill_approved'];
+    const isNoRefund = noRefundStatuses.includes(order.status);
+
+    const feeInfo = isNoRefund
+        ? { isFree: false, message: 'No refund available', isNoRefund: true }
+        : isWithinFreeTime
+            ? { isFree: true, message: 'Free cancellation', isNoRefund: false }
+            : { isFree: false, message: `₹${deliveryFee} cancellation fee`, isNoRefund: false };
 
     // Show timer widget if within free cancellation period
     if (isWithinFreeTime) {
@@ -80,10 +87,10 @@ const CancelButton = ({ order, onCancel, isCancelling = false }) => {
         );
     }
 
-    // Show regular cancel button (with fee after 10 minutes)
+    // Show regular cancel button (with fee after 10 minutes or no refund)
     return (
         <button
-            className={`cancel-button ${!isWithinFreeTime ? 'cancel-button-fee' : ''}`}
+            className={`cancel-button ${feeInfo.isNoRefund ? 'cancel-button-no-refund' : !isWithinFreeTime ? 'cancel-button-fee' : ''}`}
             onClick={handleCancelClick}
             disabled={isCancelling}
             title={`${feeInfo.message} - Click to cancel order`}
@@ -92,7 +99,9 @@ const CancelButton = ({ order, onCancel, isCancelling = false }) => {
             <span className="cancel-text">
                 {isCancelling ? 'Cancelling...' : 'Cancel Order'}
             </span>
-            {!isWithinFreeTime && deliveryFee > 0 && (
+            {feeInfo.isNoRefund ? (
+                <span className="cancel-no-refund-badge">No Refund</span>
+            ) : !isWithinFreeTime && deliveryFee > 0 && (
                 <span className="cancel-fee-badge">₹{deliveryFee}</span>
             )}
             <span className="cancel-pulse"></span>
