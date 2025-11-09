@@ -32,6 +32,13 @@ const UPIPaymentModal = ({
             return;
         }
 
+        // Allow "0000" as test transaction ID for testing purposes
+        const isTestTransaction = transactionId.trim() === '0000';
+        if (!isTestTransaction && transactionId.trim().length < 8) {
+            setError('Transaction ID should be at least 8 characters long');
+            return;
+        }
+
         setIsSubmitting(true);
         setError('');
 
