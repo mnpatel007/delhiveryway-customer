@@ -235,7 +235,9 @@ const ActiveOrdersWidget = () => {
     const getStatusDisplayName = (status) => {
         const statusMap = {
             'pending_shopper': 'Finding Personal Shopper',
-            'accepted_by_shopper': 'Personal Shopper Assigned',
+            'accepted_by_shopper': 'Payment Required',
+            'awaiting_upi_payment': 'Payment Required',
+            'payment_completed': 'Payment Completed - Shopper Can Proceed',
             'shopper_at_shop': 'Shopper at Store',
             'shopping_in_progress': 'Shopping in Progress',
             'final_shopping': 'Final Shopping',
@@ -257,7 +259,9 @@ const ActiveOrdersWidget = () => {
     const getStatusColor = (status) => {
         const colorMap = {
             'pending_shopper': '#ffc107',
-            'accepted_by_shopper': '#28a745',
+            'accepted_by_shopper': '#dc3545',
+            'awaiting_upi_payment': '#dc3545',
+            'payment_completed': '#28a745',
             'shopper_at_shop': '#17a2b8',
             'shopping_in_progress': '#fd7e14',
             'final_shopping': '#dc3545',

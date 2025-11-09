@@ -799,11 +799,13 @@ const FinalCheckoutPage = () => {
             </div>
 
             {/* Order Confirmation Popup */}
-            <OrderConfirmationPopup
-                isOpen={showConfirmationPopup}
-                onConfirm={handlePopupConfirm}
-                onCancel={handlePopupCancel}
-            />
+            {showConfirmationPopup && (
+                <OrderConfirmationPopup
+                    isOpen={showConfirmationPopup}
+                    onConfirm={handlePopupConfirm}
+                    onCancel={handlePopupCancel}
+                />
+            )}
         </div>
     );
 };
