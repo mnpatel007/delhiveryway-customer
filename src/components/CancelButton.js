@@ -99,11 +99,22 @@ const CancelButton = ({ order }) => {
 
     // Handle order cancellation
     const handleCancelOrder = async () => {
-        const feeInfo = getCancellationFeeInfo(order);
+        if (!canOrderBeCancelled(order)) {
+            alert('This order cannot be cancelled.');
+            return;
+        }
 
-        const confirmMessage = feeInfo.isFree
-            ? `Cancel order #${order.orderNumber}?\n\nFree cancellation (within 10 minutes)`
-            : `Cancel order #${order.orderNumber}?\n\n${feeInfo.message} (delivery fee only)\n\nDo you want to proceed?`;
+        const policy = getCancellationPolicy(order);
+
+        let confirmMessage = `Cancel order #${order.orderNumber}?\n\n`;
+
+        if (policy.type === 'free') {
+            confirmMessage += `${policy.message}\n${policy.description}`;
+        } else if (policy.type === 'no_refund') {
+            confirmMessage += `${policy.message}\n${policy.description}\n\nAre you sure you want to proceed?`;
+        } else {
+            confirmMessage += `${policy.message}\n${policy.description}\nRefund amount: ₹${policy.refund}\n\nDo you want to proceed?`;
+        }
 
         if (!window.confirm(confirmMessage)) {
             return;
@@ -131,12 +142,18 @@ const CancelButton = ({ order }) => {
         }
     };
 
-    const feeInfo = getCancellationFeeInfo(order);
+    const policy = getCancellationPolicy(order);
     const isFreePeriod = timeRemaining > 0;
+    const canCancel = canOrderBeCancelled(order);
+
+    // Don't show cancel button if order cannot be cancelled
+    if (!canCancel) {
+        return null;
+    }
 
     return (
         <button
-            className={`cancel-button ${isFreePeriod ? 'free-period' : 'fee-period'}`}
+            className={`cancel-button ${policy.type === 'free' ? 'free-period' : policy.type === 'no_refund' ? 'no-refund-period' : 'fee-period'}`}
             onClick={handleCancelOrder}
             disabled={isCancelling}
         >
@@ -147,14 +164,19 @@ const CancelButton = ({ order }) => {
                         {isCancelling ? 'Cancelling...' : 'Cancel'}
                     </div>
                     <div className="cancel-info">
-                        {isFreePeriod
+                        {policy.type === 'free' && isFreePeriod
                             ? `Free for ${formatTimeRemaining(timeRemaining)}`
-                            : feeInfo.message
+                            : policy.message
                         }
                     </div>
+                    {policy.type !== 'free' && (
+                        <div className="cancel-description">
+                            {policy.description}
+                        </div>
+                    )}
                 </div>
             </div>
-            {isFreePeriod && (
+            {policy.type === 'free' && isFreePeriod && (
                 <div className="cancel-progress">
                     <div
                         className="cancel-progress-bar"
