@@ -7,8 +7,25 @@ const InquiryButton = ({ order }) => {
     const [inquiryAvailable, setInquiryAvailable] = useState(false);
     const [showInquiry, setShowInquiry] = useState(false);
     const [timeRemaining, setTimeRemaining] = useState(0);
-    const [hasNotified, setHasNotified] = useState(false);
     const { addNotification } = useSocket();
+
+    // Check if this order has already been notified
+    const getNotificationKey = (orderId) => `inquiry_notified_${orderId}`;
+
+    const hasBeenNotified = (orderId) => {
+        return localStorage.getItem(getNotificationKey(orderId)) === 'true';
+    };
+
+    const markAsNotified = (orderId) => {
+        localStorage.setItem(getNotificationKey(orderId), 'true');
+    };
+
+    // Clean up notification flags for completed orders
+    useEffect(() => {
+        if (order && ['delivered', 'cancelled'].includes(order.status)) {
+            localStorage.removeItem(getNotificationKey(order._id));
+        }
+    }, [order]);
 
     // Check if inquiry is available based on order timing
     useEffect(() => {
@@ -32,8 +49,8 @@ const InquiryButton = ({ order }) => {
                     setInquiryAvailable(true);
                     setTimeRemaining(0);
 
-                    // Show notification when inquiry becomes available (only once)
-                    if (!hasNotified) {
+                    // Show notification when inquiry becomes available (only once per order)
+                    if (!hasBeenNotified(order._id)) {
                         addNotification({
                             id: Date.now(),
                             type: 'inquiry_available',
@@ -41,7 +58,7 @@ const InquiryButton = ({ order }) => {
                             message: `You can now inquire about order #${order.orderNumber}`,
                             timestamp: new Date().toISOString()
                         });
-                        setHasNotified(true);
+                        markAsNotified(order._id);
                     }
                 }
             } else {
@@ -54,7 +71,7 @@ const InquiryButton = ({ order }) => {
         const interval = setInterval(checkInquiryAvailability, 30000); // Check every 30 seconds
 
         return () => clearInterval(interval);
-    }, [order, inquiryAvailable, hasNotified, addNotification]);
+    }, [order, inquiryAvailable, addNotification]);
 
     // Don't show anything if order is delivered or cancelled
     if (!order || ['delivered', 'cancelled'].includes(order.status)) {

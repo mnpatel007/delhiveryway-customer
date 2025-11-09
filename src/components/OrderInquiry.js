@@ -52,18 +52,7 @@ const OrderInquiry = ({ order, onClose }) => {
         return () => clearInterval(interval);
     }, [order]);
 
-    // Show notification when inquiry becomes available
-    useEffect(() => {
-        if (inquiryAvailable && !showContactInfo) {
-            addNotification({
-                id: Date.now(),
-                type: 'inquiry_available',
-                title: '📞 Need Help with Your Order?',
-                message: 'You can now contact your personal shopper for order updates!',
-                timestamp: new Date().toISOString()
-            });
-        }
-    }, [inquiryAvailable, showContactInfo, addNotification]);
+    // Note: Notification logic is handled in InquiryButton component to avoid duplicates
 
     const getOrderStatusMessage = (status) => {
         const statusMessages = {
