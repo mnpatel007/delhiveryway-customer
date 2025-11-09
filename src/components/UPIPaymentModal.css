@@ -28,7 +28,7 @@
     align-items: center;
     padding: 20px;
     border-bottom: 1px solid #eee;
-    background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
     border-radius: 12px 12px 0 0;
 }
@@ -134,7 +134,7 @@
 
 .upi-app-btn {
     width: 100%;
-    background: linear-gradient(135deg, #3498db, #2980b9);
+    background: linear-gradient(135deg, #5f27cd, #341f97);
     color: white;
     border: none;
     padding: 15px;
@@ -152,7 +152,7 @@
 
 .upi-app-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+    box-shadow: 0 5px 15px rgba(95, 39, 205, 0.3);
 }
 
 .upi-app-btn small {
