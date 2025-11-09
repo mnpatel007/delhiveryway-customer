@@ -320,17 +320,20 @@ const ActiveOrdersWidget = () => {
 
                                 <div className="order-actions">
                                     <InquiryButton order={order} />
-                                    {canCancelOrder(order) && (
-                                        <button
-                                            className="cancel-order-btn"
-                                            onClick={() => handleCancelOrder(order)}
-                                            disabled={cancellingOrder === order._id}
-                                            title={getCancellationFeeInfo(order).message}
-                                        >
-                                            {cancellingOrder === order._id ? '⏳' : '❌'}
-                                            {cancellingOrder === order._id ? 'Cancelling...' : 'Cancel'}
-                                        </button>
-                                    )}
+                                    {/* Debug: Always show cancel button for testing */}
+                                    <button
+                                        className="cancel-order-btn"
+                                        onClick={() => {
+                                            console.log('Order status:', order.status);
+                                            console.log('Can cancel:', canCancelOrder(order));
+                                            handleCancelOrder(order);
+                                        }}
+                                        disabled={cancellingOrder === order._id}
+                                        title={`Status: ${order.status} | ${getCancellationFeeInfo(order).message}`}
+                                    >
+                                        {cancellingOrder === order._id ? '⏳' : '❌'}
+                                        {cancellingOrder === order._id ? 'Cancelling...' : 'Cancel'}
+                                    </button>
                                 </div>
                             </div>
                         );
