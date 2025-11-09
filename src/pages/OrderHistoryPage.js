@@ -10,6 +10,7 @@ const OrderHistoryPage = () => {
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [cancellingOrder, setCancellingOrder] = useState(null);
 
     const handleBillApproval = async (orderId) => {
         try {
@@ -33,6 +34,74 @@ const OrderHistoryPage = () => {
         } catch (error) {
             console.error('Error approving bill:', error);
             alert('Failed to approve bill. Please try again.');
+        }
+    };
+
+    // Helper function to check if order can be cancelled
+    const canCancelOrder = (order) => {
+        const cancellableStatuses = ['pending', 'confirmed', 'accepted', 'shopper_assigned'];
+        return cancellableStatuses.includes(order.status);
+    };
+
+    // Helper function to check if order is within free cancellation period (10 minutes)
+    const isWithinFreeCancellationPeriod = (order) => {
+        const orderTime = new Date(order.createdAt);
+        const now = new Date();
+        const diffInMinutes = (now - orderTime) / (1000 * 60);
+        return diffInMinutes <= 10;
+    };
+
+    // Helper function to get cancellation fee info
+    const getCancellationFeeInfo = (order) => {
+        const isWithinFreeTime = isWithinFreeCancellationPeriod(order);
+        const deliveryFee = order.deliveryFee || 0;
+
+        return {
+            isFree: isWithinFreeTime,
+            fee: isWithinFreeTime ? 0 : deliveryFee,
+            message: isWithinFreeTime
+                ? 'Free cancellation (within 10 minutes)'
+                : `Cancellation fee: ₹${deliveryFee} (delivery fee only)`
+        };
+    };
+
+    // Handle order cancellation
+    const handleCancelOrder = async (order) => {
+        const feeInfo = getCancellationFeeInfo(order);
+
+        const confirmMessage = feeInfo.isFree
+            ? `Cancel order #${order.orderNumber}?\n\n${feeInfo.message}`
+            : `Cancel order #${order.orderNumber}?\n\n${feeInfo.message}\n\nDo you want to proceed?`;
+
+        if (!window.confirm(confirmMessage)) {
+            return;
+        }
+
+        try {
+            setCancellingOrder(order._id);
+
+            const result = await apiCall(() =>
+                ordersAPI.cancel(order._id, 'Cancelled by customer')
+            );
+
+            if (result.success) {
+                // Update the order status to cancelled
+                setOrders(prevOrders =>
+                    prevOrders.map(o =>
+                        o._id === order._id
+                            ? { ...o, status: 'cancelled', cancelledBy: 'customer' }
+                            : o
+                    )
+                );
+                alert('Order cancelled successfully!');
+            } else {
+                alert('Failed to cancel order: ' + result.message);
+            }
+        } catch (error) {
+            console.error('Error cancelling order:', error);
+            alert('Failed to cancel order. Please try again.');
+        } finally {
+            setCancellingOrder(null);
         }
     };
 
@@ -388,6 +457,23 @@ const OrderHistoryPage = () => {
                                             >
                                                 Approve Bill
                                             </button>
+                                        </div>
+                                    )}
+
+                                    {/* Cancel Order Button */}
+                                    {canCancelOrder(order) && (
+                                        <div className="cancel-actions">
+                                            <button
+                                                className="cancel-order-btn"
+                                                onClick={() => handleCancelOrder(order)}
+                                                disabled={cancellingOrder === order._id}
+                                                title={getCancellationFeeInfo(order).message}
+                                            >
+                                                {cancellingOrder === order._id ? '⏳ Cancelling...' : '❌ Cancel Order'}
+                                            </button>
+                                            <div className="cancellation-info">
+                                                {getCancellationFeeInfo(order).message}
+                                            </div>
                                         </div>
                                     )}
 

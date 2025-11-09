@@ -294,3 +294,55 @@ r state styling */
 .error-message p {
     margin: 0;
 }
+
+/* Can
+cel Order Button */
+.cancel-order-btn {
+    background: rgba(255, 69, 58, 0.9);
+    color: white;
+    border: 1px solid rgba(255, 69, 58, 0.3);
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    margin-left: 8px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.cancel-order-btn:hover:not(:disabled) {
+    background: rgba(255, 69, 58, 1);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 15px rgba(255, 69, 58, 0.3);
+}
+
+.cancel-order-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.order-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Mobile responsiveness for cancel button */
+@media (max-width: 768px) {
+    .cancel-order-btn {
+        padding: 4px 8px;
+        font-size: 11px;
+        margin-left: 4px;
+    }
+
+    .order-actions {
+        flex-direction: column;
+        gap: 4px;
+        align-items: stretch;
+    }
+}

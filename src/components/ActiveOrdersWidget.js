@@ -12,6 +12,69 @@ const ActiveOrdersWidget = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [updateTimeout, setUpdateTimeout] = useState(null);
+    const [cancellingOrder, setCancellingOrder] = useState(null);
+
+    // Helper function to check if order can be cancelled
+    const canCancelOrder = (order) => {
+        const cancellableStatuses = ['pending', 'confirmed', 'accepted', 'shopper_assigned'];
+        return cancellableStatuses.includes(order.status);
+    };
+
+    // Helper function to check if order is within free cancellation period (10 minutes)
+    const isWithinFreeCancellationPeriod = (order) => {
+        const orderTime = new Date(order.createdAt);
+        const now = new Date();
+        const diffInMinutes = (now - orderTime) / (1000 * 60);
+        return diffInMinutes <= 10;
+    };
+
+    // Helper function to get cancellation fee info
+    const getCancellationFeeInfo = (order) => {
+        const isWithinFreeTime = isWithinFreeCancellationPeriod(order);
+        const deliveryFee = order.deliveryFee || 0;
+
+        return {
+            isFree: isWithinFreeTime,
+            fee: isWithinFreeTime ? 0 : deliveryFee,
+            message: isWithinFreeTime
+                ? 'Free cancellation (within 10 minutes)'
+                : `Cancellation fee: ₹${deliveryFee} (delivery fee only)`
+        };
+    };
+
+    // Handle order cancellation
+    const handleCancelOrder = async (order) => {
+        const feeInfo = getCancellationFeeInfo(order);
+
+        const confirmMessage = feeInfo.isFree
+            ? `Cancel order #${order.orderNumber}?\n\n${feeInfo.message}`
+            : `Cancel order #${order.orderNumber}?\n\n${feeInfo.message}\n\nDo you want to proceed?`;
+
+        if (!window.confirm(confirmMessage)) {
+            return;
+        }
+
+        try {
+            setCancellingOrder(order._id);
+
+            const result = await apiCall(() =>
+                ordersAPI.cancel(order._id, 'Cancelled by customer')
+            );
+
+            if (result.success) {
+                // Remove the cancelled order from active orders
+                setActiveOrders(prev => prev.filter(o => o._id !== order._id));
+                alert('Order cancelled successfully!');
+            } else {
+                alert('Failed to cancel order: ' + result.message);
+            }
+        } catch (error) {
+            console.error('Error cancelling order:', error);
+            alert('Failed to cancel order. Please try again.');
+        } finally {
+            setCancellingOrder(null);
+        }
+    };
 
     const fetchActiveOrders = async () => {
         if (!user) {
@@ -240,6 +303,17 @@ const ActiveOrdersWidget = () => {
 
                                 <div className="order-actions">
                                     <InquiryButton order={order} />
+                                    {canCancelOrder(order) && (
+                                        <button
+                                            className="cancel-order-btn"
+                                            onClick={() => handleCancelOrder(order)}
+                                            disabled={cancellingOrder === order._id}
+                                            title={getCancellationFeeInfo(order).message}
+                                        >
+                                            {cancellingOrder === order._id ? '⏳' : '❌'}
+                                            {cancellingOrder === order._id ? 'Cancelling...' : 'Cancel'}
+                                        </button>
+                                    )}
                                 </div>
                             </div>
                         );

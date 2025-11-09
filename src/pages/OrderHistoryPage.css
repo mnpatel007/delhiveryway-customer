@@ -449,3 +449,61 @@ er Inquiry Section Styles */
         align-self: stretch;
     }
 }
+
+/* Can
+cel Order Actions */
+.cancel-actions {
+    margin-top: 15px;
+    padding: 15px;
+    background: rgba(255, 69, 58, 0.1);
+    border: 1px solid rgba(255, 69, 58, 0.2);
+    border-radius: 8px;
+}
+
+.cancel-order-btn {
+    background: #ff453a;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.cancel-order-btn:hover:not(:disabled) {
+    background: #d70015;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 15px rgba(255, 69, 58, 0.3);
+}
+
+.cancel-order-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.cancellation-info {
+    margin-top: 8px;
+    font-size: 12px;
+    color: #666;
+    font-style: italic;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+    .cancel-actions {
+        margin-top: 10px;
+        padding: 10px;
+    }
+
+    .cancel-order-btn {
+        width: 100%;
+        justify-content: center;
+        padding: 12px;
+    }
+}
