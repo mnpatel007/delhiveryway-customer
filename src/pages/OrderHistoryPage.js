@@ -39,8 +39,25 @@ const OrderHistoryPage = () => {
 
     // Helper function to check if order can be cancelled
     const canCancelOrder = (order) => {
-        const cancellableStatuses = ['pending', 'confirmed', 'accepted', 'shopper_assigned'];
-        return cancellableStatuses.includes(order.status);
+        const cancellableStatuses = [
+            'pending',
+            'confirmed',
+            'accepted',
+            'shopper_assigned',
+            'personal_shopper_assigned',
+            'shopper_on_the_way',
+            'shopping_in_progress'
+        ];
+        const nonCancellableStatuses = [
+            'picked_up',
+            'out_for_delivery',
+            'delivered',
+            'cancelled',
+            'bill_uploaded',
+            'bill_approved'
+        ];
+
+        return cancellableStatuses.includes(order.status) && !nonCancellableStatuses.includes(order.status);
     };
 
     // Helper function to check if order is within free cancellation period (10 minutes)
