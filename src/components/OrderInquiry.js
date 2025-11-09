@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useSocket } from '../context/SocketContext';
 import './OrderInquiry.css';
 
@@ -7,6 +8,24 @@ const OrderInquiry = ({ order, onClose }) => {
     const [inquiryAvailable, setInquiryAvailable] = useState(false);
     const [timeRemaining, setTimeRemaining] = useState(0);
     const { addNotification } = useSocket();
+
+    // Lock body scroll when modal is open and handle escape key
+    useEffect(() => {
+        document.body.style.overflow = 'hidden';
+
+        const handleEscape = (e) => {
+            if (e.key === 'Escape') {
+                onClose();
+            }
+        };
+
+        document.addEventListener('keydown', handleEscape);
+
+        return () => {
+            document.body.style.overflow = 'unset';
+            document.removeEventListener('keydown', handleEscape);
+        };
+    }, [onClose]);
 
     // Calculate if inquiry is available based on order time and shop settings
     useEffect(() => {
@@ -150,7 +169,7 @@ const OrderInquiry = ({ order, onClose }) => {
         );
     }
 
-    return (
+    const modalContent = (
         <div className="order-inquiry-modal">
             <div className="modal-backdrop" onClick={onClose}></div>
             <div className="inquiry-content">
@@ -277,6 +296,9 @@ const OrderInquiry = ({ order, onClose }) => {
             </div>
         </div>
     );
+
+    // Render the modal using a portal to ensure it appears above everything
+    return createPortal(modalContent, document.body);
 };
 
 export default OrderInquiry;
