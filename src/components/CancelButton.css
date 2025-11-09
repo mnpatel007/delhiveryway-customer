@@ -1,22 +1,27 @@
+/* Cancel Button Styles */
 .cancel-button {
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: rgba(255, 255, 255, 0.9);
+    color: #dc3545;
     border: none;
-    border-radius: 12px;
-    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
-    min-width: 140px;
     position: relative;
     overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10px);
 }
 
 .cancel-button:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+    background: rgba(255, 255, 255, 1);
 }
 
 .cancel-button:active {
@@ -24,128 +29,131 @@
 }
 
 .cancel-button:disabled {
-    opacity: 0.7;
+    opacity: 0.6;
     cursor: not-allowed;
     transform: none;
 }
 
-/* Different styles for different cancellation types */
-.cancel-button.free-period {
-    background: linear-gradient(135deg, #4ecdc4, #44a08d);
-    box-shadow: 0 4px 12px rgba(78, 205, 196, 0.3);
-}
-
-.cancel-button.free-period:hover {
-    box-shadow: 0 6px 20px rgba(78, 205, 196, 0.4);
-}
-
-.cancel-button.fee-period {
-    background: linear-gradient(135deg, #ffa726, #ff9800);
-    box-shadow: 0 4px 12px rgba(255, 167, 38, 0.3);
-}
-
-.cancel-button.fee-period:hover {
-    box-shadow: 0 6px 20px rgba(255, 167, 38, 0.4);
-}
-
-.cancel-button.no-refund-period {
-    background: linear-gradient(135deg, #ef5350, #d32f2f);
-    box-shadow: 0 4px 12px rgba(239, 83, 80, 0.3);
-}
-
-.cancel-button.no-refund-period:hover {
-    box-shadow: 0 6px 20px rgba(239, 83, 80, 0.4);
-}
-
-.cancel-content {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    color: white;
-}
-
 .cancel-icon {
-    font-size: 18px;
-    flex-shrink: 0;
+    font-size: 16px;
 }
 
 .cancel-text {
-    flex: 1;
-    text-align: left;
-}
-
-.cancel-label {
-    font-weight: 600;
     font-size: 14px;
-    margin-bottom: 2px;
 }
 
-.cancel-info {
-    font-size: 12px;
-    opacity: 0.9;
-    font-weight: 500;
-}
-
-.cancel-description {
-    font-size: 11px;
-    opacity: 0.8;
-    margin-top: 2px;
-    line-height: 1.2;
-}
-
-/* Progress bar for free cancellation period */
-.cancel-progress {
+.cancel-pulse {
     position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
+    top: 50%;
+    left: 50%;
+    width: 100%;
+    height: 100%;
+    border-radius: 8px;
+    background: rgba(220, 53, 69, 0.3);
+    transform: translate(-50%, -50%) scale(0);
+    animation: cancelPulse 2s ease-out infinite;
+}
+
+@keyframes cancelPulse {
+    0% {
+        transform: translate(-50%, -50%) scale(0);
+        opacity: 1;
+    }
+
+    70% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0.7;
+    }
+
+    100% {
+        transform: translate(-50%, -50%) scale(1.2);
+        opacity: 0;
+    }
+}
+
+/* Timer Widget Styles */
+.cancel-timer-widget {
+    display: inline-flex;
+    flex-direction: column;
+    padding: 8px 12px;
+    background: linear-gradient(135deg, #dc3545, #c82333);
+    color: white;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
+    animation: timerPulse 2s ease-in-out infinite;
+    min-width: 120px;
+}
+
+@keyframes timerPulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+.timer-content {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.timer-icon {
+    font-size: 14px;
+}
+
+.timer-text {
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+.timer-progress-bar {
+    width: 100%;
     height: 3px;
     background: rgba(255, 255, 255, 0.3);
+    border-radius: 2px;
+    margin-top: 6px;
     overflow: hidden;
 }
 
-.cancel-progress-bar {
+.timer-progress-fill {
     height: 100%;
     background: rgba(255, 255, 255, 0.8);
-    transition: width 1s linear;
-    border-radius: 0 3px 3px 0;
+    border-radius: 2px;
+    transition: width 0.3s ease;
 }
 
-/* Responsive design */
+/* Mobile Responsive */
 @media (max-width: 768px) {
     .cancel-button {
-        min-width: 120px;
-        padding: 10px 12px;
-    }
-
-    .cancel-icon {
-        font-size: 16px;
-    }
-
-    .cancel-label {
+        padding: 8px 12px;
         font-size: 13px;
     }
 
-    .cancel-info {
+    .cancel-icon {
+        font-size: 14px;
+    }
+
+    .cancel-text {
+        font-size: 13px;
+    }
+
+    .cancel-timer-widget {
+        padding: 6px 10px;
         font-size: 11px;
     }
 
-    .cancel-description {
-        font-size: 10px;
-    }
-}
-
-/* Animation for loading state */
-.cancel-button:disabled .cancel-icon {
-    animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-    from {
-        transform: rotate(0deg);
+    .timer-icon {
+        font-size: 12px;
     }
 
-    to {
-        transform: rotate(360deg);
+    .timer-text {
+        font-size: 11px;
     }
 }

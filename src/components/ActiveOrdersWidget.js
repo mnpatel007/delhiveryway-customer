@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { ordersAPI, apiCall } from '../services/api';
 import { useSocket } from '../context/SocketContext';
 import InquiryButton from './InquiryButton';
+import CancelButton from './CancelButton';
 import './ActiveOrdersWidget.css';
 
 const ActiveOrdersWidget = () => {
@@ -320,20 +321,11 @@ const ActiveOrdersWidget = () => {
 
                                 <div className="order-actions">
                                     <InquiryButton order={order} />
-                                    {/* Debug: Always show cancel button for testing */}
-                                    <button
-                                        className="cancel-order-btn"
-                                        onClick={() => {
-                                            console.log('Order status:', order.status);
-                                            console.log('Can cancel:', canCancelOrder(order));
-                                            handleCancelOrder(order);
-                                        }}
-                                        disabled={cancellingOrder === order._id}
-                                        title={`Status: ${order.status} | ${getCancellationFeeInfo(order).message}`}
-                                    >
-                                        {cancellingOrder === order._id ? '⏳' : '❌'}
-                                        {cancellingOrder === order._id ? 'Cancelling...' : 'Cancel'}
-                                    </button>
+                                    <CancelButton
+                                        order={order}
+                                        onCancel={handleCancelOrder}
+                                        isCancelling={cancellingOrder === order._id}
+                                    />
                                 </div>
                             </div>
                         );

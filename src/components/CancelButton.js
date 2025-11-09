@@ -1,194 +1,112 @@
-import { useState, useEffect } from 'react';
-import { ordersAPI, apiCall } from '../services/api';
+import React, { useState, useEffect } from 'react';
+import { useSocket } from '../context/SocketContext';
 import './CancelButton.css';
 
-const CancelButton = ({ order }) => {
+const CancelButton = ({ order, onCancel, isCancelling = false }) => {
+    const [cancelAvailable, setCancelAvailable] = useState(false);
     const [timeRemaining, setTimeRemaining] = useState(0);
-    const [isCancelling, setIsCancelling] = useState(false);
+    const { addNotification } = useSocket();
 
-    // Helper function to check if order is within free cancellation period (10 minutes)
-    const isWithinFreeCancellationPeriod = (order) => {
-        const orderTime = new Date(order.createdAt);
-        const now = new Date();
-        const diffInMinutes = (now - orderTime) / (1000 * 60);
-        return diffInMinutes <= 10;
-    };
-
-    // Helper function to check if order can be cancelled
-    const canOrderBeCancelled = (order) => {
-        const nonCancellableStatuses = ['delivered', 'cancelled', 'refunded'];
-        return !nonCancellableStatuses.includes(order.status);
-    };
-
-    // Helper function to get cancellation policy based on status and time
-    const getCancellationPolicy = (order) => {
-        const isWithinFreeTime = isWithinFreeCancellationPeriod(order);
-        const deliveryFee = order.orderValue?.deliveryFee || order.deliveryFee || 0;
-        const total = order.orderValue?.total || order.total || 0;
-
-        // First check if within free time - this overrides everything
-        if (isWithinFreeTime) {
-            return {
-                type: 'free',
-                fee: 0,
-                refund: total,
-                message: 'Free cancellation',
-                description: 'Full refund will be issued'
-            };
-        }
-
-        // Check order status for final stages (case insensitive and handle different formats)
-        const status = (order.status || '').toLowerCase().replace(/[_\s]/g, '');
-        const finalStages = ['finalshopping', 'outfordelivery', 'delivered'];
-        const isInFinalStage = finalStages.some(stage => status.includes(stage));
-
-        if (isInFinalStage) {
-            // After final shopping starts - no refund
-            return {
-                type: 'no_refund',
-                fee: total,
-                refund: 0,
-                message: 'No refund available',
-                description: 'Order is in final stage - no refund will be issued'
-            };
-        } else {
-            // After 10 min but before final shopping - only delivery fee charged
-            return {
-                type: 'delivery_fee_only',
-                fee: deliveryFee,
-                refund: total - deliveryFee,
-                message: `Cancellation fee: ₹${deliveryFee}`,
-                description: 'Only delivery fee will be charged, rest will be refunded'
-            };
-        }
-    };
-
-    // Calculate remaining time for free cancellation
-    const calculateTimeRemaining = () => {
-        const orderTime = new Date(order.createdAt);
-        const now = new Date();
-        const diffInMs = now - orderTime;
-        const tenMinutesInMs = 10 * 60 * 1000;
-        const remaining = Math.max(0, tenMinutesInMs - diffInMs);
-        return remaining;
-    };
-
-    // Update timer every second
+    // Check if cancellation is available based on order timing and status
     useEffect(() => {
-        const updateTimer = () => {
-            const remaining = calculateTimeRemaining();
-            setTimeRemaining(remaining);
+        const checkCancelAvailability = () => {
+            if (!order || !order.createdAt) return;
+
+            // Skip if order is already delivered or cancelled
+            if (['delivered', 'cancelled', 'picked_up', 'out_for_delivery', 'bill_uploaded', 'bill_approved'].includes(order.status)) {
+                setCancelAvailable(false);
+                return;
+            }
+
+            const orderTime = new Date(order.createdAt);
+            const currentTime = new Date();
+            const timeDiff = (currentTime - orderTime) / (1000 * 60); // minutes
+            const cancelTimeLimit = 10; // 10 minutes for cancellation
+
+            if (timeDiff <= cancelTimeLimit) {
+                setCancelAvailable(true);
+                setTimeRemaining(Math.ceil(cancelTimeLimit - timeDiff));
+            } else {
+                // Check if still cancellable based on status (even after 10 min)
+                const cancellableStatuses = ['pending', 'confirmed', 'accepted', 'shopper_assigned', 'shopper_on_the_way', 'shopping_in_progress'];
+                setCancelAvailable(cancellableStatuses.includes(order.status));
+                setTimeRemaining(0);
+            }
         };
 
-        updateTimer(); // Initial calculation
-        const interval = setInterval(updateTimer, 1000);
+        checkCancelAvailability();
+        const interval = setInterval(checkCancelAvailability, 30000); // Check every 30 seconds
 
         return () => clearInterval(interval);
-    }, [order.createdAt]);
+    }, [order]);
 
-    // Format time remaining
-    const formatTimeRemaining = (ms) => {
-        const minutes = Math.floor(ms / (1000 * 60));
-        const seconds = Math.floor((ms % (1000 * 60)) / 1000);
-        return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    // Handle cancel click
+    const handleCancelClick = async () => {
+        if (!cancelAvailable || isCancelling) return;
+
+        await onCancel(order);
     };
 
-    // Calculate progress percentage (0-100)
-    const getProgressPercentage = () => {
-        const tenMinutesInMs = 10 * 60 * 1000;
-        const elapsed = tenMinutesInMs - timeRemaining;
-        return Math.min(100, (elapsed / tenMinutesInMs) * 100);
-    };
-
-    // Handle order cancellation
-    const handleCancelOrder = async () => {
-        if (!canOrderBeCancelled(order)) {
-            alert('This order cannot be cancelled.');
-            return;
-        }
-
-        const policy = getCancellationPolicy(order);
-
-        let confirmMessage = `Cancel order #${order.orderNumber}?\n\n`;
-
-        if (policy.type === 'free') {
-            confirmMessage += `${policy.message}\n${policy.description}`;
-        } else if (policy.type === 'no_refund') {
-            confirmMessage += `${policy.message}\n${policy.description}\n\nAre you sure you want to proceed?`;
-        } else {
-            confirmMessage += `${policy.message}\n${policy.description}\nRefund amount: ₹${policy.refund}\n\nDo you want to proceed?`;
-        }
-
-        if (!window.confirm(confirmMessage)) {
-            return;
-        }
-
-        try {
-            setIsCancelling(true);
-
-            const result = await apiCall(() =>
-                ordersAPI.cancel(order._id, 'Cancelled by customer')
-            );
-
-            if (result.success) {
-                alert('Order cancelled successfully!');
-                // Refresh the page to update the order list
-                window.location.reload();
-            } else {
-                alert('Failed to cancel order: ' + result.message);
-            }
-        } catch (error) {
-            console.error('Error cancelling order:', error);
-            alert('Failed to cancel order. Please try again.');
-        } finally {
-            setIsCancelling(false);
-        }
-    };
-
-    const policy = getCancellationPolicy(order);
-    const isFreePeriod = timeRemaining > 0;
-    const canCancel = canOrderBeCancelled(order);
-
-    // Don't show cancel button if order cannot be cancelled
-    if (!canCancel) {
+    // Don't show anything if order is delivered or cancelled
+    if (!order || ['delivered', 'cancelled'].includes(order.status)) {
         return null;
     }
 
-    return (
-        <button
-            className={`cancel-button ${policy.type === 'free' ? 'free-period' : policy.type === 'no_refund' ? 'no-refund-period' : 'fee-period'}`}
-            onClick={handleCancelOrder}
-            disabled={isCancelling}
-        >
-            <div className="cancel-content">
-                <div className="cancel-icon">❌</div>
-                <div className="cancel-text">
-                    <div className="cancel-label">
-                        {isCancelling ? 'Cancelling...' : 'Cancel'}
-                    </div>
-                    <div className="cancel-info">
-                        {policy.type === 'free' && isFreePeriod
-                            ? `Free for ${formatTimeRemaining(timeRemaining)}`
-                            : policy.message
-                        }
-                    </div>
-                    {policy.type !== 'free' && (
-                        <div className="cancel-description">
-                            {policy.description}
-                        </div>
-                    )}
+    // Show timer if within 10 minutes
+    if (!cancelAvailable && timeRemaining > 0) {
+        const cancelTimeLimit = 10;
+        const progress = ((cancelTimeLimit - timeRemaining) / cancelTimeLimit) * 100;
+
+        return (
+            <div className="cancel-timer-widget" title={`You can cancel your order within 10 minutes from order placement`}>
+                <div className="timer-content">
+                    <span className="timer-icon">⏰</span>
+                    <span className="timer-text">
+                        Cancel in {timeRemaining}min
+                    </span>
                 </div>
-            </div>
-            {policy.type === 'free' && isFreePeriod && (
-                <div className="cancel-progress">
+                <div className="timer-progress-bar">
                     <div
-                        className="cancel-progress-bar"
-                        style={{ width: `${getProgressPercentage()}%` }}
+                        className="timer-progress-fill"
+                        style={{ width: `${progress}%` }}
                     ></div>
                 </div>
-            )}
-        </button>
-    );
+            </div>
+        );
+    }
+
+    // Show cancel button if cancellation is available
+    if (cancelAvailable) {
+        // Determine cancellation fee info
+        const isWithinFreeTime = (() => {
+            const orderTime = new Date(order.createdAt);
+            const now = new Date();
+            const diffInMinutes = (now - orderTime) / (1000 * 60);
+            return diffInMinutes <= 10;
+        })();
+
+        const deliveryFee = order.deliveryFee || 0;
+        const feeInfo = isWithinFreeTime
+            ? { isFree: true, message: 'Free cancellation' }
+            : { isFree: false, message: `₹${deliveryFee} cancellation fee` };
+
+        return (
+            <button
+                className="cancel-button"
+                onClick={handleCancelClick}
+                disabled={isCancelling}
+                title={`${feeInfo.message} - Click to cancel order`}
+            >
+                <span className="cancel-icon">❌</span>
+                <span className="cancel-text">
+                    {isCancelling ? 'Cancelling...' : 'Cancel Order'}
+                </span>
+                <span className="cancel-pulse"></span>
+            </button>
+        );
+    }
+
+    return null;
 };
 
 export default CancelButton;
