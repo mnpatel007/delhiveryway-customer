@@ -177,8 +177,8 @@ export const contactAPI = {
 
 // Terms API
 export const termsAPI = {
-    getCurrent: () => api.get('/terms/current'),
-    accept: (termsId) => api.post('/terms/accept', { termsId }),
+    getCurrent: () => api.get('/auth/terms/current'),
+    accept: (termsId) => api.post('/auth/terms/accept', { termsId }),
 };
 
 

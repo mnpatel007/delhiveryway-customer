@@ -22,7 +22,7 @@ export const TermsProvider = ({ children }) => {
             setLoading(true);
             setError(null);
 
-            const response = await axios.get('/api/terms/current');
+            const response = await axios.get('/api/auth/terms/current');
 
             if (response.data.success && response.data.data.terms) {
                 const terms = response.data.data.terms;
@@ -51,7 +51,7 @@ export const TermsProvider = ({ children }) => {
             setLoading(true);
             setError(null);
 
-            const response = await axios.post('/api/terms/accept', {
+            const response = await axios.post('/api/auth/terms/accept', {
                 termsId: currentTerms._id
             });
 
