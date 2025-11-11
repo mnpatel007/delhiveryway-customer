@@ -4,12 +4,14 @@ import { clearProblematicStorage } from './utils/clearStorage';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 import { SocketProvider, useSocket } from './context/SocketContext';
+import { TermsProvider } from './context/TermsContext';
 
 import ErrorBoundary from './components/ErrorBoundary';
 import Navbar from './components/Navbar';
 import NotificationCenter from './components/NotificationCenter';
 import NoticeAlert from './components/NoticeAlert';
 import UPINotificationHandler from './components/UPINotificationHandler';
+import TermsHandler from './components/TermsHandler';
 
 import SocketDebugPanel from './components/SocketDebugPanel';
 import HomePage from './pages/HomePage';
@@ -92,6 +94,7 @@ const Layout = ({ children }) => {
       {!shouldHideNavbar && <NotificationCenter />}
       {!shouldHideNavbar && <NoticeAlert />}
       <UPINotificationHandler />
+      <TermsHandler />
       <SocketDebugPanel />
       {children}
     </>
@@ -140,7 +143,9 @@ function App() {
       <AuthProvider>
         <CartProvider>
           <SocketProvider>
-            <AppContent />
+            <TermsProvider>
+              <AppContent />
+            </TermsProvider>
           </SocketProvider>
         </CartProvider>
       </AuthProvider>

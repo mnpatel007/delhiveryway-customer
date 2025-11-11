@@ -175,6 +175,12 @@ export const contactAPI = {
     send: (data) => api.post('/contact', data),
 };
 
+// Terms API
+export const termsAPI = {
+    getCurrent: () => api.get('/terms/current'),
+    accept: (termsId) => api.post('/terms/accept', { termsId }),
+};
+
 
 // Utility functions for better error handling
 export const handleApiError = (error) => {
