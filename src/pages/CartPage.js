@@ -233,6 +233,11 @@ const CartPage = () => {
                                     <span>{formatPrice(orderSummary.taxes)}</span>
                                 </div>
 
+                                <div className="summary-row">
+                                    <span>Packaging Charges ({selectedShop?.hasPackaging ? `${selectedShop.packagingRate}%` : '0%'})</span>
+                                    <span>{formatPrice(orderSummary.packagingCharges)}</span>
+                                </div>
+
                                 <div className="summary-divider"></div>
 
                                 <div className="summary-row total-row">
