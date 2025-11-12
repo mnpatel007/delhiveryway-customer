@@ -234,7 +234,7 @@ const CartPage = () => {
                                 </div>
 
                                 <div className="summary-row">
-                                    <span>Packaging Charges ({selectedShop?.hasPackaging ? `${selectedShop.packagingRate}%` : '0%'})</span>
+                                    <span>Packaging Charges ({selectedShop?.hasPackaging ? `₹${selectedShop.packagingCharges}` : '₹0'})</span>
                                     <span>{formatPrice(orderSummary.packagingCharges)}</span>
                                 </div>
 

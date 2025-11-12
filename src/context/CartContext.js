@@ -414,15 +414,13 @@ export const CartProvider = ({ children }) => {
 
     const getPackagingCharges = () => {
         try {
-            if (!selectedShop || !selectedShop.hasPackaging || !selectedShop.packagingRate) {
+            if (!selectedShop || !selectedShop.hasPackaging || !selectedShop.packagingCharges) {
                 return 0;
             }
 
-            const subtotal = getCartSubtotal();
-            const packagingAmount = Math.round((subtotal * selectedShop.packagingRate) / 100);
+            const packagingAmount = selectedShop.packagingCharges;
             console.log('📦 Packaging calculation:', {
-                subtotal,
-                packagingRate: selectedShop.packagingRate,
+                packagingCharges: selectedShop.packagingCharges,
                 packagingAmount
             });
             return packagingAmount;
