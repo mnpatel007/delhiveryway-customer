@@ -104,18 +104,22 @@ const RevisedOrderPage = () => {
                 ? safeNumber(order?.orderValue?.deliveryFee)
                 : safeNumber(order?.deliveryFee);
 
-    // No taxes - removed as per requirements
-    const originalTaxes = 0;
-    const revisedTaxes = 0;
+    // Get taxes from order data
+    const originalTaxes = safeNumber(order?.orderValue?.taxes) || 0;
+    const revisedTaxes = safeNumber(order?.revisedOrderValue?.taxes) || originalTaxes;
+
+    // Get packaging charges from order data
+    const originalPackagingCharges = safeNumber(order?.orderValue?.packagingCharges) || 0;
+    const revisedPackagingCharges = safeNumber(order?.revisedOrderValue?.packagingCharges) || originalPackagingCharges;
 
     // Use backend calculated totals if available, otherwise calculate from items
     const originalTotal = safeNumber(order?.orderValue?.total, undefined) !== undefined
         ? safeNumber(order?.orderValue?.total)
-        : originalSubtotal + deliveryFee;
+        : originalSubtotal + deliveryFee + originalTaxes + originalPackagingCharges;
 
     const revisedTotal = safeNumber(order?.revisedOrderValue?.total, undefined) !== undefined
         ? safeNumber(order?.revisedOrderValue?.total)
-        : revisedSubtotal + deliveryFee;
+        : revisedSubtotal + deliveryFee + revisedTaxes + revisedPackagingCharges;
 
     // --- Actions ----------------------------------------------------------------
     const handleApproveRevision = async () => {
@@ -375,6 +379,18 @@ const RevisedOrderPage = () => {
                                 <span>Delivery Fee</span>
                                 <span>{formatPrice(deliveryFee)}</span>
                             </div>
+                            {revisedTaxes > 0 && (
+                                <div className="summary-row">
+                                    <span>Tax</span>
+                                    <span>{formatPrice(revisedTaxes)}</span>
+                                </div>
+                            )}
+                            {revisedPackagingCharges > 0 && (
+                                <div className="summary-row">
+                                    <span>Packaging Charges</span>
+                                    <span>{formatPrice(revisedPackagingCharges)}</span>
+                                </div>
+                            )}
                             <div className="summary-divider"></div>
                             <div className="summary-row total-row">
                                 <span>Total Amount</span>

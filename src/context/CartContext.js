@@ -414,13 +414,15 @@ export const CartProvider = ({ children }) => {
 
     const getPackagingCharges = () => {
         try {
-            if (!selectedShop || !selectedShop.hasPackaging || !selectedShop.packagingCharges) {
+            // Handle backward compatibility - check both new and old field names
+            const packagingCharges = selectedShop?.packagingCharges || selectedShop?.packagingRate || 0;
+            if (!selectedShop || !selectedShop.hasPackaging || !packagingCharges) {
                 return 0;
             }
 
-            const packagingAmount = selectedShop.packagingCharges;
+            const packagingAmount = packagingCharges;
             console.log('📦 Packaging calculation:', {
-                packagingCharges: selectedShop.packagingCharges,
+                packagingCharges: packagingCharges,
                 packagingAmount
             });
             return packagingAmount;

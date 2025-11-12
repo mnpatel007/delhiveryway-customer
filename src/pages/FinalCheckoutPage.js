@@ -773,6 +773,18 @@ const FinalCheckoutPage = () => {
                             <span>Delivery Fee</span>
                             <span>{formatPrice(orderSummary.deliveryFee)}</span>
                         </div>
+                        {orderSummary.taxes > 0 && (
+                            <div className="total-row">
+                                <span>Tax ({selectedShop?.hasTax ? `${selectedShop.taxRate}%` : '0%'})</span>
+                                <span>{formatPrice(orderSummary.taxes)}</span>
+                            </div>
+                        )}
+                        {orderSummary.packagingCharges > 0 && (
+                            <div className="total-row">
+                                <span>Packaging Charges</span>
+                                <span>{formatPrice(orderSummary.packagingCharges)}</span>
+                            </div>
+                        )}
                         <div className="summary-divider"></div>
                         <div className="total-row total-grand">
                             <span><strong>Total Amount</strong></span>
