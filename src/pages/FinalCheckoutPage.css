@@ -574,3 +574,47 @@ label:contains("*")::after {
         width: 100%;
     }
 }
+
+/* Duplicate Order Dialog Animation */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px) scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.duplicate-order-overlay {
+    animation: fadeIn 0.3s ease-out;
+}
+
+.duplicate-order-dialog {
+    animation: slideIn 0.3s ease-out;
+}
+
+/* Button hover effects for better visibility */
+.duplicate-order-dialog button {
+    transition: all 0.2s ease !important;
+}
+
+.duplicate-order-dialog button:hover {
+    transform: translateY(-1px) !important;
+}
+
+.duplicate-order-dialog button:active {
+    transform: translateY(0) !important;
+}

@@ -48,7 +48,6 @@ const FinalCheckoutPage = () => {
     const [hasGeocodedAddress, setHasGeocodedAddress] = useState(false);
     const [acceptanceTime, setAcceptanceTime] = useState(null);
     const [loadingAcceptanceTime, setLoadingAcceptanceTime] = useState(false);
-    const [lastOrderAttempt, setLastOrderAttempt] = useState(null);
     const [duplicateOrderInfo, setDuplicateOrderInfo] = useState(null);
     const [showDuplicateDialog, setShowDuplicateDialog] = useState(false);
     const navigate = useNavigate();
@@ -173,15 +172,7 @@ const FinalCheckoutPage = () => {
     };
 
     const placeOrderRequest = async (confirmDuplicate = false) => {
-        // Prevent rapid clicking - check if order was attempted in last 10 seconds
-        const now = Date.now();
-        if (lastOrderAttempt && (now - lastOrderAttempt) < 10000) {
-            const waitTime = Math.ceil((10000 - (now - lastOrderAttempt)) / 1000);
-            alert(`Please wait ${waitTime} seconds before trying again to avoid duplicate orders.`);
-            return;
-        }
-
-        setLastOrderAttempt(now);
+        // No cooldown needed - backend handles duplicate prevention
 
         // Validate delivery address and contact information
         if (!deliveryAddress.street.trim() || !deliveryAddress.city.trim() || !deliveryAddress.state.trim()) {
@@ -563,15 +554,13 @@ const FinalCheckoutPage = () => {
                         <button
                             className="btn btn-primary"
                             onClick={handleConfirmOrder}
-                            disabled={loading || isGeocoding || (lastOrderAttempt && (Date.now() - lastOrderAttempt) < 10000)}
+                            disabled={loading || isGeocoding}
                         >
                             {isGeocoding
                                 ? 'Locating your address...'
                                 : loading
                                     ? 'Placing Order...'
-                                    : (lastOrderAttempt && (Date.now() - lastOrderAttempt) < 10000)
-                                        ? `Wait ${Math.ceil((10000 - (Date.now() - lastOrderAttempt)) / 1000)}s...`
-                                        : 'Confirm Order'}
+                                    : 'Confirm Order'}
                         </button>
                         {geocodingError && (
                             <div className="error-message" style={{ marginTop: '10px', color: 'red' }}>
@@ -829,16 +818,10 @@ const FinalCheckoutPage = () => {
                         !deliveryAddress.state.trim() ||
                         !deliveryAddress.contactName.trim() ||
                         !deliveryAddress.contactPhone.trim() ||
-                        deliveryAddress.contactPhone.length !== 10 ||
-                        (lastOrderAttempt && (Date.now() - lastOrderAttempt) < 10000)
+                        deliveryAddress.contactPhone.length !== 10
                     }
                 >
-                    {loading
-                        ? 'Placing Order...'
-                        : (lastOrderAttempt && (Date.now() - lastOrderAttempt) < 10000)
-                            ? `Wait ${Math.ceil((10000 - (Date.now() - lastOrderAttempt)) / 1000)}s to avoid duplicates`
-                            : '✅ Confirm Order'
-                    }
+                    {loading ? 'Placing Order...' : '✅ Confirm Order'}
                 </button>
 
                 {/* Duplicate Order Confirmation Dialog */}
@@ -849,77 +832,150 @@ const FinalCheckoutPage = () => {
                         left: 0,
                         right: 0,
                         bottom: 0,
-                        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                        backgroundColor: 'rgba(0, 0, 0, 0.6)',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        zIndex: 1000
+                        zIndex: 1000,
+                        backdropFilter: 'blur(2px)'
                     }}>
                         <div className="duplicate-order-dialog" style={{
                             backgroundColor: 'white',
-                            padding: '2rem',
-                            borderRadius: '8px',
-                            maxWidth: '500px',
+                            padding: '2.5rem',
+                            borderRadius: '12px',
+                            maxWidth: '520px',
                             width: '90%',
-                            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.15)'
+                            boxShadow: '0 10px 40px rgba(0, 0, 0, 0.2)',
+                            border: '1px solid #e9ecef',
+                            animation: 'slideIn 0.3s ease-out'
                         }}>
-                            <h3 style={{ color: '#ff6b35', marginBottom: '1rem' }}>
+                            <h3 style={{
+                                color: '#ff6b35',
+                                marginBottom: '1.5rem',
+                                fontSize: '1.4rem',
+                                fontWeight: '600',
+                                textAlign: 'center',
+                                borderBottom: '2px solid #ff6b35',
+                                paddingBottom: '0.5rem'
+                            }}>
                                 ⚠️ Similar Order Detected
                             </h3>
 
-                            <p style={{ marginBottom: '1rem', lineHeight: '1.5' }}>
-                                You have a similar order in progress (Order #{duplicateOrderInfo.existingOrderNumber}).
+                            <p style={{
+                                marginBottom: '1.5rem',
+                                lineHeight: '1.6',
+                                fontSize: '16px',
+                                color: '#333',
+                                textAlign: 'center'
+                            }}>
+                                You have a similar order in progress<br />
+                                <strong style={{ color: '#ff6b35' }}>Order #{duplicateOrderInfo.existingOrderNumber}</strong>
                             </p>
 
                             <div style={{
                                 backgroundColor: '#f8f9fa',
-                                padding: '1rem',
-                                borderRadius: '4px',
-                                marginBottom: '1rem',
-                                border: '1px solid #e9ecef'
+                                padding: '1.25rem',
+                                borderRadius: '8px',
+                                marginBottom: '1.5rem',
+                                border: '1px solid #e9ecef',
+                                borderLeft: '4px solid #ff6b35'
                             }}>
-                                <p style={{ margin: '0 0 0.5rem 0', fontWeight: 'bold', fontSize: '14px' }}>
-                                    Previous Order Status: <span style={{
+                                <p style={{ margin: '0 0 0.75rem 0', fontWeight: '600', fontSize: '15px' }}>
+                                    📋 Previous Order Status: <span style={{
                                         color: duplicateOrderInfo.existingOrderStatus === 'pending_shopper' ? '#ff6b35' : '#28a745',
-                                        textTransform: 'capitalize'
+                                        textTransform: 'capitalize',
+                                        backgroundColor: duplicateOrderInfo.existingOrderStatus === 'pending_shopper' ? '#fff3e0' : '#e8f5e8',
+                                        padding: '2px 8px',
+                                        borderRadius: '4px',
+                                        fontSize: '14px'
                                     }}>
                                         {duplicateOrderInfo.existingOrderStatus.replace(/_/g, ' ')}
                                     </span>
                                 </p>
                                 <p style={{ margin: '0', fontSize: '14px', color: '#666' }}>
-                                    Similarity: {duplicateOrderInfo.similarityPercentage}%
+                                    🔍 Similarity: <strong>{duplicateOrderInfo.similarityPercentage}%</strong>
                                 </p>
                             </div>
 
-                            <p style={{ marginBottom: '1.5rem', fontWeight: 'bold' }}>
-                                Are you sure you want to place another similar order?
+                            <p style={{
+                                marginBottom: '2rem',
+                                fontWeight: '600',
+                                fontSize: '16px',
+                                color: '#333',
+                                textAlign: 'center',
+                                backgroundColor: '#fff3e0',
+                                padding: '1rem',
+                                borderRadius: '6px',
+                                border: '1px solid #ffcc80'
+                            }}>
+                                🤔 Are you sure you want to place another similar order?
                             </p>
 
-                            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
+                            <div style={{
+                                display: 'flex',
+                                gap: '1rem',
+                                justifyContent: 'flex-end',
+                                marginTop: '1.5rem'
+                            }}>
                                 <button
                                     onClick={handleCancelDuplicateOrder}
                                     style={{
                                         padding: '0.75rem 1.5rem',
-                                        border: '1px solid #ddd',
+                                        border: '2px solid #6c757d',
                                         backgroundColor: 'white',
-                                        borderRadius: '4px',
-                                        cursor: 'pointer'
+                                        color: '#6c757d',
+                                        borderRadius: '6px',
+                                        cursor: 'pointer',
+                                        fontSize: '14px',
+                                        fontWeight: '500',
+                                        minWidth: '100px',
+                                        transition: 'all 0.2s ease',
+                                        boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                                    }}
+                                    onMouseOver={(e) => {
+                                        e.target.style.backgroundColor = '#6c757d';
+                                        e.target.style.color = 'white';
+                                        e.target.style.transform = 'translateY(-1px)';
+                                        e.target.style.boxShadow = '0 4px 8px rgba(0,0,0,0.15)';
+                                    }}
+                                    onMouseOut={(e) => {
+                                        e.target.style.backgroundColor = 'white';
+                                        e.target.style.color = '#6c757d';
+                                        e.target.style.transform = 'translateY(0)';
+                                        e.target.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
                                     }}
                                 >
-                                    Cancel
+                                    ❌ Cancel
                                 </button>
                                 <button
                                     onClick={handleConfirmDuplicateOrder}
                                     style={{
                                         padding: '0.75rem 1.5rem',
-                                        border: 'none',
+                                        border: '2px solid #ff6b35',
                                         backgroundColor: '#ff6b35',
                                         color: 'white',
-                                        borderRadius: '4px',
-                                        cursor: 'pointer'
+                                        borderRadius: '6px',
+                                        cursor: 'pointer',
+                                        fontSize: '14px',
+                                        fontWeight: '500',
+                                        minWidth: '140px',
+                                        transition: 'all 0.2s ease',
+                                        boxShadow: '0 2px 4px rgba(255,107,53,0.3)'
+                                    }}
+                                    onMouseOver={(e) => {
+                                        e.target.style.backgroundColor = '#e55a2b';
+                                        e.target.style.borderColor = '#e55a2b';
+                                        e.target.style.transform = 'translateY(-1px)';
+                                        e.target.style.boxShadow = '0 4px 8px rgba(255,107,53,0.4)';
+                                    }}
+                                    onMouseOut={(e) => {
+                                        e.target.style.backgroundColor = '#ff6b35';
+                                        e.target.style.borderColor = '#ff6b35';
+                                        e.target.style.transform = 'translateY(0)';
+                                        e.target.style.boxShadow = '0 2px 4px rgba(255,107,53,0.3)';
                                     }}
                                 >
-                                    Yes, Place Order
+                                    ✅ Yes, Place Order
                                 </button>
                             </div>
                         </div>
