@@ -49,6 +49,8 @@ const FinalCheckoutPage = () => {
     const [acceptanceTime, setAcceptanceTime] = useState(null);
     const [loadingAcceptanceTime, setLoadingAcceptanceTime] = useState(false);
     const [lastOrderAttempt, setLastOrderAttempt] = useState(null);
+    const [duplicateOrderInfo, setDuplicateOrderInfo] = useState(null);
+    const [showDuplicateDialog, setShowDuplicateDialog] = useState(false);
     const navigate = useNavigate();
 
     // Clean up user data and ensure phone field is empty if invalid
@@ -170,7 +172,7 @@ const FinalCheckoutPage = () => {
         return match ? match.name : 'Unknown Shop';
     };
 
-    const handleConfirmOrder = async () => {
+    const placeOrderRequest = async (confirmDuplicate = false) => {
         // Prevent rapid clicking - check if order was attempted in last 10 seconds
         const now = Date.now();
         if (lastOrderAttempt && (now - lastOrderAttempt) < 10000) {
@@ -293,7 +295,8 @@ const FinalCheckoutPage = () => {
                     contactName: deliveryAddress.contactName.trim(),
                     contactPhone: `${deliveryAddress.countryCode}${deliveryAddress.contactPhone.replace(/\s+/g, '')}`
                 },
-                paymentMethod: 'cash' // Default to cash on delivery
+                paymentMethod: 'cash', // Default to cash on delivery
+                confirmDuplicate: confirmDuplicate
             });
 
             if (response.data.success) {
@@ -314,22 +317,23 @@ const FinalCheckoutPage = () => {
             // Handle duplicate order error specifically
             if (err.response?.data?.duplicateOrder) {
                 const data = err.response.data;
-                const waitTime = data.waitTime || 0;
-                const message = waitTime > 0
-                    ? `${data.message}\n\nPlease wait ${waitTime} more minute${waitTime !== 1 ? 's' : ''} before placing a similar order.`
-                    : data.message;
 
-                // Show notification for duplicate order prevention
-                addNotification({
-                    id: Date.now(),
-                    type: 'duplicate_order_warning',
-                    title: '🚫 Duplicate Order Prevented',
-                    message: data.message,
-                    waitTime: waitTime,
-                    existingOrderNumber: data.existingOrderNumber
-                });
+                if (data.duplicateType === 'exact') {
+                    // Exact match - show blocking message
+                    alert(data.message);
+                    addNotification({
+                        id: Date.now(),
+                        type: 'duplicate_order_blocked',
+                        title: '🚫 Exact Duplicate Order Blocked',
+                        message: data.message,
+                        existingOrderNumber: data.existingOrderNumber
+                    });
+                } else if (data.duplicateType === 'similar' && data.requiresConfirmation) {
+                    // Similar match - show confirmation dialog
+                    setDuplicateOrderInfo(data);
+                    setShowDuplicateDialog(true);
+                }
 
-                alert(message); // Keep alert for immediate feedback
                 setGeocodingError('');
                 return;
             }
@@ -344,6 +348,21 @@ const FinalCheckoutPage = () => {
             setLoading(false);
             setIsGeocoding(false);
         }
+    };
+
+    const handleConfirmOrder = async () => {
+        await placeOrderRequest(false);
+    };
+
+    const handleConfirmDuplicateOrder = async () => {
+        setShowDuplicateDialog(false);
+        setDuplicateOrderInfo(null);
+        await placeOrderRequest(true);
+    };
+
+    const handleCancelDuplicateOrder = () => {
+        setShowDuplicateDialog(false);
+        setDuplicateOrderInfo(null);
     };
 
     // Get current GPS location
@@ -821,6 +840,92 @@ const FinalCheckoutPage = () => {
                             : '✅ Confirm Order'
                     }
                 </button>
+
+                {/* Duplicate Order Confirmation Dialog */}
+                {showDuplicateDialog && duplicateOrderInfo && (
+                    <div className="duplicate-order-overlay" style={{
+                        position: 'fixed',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        zIndex: 1000
+                    }}>
+                        <div className="duplicate-order-dialog" style={{
+                            backgroundColor: 'white',
+                            padding: '2rem',
+                            borderRadius: '8px',
+                            maxWidth: '500px',
+                            width: '90%',
+                            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.15)'
+                        }}>
+                            <h3 style={{ color: '#ff6b35', marginBottom: '1rem' }}>
+                                ⚠️ Similar Order Detected
+                            </h3>
+
+                            <p style={{ marginBottom: '1rem', lineHeight: '1.5' }}>
+                                You placed a similar order <strong>{duplicateOrderInfo.timeDiffMinutes} minute{duplicateOrderInfo.timeDiffMinutes !== 1 ? 's' : ''} ago</strong>
+                                (Order #{duplicateOrderInfo.existingOrderNumber}).
+                            </p>
+
+                            <div style={{
+                                backgroundColor: '#f8f9fa',
+                                padding: '1rem',
+                                borderRadius: '4px',
+                                marginBottom: '1rem',
+                                border: '1px solid #e9ecef'
+                            }}>
+                                <p style={{ margin: '0 0 0.5rem 0', fontWeight: 'bold', fontSize: '14px' }}>
+                                    Previous Order Status: <span style={{
+                                        color: duplicateOrderInfo.existingOrderStatus === 'pending_shopper' ? '#ff6b35' : '#28a745',
+                                        textTransform: 'capitalize'
+                                    }}>
+                                        {duplicateOrderInfo.existingOrderStatus.replace(/_/g, ' ')}
+                                    </span>
+                                </p>
+                                <p style={{ margin: '0', fontSize: '14px', color: '#666' }}>
+                                    Similarity: {duplicateOrderInfo.similarityPercentage}%
+                                </p>
+                            </div>
+
+                            <p style={{ marginBottom: '1.5rem', fontWeight: 'bold' }}>
+                                Are you sure you want to place another similar order?
+                            </p>
+
+                            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
+                                <button
+                                    onClick={handleCancelDuplicateOrder}
+                                    style={{
+                                        padding: '0.75rem 1.5rem',
+                                        border: '1px solid #ddd',
+                                        backgroundColor: 'white',
+                                        borderRadius: '4px',
+                                        cursor: 'pointer'
+                                    }}
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={handleConfirmDuplicateOrder}
+                                    style={{
+                                        padding: '0.75rem 1.5rem',
+                                        border: 'none',
+                                        backgroundColor: '#ff6b35',
+                                        color: 'white',
+                                        borderRadius: '4px',
+                                        cursor: 'pointer'
+                                    }}
+                                >
+                                    Yes, Place Order
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );
