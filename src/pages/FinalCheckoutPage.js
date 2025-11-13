@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { CartContext } from '../context/CartContext';
+import { useSocket } from '../context/SocketContext';
 import { useNavigate } from 'react-router-dom';
 import { shopsAPI, apiCall, api } from '../services/api';
 import { geocodeAddress } from '../utils/geocoding';
@@ -19,6 +20,7 @@ const formatPrice = (price) => {
 
 const FinalCheckoutPage = () => {
     const { user } = useAuth();
+    const { addNotification } = useSocket();
     const {
         cartItems,
         selectedShop,
@@ -46,6 +48,7 @@ const FinalCheckoutPage = () => {
     const [hasGeocodedAddress, setHasGeocodedAddress] = useState(false);
     const [acceptanceTime, setAcceptanceTime] = useState(null);
     const [loadingAcceptanceTime, setLoadingAcceptanceTime] = useState(false);
+    const [lastOrderAttempt, setLastOrderAttempt] = useState(null);
     const navigate = useNavigate();
 
     // Clean up user data and ensure phone field is empty if invalid
@@ -168,6 +171,16 @@ const FinalCheckoutPage = () => {
     };
 
     const handleConfirmOrder = async () => {
+        // Prevent rapid clicking - check if order was attempted in last 10 seconds
+        const now = Date.now();
+        if (lastOrderAttempt && (now - lastOrderAttempt) < 10000) {
+            const waitTime = Math.ceil((10000 - (now - lastOrderAttempt)) / 1000);
+            alert(`Please wait ${waitTime} seconds before trying again to avoid duplicate orders.`);
+            return;
+        }
+
+        setLastOrderAttempt(now);
+
         // Validate delivery address and contact information
         if (!deliveryAddress.street.trim() || !deliveryAddress.city.trim() || !deliveryAddress.state.trim()) {
             alert('Please fill in all required address fields (Street, City, State)');
@@ -297,6 +310,30 @@ const FinalCheckoutPage = () => {
 
         } catch (err) {
             console.error('Order placement error:', err);
+
+            // Handle duplicate order error specifically
+            if (err.response?.data?.duplicateOrder) {
+                const data = err.response.data;
+                const waitTime = data.waitTime || 0;
+                const message = waitTime > 0
+                    ? `${data.message}\n\nPlease wait ${waitTime} more minute${waitTime !== 1 ? 's' : ''} before placing a similar order.`
+                    : data.message;
+
+                // Show notification for duplicate order prevention
+                addNotification({
+                    id: Date.now(),
+                    type: 'duplicate_order_warning',
+                    title: '🚫 Duplicate Order Prevented',
+                    message: data.message,
+                    waitTime: waitTime,
+                    existingOrderNumber: data.existingOrderNumber
+                });
+
+                alert(message); // Keep alert for immediate feedback
+                setGeocodingError('');
+                return;
+            }
+
             const errorMessage = isGeocoding
                 ? `Error processing address: ${err.message || 'Could not determine location coordinates'}`
                 : (err.response?.data?.message || 'Failed to place order. Please try again.');
@@ -507,13 +544,15 @@ const FinalCheckoutPage = () => {
                         <button
                             className="btn btn-primary"
                             onClick={handleConfirmOrder}
-                            disabled={loading || isGeocoding}
+                            disabled={loading || isGeocoding || (lastOrderAttempt && (Date.now() - lastOrderAttempt) < 10000)}
                         >
                             {isGeocoding
                                 ? 'Locating your address...'
                                 : loading
                                     ? 'Placing Order...'
-                                    : 'Confirm Order'}
+                                    : (lastOrderAttempt && (Date.now() - lastOrderAttempt) < 10000)
+                                        ? `Wait ${Math.ceil((10000 - (Date.now() - lastOrderAttempt)) / 1000)}s...`
+                                        : 'Confirm Order'}
                         </button>
                         {geocodingError && (
                             <div className="error-message" style={{ marginTop: '10px', color: 'red' }}>
@@ -676,7 +715,7 @@ const FinalCheckoutPage = () => {
                                 />
                             </div>
                         </div>
-                        
+
                         {/* Calculate Delivery Fee Button - Only show for distance-based shops */}
                         {deliveryAddress.street.trim() && deliveryAddress.city.trim() && deliveryAddress.state.trim() && !deliveryAddress.coordinates && selectedShop && selectedShop.deliveryFeeMode === 'distance' && (
                             <div className="form-row" style={{ marginTop: '1rem' }}>
@@ -771,10 +810,16 @@ const FinalCheckoutPage = () => {
                         !deliveryAddress.state.trim() ||
                         !deliveryAddress.contactName.trim() ||
                         !deliveryAddress.contactPhone.trim() ||
-                        deliveryAddress.contactPhone.length !== 10
+                        deliveryAddress.contactPhone.length !== 10 ||
+                        (lastOrderAttempt && (Date.now() - lastOrderAttempt) < 10000)
                     }
                 >
-                    {loading ? 'Placing Order...' : '✅ Confirm Order'}
+                    {loading
+                        ? 'Placing Order...'
+                        : (lastOrderAttempt && (Date.now() - lastOrderAttempt) < 10000)
+                            ? `Wait ${Math.ceil((10000 - (Date.now() - lastOrderAttempt)) / 1000)}s to avoid duplicates`
+                            : '✅ Confirm Order'
+                    }
                 </button>
             </div>
         </div>
