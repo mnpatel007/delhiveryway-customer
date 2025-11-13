@@ -868,8 +868,7 @@ const FinalCheckoutPage = () => {
                             </h3>
 
                             <p style={{ marginBottom: '1rem', lineHeight: '1.5' }}>
-                                You placed a similar order <strong>{duplicateOrderInfo.timeDiffMinutes} minute{duplicateOrderInfo.timeDiffMinutes !== 1 ? 's' : ''} ago</strong>
-                                (Order #{duplicateOrderInfo.existingOrderNumber}).
+                                You have a similar order in progress (Order #{duplicateOrderInfo.existingOrderNumber}).
                             </p>
 
                             <div style={{
