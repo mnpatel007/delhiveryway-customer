@@ -9,7 +9,7 @@ const geocodingAxios = axios.create({
 });
 
 // ====== Config ======
-const GOOGLE_MAPS_API_KEY = 'AIzaSyBTM8risurfzxPDibLQTKHOA9DSr89S6FA';
+const GOOGLE_MAPS_API_KEY = process.env.GOOGLE_MAPS_API_KEY;
 const NOMINATIM_SEARCH_URL = 'https://nominatim.openstreetmap.org/search';
 const NOMINATIM_REVERSE_URL = 'https://nominatim.openstreetmap.org/reverse';
 const GOOGLE_GEOCODE_URL = 'https://maps.googleapis.com/maps/api/geocode/json';
