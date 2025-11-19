@@ -1,7 +1,8 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { CartContext } from '../context/CartContext';
+import { useSearch } from '../context/SearchContext';
 import Logo from './Logo';
 import './Navbar.css';
 
@@ -21,6 +22,57 @@ const Navbar = () => {
     };
 
     const isActive = (path) => location.pathname === path;
+    const [searchTerm, setSearchTerm] = useState('');
+    const [suggestions, setSuggestions] = useState([]);
+    const [showSuggestions, setShowSuggestions] = useState(false);
+    const { indexLoaded, searchLocal } = useSearch();
+    const inputRef = useRef(null);
+
+    const handleSearchSubmit = (e) => {
+        e.preventDefault();
+        const q = (searchTerm || '').trim();
+        if (!q) return;
+        navigate(`/search?q=${encodeURIComponent(q)}`);
+        setSearchTerm('');
+    };
+
+    // Instant suggestions (local Fuse) with tiny debounce
+    useEffect(() => {
+        if (!searchTerm || searchTerm.trim().length < 1) {
+            setSuggestions([]);
+            setShowSuggestions(false);
+            return;
+        }
+
+        let cancelled = false;
+        const t = setTimeout(() => {
+            if (indexLoaded) {
+                const local = searchLocal(searchTerm, 6);
+                if (cancelled) return;
+                setSuggestions(local);
+                setShowSuggestions(true);
+            } else {
+                // no local index yet - don't call server per keystroke
+                setSuggestions([]);
+                setShowSuggestions(false);
+            }
+        }, 120);
+
+        return () => { cancelled = true; clearTimeout(t); };
+    }, [searchTerm, indexLoaded]);
+
+    const handleSuggestionClick = (item) => {
+        // navigate to shop page and highlight product
+        if (item.shopId && item.shopId._id) {
+            navigate(`/shop/${item.shopId._id}?highlight=${encodeURIComponent(item._id)}`);
+        } else if (item.shopId && item.shopId) {
+            navigate(`/shop/${item.shopId}?highlight=${encodeURIComponent(item._id)}`);
+        } else {
+            navigate(`/search?q=${encodeURIComponent(item.name)}`);
+        }
+        setSearchTerm('');
+        setShowSuggestions(false);
+    };
 
     const toggleMenu = () => {
         const newMenuState = !isMenuOpen;
@@ -42,6 +94,32 @@ const Navbar = () => {
 
                 {/* Desktop Navigation */}
                 <div className="navbar-menu">
+                    <form className="navbar-search" onSubmit={handleSearchSubmit}>
+                        <input
+                            type="search"
+                            placeholder="Search for products or shops (e.g. 'dal tadka')"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            ref={inputRef}
+                            aria-label="Search"
+                        />
+                        <button type="submit" className="btn btn-primary btn-sm">Search</button>
+                        {showSuggestions && suggestions.length > 0 && (
+                            <div className="navbar-search-suggestions" role="listbox">
+                                {suggestions.map(s => (
+                                    <div key={s._id} role="option" tabIndex={0} className="suggestion-item" onClick={() => handleSuggestionClick(s)}>
+                                        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                                            {s.images?.[0] && <img src={s.images[0]} alt={s.name} style={{ width: 48, height: 48, objectFit: 'cover', borderRadius: 6 }} />}
+                                            <div>
+                                                <div style={{ fontWeight: 600 }}>{s.name}</div>
+                                                <div style={{ fontSize: 12, color: '#666' }}>{s.shopId?.name || ''} • ₹{s.price}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </form>
                     <Link
                         to="/"
                         className={`navbar-link ${isActive('/') ? 'active' : ''}`}
