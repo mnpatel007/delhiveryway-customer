@@ -246,7 +246,7 @@ const ShopPage = () => {
                     top: absoluteElementTop - 100,
                     behavior: 'smooth'
                 });
-                
+
                 // Add highlight animation
                 element.classList.add('highlighted');
                 setTimeout(() => {

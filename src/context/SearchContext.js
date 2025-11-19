@@ -56,13 +56,44 @@ export const SearchProvider = ({ children }) => {
 
     const searchLocal = (query, limit = 500) => {
         if (!fuseRef.current || !query || query.trim().length < 1) return [];
+
+        const q = query.trim().toLowerCase();
+        const tokens = q.split(/\s+/).filter(Boolean);
+
+        // Prefer strict substring matching on product name: every token must be present
+        // Order results: prefix matches first, then other substring matches
+        if (tokens.length > 0) {
+            const prefixMatches = [];
+            const containsMatches = [];
+
+            for (const p of productsIndex) {
+                const name = (p.name || '').toLowerCase();
+                if (!name) continue;
+                const allTokensPresent = tokens.every(tok => name.includes(tok));
+                if (!allTokensPresent) continue;
+                // If the name starts with the full query or first token, prefer it
+                if (name.startsWith(q) || name.startsWith(tokens[0])) {
+                    prefixMatches.push(p);
+                } else {
+                    containsMatches.push(p);
+                }
+            }
+
+            const combined = [...prefixMatches, ...containsMatches];
+            if (combined.length > 0) {
+                console.log(`🔎 Direct substring match for "${query}": ${combined.length} results (prefix ${prefixMatches.length}, contains ${containsMatches.length})`);
+                return combined.slice(0, limit);
+            }
+        }
+
+        // Fallback to Fuse fuzzy search when strict substring doesn't return results
         const results = fuseRef.current.search(query, { limit });
         // Log search results with relevance scores for debugging
         if (results.length > 0) {
-            console.log(`🔍 Search "${query}": ${results.length} results`, 
+            console.log(`🔍 Fuzzy search "${query}": ${results.length} results`, 
                 results.slice(0, 3).map(r => ({ 
                     name: r.item.name, 
-                    score: r.score.toFixed(3),
+                    score: (r.score || 0).toFixed(3),
                     shop: r.item.shopId?.name 
                 }))
             );
