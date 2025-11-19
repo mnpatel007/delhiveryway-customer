@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useSearch } from '../context/SearchContext';
 import PermanentNotices from '../components/PermanentNotices';
 import ActiveOrdersWidget from '../components/ActiveOrdersWidget';
 import Logo from '../components/Logo';
@@ -24,6 +25,9 @@ const HomePage = () => {
     const navigate = useNavigate();
     const { user } = useAuth();
     const searchInputRef = useRef(null);
+    const { indexLoaded, searchLocal } = useSearch();
+    const [suggestions, setSuggestions] = useState([]);
+    const [showSuggestions, setShowSuggestions] = useState(false);
 
     // Sample shops as fallback
     const sampleShops = [
@@ -366,6 +370,42 @@ const HomePage = () => {
         // Search will be triggered by useEffect when searchTerm changes
     };
 
+    // Instant suggestions using local Fuse index (small debounce)
+    useEffect(() => {
+        if (!searchTerm || searchTerm.trim().length < 1) {
+            setSuggestions([]);
+            setShowSuggestions(false);
+            return;
+        }
+
+        let cancelled = false;
+        const t = setTimeout(() => {
+            if (indexLoaded) {
+                const local = searchLocal(searchTerm, 6);
+                if (cancelled) return;
+                setSuggestions(local);
+                setShowSuggestions(local.length > 0);
+            } else {
+                setSuggestions([]);
+                setShowSuggestions(false);
+            }
+        }, 120);
+
+        return () => { cancelled = true; clearTimeout(t); };
+    }, [searchTerm, indexLoaded]);
+
+    const handleSuggestionClick = (item) => {
+        if (item.shopId && item.shopId._id) {
+            navigate(`/shop/${item.shopId._id}?highlight=${encodeURIComponent(item._id)}`);
+        } else if (item.shopId) {
+            navigate(`/shop/${item.shopId}?highlight=${encodeURIComponent(item._id)}`);
+        } else {
+            navigate(`/search?q=${encodeURIComponent(item.name)}`);
+        }
+        setSearchTerm('');
+        setShowSuggestions(false);
+    };
+
     const retryFetch = () => {
         setError('');
         fetchShops();
@@ -469,6 +509,44 @@ const HomePage = () => {
                             {searchTerm ? `Search Results for "${searchTerm}"` : 'Available Shops'}
                             <span className="shops-count">({filteredShops.length} shops)</span>
                         </h2>
+
+                        {/* Search placed under Available Shops header */}
+                        <div className="search-section" style={{ marginTop: 16 }}>
+                            <div className="search-content">
+                                <form className="search-form" onSubmit={handleSearch}>
+                                    <div className="search-container">
+                                        <span className="search-icon">🔍</span>
+                                        <input
+                                            ref={searchInputRef}
+                                            className="search-input"
+                                            type="search"
+                                            placeholder="Search for products or shops (e.g. 'dal tadka')"
+                                            value={searchTerm}
+                                            onChange={(e) => setSearchTerm(e.target.value)}
+                                            aria-label="Search products"
+                                        />
+
+                                        {showSuggestions && suggestions.length > 0 && (
+                                            <div className="home-search-suggestions" role="listbox">
+                                                {suggestions.map(s => (
+                                                    <div key={s._id} role="option" tabIndex={0} className="suggestion-item" onClick={() => handleSuggestionClick(s)}>
+                                                        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                                                            {s.images?.[0] && <img src={s.images[0]} alt={s.name} style={{ width: 48, height: 48, objectFit: 'cover', borderRadius: 6 }} />}
+                                                            <div>
+                                                                <div style={{ fontWeight: 600 }}>{s.name}</div>
+                                                                <div style={{ fontSize: 12, color: '#666' }}>{s.shopId?.name || ''} • ₹{s.price}</div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    <button type="submit" className="search-btn">Search</button>
+                                </form>
+                            </div>
+                        </div>
                     </div>
 
                     {filteredShops.length === 0 ? (
