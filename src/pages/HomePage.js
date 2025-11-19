@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useSearch } from '../context/SearchContext';
 import PermanentNotices from '../components/PermanentNotices';
@@ -26,6 +26,7 @@ const HomePage = () => {
     const [categories] = useState(['all', 'grocery', 'pharmacy', 'electronics', 'clothing', 'restaurant']);
 
     const navigate = useNavigate();
+    const location = useLocation();
     const { user } = useAuth();
     const searchInputRef = useRef(null);
     const { indexLoaded, searchLocal } = useSearch();
@@ -263,6 +264,18 @@ const HomePage = () => {
     useEffect(() => {
         fetchShops();
     }, [fetchShops]);
+
+    // Ensure when arriving on HomePage (including via back navigation) we start at the top
+    useEffect(() => {
+        if (location && (location.pathname === '/' || location.pathname === '')) {
+            try {
+                window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+            } catch (e) {
+                // fallback
+                window.scrollTo(0, 0);
+            }
+        }
+    }, [location.key, location.pathname]);
 
     // Automatically request location on page load for better UX
     useEffect(() => {
