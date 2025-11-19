@@ -13,7 +13,10 @@ const HomePage = () => {
     const [shops, setShops] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
+    // `searchTerm` is the applied filter used when fetching shops.
+    // `query` is the live input bound to the search box (used for suggestions).
     const [searchTerm, setSearchTerm] = useState('');
+    const [query, setQuery] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('all');
     const [deliveryFees, setDeliveryFees] = useState({});
     const [customerLocation, setCustomerLocation] = useState(null);
@@ -367,12 +370,15 @@ const HomePage = () => {
 
     const handleSearch = (e) => {
         e.preventDefault();
-        // Search will be triggered by useEffect when searchTerm changes
+        // Apply the live query as the search filter which will trigger fetchShops
+        setSearchTerm(query.trim());
+        setShowSuggestions(false);
     };
 
     // Instant suggestions using local Fuse index (small debounce)
     useEffect(() => {
-        if (!searchTerm || searchTerm.trim().length < 1) {
+        // Use `query` (live input) for suggestions so typing doesn't trigger shop fetches.
+        if (!query || query.trim().length < 1) {
             setSuggestions([]);
             setShowSuggestions(false);
             return;
@@ -381,7 +387,7 @@ const HomePage = () => {
         let cancelled = false;
         const t = setTimeout(() => {
             if (indexLoaded) {
-                const local = searchLocal(searchTerm, 6);
+                const local = searchLocal(query, 6);
                 if (cancelled) return;
                 setSuggestions(local);
                 setShowSuggestions(local.length > 0);
@@ -392,17 +398,20 @@ const HomePage = () => {
         }, 120);
 
         return () => { cancelled = true; clearTimeout(t); };
-    }, [searchTerm, indexLoaded]);
+    }, [query, indexLoaded]);
 
     const handleSuggestionClick = (item) => {
+        // Clicking a suggestion should navigate to the shop and highlight the product.
         if (item.shopId && item.shopId._id) {
             navigate(`/shop/${item.shopId._id}?highlight=${encodeURIComponent(item._id)}`);
         } else if (item.shopId) {
             navigate(`/shop/${item.shopId}?highlight=${encodeURIComponent(item._id)}`);
         } else {
-            navigate(`/search?q=${encodeURIComponent(item.name)}`);
+            // fallback: apply the item name as search filter
+            setSearchTerm(item.name || '');
+            navigate(`/search?q=${encodeURIComponent(item.name || '')}`);
         }
-        setSearchTerm('');
+        setQuery('');
         setShowSuggestions(false);
     };
 
@@ -413,6 +422,7 @@ const HomePage = () => {
 
     const clearSearch = () => {
         setSearchTerm('');
+        setQuery('');
         setSelectedCategory('all');
         fetchShops();
     };
@@ -521,8 +531,8 @@ const HomePage = () => {
                                             className="search-input"
                                             type="search"
                                             placeholder="Search for products or shops (e.g. 'dal tadka')"
-                                            value={searchTerm}
-                                            onChange={(e) => setSearchTerm(e.target.value)}
+                                            value={query}
+                                            onChange={(e) => setQuery(e.target.value)}
                                             aria-label="Search products"
                                         />
 
