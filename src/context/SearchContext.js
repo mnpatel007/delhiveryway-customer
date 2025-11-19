@@ -27,17 +27,19 @@ export const SearchProvider = ({ children }) => {
 
                 setProductsIndex(items);
 
-                // build Fuse index
+                // build Fuse index with stricter matching for better accuracy
                 fuseRef.current = new Fuse(items, {
                     keys: [
-                        { name: 'name', weight: 0.7 },
-                        { name: 'tags', weight: 0.2 },
-                        { name: 'shopId.name', weight: 0.1 }
+                        { name: 'name', weight: 0.8 },      // Prioritize product name
+                        { name: 'tags', weight: 0.15 },     // Tags less important
+                        { name: 'shopId.name', weight: 0.05 } // Shop name least important
                     ],
                     includeScore: true,
-                    threshold: 0.4,
+                    threshold: 0.5,                  // Stricter threshold for closer matches only
+                    minMatchCharLength: 2,           // Require at least 2 character match
                     ignoreLocation: true,
-                    useExtendedSearch: true
+                    useExtendedSearch: true,
+                    shouldSort: true                 // Sort by relevance score
                 });
 
                 setIndexLoaded(true);
@@ -55,6 +57,16 @@ export const SearchProvider = ({ children }) => {
     const searchLocal = (query, limit = 500) => {
         if (!fuseRef.current || !query || query.trim().length < 1) return [];
         const results = fuseRef.current.search(query, { limit });
+        // Log search results with relevance scores for debugging
+        if (results.length > 0) {
+            console.log(`🔍 Search "${query}": ${results.length} results`, 
+                results.slice(0, 3).map(r => ({ 
+                    name: r.item.name, 
+                    score: r.score.toFixed(3),
+                    shop: r.item.shopId?.name 
+                }))
+            );
+        }
         return results.map(r => r.item);
     };
 

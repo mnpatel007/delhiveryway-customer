@@ -1146,3 +1146,32 @@ osed Notice */
         font-size: 0.9rem;
     }
 }
+
+/* Product Highlight Animation - for scroll-to featured product */
+.product-card.highlighted {
+    animation: highlightPulse 2s ease-in-out;
+    box-shadow: 0 0 20px rgba(99, 102, 241, 0.6), 0 0 40px rgba(99, 102, 241, 0.3) !important;
+}
+
+@keyframes highlightPulse {
+    0% {
+        background: var(--background-primary);
+        box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.7);
+    }
+    25% {
+        background: rgba(99, 102, 241, 0.05);
+        box-shadow: 0 0 20px 5px rgba(99, 102, 241, 0.5);
+    }
+    50% {
+        background: rgba(99, 102, 241, 0.08);
+        box-shadow: 0 0 30px 10px rgba(99, 102, 241, 0.3);
+    }
+    75% {
+        background: rgba(99, 102, 241, 0.05);
+        box-shadow: 0 0 20px 5px rgba(99, 102, 241, 0.5);
+    }
+    100% {
+        background: var(--background-primary);
+        box-shadow: 0 0 0 0 rgba(99, 102, 241, 0);
+    }
+}
