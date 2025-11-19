@@ -1,11 +1,12 @@
-import React, { useEffect, useState, useContext } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import React, { useEffect, useState, useContext, useRef } from 'react';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { shopsAPI, productsAPI, apiCall } from '../services/api';
 import { CartContext } from '../context/CartContext';
 import './ShopPage.css';
 
 const ShopPage = () => {
     const { id } = useParams();
+    const [searchParams] = useSearchParams();
     const navigate = useNavigate();
     const [shop, setShop] = useState(null);
     const [products, setProducts] = useState([]);
@@ -19,6 +20,7 @@ const ShopPage = () => {
     const [viewMode, setViewMode] = useState('grid');
     const [showMenu, setShowMenu] = useState(false);
     const { addToCart, selectedShop, setSelectedShop } = useContext(CartContext);
+    const productRefsMap = useRef({});
 
     useEffect(() => {
         const fetchShopAndProducts = async () => {
@@ -230,6 +232,29 @@ const ShopPage = () => {
             fetchShopAndProducts();
         }
     }, [id]);
+
+    // Scroll to highlighted product when it loads
+    useEffect(() => {
+        const highlightId = searchParams.get('highlight');
+        if (highlightId && filteredProducts.length > 0 && productRefsMap.current[highlightId]) {
+            const element = productRefsMap.current[highlightId];
+            if (element) {
+                // Scroll with offset for smooth behavior
+                const elementRect = element.getBoundingClientRect();
+                const absoluteElementTop = elementRect.top + window.scrollY;
+                window.scrollTo({
+                    top: absoluteElementTop - 100,
+                    behavior: 'smooth'
+                });
+
+                // Add highlight animation
+                element.classList.add('highlighted');
+                setTimeout(() => {
+                    element.classList.remove('highlighted');
+                }, 2000);
+            }
+        }
+    }, [filteredProducts, searchParams]);
 
     // Filter and sort products
     useEffect(() => {
@@ -799,7 +824,13 @@ const ShopPage = () => {
                 ) : (
                     <div className={`products-container ${viewMode === 'grid' ? 'grid-view' : 'list-view'}`}>
                         {filteredProducts.map(product => (
-                            <div key={product._id} className="product-card">
+                            <div
+                                key={product._id}
+                                className="product-card"
+                                ref={(el) => {
+                                    if (el) productRefsMap.current[product._id] = el;
+                                }}
+                            >
                                 <div className="product-image-section">
                                     {product.images && product.images.length > 0 ? (
                                         <img

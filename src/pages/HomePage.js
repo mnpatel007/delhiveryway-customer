@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useSearch } from '../context/SearchContext';
 import PermanentNotices from '../components/PermanentNotices';
 import ActiveOrdersWidget from '../components/ActiveOrdersWidget';
 import Logo from '../components/Logo';
@@ -12,7 +13,10 @@ const HomePage = () => {
     const [shops, setShops] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
+    // `searchTerm` is the applied filter used when fetching shops.
+    // `query` is the live input bound to the search box (used for suggestions).
     const [searchTerm, setSearchTerm] = useState('');
+    const [query, setQuery] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('all');
     const [deliveryFees, setDeliveryFees] = useState({});
     const [customerLocation, setCustomerLocation] = useState(null);
@@ -22,8 +26,12 @@ const HomePage = () => {
     const [categories] = useState(['all', 'grocery', 'pharmacy', 'electronics', 'clothing', 'restaurant']);
 
     const navigate = useNavigate();
+    const location = useLocation();
     const { user } = useAuth();
     const searchInputRef = useRef(null);
+    const { indexLoaded, searchLocal } = useSearch();
+    const [suggestions, setSuggestions] = useState([]);
+    const [showSuggestions, setShowSuggestions] = useState(false);
 
     // Sample shops as fallback
     const sampleShops = [
@@ -257,6 +265,18 @@ const HomePage = () => {
         fetchShops();
     }, [fetchShops]);
 
+    // Ensure when arriving on HomePage (including via back navigation) we start at the top
+    useEffect(() => {
+        if (location && (location.pathname === '/' || location.pathname === '')) {
+            try {
+                window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+            } catch (e) {
+                // fallback
+                window.scrollTo(0, 0);
+            }
+        }
+    }, [location.key, location.pathname]);
+
     // Automatically request location on page load for better UX
     useEffect(() => {
         const autoRequestLocation = async () => {
@@ -363,7 +383,49 @@ const HomePage = () => {
 
     const handleSearch = (e) => {
         e.preventDefault();
-        // Search will be triggered by useEffect when searchTerm changes
+        // Apply the live query as the search filter which will trigger fetchShops
+        setSearchTerm(query.trim());
+        setShowSuggestions(false);
+    };
+
+    // Instant suggestions using local Fuse index (small debounce)
+    useEffect(() => {
+        // Use `query` (live input) for suggestions so typing doesn't trigger shop fetches.
+        if (!query || query.trim().length < 1) {
+            setSuggestions([]);
+            setShowSuggestions(false);
+            return;
+        }
+
+        let cancelled = false;
+        const t = setTimeout(() => {
+            if (indexLoaded) {
+                const local = searchLocal(query, 500);
+                if (cancelled) return;
+                setSuggestions(local);
+                setShowSuggestions(local.length > 0);
+            } else {
+                setSuggestions([]);
+                setShowSuggestions(false);
+            }
+        }, 120);
+
+        return () => { cancelled = true; clearTimeout(t); };
+    }, [query, indexLoaded]);
+
+    const handleSuggestionClick = (item) => {
+        // Clicking a suggestion should navigate to the shop and highlight the product.
+        if (item.shopId && item.shopId._id) {
+            navigate(`/shop/${item.shopId._id}?highlight=${encodeURIComponent(item._id)}`);
+        } else if (item.shopId) {
+            navigate(`/shop/${item.shopId}?highlight=${encodeURIComponent(item._id)}`);
+        } else {
+            // fallback: apply the item name as search filter
+            setSearchTerm(item.name || '');
+            navigate(`/search?q=${encodeURIComponent(item.name || '')}`);
+        }
+        setQuery('');
+        setShowSuggestions(false);
     };
 
     const retryFetch = () => {
@@ -373,6 +435,7 @@ const HomePage = () => {
 
     const clearSearch = () => {
         setSearchTerm('');
+        setQuery('');
         setSelectedCategory('all');
         fetchShops();
     };
@@ -469,6 +532,62 @@ const HomePage = () => {
                             {searchTerm ? `Search Results for "${searchTerm}"` : 'Available Shops'}
                             <span className="shops-count">({filteredShops.length} shops)</span>
                         </h2>
+
+                        {/* Search placed under Available Shops header */}
+                        <div className="search-section" style={{ marginTop: 16 }}>
+                            <div className="search-content">
+                                <form className="search-form" onSubmit={handleSearch}>
+                                    <div className="search-container">
+                                        <span className="search-icon">🔍</span>
+                                        <input
+                                            ref={searchInputRef}
+                                            className="search-input"
+                                            type="search"
+                                            placeholder="Search for products or shops (e.g. 'dal tadka')"
+                                            value={query}
+                                            onChange={(e) => setQuery(e.target.value)}
+                                            aria-label="Search products"
+                                        />
+
+                                        {showSuggestions && suggestions.length > 0 && (
+                                            <div className="home-search-suggestions" role="listbox">
+                                                {(() => {
+                                                    // Group suggestions by shop
+                                                    const grouped = {};
+                                                    suggestions.forEach(s => {
+                                                        const shopId = s.shopId?._id || s.shopId || 'unknown';
+                                                        const shopName = s.shopId?.name || 'Unknown Shop';
+                                                        if (!grouped[shopId]) {
+                                                            grouped[shopId] = { shopName, products: [] };
+                                                        }
+                                                        grouped[shopId].products.push(s);
+                                                    });
+
+                                                    return Object.entries(grouped).map(([shopId, { shopName, products }]) => (
+                                                        <div key={shopId} className="suggestion-shop-group">
+                                                            <div className="suggestion-shop-header">{shopName}</div>
+                                                            {products.slice(0, 3).map(s => (
+                                                                <div key={s._id} role="option" tabIndex={0} className="suggestion-item" onClick={() => handleSuggestionClick(s)}>
+                                                                    <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                                                                        {s.images?.[0] && <img src={s.images[0]} alt={s.name} style={{ width: 48, height: 48, objectFit: 'cover', borderRadius: 6 }} />}
+                                                                        <div>
+                                                                            <div style={{ fontWeight: 600 }}>{s.name}</div>
+                                                                            <div style={{ fontSize: 12, color: '#666' }}>₹{s.price}</div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    ));
+                                                })()}
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    <button type="submit" className="search-btn">Search</button>
+                                </form>
+                            </div>
+                        </div>
                     </div>
 
                     {filteredShops.length === 0 ? (

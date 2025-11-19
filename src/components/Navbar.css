@@ -71,6 +71,57 @@
     gap: 1.5rem;
 }
 
+.navbar-search {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.navbar-search input[type="search"] {
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.5rem;
+    min-width: 260px;
+}
+
+.navbar-search button {
+    padding: 0.5rem 0.75rem;
+}
+
+.navbar-search {
+    display: none;
+    /* search moved to HomePage */
+}
+
+.navbar-search-suggestions {
+    position: absolute;
+    background: white;
+    border: 1px solid #e6e9ef;
+    box-shadow: 0 4px 12px rgba(16, 24, 40, 0.08);
+    margin-top: 8px;
+    width: 360px;
+    max-height: 360px;
+    overflow: auto;
+    z-index: 60;
+    border-radius: 8px;
+    padding: 8px;
+}
+
+.suggestion-item {
+    padding: 8px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.suggestion-item:hover {
+    background: #f8fafc;
+}
+
+.navbar-search-suggestions {
+    display: none;
+    /* moved to HomePage */
+}
+
 .navbar-link {
     display: flex;
     align-items: center;

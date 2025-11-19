@@ -136,6 +136,7 @@ export const productsAPI = {
     },
     getById: (id) => api.get(`/products/${id}`),
     search: (params = {}) => api.get('/products/search', { params }),
+    index: (params = {}) => api.get('/products/index', { params }),
     getByCategory: (category, params = {}) => api.get(`/products/category/${category}`, { params }),
     getFeatured: (params = {}) => api.get('/products/featured', { params }),
 };

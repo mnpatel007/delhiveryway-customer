@@ -4,6 +4,7 @@ import { clearProblematicStorage } from './utils/clearStorage';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 import { SocketProvider, useSocket } from './context/SocketContext';
+import { SearchProvider } from './context/SearchContext';
 
 import ErrorBoundary from './components/ErrorBoundary';
 import Navbar from './components/Navbar';
@@ -15,6 +16,7 @@ import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
 import ShopPage from './pages/ShopPage';
+import SearchPage from './pages/SearchPage';
 import CartPage from './pages/CartPage';
 import OrderSuccessPage from './pages/OrderSuccessPage';
 import CheckoutPage from './pages/FinalCheckoutPage';
@@ -105,6 +107,7 @@ const AppContent = () => {
         <Layout>
           <Routes>
             <Route path="/" element={<PrivateRoute><HomePage /></PrivateRoute>} />
+            <Route path="/search" element={<PrivateRoute><SearchPage /></PrivateRoute>} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignupPage />} />
             <Route path="/shop/:id" element={<PrivateRoute><ShopPage /></PrivateRoute>} />
@@ -138,7 +141,9 @@ function App() {
       <AuthProvider>
         <CartProvider>
           <SocketProvider>
-            <AppContent />
+            <SearchProvider>
+              <AppContent />
+            </SearchProvider>
           </SocketProvider>
         </CartProvider>
       </AuthProvider>
