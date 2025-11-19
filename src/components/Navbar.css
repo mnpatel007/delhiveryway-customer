@@ -87,8 +87,10 @@
 .navbar-search button {
     padding: 0.5rem 0.75rem;
 }
+
 .navbar-search {
-    display: none; /* search moved to HomePage */
+    display: none;
+    /* search moved to HomePage */
 }
 
 .navbar-search-suggestions {
@@ -114,8 +116,10 @@
 .suggestion-item:hover {
     background: #f8fafc;
 }
+
 .navbar-search-suggestions {
-    display: none; /* moved to HomePage */
+    display: none;
+    /* moved to HomePage */
 }
 
 .navbar-link {

@@ -387,7 +387,7 @@ const HomePage = () => {
         let cancelled = false;
         const t = setTimeout(() => {
             if (indexLoaded) {
-                const local = searchLocal(query, 6);
+                const local = searchLocal(query, 500);
                 if (cancelled) return;
                 setSuggestions(local);
                 setShowSuggestions(local.length > 0);
@@ -538,17 +538,35 @@ const HomePage = () => {
 
                                         {showSuggestions && suggestions.length > 0 && (
                                             <div className="home-search-suggestions" role="listbox">
-                                                {suggestions.map(s => (
-                                                    <div key={s._id} role="option" tabIndex={0} className="suggestion-item" onClick={() => handleSuggestionClick(s)}>
-                                                        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                                                            {s.images?.[0] && <img src={s.images[0]} alt={s.name} style={{ width: 48, height: 48, objectFit: 'cover', borderRadius: 6 }} />}
-                                                            <div>
-                                                                <div style={{ fontWeight: 600 }}>{s.name}</div>
-                                                                <div style={{ fontSize: 12, color: '#666' }}>{s.shopId?.name || ''} • ₹{s.price}</div>
-                                                            </div>
+                                                {(() => {
+                                                    // Group suggestions by shop
+                                                    const grouped = {};
+                                                    suggestions.forEach(s => {
+                                                        const shopId = s.shopId?._id || s.shopId || 'unknown';
+                                                        const shopName = s.shopId?.name || 'Unknown Shop';
+                                                        if (!grouped[shopId]) {
+                                                            grouped[shopId] = { shopName, products: [] };
+                                                        }
+                                                        grouped[shopId].products.push(s);
+                                                    });
+
+                                                    return Object.entries(grouped).map(([shopId, { shopName, products }]) => (
+                                                        <div key={shopId} className="suggestion-shop-group">
+                                                            <div className="suggestion-shop-header">{shopName}</div>
+                                                            {products.slice(0, 3).map(s => (
+                                                                <div key={s._id} role="option" tabIndex={0} className="suggestion-item" onClick={() => handleSuggestionClick(s)}>
+                                                                    <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                                                                        {s.images?.[0] && <img src={s.images[0]} alt={s.name} style={{ width: 48, height: 48, objectFit: 'cover', borderRadius: 6 }} />}
+                                                                        <div>
+                                                                            <div style={{ fontWeight: 600 }}>{s.name}</div>
+                                                                            <div style={{ fontSize: 12, color: '#666' }}>₹{s.price}</div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            ))}
                                                         </div>
-                                                    </div>
-                                                ))}
+                                                    ));
+                                                })()}
                                             </div>
                                         )}
                                     </div>

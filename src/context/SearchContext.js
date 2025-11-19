@@ -52,7 +52,7 @@ export const SearchProvider = ({ children }) => {
         return () => { cancelled = true; };
     }, []);
 
-    const searchLocal = (query, limit = 50) => {
+    const searchLocal = (query, limit = 500) => {
         if (!fuseRef.current || !query || query.trim().length < 1) return [];
         const results = fuseRef.current.search(query, { limit });
         return results.map(r => r.item);
