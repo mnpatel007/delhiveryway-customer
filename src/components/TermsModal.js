@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { useLocation } from 'react-router-dom';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { useSocket } from '../context/SocketContext';
@@ -35,9 +36,14 @@ const LOCAL_KEY_PREFIX = 'accepted_terms_';
 const TermsModal = () => {
   const { user, logout } = useAuth();
   const { socket } = useSocket();
+  const location = useLocation();
   const [terms, setTerms] = useState(null);
   const [show, setShow] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  // Don't show on login/signup/verify-email/forgot-password/reset-password pages
+  const hideOnPages = ['/login', '/signup', '/verify-email', '/forgot-password', '/reset-password'];
+  const shouldHideModal = hideOnPages.includes(location.pathname);
 
   const localAccepted = (termsId) => {
     try {
@@ -132,7 +138,7 @@ const TermsModal = () => {
     window.location.href = '/login';
   };
 
-  if (!terms || !show) return null;
+  if (!terms || !show || shouldHideModal) return null;
 
   return (
     <div style={overlayStyle}>
