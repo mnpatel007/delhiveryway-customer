@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { useSocket } from '../context/SocketContext';
 
@@ -30,14 +31,14 @@ const TermsModal = () => {
 
   const fetchCurrentTerms = async () => {
     try {
-      const res = await axios.get('/api/terms/current');
+      const res = await api.get('/terms/current');
       const current = res.data?.data?.terms || null;
       if (!current) return setTerms(null);
 
       // If user is logged in, ask protected endpoint to know if they've accepted
       if (user) {
         try {
-          const authRes = await axios.get('/api/auth/terms/current');
+          const authRes = await api.get('/auth/terms/current');
           const authTerms = authRes.data?.data?.terms || current;
           setTerms(authTerms);
           if (!authTerms.hasAccepted) setShow(true);
@@ -78,7 +79,7 @@ const TermsModal = () => {
     setLoading(true);
     try {
       if (user) {
-        await axios.post('/api/auth/terms/accept', { termsId: terms._id });
+        await api.post('/auth/terms/accept', { termsId: terms._id });
       } else {
         // For anonymous users, acceptance is stored client-side
         markLocalAccepted(terms._id);
