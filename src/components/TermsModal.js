@@ -103,24 +103,59 @@ const TermsModal = () => {
 
   return (
     <div className="tm-overlay">
+      <div className="tm-backdrop-blur"></div>
       <div className="tm-modal">
+        <div className="tm-glow-effect"></div>
+
         <div className="tm-header">
-          <div className="tm-icon">📜</div>
-          <div>
-            <div className="tm-header-title">PLEASE READ</div>
-            <h2 className="tm-modal-title">{terms.title || 'Terms and Conditions'}</h2>
+          <div className="tm-header-decoration">
+            <div className="tm-decoration-circle"></div>
+            <div className="tm-decoration-circle"></div>
+            <div className="tm-decoration-circle"></div>
+          </div>
+          <div className="tm-icon-wrapper">
+            <svg className="tm-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </div>
+          <h2 className="tm-modal-title">Terms and Conditions</h2>
+          <p className="tm-subtitle">Please review our terms before continuing</p>
+        </div>
+
+        <div className="tm-content-wrapper">
+          <div className="tm-scroll-indicator">
+            <div className="tm-scroll-line"></div>
+          </div>
+          <div className="tm-content-container">
+            <div className="tm-content" dangerouslySetInnerHTML={{ __html: terms.content || 'No content available' }} />
           </div>
         </div>
 
-        <div className="tm-content-container">
-          <div className="tm-content" dangerouslySetInnerHTML={{ __html: terms.content || 'No content available' }} />
-        </div>
-
         <div className="tm-footer">
-          <p className="tm-disclaimer">✓ You need to accept these terms to continue using our services</p>
+          <div className="tm-notice">
+            <svg className="tm-notice-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+            <p className="tm-notice-text">You must accept these terms to continue using our services</p>
+          </div>
           <div className="tm-button-container">
-            <button onClick={handleDecline} className="tm-decline">✖ Decline & Exit</button>
-            <button onClick={handleAccept} className="tm-accept" disabled={loading}>{loading ? '⏳ Processing...' : '✓ Accept & Continue'}</button>
+            <button onClick={handleDecline} className="tm-decline">
+              <span className="tm-btn-text">Decline & Exit</span>
+            </button>
+            <button onClick={handleAccept} className="tm-accept" disabled={loading}>
+              <span className="tm-btn-icon">
+                {loading ? (
+                  <svg className="tm-spinner" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <circle className="tm-spinner-circle" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                  </svg>
+                ) : (
+                  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M5 13l4 4L19 7" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                )}
+              </span>
+              <span className="tm-btn-text">{loading ? 'Processing...' : 'Accept & Continue'}</span>
+            </button>
           </div>
         </div>
       </div>
