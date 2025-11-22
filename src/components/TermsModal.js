@@ -163,16 +163,16 @@ const TermsModal = () => {
             ✓ You need to accept these terms to continue using our services
           </p>
           <div style={buttonContainerStyle}>
-            <button 
-              onClick={handleDecline} 
+            <button
+              onClick={handleDecline}
               style={declineStyle}
               onMouseEnter={(e) => e.target.style.background = '#f0f0f0'}
               onMouseLeave={(e) => e.target.style.background = '#fff'}
             >
               ✖ Decline & Exit
             </button>
-            <button 
-              onClick={handleAccept} 
+            <button
+              onClick={handleAccept}
               style={acceptStyle}
               disabled={loading}
               onMouseEnter={(e) => !loading && (e.target.style.background = '#0052a3')}
