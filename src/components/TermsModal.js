@@ -145,10 +145,10 @@ const TermsModal = () => {
       <div style={modalStyle}>
         {/* Header with gradient */}
         <div style={headerStyle}>
-          <div style={iconStyle}>📋</div>
+          <div style={iconStyle}>📜</div>
           <div>
             <div style={headerTitleStyle}>PLEASE READ</div>
-            <h2 style={modalTitleStyle}>{terms.title || 'Terms & Conditions'}</h2>
+            <h2 style={modalTitleStyle}>{terms.title || 'Terms and Conditions'}</h2>
           </div>
         </div>
 
