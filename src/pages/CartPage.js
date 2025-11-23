@@ -218,6 +218,39 @@ const CartPage = () => {
                             <h3>Order Summary</h3>
 
                             <div className="summary-breakdown">
+                                <div className="summary-row">
+                                    <span>Subtotal ({orderSummary.itemCount} items)</span>
+                                    <span>{formatPrice(orderSummary.subtotal)}</span>
+                                </div>
+
+                                <div className="summary-row">
+                                    <span>Delivery Fee</span>
+                                    <span>
+                                        {deliveryCalculationDetails?.originalDeliveryFee && deliveryCalculationDetails?.deliveryDiscountApplied ? (
+                                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+                                                <span style={{ textDecoration: 'line-through', color: '#999', fontSize: '0.9em' }}>
+                                                    {formatPrice(deliveryCalculationDetails.originalDeliveryFee)}
+                                                </span>
+                                                <span style={{ color: '#28a745', fontWeight: 'bold' }}>
+                                                    {formatPrice(orderSummary.deliveryFee)}
+                                                </span>
+                                                <span style={{ fontSize: '0.75em', color: '#28a745' }}>
+                                                    Saved {formatPrice(deliveryCalculationDetails.deliveryDiscount)}
+                                                </span>
+                                            </div>
+                                        ) : (
+                                            formatPrice(orderSummary.deliveryFee)
+                                        )}
+                                    </span>
+                                </div>
+
+                                {orderSummary.tax > 0 && (
+                                    <div className="summary-row">
+                                        <span>Tax ({selectedShop?.taxRate || 5}%)</span>
+                                        <span>{formatPrice(orderSummary.tax)}</span>
+                                    </div>
+                                )}
+
                                 <div className="summary-divider"></div>
 
                                 <div className="summary-row total-row">

@@ -791,6 +791,49 @@ const FinalCheckoutPage = () => {
                         </div>
                     )}
 
+                    {/* Pricing Breakdown */}
+                    <div className="order-pricing-breakdown">
+                        <div className="pricing-row">
+                            <span>Subtotal ({getOrderSummary().itemCount} items)</span>
+                            <span>{formatPrice(getOrderSummary().subtotal)}</span>
+                        </div>
+
+                        <div className="pricing-row">
+                            <span>Delivery Fee</span>
+                            <span>
+                                {deliveryCalculationDetails?.originalDeliveryFee && deliveryCalculationDetails?.deliveryDiscountApplied ? (
+                                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+                                        <span style={{ textDecoration: 'line-through', color: '#999', fontSize: '0.9em' }}>
+                                            {formatPrice(deliveryCalculationDetails.originalDeliveryFee)}
+                                        </span>
+                                        <span style={{ color: '#28a745', fontWeight: 'bold' }}>
+                                            {formatPrice(getOrderSummary().deliveryFee)}
+                                        </span>
+                                        <span style={{ fontSize: '0.75em', color: '#28a745' }}>
+                                            Saved {formatPrice(deliveryCalculationDetails.deliveryDiscount)}
+                                        </span>
+                                    </div>
+                                ) : (
+                                    formatPrice(getOrderSummary().deliveryFee)
+                                )}
+                            </span>
+                        </div>
+
+                        {getOrderSummary().tax > 0 && (
+                            <div className="pricing-row">
+                                <span>Tax ({selectedShop?.taxRate || 5}%)</span>
+                                <span>{formatPrice(getOrderSummary().tax)}</span>
+                            </div>
+                        )}
+
+                        <div className="pricing-divider"></div>
+
+                        <div className="pricing-row total-row">
+                            <span>Total Amount</span>
+                            <span>{formatPrice(getOrderSummary().total)}</span>
+                        </div>
+                    </div>
+
                 </div>
 
                 <button
