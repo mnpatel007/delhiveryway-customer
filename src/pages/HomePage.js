@@ -687,16 +687,14 @@ const HomePage = () => {
 
                                                             if (hasDiscount) {
                                                                 return (
-                                                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                                                                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                                                            <span style={{ textDecoration: 'line-through', color: '#999', fontSize: '0.85em' }}>
-                                                                                🚚 ₹{feeResult.originalDeliveryFee}
-                                                                            </span>
-                                                                            <span style={{ color: '#28a745', fontWeight: 'bold' }}>
-                                                                                ₹{feeResult.deliveryFee}
-                                                                            </span>
-                                                                        </div>
-                                                                        <span style={{ fontSize: '0.7em', color: '#28a745', fontWeight: '600' }}>
+                                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                                                                        <span style={{ textDecoration: 'line-through', color: '#999', fontSize: '0.9em' }}>
+                                                                            🚚 ₹{feeResult.originalDeliveryFee}
+                                                                        </span>
+                                                                        <span style={{ color: '#28a745', fontWeight: 'bold', fontSize: '1em' }}>
+                                                                            ₹{feeResult.deliveryFee}
+                                                                        </span>
+                                                                        <span style={{ fontSize: '0.85em', color: '#28a745', fontWeight: '600' }}>
                                                                             💰 Save ₹{feeResult.originalDeliveryFee - feeResult.deliveryFee}
                                                                         </span>
                                                                     </div>
