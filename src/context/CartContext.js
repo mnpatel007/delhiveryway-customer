@@ -451,7 +451,7 @@ export const CartProvider = ({ children }) => {
                 itemCount: getCartItemsCount(),
                 subtotal,
                 deliveryFee,
-                taxes,
+                tax: taxes,  // Changed from 'taxes' to 'tax' for UI consistency
                 total,
                 shop: selectedShop
             };
@@ -463,7 +463,7 @@ export const CartProvider = ({ children }) => {
                 subtotal: 0,
                 deliveryFee: 0,
                 serviceFee: 0,
-                taxes: 0,
+                tax: 0,  // Changed from 'taxes' to 'tax'
                 total: 0,
                 shop: null
             };

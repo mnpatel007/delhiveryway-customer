@@ -247,7 +247,12 @@ const HomePage = () => {
             const feesMap = {};
             feeResults.forEach(result => {
                 if (result.shopId && !result.error) {
-                    feesMap[result.shopId] = result.deliveryFee;
+                    // Store the complete result to access discount info
+                    feesMap[result.shopId] = {
+                        deliveryFee: result.deliveryFee,
+                        originalDeliveryFee: result.originalDeliveryFee,
+                        discountApplied: result.discountApplied
+                    };
                 }
             });
 
@@ -673,11 +678,40 @@ const HomePage = () => {
                                             <div className="delivery-fee">
                                                 {(() => {
                                                     // Use calculated delivery fee if available
-                                                    const calculatedFee = deliveryFees[shop._id];
-                                                    if (calculatedFee !== undefined) {
-                                                        return calculatedFee === 0
+                                                    const feeResult = deliveryFees[shop._id];
+
+                                                    if (feeResult !== undefined) {
+                                                        // Check if this is a detailed result with discount info
+                                                        if (typeof feeResult === 'object' && feeResult.deliveryFee !== undefined) {
+                                                            const hasDiscount = feeResult.originalDeliveryFee && feeResult.discountApplied;
+
+                                                            if (hasDiscount) {
+                                                                return (
+                                                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                                                                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                                                            <span style={{ textDecoration: 'line-through', color: '#999', fontSize: '0.85em' }}>
+                                                                                🚚 ₹{feeResult.originalDeliveryFee}
+                                                                            </span>
+                                                                            <span style={{ color: '#28a745', fontWeight: 'bold' }}>
+                                                                                ₹{feeResult.deliveryFee}
+                                                                            </span>
+                                                                        </div>
+                                                                        <span style={{ fontSize: '0.7em', color: '#28a745', fontWeight: '600' }}>
+                                                                            💰 Save ₹{feeResult.originalDeliveryFee - feeResult.deliveryFee}
+                                                                        </span>
+                                                                    </div>
+                                                                );
+                                                            }
+
+                                                            return feeResult.deliveryFee === 0
+                                                                ? '🚚 Free Delivery'
+                                                                : `🚚 ₹${feeResult.deliveryFee} delivery`;
+                                                        }
+
+                                                        // Simple number result (backward compatibility)
+                                                        return feeResult === 0
                                                             ? '🚚 Free Delivery'
-                                                            : `🚚 ₹${calculatedFee} delivery`;
+                                                            : `🚚 ₹${feeResult} delivery`;
                                                     }
 
                                                     // Fallback to display logic based on shop settings
