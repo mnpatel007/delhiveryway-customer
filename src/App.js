@@ -10,6 +10,7 @@ import ErrorBoundary from './components/ErrorBoundary';
 import Navbar from './components/Navbar';
 import NotificationCenter from './components/NotificationCenter';
 import NoticeAlert from './components/NoticeAlert';
+import TermsModal from './components/TermsModal';
 
 import SocketDebugPanel from './components/SocketDebugPanel';
 import HomePage from './pages/HomePage';
@@ -105,7 +106,8 @@ const AppContent = () => {
       <GlobalCustomerAlert />
       <BrowserRouter>
         <Layout>
-          <Routes>
+            <TermsModal />
+            <Routes>
             <Route path="/" element={<PrivateRoute><HomePage /></PrivateRoute>} />
             <Route path="/search" element={<PrivateRoute><SearchPage /></PrivateRoute>} />
             <Route path="/login" element={<LoginPage />} />
