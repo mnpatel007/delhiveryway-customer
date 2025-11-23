@@ -36,23 +36,39 @@ const TermsModal = () => {
 
   const fetchCurrentTerms = async () => {
     try {
-      const res = await api.get('/terms/current');
-      const current = res.data?.data?.terms || null;
-      if (!current) return setTerms(null);
+      // 1. Fetch public terms (for guests or fallback)
+      let publicTerms = null;
+      try {
+        const res = await api.get('/terms/current');
+        publicTerms = res.data?.data?.terms || null;
+      } catch (e) {
+        console.warn('Failed to fetch public terms', e);
+      }
 
+      // 2. If user is logged in, fetch authenticated terms (includes testing mode terms)
       if (user) {
         try {
           const authRes = await api.get('/auth/terms/current');
-          const authTerms = authRes.data?.data?.terms || current;
-          setTerms(authTerms);
-          if (!authTerms.hasAccepted) setShow(true);
+          const authTerms = authRes.data?.data?.terms;
+
+          if (authTerms) {
+            setTerms(authTerms);
+            if (!authTerms.hasAccepted) setShow(true);
+            return;
+          }
         } catch (e) {
-          setTerms(current);
-          if (!localAccepted(current._id)) setShow(true);
+          console.error('Failed to fetch auth terms', e);
         }
+      }
+
+      // 3. Fallback to public terms if no auth terms found (or user not logged in)
+      if (publicTerms) {
+        setTerms(publicTerms);
+        // Only show if not locally accepted (mostly for guests)
+        if (!localAccepted(publicTerms._id)) setShow(true);
       } else {
-        setTerms(current);
-        if (!localAccepted(current._id)) setShow(true);
+        setTerms(null);
+        setShow(false);
       }
     } catch (error) {
       console.error('Failed to fetch terms:', error);
