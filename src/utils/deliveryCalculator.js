@@ -4,9 +4,10 @@ import { api } from '../services/api';
  * Calculate delivery fee for a single shop
  * @param {string} shopId - Shop ID
  * @param {object} location - Customer location {lat, lng}
+ * @param {number} orderValue - Order value for discount calculation
  * @returns {Promise<object>} Delivery fee calculation result
  */
-export const calculateDeliveryFee = async (shopId, location) => {
+export const calculateDeliveryFee = async (shopId, location, orderValue = 0) => {
     try {
         if (!shopId || !location || !location.lat || !location.lng) {
             throw new Error('Shop ID and location are required');
@@ -17,7 +18,8 @@ export const calculateDeliveryFee = async (shopId, location) => {
             deliveryLocation: {
                 lat: location.lat,
                 lng: location.lng
-            }
+            },
+            orderValue
         });
 
         if (response.data.success) {
@@ -35,9 +37,10 @@ export const calculateDeliveryFee = async (shopId, location) => {
  * Calculate delivery fees for multiple shops
  * @param {string[]} shopIds - Array of shop IDs
  * @param {object} location - Customer location {lat, lng}
+ * @param {number} orderValue - Order value for discount calculation
  * @returns {Promise<object[]>} Array of delivery fee calculations
  */
-export const calculateDeliveryFeesBulk = async (shopIds, location) => {
+export const calculateDeliveryFeesBulk = async (shopIds, location, orderValue = 0) => {
     try {
         if (!shopIds || !Array.isArray(shopIds) || shopIds.length === 0) {
             throw new Error('Shop IDs array is required');
@@ -52,7 +55,8 @@ export const calculateDeliveryFeesBulk = async (shopIds, location) => {
             deliveryLocation: {
                 lat: location.lat,
                 lng: location.lng
-            }
+            },
+            orderValue
         });
 
         if (response.data.success) {

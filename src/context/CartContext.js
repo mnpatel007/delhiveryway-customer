@@ -326,11 +326,16 @@ export const CartProvider = ({ children }) => {
             console.log('🚚 Calculating delivery fee for shop:', selectedShop.name, 'with location:', location);
 
             // Calculate delivery fee using the API
-            const result = await calculateDeliveryFee(selectedShop._id, location);
+            const subtotal = getCartSubtotal();
+            const result = await calculateDeliveryFee(selectedShop._id, location, subtotal);
 
             console.log('🚚 Calculated delivery fee result:', result);
             setCalculatedDeliveryFee(result.deliveryFee);
-            setDeliveryCalculationDetails(result.calculation);
+            setDeliveryCalculationDetails({
+                ...result.calculation,
+                originalDeliveryFee: result.originalDeliveryFee,
+                discountApplied: result.discountApplied
+            });
             setIsCalculatingDeliveryFee(false);
 
             return result;
@@ -446,7 +451,7 @@ export const CartProvider = ({ children }) => {
                 itemCount: getCartItemsCount(),
                 subtotal,
                 deliveryFee,
-                taxes,
+                tax: taxes,  // Changed from 'taxes' to 'tax' for UI consistency
                 total,
                 shop: selectedShop
             };
@@ -458,7 +463,7 @@ export const CartProvider = ({ children }) => {
                 subtotal: 0,
                 deliveryFee: 0,
                 serviceFee: 0,
-                taxes: 0,
+                tax: 0,  // Changed from 'taxes' to 'tax'
                 total: 0,
                 shop: null
             };

@@ -14,7 +14,7 @@ const formatPrice = (price) => {
 };
 
 const CartPage = () => {
-    const { cartItems, selectedShop, removeFromCart, updateQuantity, getOrderSummary, clearCart } = useContext(CartContext);
+    const { cartItems, selectedShop, removeFromCart, updateQuantity, getOrderSummary, clearCart, deliveryCalculationDetails } = useContext(CartContext);
     const [toast, setToast] = useState('');
     const [removingItem, setRemovingItem] = useState(null);
     const navigate = useNavigate();
@@ -219,19 +219,37 @@ const CartPage = () => {
 
                             <div className="summary-breakdown">
                                 <div className="summary-row">
-                                    <span>Items ({orderSummary.itemCount})</span>
+                                    <span>Subtotal ({orderSummary.itemCount} items)</span>
                                     <span>{formatPrice(orderSummary.subtotal)}</span>
                                 </div>
 
                                 <div className="summary-row">
                                     <span>Delivery Fee</span>
-                                    <span>{formatPrice(orderSummary.deliveryFee)}</span>
+                                    <span>
+                                        {deliveryCalculationDetails?.originalDeliveryFee && deliveryCalculationDetails?.deliveryDiscountApplied ? (
+                                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+                                                <span style={{ textDecoration: 'line-through', color: '#999', fontSize: '0.9em' }}>
+                                                    {formatPrice(deliveryCalculationDetails.originalDeliveryFee)}
+                                                </span>
+                                                <span style={{ color: '#28a745', fontWeight: 'bold' }}>
+                                                    {formatPrice(orderSummary.deliveryFee)}
+                                                </span>
+                                                <span style={{ fontSize: '0.75em', color: '#28a745' }}>
+                                                    Saved {formatPrice(deliveryCalculationDetails.deliveryDiscount)}
+                                                </span>
+                                            </div>
+                                        ) : (
+                                            formatPrice(orderSummary.deliveryFee)
+                                        )}
+                                    </span>
                                 </div>
 
-                                <div className="summary-row">
-                                    <span>Taxes ({selectedShop?.hasTax ? `${selectedShop.taxRate}%` : '0%'})</span>
-                                    <span>{formatPrice(orderSummary.taxes)}</span>
-                                </div>
+                                {orderSummary.tax > 0 && (
+                                    <div className="summary-row">
+                                        <span>Tax ({selectedShop?.taxRate || 5}%)</span>
+                                        <span>{formatPrice(orderSummary.tax)}</span>
+                                    </div>
+                                )}
 
                                 <div className="summary-divider"></div>
 
