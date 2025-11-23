@@ -14,7 +14,7 @@ const formatPrice = (price) => {
 };
 
 const CartPage = () => {
-    const { cartItems, selectedShop, removeFromCart, updateQuantity, getOrderSummary, clearCart } = useContext(CartContext);
+    const { cartItems, selectedShop, removeFromCart, updateQuantity, getOrderSummary, clearCart, deliveryCalculationDetails } = useContext(CartContext);
     const [toast, setToast] = useState('');
     const [removingItem, setRemovingItem] = useState(null);
     const navigate = useNavigate();
@@ -218,21 +218,6 @@ const CartPage = () => {
                             <h3>Order Summary</h3>
 
                             <div className="summary-breakdown">
-                                <div className="summary-row">
-                                    <span>Items ({orderSummary.itemCount})</span>
-                                    <span>{formatPrice(orderSummary.subtotal)}</span>
-                                </div>
-
-                                <div className="summary-row">
-                                    <span>Delivery Fee</span>
-                                    <span>{formatPrice(orderSummary.deliveryFee)}</span>
-                                </div>
-
-                                <div className="summary-row">
-                                    <span>Taxes ({selectedShop?.hasTax ? `${selectedShop.taxRate}%` : '0%'})</span>
-                                    <span>{formatPrice(orderSummary.taxes)}</span>
-                                </div>
-
                                 <div className="summary-divider"></div>
 
                                 <div className="summary-row total-row">

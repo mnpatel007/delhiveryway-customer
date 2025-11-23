@@ -326,11 +326,16 @@ export const CartProvider = ({ children }) => {
             console.log('🚚 Calculating delivery fee for shop:', selectedShop.name, 'with location:', location);
 
             // Calculate delivery fee using the API
-            const result = await calculateDeliveryFee(selectedShop._id, location);
+            const subtotal = getCartSubtotal();
+            const result = await calculateDeliveryFee(selectedShop._id, location, subtotal);
 
             console.log('🚚 Calculated delivery fee result:', result);
             setCalculatedDeliveryFee(result.deliveryFee);
-            setDeliveryCalculationDetails(result.calculation);
+            setDeliveryCalculationDetails({
+                ...result.calculation,
+                originalDeliveryFee: result.originalDeliveryFee,
+                discountApplied: result.discountApplied
+            });
             setIsCalculatingDeliveryFee(false);
 
             return result;

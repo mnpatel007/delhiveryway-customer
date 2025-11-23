@@ -791,21 +791,6 @@ const FinalCheckoutPage = () => {
                         </div>
                     )}
 
-                    <div className="order-total-breakdown">
-                        <div className="total-row">
-                            <span>Items ({orderSummary.itemCount})</span>
-                            <span>{formatPrice(orderSummary.subtotal)}</span>
-                        </div>
-                        <div className="total-row">
-                            <span>Delivery Fee</span>
-                            <span>{formatPrice(orderSummary.deliveryFee)}</span>
-                        </div>
-                        <div className="summary-divider"></div>
-                        <div className="total-row total-grand">
-                            <span><strong>Total Amount</strong></span>
-                            <span><strong>{formatPrice(orderSummary.total)}</strong></span>
-                        </div>
-                    </div>
                 </div>
 
                 <button
