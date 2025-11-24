@@ -415,6 +415,7 @@
     font-size: 14px;
     font-weight: 500;
     position: relative;
+    font-size: 14px;
     z-index: 2;
     display: inline-block;
 }
@@ -422,6 +423,46 @@
 /* Social Login */
 .social-login {
     margin-bottom: 30px;
+}
+
+/* Google Button */
+.google-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 14px 24px;
+    background: white;
+    border: 2px solid #e1e5e9;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #1f2937;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.google-btn:hover {
+    background: #f9fafb;
+    border-color: #d1d5db;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.google-btn:active {
+    transform: translateY(0);
+}
+
+.google-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.google-icon {
+    width: 24px;
+    height: 24px;
 }
 
 /* Signup Prompt */
@@ -521,5 +562,16 @@
         position: relative;
         z-index: 2;
         display: inline-block;
+    }
+
+    .google-btn {
+        background: #2a2a2a;
+        border-color: #404040;
+        color: #ffffff;
+    }
+
+    .google-btn:hover {
+        background: #333333;
+        border-color: #505050;
     }
 }
