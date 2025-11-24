@@ -1,4 +1,3 @@
-```javascript
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -75,7 +74,7 @@ const LoginForm = () => {
             try {
                 // Fetch user info from Google
                 const userInfo = await axios.get('https://www.googleapis.com/oauth2/v3/userinfo', {
-                    headers: { Authorization: `Bearer ${ tokenResponse.access_token } ` },
+                    headers: { Authorization: `Bearer ${tokenResponse.access_token}` },
                 });
 
                 const { email, name, sub: googleId } = userInfo.data;
@@ -212,7 +211,7 @@ const LoginForm = () => {
 
                             <button
                                 type="submit"
-                                className={`login - button ${ isLoading ? 'loading' : '' } `}
+                                className={`login-button ${isLoading ? 'loading' : ''}`}
                                 disabled={isLoading || !email || !password}
                             >
                                 {isLoading ? (
@@ -231,15 +230,15 @@ const LoginForm = () => {
                         </div>
 
                         <div className="social-login">
-                            <button 
-                                type="button" 
-                                className="google-btn" 
+                            <button
+                                type="button"
+                                className="google-btn"
                                 onClick={() => googleLogin()}
                                 disabled={isLoading}
                             >
-                                <img 
-                                    src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" 
-                                    alt="Google" 
+                                <img
+                                    src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+                                    alt="Google"
                                     className="google-icon"
                                 />
                                 <span>Sign in with Google</span>
@@ -266,4 +265,3 @@ const LoginPage = () => {
 };
 
 export default LoginPage;
-```
