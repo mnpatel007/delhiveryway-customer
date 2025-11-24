@@ -6,7 +6,11 @@ import { jwtDecode } from 'jwt-decode';
 import { GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google';
 import './LoginPage.css';
 
-const clientId = '117679354054-t7tsl5najnu2kab80ffls6flkau21idl.apps.googleusercontent.com';
+const clientId = process.env.REACT_APP_GOOGLE_CLIENT_ID || '117679354054-t7tsl5najnu2kab80ffls6flkau21idl.apps.googleusercontent.com';
+
+if (!process.env.REACT_APP_GOOGLE_CLIENT_ID) {
+    console.warn('⚠️ Google Client ID not found in environment variables. Using fallback ID.');
+}
 
 const LoginPage = () => {
     const { login } = useAuth();
