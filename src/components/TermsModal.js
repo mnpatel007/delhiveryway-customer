@@ -109,10 +109,20 @@ const TermsModal = () => {
   };
 
   const handleDecline = () => {
+    // Clear any local acceptance
+    if (terms && terms._id) {
+      localStorage.removeItem(LOCAL_KEY_PREFIX + terms._id);
+    }
+
     if (user) {
       logout();
     }
-    window.location.href = '/login';
+
+    // Force clear any other potential debris
+    localStorage.removeItem('customerAuth');
+
+    // Use replace to prevent back navigation
+    window.location.replace('/login');
   };
 
   if (!terms || !show || shouldHideModal) return null;
@@ -143,7 +153,7 @@ const TermsModal = () => {
             <div className="tm-scroll-line"></div>
           </div>
           <div className="tm-content-container">
-            <div className="tm-content" dangerouslySetInnerHTML={{ __html: terms.content || 'No content available' }} />
+            <div className="tm-content" dangerouslySetInnerHTML={{ __html: terms.content || '<p>Please review the terms and conditions.</p>' }} />
           </div>
         </div>
 
