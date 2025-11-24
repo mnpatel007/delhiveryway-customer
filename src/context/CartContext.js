@@ -417,13 +417,26 @@ export const CartProvider = ({ children }) => {
         }
     };
 
+    const getPackagingCharges = () => {
+        try {
+            if (!selectedShop || !selectedShop.hasPackaging || !selectedShop.packagingCharges) {
+                return 0;
+            }
+            return parseFloat(selectedShop.packagingCharges) || 0;
+        } catch (error) {
+            console.error('❌ Error calculating packaging charges:', error);
+            return 0;
+        }
+    };
+
     const getGrandTotal = () => {
         try {
             const subtotal = getCartSubtotal();
             const deliveryFee = getDeliveryFee();
             const taxes = getTaxes();
-            // subtotal + delivery fee + taxes
-            return Math.round((subtotal + deliveryFee + taxes) * 100) / 100;
+            const packagingCharges = getPackagingCharges();
+            // subtotal + delivery fee + taxes + packaging charges
+            return Math.round((subtotal + deliveryFee + taxes + packagingCharges) * 100) / 100;
         } catch (error) {
             console.error('❌ Error calculating grand total:', error);
             return 0;
@@ -444,6 +457,7 @@ export const CartProvider = ({ children }) => {
             const subtotal = getCartSubtotal();
             const deliveryFee = getDeliveryFee();
             const taxes = getTaxes();
+            const packagingCharges = getPackagingCharges();
             const total = getGrandTotal();
 
             return {
@@ -451,7 +465,8 @@ export const CartProvider = ({ children }) => {
                 itemCount: getCartItemsCount(),
                 subtotal,
                 deliveryFee,
-                tax: taxes,  // Changed from 'taxes' to 'tax' for UI consistency
+                tax: taxes,
+                packagingCharges,
                 total,
                 shop: selectedShop
             };
@@ -463,7 +478,8 @@ export const CartProvider = ({ children }) => {
                 subtotal: 0,
                 deliveryFee: 0,
                 serviceFee: 0,
-                tax: 0,  // Changed from 'taxes' to 'tax'
+                tax: 0,
+                packagingCharges: 0,
                 total: 0,
                 shop: null
             };
@@ -502,6 +518,7 @@ export const CartProvider = ({ children }) => {
         getCartSubtotal,
         getDeliveryFee,
         getTaxes,
+        getPackagingCharges,
         getGrandTotal,
         getCartItemsCount,
         getOrderSummary,

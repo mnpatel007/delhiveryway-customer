@@ -819,6 +819,13 @@ const FinalCheckoutPage = () => {
                             </span>
                         </div>
 
+                        {getOrderSummary().packagingCharges > 0 && (
+                            <div className="pricing-row">
+                                <span>Packaging Charges</span>
+                                <span>{formatPrice(getOrderSummary().packagingCharges)}</span>
+                            </div>
+                        )}
+
                         {getOrderSummary().tax > 0 && (
                             <div className="pricing-row">
                                 <span>Tax ({selectedShop?.taxRate || 5}%)</span>
