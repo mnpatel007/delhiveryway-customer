@@ -69,16 +69,20 @@ const LoginForm = () => {
 
     const googleLogin = useGoogleLogin({
         onSuccess: async (tokenResponse) => {
+            console.log('✅ Google Login Success - Token Response:', tokenResponse);
             setError('');
             setIsLoading(true);
             try {
                 // Fetch user info from Google
+                console.log('🔄 Fetching user info from Google...');
                 const userInfo = await axios.get('https://www.googleapis.com/oauth2/v3/userinfo', {
                     headers: { Authorization: `Bearer ${tokenResponse.access_token}` },
                 });
+                console.log('✅ User Info Fetched:', userInfo.data);
 
                 const { email, name, sub: googleId } = userInfo.data;
 
+                console.log('🔄 Sending Google login request to backend...');
                 const result = await apiCall(authAPI.googleLogin, {
                     email,
                     name,
@@ -87,13 +91,16 @@ const LoginForm = () => {
                 });
 
                 if (!result.success) {
+                    console.error('❌ Backend Google Login Failed:', result);
                     setError(result.message || 'Google login failed');
                     setIsLoading(false);
                     return;
                 }
 
+                console.log('✅ Backend Login Success:', result.data);
                 const userData = result.data.data?.user || result.data.user;
                 if (userData.role !== 'customer') {
+                    console.error('❌ Role Mismatch:', userData.role);
                     setError('This account is not registered as a customer. Please use the correct app.');
                     setIsLoading(false);
                     return;
@@ -103,13 +110,17 @@ const LoginForm = () => {
                 navigate('/');
             } catch (err) {
                 console.error('❌ Google login error:', err);
+                if (err.response) {
+                    console.error('Error Response Data:', err.response.data);
+                    console.error('Error Response Status:', err.response.status);
+                }
                 setError('Google login failed. Please try again.');
                 setIsLoading(false);
             }
         },
-        onError: () => {
-            console.log('Google login cancelled or failed');
-            setError('Google login was cancelled or failed.');
+        onError: (errorResponse) => {
+            console.error('❌ Google login cancelled or failed:', errorResponse);
+            setError('Google login was cancelled or failed. Check console for details.');
         },
     });
 
