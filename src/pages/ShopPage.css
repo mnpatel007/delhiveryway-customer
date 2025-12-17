@@ -776,13 +776,14 @@
     align-items: center;
     gap: 0.4rem;
     font-size: 0.8rem;
-    color: var(--text-secondary);
+    color: #1f2937;
+    /* Dark text for contrast against light background */
     margin-bottom: 0.5rem;
-    font-weight: 500;
+    font-weight: 600;
     background: #f3f4f6;
     padding: 0.25rem 0.5rem;
     border-radius: 4px;
-    border: none;
+    border: 1px solid #e5e7eb;
     text-shadow: none;
 }
 
@@ -839,9 +840,10 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    background: #e2e8f0;
-    /* Soft grey initially */
-    color: #1e293b;
+    background: #10b981;
+    /* Green color */
+    color: white;
+    /* White text */
     border: none;
     padding: 0.5rem 1rem;
     border-radius: 20px;
@@ -851,15 +853,14 @@
     cursor: pointer;
     transition: all 0.2s;
     min-width: 80px;
-    box-shadow: none;
+    box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);
 }
 
 .add-to-cart-btn:hover:not(:disabled) {
-    background: #cbf3db;
-    /* Light green hover */
-    color: #059669;
-    transform: none;
-    box-shadow: none;
+    background: #059669;
+    /* Darker green hover */
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px rgba(16, 185, 129, 0.3);
 }
 
 .add-to-cart-btn:active:not(:disabled) {
