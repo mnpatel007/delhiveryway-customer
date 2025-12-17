@@ -526,11 +526,19 @@ const ShopPage = () => {
 
                     <div className="shop-main-info">
                         <div className="shop-avatar">
-                            {shop.images && shop.images.length > 0 ? (
-                                <img src={shop.images[0]} alt={shop.name} />
-                            ) : (
-                                <span className="shop-emoji">🏪</span>
-                            )}
+                            <img
+                                src={shop.images && shop.images.length > 0 ? shop.images[0] : `https://image.pollinations.ai/prompt/modern%20restaurant%20logo%20${encodeURIComponent(shop.name)}%20minimalist%20professional?width=200&height=200&nologo=true`}
+                                alt={shop.name}
+                                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                onError={(e) => {
+                                    if (!e.target.src.includes('pollinations.ai')) {
+                                        e.target.src = `https://image.pollinations.ai/prompt/modern%20restaurant%20logo%20${encodeURIComponent(shop.name)}%20minimalist%20professional?width=200&height=200&nologo=true`;
+                                    } else {
+                                        e.target.style.display = 'none';
+                                        e.target.parentNode.innerHTML = '<span class="shop-emoji">🏪</span>';
+                                    }
+                                }}
+                            />
                         </div>
 
                         <div className="shop-details">
@@ -657,11 +665,19 @@ const ShopPage = () => {
                                             alignItems: 'center'
                                         }}>
                                             <div style={{ width: 72, height: 72, borderRadius: 8, background: '#fafafa', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
-                                                {item.images && item.images[0] ? (
-                                                    <img src={item.images[0]} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                                                ) : (
-                                                    <span style={{ fontSize: 24 }}>📦</span>
-                                                )}
+                                                <img
+                                                    src={item.images && item.images.length > 0 ? item.images[0] : `https://image.pollinations.ai/prompt/delicious%20indian%20food%20${encodeURIComponent(item.name)}%20dish%20professional%20food%20photography%20isolated%20white%20background%20high%20quality?width=400&height=320&nologo=true`}
+                                                    alt={item.name}
+                                                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                                    onError={(e) => {
+                                                        if (!e.target.src.includes('pollinations.ai')) {
+                                                            e.target.src = `https://image.pollinations.ai/prompt/delicious%20indian%20food%20${encodeURIComponent(item.name)}%20dish%20professional%20food%20photography%20isolated%20white%20background%20high%20quality?width=400&height=320&nologo=true`;
+                                                        } else {
+                                                            e.target.style.display = 'none';
+                                                            e.target.parentNode.innerHTML = '<span style="font-size: 24px">🍽️</span>';
+                                                        }
+                                                    }}
+                                                />
                                             </div>
 
                                             <div>
