@@ -531,8 +531,10 @@ const ShopPage = () => {
                                 alt={shop.name}
                                 style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                                 onError={(e) => {
-                                    if (!e.target.src.includes('pollinations.ai')) {
-                                        e.target.src = `https://image.pollinations.ai/prompt/modern%20restaurant%20logo%20${encodeURIComponent(shop.name)}%20minimalist%20professional?width=200&height=200&nologo=true`;
+                                    const aiUrl = `https://image.pollinations.ai/prompt/modern%20restaurant%20logo%20${encodeURIComponent(shop.name)}%20minimalist%20professional?width=200&height=200&nologo=true`;
+                                    if (!e.target.dataset.triedAi) {
+                                        e.target.dataset.triedAi = 'true';
+                                        e.target.src = aiUrl;
                                     } else {
                                         e.target.style.display = 'none';
                                         e.target.parentNode.innerHTML = '<span class="shop-emoji">🏪</span>';
@@ -673,7 +675,8 @@ const ShopPage = () => {
                                                         const cleanName = item.name.replace(/[()]/g, '').replace(/[^a-zA-Z0-9 ]/g, '');
                                                         const aiUrl = `https://image.pollinations.ai/prompt/delicious%20indian%20food%20${encodeURIComponent(cleanName)}%20dish%20professional%20food%20photography%20isolated%20white%20background%20high%20quality?width=400&height=320&nologo=true`;
 
-                                                        if (e.target.src !== aiUrl) {
+                                                        if (!e.target.dataset.triedAi) {
+                                                            e.target.dataset.triedAi = 'true';
                                                             e.target.src = aiUrl;
                                                         } else {
                                                             e.target.style.display = 'none';
@@ -859,7 +862,8 @@ const ShopPage = () => {
                                             const cleanName = product.name.replace(/[()]/g, '').replace(/[^a-zA-Z0-9 ]/g, '');
                                             const aiUrl = `https://image.pollinations.ai/prompt/delicious%20indian%20food%20${encodeURIComponent(cleanName)}%20dish%20professional%20food%20photography%20isolated%20white%20background%20high%20quality?width=400&height=320&nologo=true`;
 
-                                            if (e.target.src !== aiUrl) {
+                                            if (!e.target.dataset.triedAi) {
+                                                e.target.dataset.triedAi = 'true';
                                                 e.target.src = aiUrl;
                                             } else {
                                                 e.target.style.display = 'none';
