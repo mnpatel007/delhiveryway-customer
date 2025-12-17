@@ -863,7 +863,11 @@ const ShopPage = () => {
                                                     : product.description
                                                 }
                                             </p>
-                                        ) : null}
+                                        ) : (
+                                            <p className="product-description no-description">
+                                                No description available
+                                            </p>
+                                        )}
                                     </div>
 
                                     {/* Product details section */}
