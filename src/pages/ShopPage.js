@@ -1,41 +1,49 @@
-import React, { useEffect, useState, useContext, useRef } from 'react';
+import React, { useEffect, useState, useContext, useRef, useMemo } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { shopsAPI, productsAPI, apiCall } from '../services/api';
 import { CartContext } from '../context/CartContext';
 import './ShopPage.css';
 
 const ProductImage = ({ product, className, style }) => {
+    // 1. Sanitize the name aggressively
     const baseName = product.name ? product.name.split('(')[0] : 'food';
     const cleanName = baseName.replace(/[^a-zA-Z0-9 ]/g, '').trim() || 'indian food';
 
-    // Create deterministic seeds to avoid flickering but ensure uniqueness
-    const seed = product._id ? product._id.slice(-6) : '42';
-
+    // 2. Deterministic URLs
     const originalUrl = (product.images && product.images.length > 0) ? product.images[0] : null;
-    const aiUrl = `https://image.pollinations.ai/prompt/delicious%20indian%20food%20${encodeURIComponent(cleanName)}%20dish%20professional%20food%20photography%20isolated%20white%20background%20high%20quality?width=400&height=320&nologo=true&seed=${seed}`;
-    const backupUrl = `https://image.pollinations.ai/prompt/delicious%20indian%20food%20platter%20professional%20food%20photography%20isolated%20white%20background%20high%20quality?width=400&height=320&nologo=true&seed=999`;
 
-    const [src, setSrc] = useState(originalUrl || aiUrl);
-    const [hasFinalError, setHasFinalError] = useState(false);
+    // We use useMemo to ensure these strings are stable across renders unless product changes
+    const specificAiUrl = useMemo(() =>
+        `https://image.pollinations.ai/prompt/delicious%20indian%20food%20${encodeURIComponent(cleanName)}%20professional%20food%20photography%20white%20background?width=400&height=320&nologo=true&seed=${product._id?.slice(-5) || '1'}`,
+        [cleanName, product._id]
+    );
+
+    const genericAiUrl = useMemo(() =>
+        `https://image.pollinations.ai/prompt/delicious%20indian%20food%20platter%20professional%20food%20photography%20white%20background?width=400&height=320&nologo=true&seed=999`,
+        []
+    );
+
+    // Level 0: Original | Level 1: Specific AI | Level 2: Generic AI | Level 3: Placeholder
+    const [level, setLevel] = useState(originalUrl ? 0 : 1);
 
     useEffect(() => {
-        setSrc(originalUrl || aiUrl);
-        setHasFinalError(false);
-    }, [product._id, originalUrl, aiUrl]);
+        setLevel(originalUrl ? 0 : 1);
+    }, [product._id, originalUrl]);
 
     const handleError = () => {
-        if (src === originalUrl) {
-            setSrc(aiUrl);
-        } else if (src === aiUrl) {
-            setSrc(backupUrl);
-        } else {
-            setHasFinalError(true);
-        }
+        console.log(`Image failed at level ${level} for ${product.name}, moving to ${level + 1}`);
+        setLevel(prev => prev + 1);
     };
 
-    if (hasFinalError) {
+    // Determine current source
+    let currentSrc = null;
+    if (level === 0) currentSrc = originalUrl;
+    else if (level === 1) currentSrc = specificAiUrl;
+    else if (level === 2) currentSrc = genericAiUrl;
+
+    if (level >= 3 || !currentSrc) {
         return (
-            <div className={className} style={{ ...style, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f3f4f6', minHeight: '100%' }}>
+            <div className={className} style={{ ...style, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--background-secondary)', minHeight: '100px' }}>
                 <span style={{ fontSize: '24px' }}>🍽️</span>
             </div>
         );
@@ -43,8 +51,8 @@ const ProductImage = ({ product, className, style }) => {
 
     return (
         <img
-            key={src}
-            src={src}
+            key={`${product._id}-${level}`} // Unique key forces a hard DOM refresh per level
+            src={currentSrc}
             alt={product.name}
             className={className}
             style={style}
@@ -57,10 +65,10 @@ const ShopPage = () => {
     const { id } = useParams();
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
+
     const [shop, setShop] = useState(null);
     const [products, setProducts] = useState([]);
     const [filteredProducts, setFilteredProducts] = useState([]);
-    const [toast, setToast] = useState('');
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [searchTerm, setSearchTerm] = useState('');
@@ -68,225 +76,139 @@ const ShopPage = () => {
     const [sortBy, setSortBy] = useState('name');
     const [viewMode, setViewMode] = useState('grid');
     const [showMenu, setShowMenu] = useState(false);
+    const [toast, setToast] = useState('');
+
     const { addToCart, setSelectedShop } = useContext(CartContext);
     const productRefsMap = useRef({});
 
+    // 1. Unified Fetching (Flicker Protected)
     useEffect(() => {
-        const fetchShopAndProducts = async () => {
+        let isMounted = true;
+        const fetchData = async () => {
             try {
-                setLoading(true);
-                setError('');
+                if (isMounted) {
+                    setLoading(true);
+                    setError('');
+                }
 
-                const shopResult = await apiCall(shopsAPI.getById, id);
+                const [shopRes, prodRes] = await Promise.all([
+                    apiCall(shopsAPI.getById, id),
+                    apiCall(productsAPI.getByShop, id)
+                ]);
 
-                if (shopResult.success && shopResult.data) {
-                    let shopData = null;
-                    const possiblePaths = [
-                        shopResult.data.shop,
-                        shopResult.data.data?.shop,
-                        shopResult.data,
-                        shopResult.data.data
-                    ];
+                if (!isMounted) return;
 
-                    for (let candidate of possiblePaths) {
-                        if (candidate && candidate._id && candidate.name) {
-                            shopData = candidate;
-                            break;
-                        }
-                    }
-
-                    if (!shopData) shopData = shopResult.data;
-                    if (!shopData || !shopData._id || !shopData.name) {
-                        setError('Invalid shop data received');
-                        return;
-                    }
-
-                    setShop(shopData);
+                if (shopRes.success) {
+                    const sData = shopRes.data?.shop || shopRes.data?.data?.shop || shopRes.data;
+                    setShop(sData);
+                    // Update context ONCE
+                    setSelectedShop(sData);
                 } else {
-                    setShop(null);
-                    setError(shopResult.message || 'Failed to load shop details');
-                    return;
+                    setError('Shop not found');
                 }
 
-                const productResult = await apiCall(productsAPI.getByShop, id);
-                let productsData = [];
-                if (productResult.success && productResult.data) {
-                    if (Array.isArray(productResult.data)) {
-                        productsData = productResult.data;
-                    } else if (productResult.data.products) {
-                        productsData = productResult.data.products;
-                    } else if (productResult.data.data?.products) {
-                        productsData = productResult.data.data.products;
-                    }
+                if (prodRes.success) {
+                    let pList = prodRes.data?.products || prodRes.data?.data?.products || (Array.isArray(prodRes.data) ? prodRes.data : []);
+                    setProducts(pList.map(p => ({
+                        ...p,
+                        price: parseFloat(p.price || 0),
+                        inStock: p.inStock !== false
+                    })));
                 }
-
-                productsData = productsData.map(product => ({
-                    ...product,
-                    shopId: product.shopId || id,
-                    inStock: product.inStock !== undefined ? product.inStock : true,
-                    price: parseFloat(product.price || 0),
-                    originalPrice: parseFloat(product.originalPrice || product.price || 0)
-                }));
-
-                setProducts(productsData);
-                setFilteredProducts(productsData);
 
             } catch (err) {
-                console.error('❌ Error fetching data:', err);
-                setError('Failed to load data.');
-                setProducts([]);
+                if (isMounted) setError('Failed to load shop data');
             } finally {
-                setLoading(false);
+                if (isMounted) setLoading(false);
             }
         };
 
-        if (id) {
-            fetchShopAndProducts();
-        }
-    }, [id]);
+        if (id) fetchData();
+        return () => { isMounted = false; };
+    }, [id]); // DO NOT add setSelectedShop here, it causes the flicker loop
 
+    // 2. Filtering & Sorting
     useEffect(() => {
-        const highlightId = searchParams.get('highlight');
-        if (highlightId && filteredProducts.length > 0 && productRefsMap.current[highlightId]) {
-            const element = productRefsMap.current[highlightId];
-            if (element) {
-                const absoluteElementTop = element.getBoundingClientRect().top + window.scrollY;
-                window.scrollTo({ top: absoluteElementTop - 100, behavior: 'smooth' });
-                element.classList.add('highlighted');
-                setTimeout(() => element.classList.remove('highlighted'), 2000);
-            }
-        }
-    }, [filteredProducts, searchParams]);
+        let result = [...products];
 
-    useEffect(() => {
-        if (!Array.isArray(products)) return;
-        let filtered = [...products];
-
-        if (searchTerm.trim()) {
-            const searchLower = searchTerm.toLowerCase().trim();
-            filtered = filtered.filter(p =>
-                p.name?.toLowerCase().includes(searchLower) ||
-                p.description?.toLowerCase().includes(searchLower)
-            );
+        if (searchTerm) {
+            const term = searchTerm.toLowerCase();
+            result = result.filter(p => p.name?.toLowerCase().includes(term) || p.description?.toLowerCase().includes(term));
         }
 
         if (selectedCategory !== 'all') {
-            filtered = filtered.filter(p => p.category?.toLowerCase() === selectedCategory.toLowerCase());
+            result = result.filter(p => p.category?.toLowerCase() === selectedCategory.toLowerCase());
         }
 
-        filtered.sort((a, b) => {
-            if (sortBy === 'price-low') return a.price - b.price;
-            if (sortBy === 'price-high') return b.price - a.price;
+        result.sort((a, b) => {
+            if (sortBy === 'price') return a.price - b.price;
+            if (sortBy === 'price-desc') return b.price - a.price;
             return (a.name || '').localeCompare(b.name || '');
         });
 
-        setFilteredProducts(filtered);
+        setFilteredProducts(result);
     }, [products, searchTerm, selectedCategory, sortBy]);
 
+    // 3. Highlight Logic
     useEffect(() => {
-        if (shop && shop._id && shop.name && shop.name !== 'Loading...') {
-            setSelectedShop(shop);
+        const highlight = searchParams.get('highlight');
+        if (highlight && productRefsMap.current[highlight]) {
+            setTimeout(() => {
+                productRefsMap.current[highlight].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                productRefsMap.current[highlight].classList.add('highlighted');
+                setTimeout(() => productRefsMap.current[highlight].classList.remove('highlighted'), 3000);
+            }, 500);
         }
-    }, [shop, setSelectedShop]);
-
-    const getShopStatusMessage = (shop) => {
-        if (!shop?.operatingHours) return { isOpen: true, message: 'Open' };
-        const istTime = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" }));
-        const day = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'][istTime.getDay()];
-        const currentTime = istTime.toTimeString().slice(0, 5);
-        const hours = shop.operatingHours[day];
-        if (!hours || hours.closed) return { isOpen: false, message: 'Closed today' };
-        if (!hours.open || !hours.close) return { isOpen: true, message: 'Open' };
-        const isOpen = currentTime >= hours.open && currentTime <= hours.close;
-        return { isOpen, message: isOpen ? `Open until ${hours.close}` : `Closed (Opens at ${hours.open})` };
-    };
+    }, [filteredProducts, searchParams]);
 
     const handleAddToCart = (product) => {
-        try {
-            if (!shop?._id) return;
-            const success = addToCart({ ...product, shopId: shop._id, shopData: shop }, 1);
-            if (success) {
-                setSelectedShop(shop);
-                setToast(`✅ ${product.name} added to cart`);
-            }
-        } catch (error) {
-            setToast('❌ Error adding to cart');
+        const success = addToCart({ ...product, shopId: id, shopData: shop }, 1);
+        if (success) {
+            setToast(`Added ${product.name}`);
+            setTimeout(() => setToast(''), 3000);
         }
-        setTimeout(() => setToast(''), 3000);
     };
 
-    const getCategories = () => {
-        const categories = new Set(['all']);
-        products.forEach(p => p.category && categories.add(p.category.toLowerCase()));
-        return Array.from(categories);
-    };
+    if (loading) return <div className="modern-shop-container"><div className="loading-state"><div className="loading-spinner"></div><h3>Loading Shop...</h3></div></div>;
+    if (error || !shop) return <div className="modern-shop-container"><div className="error-state"><h2>{error || 'Shop not found'}</h2><button onClick={() => navigate('/')}>Back Home</button></div></div>;
 
-    if (loading) return <div className="modern-shop-container"><div className="loading-state"><h3>Loading...</h3></div></div>;
-    if (error || !shop) return <div className="modern-shop-container"><div className="error-state"><h2>{error || 'Not found'}</h2></div></div>;
+    const categories = ['all', ...new Set(products.map(p => p.category?.toLowerCase()).filter(Boolean))];
 
     return (
         <div className="modern-shop-container">
-            {toast && <div className="toast-notification"><div className="toast-content"><span>{toast}</span></div></div>}
+            {toast && <div className="toast-notification">{toast}</div>}
 
             <div className="shop-hero">
                 <div className="shop-hero-content">
                     <button onClick={() => navigate('/')} className="back-button">← Back</button>
                     <div className="shop-main-info">
                         <div className="shop-avatar">
-                            <img
-                                src={shop.images?.[0] || `https://image.pollinations.ai/prompt/restaurant%20logo%20${encodeURIComponent(shop.name)}?width=200&height=200`}
-                                alt={shop.name}
-                                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                            />
+                            <img src={shop.images?.[0] || 'https://via.placeholder.com/150'} alt={shop.name} onError={(e) => e.target.src = 'https://via.placeholder.com/150'} />
                         </div>
                         <div className="shop-details">
                             <h1 className="shop-name">{shop.name}</h1>
                             <p className="shop-description">{shop.description}</p>
                             <div className="shop-meta">
-                                <div className="meta-item">📦 {products.length} products</div>
-                                <div className={`meta-item ${getShopStatusMessage(shop).isOpen ? 'open' : 'closed'}`}>
-                                    {getShopStatusMessage(shop).message}
-                                </div>
+                                <span>📦 {products.length} Products</span>
+                                <span className="shop-status-badge">Open</span>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            {showMenu && (
-                <div className="menu-overlay" onClick={(e) => e.target.classList.contains('menu-overlay') && setShowMenu(false)}>
-                    <div className="menu-panel">
-                        <div className="menu-panel-header">
-                            <h3>Menu</h3>
-                            <button onClick={() => setShowMenu(false)}>✕</button>
-                        </div>
-                        <div className="menu-list">
-                            {products.map(item => (
-                                <div key={item._id} className="menu-item">
-                                    <div style={{ width: 48, height: 48, borderRadius: 4, overflow: 'hidden' }}>
-                                        <ProductImage product={item} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                                    </div>
-                                    <div style={{ flex: 1 }}>{item.name} <small>₹{item.price.toFixed(2)}</small></div>
-                                    <button onClick={() => handleAddToCart(item)} disabled={!item.inStock}>Add</button>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </div>
-            )}
-
             <div className="shop-controls">
                 <div className="controls-content">
-                    <div className="search-and-filters">
-                        <input type="text" placeholder="Search..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="search-input" />
+                    <div className="search-group">
+                        <input type="text" placeholder="Search menu..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
                         <select value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)}>
-                            {getCategories().map(cat => <option key={cat} value={cat}>{cat}</option>)}
+                            {categories.map(c => <option key={c} value={c}>{c === 'all' ? 'All Items' : c}</option>)}
                         </select>
                     </div>
-                    <div className="view-controls">
-                        <button onClick={() => setShowMenu(true)}>📖 Menu</button>
-                        <button onClick={() => setViewMode('grid')} className={viewMode === 'grid' ? 'active' : ''}>Grid</button>
-                        <button onClick={() => setViewMode('list')} className={viewMode === 'list' ? 'active' : ''}>List</button>
+                    <div className="view-group">
+                        <button className="view-menu-btn" onClick={() => setShowMenu(true)}>📖 Menu</button>
+                        <button className={`view-btn ${viewMode === 'grid' ? 'active' : ''}`} onClick={() => setViewMode('grid')}>Grid</button>
+                        <button className={`view-btn ${viewMode === 'list' ? 'active' : ''}`} onClick={() => setViewMode('list')}>List</button>
                     </div>
                 </div>
             </div>
@@ -300,11 +222,11 @@ const ShopPage = () => {
                             </div>
                             <div className="product-content">
                                 <h3 className="product-name">{product.name}</h3>
-                                {product.description && product.description !== '.' && <p className="product-description">{product.description}</p>}
+                                {product.description && <p className="product-description">{product.description}</p>}
                                 <div className="product-footer">
                                     <span className="product-price">₹{product.price.toFixed(2)}</span>
-                                    <button onClick={() => handleAddToCart(product)} className="add-to-cart-btn" disabled={!product.inStock}>
-                                        {product.inStock ? 'Add to Cart' : 'Out'}
+                                    <button className="add-to-cart-btn" onClick={() => handleAddToCart(product)} disabled={!product.inStock}>
+                                        {product.inStock ? 'Add to Cart' : 'Sold Out'}
                                     </button>
                                 </div>
                             </div>
@@ -312,6 +234,31 @@ const ShopPage = () => {
                     ))}
                 </div>
             </div>
+
+            {showMenu && (
+                <div className="menu-overlay" onClick={() => setShowMenu(false)}>
+                    <div className="menu-panel" onClick={e => e.stopPropagation()}>
+                        <div className="menu-header">
+                            <h2>Full Menu</h2>
+                            <button onClick={() => setShowMenu(false)}>✕</button>
+                        </div>
+                        <div className="menu-items">
+                            {products.map(p => (
+                                <div key={p._id} className="menu-row">
+                                    <div className="menu-row-img">
+                                        <ProductImage product={p} />
+                                    </div>
+                                    <div className="menu-row-info">
+                                        <strong>{p.name}</strong>
+                                        <span>₹{p.price.toFixed(2)}</span>
+                                    </div>
+                                    <button onClick={() => handleAddToCart(p)}>Add</button>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
