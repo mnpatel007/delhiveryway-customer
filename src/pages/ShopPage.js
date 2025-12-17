@@ -832,19 +832,23 @@ const ShopPage = () => {
                                 }}
                             >
                                 <div className="product-image-section">
-                                    {product.images && product.images.length > 0 ? (
-                                        <img
-                                            src={product.images[0]}
-                                            alt={product.name}
-                                            className="product-image"
-                                            onError={(e) => {
+                                    <img
+                                        src={product.images && product.images.length > 0 ? product.images[0] : `https://image.pollinations.ai/prompt/delicious%20indian%20food%20${encodeURIComponent(product.name)}%20dish%20professional%20food%20photography%20isolated%20white%20background%20high%20quality?width=400&height=320&nologo=true`}
+                                        alt={product.name}
+                                        className="product-image"
+                                        onError={(e) => {
+                                            // Fallback to AI image if main image fails
+                                            if (!e.target.src.includes('pollinations.ai')) {
+                                                e.target.src = `https://image.pollinations.ai/prompt/delicious%20indian%20food%20${encodeURIComponent(product.name)}%20dish%20professional%20food%20photography%20isolated%20white%20background%20high%20quality?width=400&height=320&nologo=true`;
+                                            } else {
+                                                // If AI image also fails, show placeholder
                                                 e.target.style.display = 'none';
                                                 e.target.nextSibling.style.display = 'flex';
-                                            }}
-                                        />
-                                    ) : null}
-                                    <div className="product-placeholder" style={{ display: product.images && product.images.length > 0 ? 'none' : 'flex' }}>
-                                        <span className="product-icon">📦</span>
+                                            }
+                                        }}
+                                    />
+                                    <div className="product-placeholder" style={{ display: 'none' }}>
+                                        <span className="product-icon">🍽️</span>
                                     </div>
                                 </div>
 
