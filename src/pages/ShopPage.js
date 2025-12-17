@@ -5,25 +5,49 @@ import { CartContext } from '../context/CartContext';
 import './ShopPage.css';
 
 const ProductImage = ({ product, className, style }) => {
-    const cleanName = product.name.replace(/[()]/g, '').replace(/[^a-zA-Z0-9 ]/g, '');
-    const aiUrl = `https://image.pollinations.ai/prompt/delicious%20indian%20food%20${encodeURIComponent(cleanName)}%20dish%20professional%20food%20photography%20isolated%20white%20background%20high%20quality?width=400&height=320&nologo=true`;
+    // Better sanitization: take only the part before '(', then remove special chars
+    const baseName = product.name.split('(')[0];
+    const cleanName = baseName.replace(/[^a-zA-Z0-9 ]/g, '').trim();
+
+    // Base AI URL without seed
+    const getAiUrl = (seed = null) => {
+        let url = `https://image.pollinations.ai/prompt/delicious%20indian%20food%20${encodeURIComponent(cleanName)}%20dish%20professional%20food%20photography%20isolated%20white%20background%20high%20quality?width=400&height=320&nologo=true`;
+        if (seed) {
+            url += `&seed=${seed}`;
+        }
+        return url;
+    };
 
     const [imgSrc, setImgSrc] = useState(() => {
-        return (product.images && product.images.length > 0) ? product.images[0] : aiUrl;
+        return (product.images && product.images.length > 0) ? product.images[0] : getAiUrl();
     });
     const [hasError, setHasError] = useState(false);
+    const [retryCount, setRetryCount] = useState(0);
 
+    // Reset state when product changes
     useEffect(() => {
-        const url = (product.images && product.images.length > 0) ? product.images[0] : aiUrl;
+        const url = (product.images && product.images.length > 0) ? product.images[0] : getAiUrl();
         setImgSrc(url);
         setHasError(false);
-    }, [product, aiUrl]);
+        setRetryCount(0);
+    }, [product._id]); // Use ID instead of object to prevent unnecessary resets
 
     const handleError = () => {
-        if (imgSrc !== aiUrl) {
-            setImgSrc(aiUrl);
+        const currentAiUrl = getAiUrl();
+
+        // If we are not yet using the AI URL (or using a seeded version of it), switch to base AI one or retry
+        if (!imgSrc.includes('pollinations.ai')) {
+            setImgSrc(currentAiUrl);
         } else {
-            setHasError(true);
+            // If we are already using AI URL and it failed, try with a new seed
+            if (retryCount < 3) {
+                const newRetryCount = retryCount + 1;
+                setRetryCount(newRetryCount);
+                // Add a random seed to bypass cache and force regeneration
+                setImgSrc(getAiUrl(Math.floor(Math.random() * 1000000)));
+            } else {
+                setHasError(true);
+            }
         }
     };
 
