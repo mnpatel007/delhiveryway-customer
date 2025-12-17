@@ -666,12 +666,15 @@ const ShopPage = () => {
                                         }}>
                                             <div style={{ width: 72, height: 72, borderRadius: 8, background: '#fafafa', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
                                                 <img
-                                                    src={item.images && item.images.length > 0 ? item.images[0] : `https://image.pollinations.ai/prompt/delicious%20indian%20food%20${encodeURIComponent(item.name)}%20dish%20professional%20food%20photography%20isolated%20white%20background%20high%20quality?width=400&height=320&nologo=true`}
+                                                    src={item.images && item.images.length > 0 ? item.images[0] : `https://image.pollinations.ai/prompt/delicious%20indian%20food%20${encodeURIComponent(item.name.replace(/[()]/g, '').replace(/[^a-zA-Z0-9 ]/g, ''))}%20dish%20professional%20food%20photography%20isolated%20white%20background%20high%20quality?width=400&height=320&nologo=true`}
                                                     alt={item.name}
                                                     style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                                                     onError={(e) => {
-                                                        if (!e.target.src.includes('pollinations.ai')) {
-                                                            e.target.src = `https://image.pollinations.ai/prompt/delicious%20indian%20food%20${encodeURIComponent(item.name)}%20dish%20professional%20food%20photography%20isolated%20white%20background%20high%20quality?width=400&height=320&nologo=true`;
+                                                        const cleanName = item.name.replace(/[()]/g, '').replace(/[^a-zA-Z0-9 ]/g, '');
+                                                        const aiUrl = `https://image.pollinations.ai/prompt/delicious%20indian%20food%20${encodeURIComponent(cleanName)}%20dish%20professional%20food%20photography%20isolated%20white%20background%20high%20quality?width=400&height=320&nologo=true`;
+
+                                                        if (e.target.src !== aiUrl) {
+                                                            e.target.src = aiUrl;
                                                         } else {
                                                             e.target.style.display = 'none';
                                                             e.target.parentNode.innerHTML = '<span style="font-size: 24px">🍽️</span>';
@@ -849,17 +852,18 @@ const ShopPage = () => {
                             >
                                 <div className="product-image-section">
                                     <img
-                                        src={product.images && product.images.length > 0 ? product.images[0] : `https://image.pollinations.ai/prompt/delicious%20indian%20food%20${encodeURIComponent(product.name)}%20dish%20professional%20food%20photography%20isolated%20white%20background%20high%20quality?width=400&height=320&nologo=true`}
+                                        src={product.images && product.images.length > 0 ? product.images[0] : `https://image.pollinations.ai/prompt/delicious%20indian%20food%20${encodeURIComponent(product.name.replace(/[()]/g, '').replace(/[^a-zA-Z0-9 ]/g, ''))}%20dish%20professional%20food%20photography%20isolated%20white%20background%20high%20quality?width=400&height=320&nologo=true`}
                                         alt={product.name}
                                         className="product-image"
                                         onError={(e) => {
-                                            // Fallback to AI image if main image fails
-                                            if (!e.target.src.includes('pollinations.ai')) {
-                                                e.target.src = `https://image.pollinations.ai/prompt/delicious%20indian%20food%20${encodeURIComponent(product.name)}%20dish%20professional%20food%20photography%20isolated%20white%20background%20high%20quality?width=400&height=320&nologo=true`;
+                                            const cleanName = product.name.replace(/[()]/g, '').replace(/[^a-zA-Z0-9 ]/g, '');
+                                            const aiUrl = `https://image.pollinations.ai/prompt/delicious%20indian%20food%20${encodeURIComponent(cleanName)}%20dish%20professional%20food%20photography%20isolated%20white%20background%20high%20quality?width=400&height=320&nologo=true`;
+
+                                            if (e.target.src !== aiUrl) {
+                                                e.target.src = aiUrl;
                                             } else {
-                                                // If AI image also fails, show placeholder
                                                 e.target.style.display = 'none';
-                                                e.target.nextSibling.style.display = 'flex';
+                                                if (e.target.nextSibling) e.target.nextSibling.style.display = 'flex';
                                             }
                                         }}
                                     />
