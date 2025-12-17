@@ -856,18 +856,14 @@ const ShopPage = () => {
                                             </span>
                                         </h3>
 
-                                        {product.description ? (
+                                        {product.description && product.description !== '.' ? (
                                             <p className="product-description">
                                                 {product.description.length > 80
                                                     ? `${product.description.substring(0, 80)}...`
                                                     : product.description
                                                 }
                                             </p>
-                                        ) : (
-                                            <p className="product-description no-description">
-                                                No description available
-                                            </p>
-                                        )}
+                                        ) : null}
                                     </div>
 
                                     {/* Product details section */}
