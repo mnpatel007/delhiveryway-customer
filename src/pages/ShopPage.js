@@ -4,6 +4,48 @@ import { shopsAPI, productsAPI, apiCall } from '../services/api';
 import { CartContext } from '../context/CartContext';
 import './ShopPage.css';
 
+const ProductImage = ({ product, className, style }) => {
+    const cleanName = product.name.replace(/[()]/g, '').replace(/[^a-zA-Z0-9 ]/g, '');
+    const aiUrl = `https://image.pollinations.ai/prompt/delicious%20indian%20food%20${encodeURIComponent(cleanName)}%20dish%20professional%20food%20photography%20isolated%20white%20background%20high%20quality?width=400&height=320&nologo=true`;
+
+    const [imgSrc, setImgSrc] = useState(() => {
+        return (product.images && product.images.length > 0) ? product.images[0] : aiUrl;
+    });
+    const [hasError, setHasError] = useState(false);
+
+    useEffect(() => {
+        const url = (product.images && product.images.length > 0) ? product.images[0] : aiUrl;
+        setImgSrc(url);
+        setHasError(false);
+    }, [product, aiUrl]);
+
+    const handleError = () => {
+        if (imgSrc !== aiUrl) {
+            setImgSrc(aiUrl);
+        } else {
+            setHasError(true);
+        }
+    };
+
+    if (hasError) {
+        return (
+            <div className={className} style={{ ...style, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f3f4f6', minHeight: '100%' }}>
+                <span style={{ fontSize: '24px' }}>🍽️</span>
+            </div>
+        );
+    }
+
+    return (
+        <img
+            src={imgSrc}
+            alt={product.name}
+            className={className}
+            style={style}
+            onError={handleError}
+        />
+    );
+};
+
 const ShopPage = () => {
     const { id } = useParams();
     const [searchParams] = useSearchParams();
@@ -667,22 +709,9 @@ const ShopPage = () => {
                                             alignItems: 'center'
                                         }}>
                                             <div style={{ width: 72, height: 72, borderRadius: 8, background: '#fafafa', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
-                                                <img
-                                                    src={item.images && item.images.length > 0 ? item.images[0] : `https://image.pollinations.ai/prompt/delicious%20indian%20food%20${encodeURIComponent(item.name.replace(/[()]/g, '').replace(/[^a-zA-Z0-9 ]/g, ''))}%20dish%20professional%20food%20photography%20isolated%20white%20background%20high%20quality?width=400&height=320&nologo=true`}
-                                                    alt={item.name}
+                                                <ProductImage
+                                                    product={item}
                                                     style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                                                    onError={(e) => {
-                                                        const cleanName = item.name.replace(/[()]/g, '').replace(/[^a-zA-Z0-9 ]/g, '');
-                                                        const aiUrl = `https://image.pollinations.ai/prompt/delicious%20indian%20food%20${encodeURIComponent(cleanName)}%20dish%20professional%20food%20photography%20isolated%20white%20background%20high%20quality?width=400&height=320&nologo=true`;
-
-                                                        if (!e.target.dataset.triedAi) {
-                                                            e.target.dataset.triedAi = 'true';
-                                                            e.target.src = aiUrl;
-                                                        } else {
-                                                            e.target.style.display = 'none';
-                                                            e.target.parentNode.innerHTML = '<span style="font-size: 24px">🍽️</span>';
-                                                        }
-                                                    }}
                                                 />
                                             </div>
 
@@ -854,26 +883,10 @@ const ShopPage = () => {
                                 }}
                             >
                                 <div className="product-image-section">
-                                    <img
-                                        src={product.images && product.images.length > 0 ? product.images[0] : `https://image.pollinations.ai/prompt/delicious%20indian%20food%20${encodeURIComponent(product.name.replace(/[()]/g, '').replace(/[^a-zA-Z0-9 ]/g, ''))}%20dish%20professional%20food%20photography%20isolated%20white%20background%20high%20quality?width=400&height=320&nologo=true`}
-                                        alt={product.name}
+                                    <ProductImage
+                                        product={product}
                                         className="product-image"
-                                        onError={(e) => {
-                                            const cleanName = product.name.replace(/[()]/g, '').replace(/[^a-zA-Z0-9 ]/g, '');
-                                            const aiUrl = `https://image.pollinations.ai/prompt/delicious%20indian%20food%20${encodeURIComponent(cleanName)}%20dish%20professional%20food%20photography%20isolated%20white%20background%20high%20quality?width=400&height=320&nologo=true`;
-
-                                            if (!e.target.dataset.triedAi) {
-                                                e.target.dataset.triedAi = 'true';
-                                                e.target.src = aiUrl;
-                                            } else {
-                                                e.target.style.display = 'none';
-                                                if (e.target.nextSibling) e.target.nextSibling.style.display = 'flex';
-                                            }
-                                        }}
                                     />
-                                    <div className="product-placeholder" style={{ display: 'none' }}>
-                                        <span className="product-icon">🍽️</span>
-                                    </div>
                                 </div>
 
                                 <div className="product-content">
