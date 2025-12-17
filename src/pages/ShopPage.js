@@ -92,7 +92,7 @@ const ShopPage = () => {
     const [sortBy, setSortBy] = useState('name');
     const [viewMode, setViewMode] = useState('grid');
     const [showMenu, setShowMenu] = useState(false);
-    const { addToCart, selectedShop, setSelectedShop } = useContext(CartContext);
+    const { addToCart, setSelectedShop } = useContext(CartContext);
     const productRefsMap = useRef({});
 
     useEffect(() => {
@@ -134,7 +134,6 @@ const ShopPage = () => {
                     }
 
                     setShop(shopData);
-                    setSelectedShop(shopData);
                 } else {
                     setShop(null);
                     setError(shopResult.message || 'Failed to load shop details');
@@ -180,7 +179,7 @@ const ShopPage = () => {
         if (id) {
             fetchShopAndProducts();
         }
-    }, [id, setSelectedShop]);
+    }, [id]);
 
     // Scroll to highlighted product when it loads
     useEffect(() => {
