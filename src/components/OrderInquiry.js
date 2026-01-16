@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import ReactDOM from 'react-dom';
 import { useSocket } from '../context/SocketContext';
 import './OrderInquiry.css';
 
@@ -150,8 +151,8 @@ const OrderInquiry = ({ order, onClose }) => {
         );
     }
 
-    return (
-        <div className="order-inquiry-modal">
+    return ReactDOM.createPortal(
+        <div className="order-inquiry-modal" style={{ zIndex: 99999 }}>
             <div className="modal-backdrop" onClick={onClose}></div>
             <div className="inquiry-content">
                 <div className="inquiry-header">
@@ -275,7 +276,8 @@ const OrderInquiry = ({ order, onClose }) => {
                     </button>
                 </div>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 };
 

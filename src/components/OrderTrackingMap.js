@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import ReactDOM from 'react-dom';
 import { GoogleMap, useJsApiLoader, Marker, DirectionsRenderer, InfoWindow } from '@react-google-maps/api';
 import './OrderTrackingMap.css';
 
@@ -129,8 +130,8 @@ const OrderTrackingMap = ({ order, driverLocation, isExpanded, onToggleExpand })
     // const homeIcon = { url: '/assets/home-marker.png', scaledSize: new window.google.maps.Size(40, 40) };
     // const driverIcon = { url: '/assets/driver-marker.png', scaledSize: new window.google.maps.Size(40, 40) };
 
-    return (
-        <div className={`order-tracking-map-container ${isExpanded ? 'expanded' : ''}`}>
+    const mapContent = (
+        <div className={`order-tracking-map-container ${isExpanded ? 'expanded' : ''}`} style={isExpanded ? { zIndex: 10000 } : {}}>
             <div className="map-wrapper" onClick={!isExpanded ? onToggleExpand : undefined}>
                 <GoogleMap
                     mapContainerStyle={containerStyle}
@@ -202,6 +203,12 @@ const OrderTrackingMap = ({ order, driverLocation, isExpanded, onToggleExpand })
             </div>
         </div>
     );
+
+    if (isExpanded) {
+        return ReactDOM.createPortal(mapContent, document.body);
+    }
+
+    return mapContent;
 };
 
 export default React.memo(OrderTrackingMap);
