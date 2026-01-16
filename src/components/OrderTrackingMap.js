@@ -112,7 +112,15 @@ const OrderTrackingMap = ({ order, driverLocation, isExpanded, onToggleExpand })
             // Let's add 15 mins shopping buffer if driver is not yet at shop (can be refined later)
             const bufferSecs = 0;
             const arrivalTime = new Date(Date.now() + (totalDurationSecs + bufferSecs) * 1000);
-            setEta(arrivalTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+
+            // Fix: Force Indian Standard Time (IST)
+            const istTime = arrivalTime.toLocaleTimeString('en-IN', {
+                timeZone: 'Asia/Kolkata',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: true
+            });
+            setEta(istTime);
 
             // We only show the Shop->Customer line on map to keep it clean, OR show both?
             // User asked for "sync", let's show Shop->Customer mainly, 
@@ -168,16 +176,13 @@ const OrderTrackingMap = ({ order, driverLocation, isExpanded, onToggleExpand })
         }
     }, [map, shopLocation, customerLocation, driverPos]);
 
-    // Debug Listener
+    // Debug Listener - Keeping logic but removing UI Overlay as requested
     useEffect(() => {
         if (!socket) return;
 
         const handleDebugMsg = (data) => {
-            console.log('Server Debug Msg:', data); // Log to console too
-            window.debugServerMsg = data;
-            // Force re-render if needed, or just let the next render cycle pick it up
-            // Since this is debug only, we can use a forceUpdate or just relying on other updates
-            // A simple way to force render: setEta(prev => prev);
+            console.log('Server Debug Msg:', data);
+            // window.debugServerMsg = data; // Unused now
         };
 
         socket.on('debug_server_msg', handleDebugMsg);
@@ -281,39 +286,6 @@ const OrderTrackingMap = ({ order, driverLocation, isExpanded, onToggleExpand })
                     <button className="close-map-btn" onClick={(e) => { e.stopPropagation(); onToggleExpand(); }}>
                         ✕
                     </button>
-                )}
-
-                {/* DEBUG: Show coordinates and SERVER messages if expanded */}
-                {isExpanded && (
-                    <div style={{
-                        position: 'absolute',
-                        bottom: '20px',
-                        left: '20px',
-                        background: 'rgba(0,0,0,0.85)',
-                        color: '#00ff00',
-                        padding: '12px',
-                        fontSize: '11px',
-                        borderRadius: '8px',
-                        zIndex: 10001,
-                        fontFamily: 'monospace',
-                        maxWidth: '300px'
-                    }}>
-                        <strong>Client Debug:</strong><br />
-                        Lat: {driverPos?.lat?.toFixed(4) || 'N/A'}<br />
-                        Lng: {driverPos?.lng?.toFixed(4) || 'N/A'}<br />
-                        ETA: {eta}<br />
-                        Last Update: {new Date().toLocaleTimeString()}
-                        <div style={{ borderTop: '1px solid #555', marginTop: '8px', paddingTop: '8px' }}>
-                            <strong>Server Trace:</strong><br />
-                            {window.debugServerMsg ? (
-                                <>
-                                    Msg: {window.debugServerMsg.msg}<br />
-                                    Orders Found: {window.debugServerMsg.ordersFound}<br />
-                                    Shopper: {window.debugServerMsg.shopperId?.slice(-6)}
-                                </>
-                            ) : 'Waiting for server...'}
-                        </div>
-                    </div>
                 )}
             </div>
         </div>
