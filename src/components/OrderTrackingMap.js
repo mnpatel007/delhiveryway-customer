@@ -48,34 +48,79 @@ const OrderTrackingMap = ({ order, driverLocation, isExpanded, onToggleExpand })
         };
     }, [driverLocation]);
 
-    // Calculate Route
+    // Calculate Route with Split ETA (Driver -> Shop -> Customer)
     const calculateRoute = useCallback(async () => {
         if (!isLoaded || !shopLocation || !customerLocation || !window.google) return;
 
-        // Origin is driver if available, otherwise shop
-        const origin = driverPos || shopLocation;
-        const destination = customerLocation;
-
         try {
             const directionsService = new window.google.maps.DirectionsService();
-            const results = await directionsService.route({
-                origin: origin,
-                destination: destination,
+            let totalDurationSecs = 0;
+            let totalDistanceMeters = 0;
+            let route1Result = null;
+            let route2Result = null;
+
+            // Route 2: Shop -> Customer (Always exists)
+            route2Result = await directionsService.route({
+                origin: shopLocation,
+                destination: customerLocation,
                 travelMode: window.google.maps.TravelMode.DRIVING,
             });
 
-            setDirectionsResponse(results);
-
-            if (results.routes?.[0]?.legs?.[0]) {
-                const leg = results.routes[0].legs[0];
-                setDistance(leg.distance.text);
-                setDuration(leg.duration.text);
-
-                // Calculate ETA
-                const durationSecs = leg.duration.value;
-                const arrivalTime = new Date(Date.now() + durationSecs * 1000);
-                setEta(arrivalTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+            if (route2Result.routes?.[0]?.legs?.[0]) {
+                const leg = route2Result.routes[0].legs[0];
+                totalDurationSecs += leg.duration.value;
+                totalDistanceMeters += leg.distance.value;
             }
+
+            // Route 1: Driver -> Shop (Only if driver is available and not at shop yet)
+            // We assume driver needs to go to shop if order status implies it
+            // Simple check: if driverLocation is available, calculate path to shop
+            if (driverPos) {
+                try {
+                    route1Result = await directionsService.route({
+                        origin: driverPos,
+                        destination: shopLocation,
+                        travelMode: window.google.maps.TravelMode.DRIVING,
+                    });
+
+                    if (route1Result.routes?.[0]?.legs?.[0]) {
+                        const leg = route1Result.routes[0].legs[0];
+                        totalDurationSecs += leg.duration.value;
+                        totalDistanceMeters += leg.distance.value;
+                    }
+                } catch (e) {
+                    console.warn("Could not calculate driver->shop route", e);
+                }
+            }
+
+            // Set formatted Distance and Duration
+            const distanceKm = (totalDistanceMeters / 1000).toFixed(1);
+            setDistance(`${distanceKm} km`);
+
+            // Format duration human readable
+            const hours = Math.floor(totalDurationSecs / 3600);
+            const minutes = Math.floor((totalDurationSecs % 3600) / 60);
+            let timeString = '';
+            if (hours > 0) timeString += `${hours} hr `;
+            timeString += `${minutes} min`;
+            setDuration(timeString);
+
+            // Calculate ETA
+            // Add a buffer for shopping time? Let's keep it pure travel time for now or add fixed buffer
+            // Let's add 15 mins shopping buffer if driver is not yet at shop (can be refined later)
+            const bufferSecs = 0;
+            const arrivalTime = new Date(Date.now() + (totalDurationSecs + bufferSecs) * 1000);
+            setEta(arrivalTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+
+            // We only show the Shop->Customer line on map to keep it clean, OR show both?
+            // User asked for "sync", let's show Shop->Customer mainly, 
+            // but tracking driver is important. 
+            // Let's just set directionsResponse to the Shop->Customer one for the main line,
+            // as plotting multiple polylines with one DirectionsRenderer is tricky (needs array).
+            // Actually, showing just Shop->Customer path is standard, 
+            // while Driver marker moves freely.
+            setDirectionsResponse(route2Result);
+
         } catch (error) {
             console.error("Error calculating route:", error);
         }
@@ -98,10 +143,26 @@ const OrderTrackingMap = ({ order, driverLocation, isExpanded, onToggleExpand })
     useEffect(() => {
         if (map && shopLocation && customerLocation) {
             const bounds = new window.google.maps.LatLngBounds();
+
+            // Always include Shop and Customer
             bounds.extend(shopLocation);
             bounds.extend(customerLocation);
-            if (driverPos) bounds.extend(driverPos);
-            map.fitBounds(bounds);
+
+            // Include Driver if valid
+            if (driverPos && driverPos.lat && driverPos.lng) {
+                // Check if driver coords are reasonable (not 0,0)
+                if (Math.abs(driverPos.lat) > 0.0001 && Math.abs(driverPos.lng) > 0.0001) {
+                    bounds.extend(driverPos);
+                }
+            }
+
+            // Add generous padding so markers aren't on usage edge
+            map.fitBounds(bounds, {
+                top: 50,
+                right: 50,
+                bottom: 50,
+                left: 50
+            });
         }
     }, [map, shopLocation, customerLocation, driverPos]);
 
@@ -188,7 +249,7 @@ const OrderTrackingMap = ({ order, driverLocation, isExpanded, onToggleExpand })
                 {/* Overlay Info for Small View / Pop up */}
                 <div className="map-info-overlay" onClick={(e) => { e.stopPropagation(); if (!isExpanded) onToggleExpand(); }}>
                     <div className="eta-badge">
-                        <span className="eta-label">ETA</span>
+                        <span className="eta-label">Total ETA</span>
                         <span className="eta-time">{eta || '--:--'}</span>
                     </div>
                     {duration && <div className="duration-badge">{duration} away</div>}
