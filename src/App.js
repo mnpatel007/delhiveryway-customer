@@ -25,6 +25,7 @@ import OrderConfirmationPage from './pages/OrderConfirmationPage';
 import RevisedOrderPage from './pages/RevisedOrderPage';
 import OrderHistoryPage from './pages/OrderHistoryPage';
 import ContactPage from './pages/ContactPage';
+import LandingPage from './pages/LandingPage';
 
 import VerifyEmail from './pages/VerifyEmail';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
@@ -106,9 +107,10 @@ const AppContent = () => {
       <GlobalCustomerAlert />
       <BrowserRouter>
         <Layout>
-            <TermsModal />
-            <Routes>
+          <TermsModal />
+          <Routes>
             <Route path="/" element={<PrivateRoute><HomePage /></PrivateRoute>} />
+            <Route path="/welcome" element={<PrivateRoute><LandingPage /></PrivateRoute>} />
             <Route path="/search" element={<PrivateRoute><SearchPage /></PrivateRoute>} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignupPage />} />
