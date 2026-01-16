@@ -261,6 +261,26 @@ const OrderTrackingMap = ({ order, driverLocation, isExpanded, onToggleExpand })
                         ✕
                     </button>
                 )}
+
+                {/* DEBUG: Show coordinates if expanded */}
+                {isExpanded && (
+                    <div style={{
+                        position: 'absolute',
+                        bottom: '20px',
+                        left: '20px',
+                        background: 'rgba(0,0,0,0.7)',
+                        color: 'white',
+                        padding: '10px',
+                        fontSize: '12px',
+                        borderRadius: '8px',
+                        zIndex: 10001
+                    }}>
+                        <strong>Debug Info:</strong><br />
+                        Shopper Lat: {driverPos?.lat?.toFixed(4) || 'N/A'}<br />
+                        Shopper Lng: {driverPos?.lng?.toFixed(4) || 'N/A'}<br />
+                        ETA: {eta}
+                    </div>
+                )}
             </div>
         </div>
     );
