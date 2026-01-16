@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import ReactDOM from 'react-dom';
 import { GoogleMap, useJsApiLoader, Marker, DirectionsRenderer, InfoWindow } from '@react-google-maps/api';
+import { useSocket } from '../context/SocketContext';
 import './OrderTrackingMap.css';
 
 const containerStyle = {
@@ -17,6 +18,7 @@ const OrderTrackingMap = ({ order, driverLocation, isExpanded, onToggleExpand })
     const [distance, setDistance] = useState('');
     const [duration, setDuration] = useState('');
     const [eta, setEta] = useState(null);
+    const { socket } = useSocket();
 
     const { isLoaded, loadError } = useJsApiLoader({
         id: 'google-map-script',
@@ -166,6 +168,25 @@ const OrderTrackingMap = ({ order, driverLocation, isExpanded, onToggleExpand })
         }
     }, [map, shopLocation, customerLocation, driverPos]);
 
+    // Debug Listener
+    useEffect(() => {
+        if (!socket) return;
+
+        const handleDebugMsg = (data) => {
+            console.log('Server Debug Msg:', data); // Log to console too
+            window.debugServerMsg = data;
+            // Force re-render if needed, or just let the next render cycle pick it up
+            // Since this is debug only, we can use a forceUpdate or just relying on other updates
+            // A simple way to force render: setEta(prev => prev);
+        };
+
+        socket.on('debug_server_msg', handleDebugMsg);
+
+        return () => {
+            socket.off('debug_server_msg', handleDebugMsg);
+        };
+    }, [socket]);
+
     const onLoad = useCallback(function callback(map) {
         setMap(map);
     }, []);
@@ -262,23 +283,36 @@ const OrderTrackingMap = ({ order, driverLocation, isExpanded, onToggleExpand })
                     </button>
                 )}
 
-                {/* DEBUG: Show coordinates if expanded */}
+                {/* DEBUG: Show coordinates and SERVER messages if expanded */}
                 {isExpanded && (
                     <div style={{
                         position: 'absolute',
                         bottom: '20px',
                         left: '20px',
-                        background: 'rgba(0,0,0,0.7)',
-                        color: 'white',
-                        padding: '10px',
-                        fontSize: '12px',
+                        background: 'rgba(0,0,0,0.85)',
+                        color: '#00ff00',
+                        padding: '12px',
+                        fontSize: '11px',
                         borderRadius: '8px',
-                        zIndex: 10001
+                        zIndex: 10001,
+                        fontFamily: 'monospace',
+                        maxWidth: '300px'
                     }}>
-                        <strong>Debug Info:</strong><br />
-                        Shopper Lat: {driverPos?.lat?.toFixed(4) || 'N/A'}<br />
-                        Shopper Lng: {driverPos?.lng?.toFixed(4) || 'N/A'}<br />
-                        ETA: {eta}
+                        <strong>Client Debug:</strong><br />
+                        Lat: {driverPos?.lat?.toFixed(4) || 'N/A'}<br />
+                        Lng: {driverPos?.lng?.toFixed(4) || 'N/A'}<br />
+                        ETA: {eta}<br />
+                        Last Update: {new Date().toLocaleTimeString()}
+                        <div style={{ borderTop: '1px solid #555', marginTop: '8px', paddingTop: '8px' }}>
+                            <strong>Server Trace:</strong><br />
+                            {window.debugServerMsg ? (
+                                <>
+                                    Msg: {window.debugServerMsg.msg}<br />
+                                    Orders Found: {window.debugServerMsg.ordersFound}<br />
+                                    Shopper: {window.debugServerMsg.shopperId?.slice(-6)}
+                                </>
+                            ) : 'Waiting for server...'}
+                        </div>
                     </div>
                 )}
             </div>
