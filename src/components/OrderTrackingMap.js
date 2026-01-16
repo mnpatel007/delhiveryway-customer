@@ -19,7 +19,7 @@ const OrderTrackingMap = ({ order, driverLocation, isExpanded, onToggleExpand })
 
     const { isLoaded, loadError } = useJsApiLoader({
         id: 'google-map-script',
-        googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
+        googleMapsApiKey: 'AIzaSyAmK37yeYijXJ1lk6g3ptF_ex3Mrna5ExM',
         libraries
     });
 
