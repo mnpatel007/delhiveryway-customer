@@ -40,13 +40,21 @@ const ActiveOrdersWidget = () => {
 
                 console.log('Active orders loaded:', sortedOrders);
 
-                // Initialize driver locations from orders if available
                 const initialDriverLocations = {};
                 sortedOrders.forEach(order => {
                     if (order.personalShopperId?.currentLocation) {
                         initialDriverLocations[order._id] = order.personalShopperId.currentLocation;
                     } else if (order.shopperLocation) {
                         initialDriverLocations[order._id] = order.shopperLocation;
+                    } else if (order.shopId?.address?.coordinates) {
+                        // MOCK FOR TESTING: If no driver location, simulate them near the shop
+                        // Add a small random offset (approx 500m) to show distinct marker
+                        const lat = parseFloat(order.shopId.address.coordinates.lat);
+                        const lng = parseFloat(order.shopId.address.coordinates.lng);
+                        initialDriverLocations[order._id] = {
+                            latitude: lat + 0.005,
+                            longitude: lng + 0.005
+                        };
                     }
                 });
                 setDriverLocations(prev => ({ ...prev, ...initialDriverLocations }));
