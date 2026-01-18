@@ -94,7 +94,7 @@ const Layout = ({ children }) => {
       {!shouldHideNavbar && <Navbar />}
       {!shouldHideNavbar && <NotificationCenter />}
       {!shouldHideNavbar && <NoticeAlert />}
-      <SocketDebugPanel />
+      {!shouldHideNavbar && <SocketDebugPanel />}
       {children}
     </>
   );

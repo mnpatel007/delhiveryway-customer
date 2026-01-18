@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import './LandingPage.css';
@@ -6,93 +6,116 @@ import './LandingPage.css';
 const LandingPage = () => {
     const navigate = useNavigate();
     const { user, logout } = useAuth();
-    const [hoveredCard, setHoveredCard] = useState(null);
+    const containerRef = useRef(null);
+    const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
     const handleLogout = () => {
         logout();
         navigate('/');
     };
 
+    useEffect(() => {
+        const handleMouseMove = (e) => {
+            const { innerWidth, innerHeight } = window;
+            // Calculate normalized coordinates (-1 to 1)
+            const x = (e.clientX - innerWidth / 2) / (innerWidth / 2);
+            const y = (e.clientY - innerHeight / 2) / (innerHeight / 2);
+            setMousePosition({ x, y });
+        };
+        window.addEventListener('mousemove', handleMouseMove);
+        return () => window.removeEventListener('mousemove', handleMouseMove);
+    }, []);
+
     const sponsors = [
         {
-            id: 'gold',
-            tier: 'Gold Member',
+            id: 'quantum',
             name: 'Quantum Logistics',
-            perk: 'Priority Shipping',
-            description: 'Complimentary express upgrade on all domestic orders.',
-            style: 'card-gold'
+            img: '/assets/sponsor-quantum.png',
+            desc: 'Hyperspeed Transport Network'
         },
         {
-            id: 'platinum',
-            tier: 'Platinum Access',
+            id: 'aero',
             name: 'Aero-Shop',
-            perk: 'Drone Delivery',
-            description: 'Unlocks autonomous aerial delivery options in select cities.',
-            style: 'card-platinum'
+            img: '/assets/sponsor-aero.png',
+            desc: 'Autonomous Aerial Delivery'
         },
         {
-            id: 'black',
-            tier: 'Centurion',
+            id: 'nexus',
             name: 'Nexus Retail',
-            perk: 'Concierge Service',
-            description: '24/7 dedicated support team for all your shopping needs.',
-            style: 'card-black'
+            img: '/assets/sponsor-nexus.png',
+            desc: 'Global Digital Marketplace'
         }
     ];
 
+    // Compute parallax styles based on mouse position
+    const bgStyle = {
+        transform: `translate(${mousePosition.x * -20}px, ${mousePosition.y * -20}px) scale(1.1)`
+    };
+
+    const portalStyle = {
+        transform: `rotateY(${mousePosition.x * 20}deg) rotateX(${mousePosition.y * -20}deg)`
+    };
+
+    const contentStyle = {
+        transform: `translate(${mousePosition.x * 10}px, ${mousePosition.y * 10}px)`
+    };
+
     return (
-        <div className="luxury-container">
-            {/* Minimal Header */}
-            <header className="luxury-header">
-                <div className="user-profile">
-                    <div className="avatar-circle">
-                        {user?.name?.charAt(0).toUpperCase() || 'M'}
-                    </div>
+        <div className="omni-container" ref={containerRef}>
+            {/* Parallax Background */}
+            <div className="omni-bg" style={bgStyle}></div>
+            <div className="omni-overlay"></div>
+
+            {/* Omni-Header */}
+            <header className="omni-header">
+                <div className="user-module">
+                    <span className="user-id">CMD: {user?.name}</span>
+                    <button className="logout-btn-glitch" onClick={handleLogout} data-text="DISCONNECT">
+                        DISCONNECT
+                    </button>
                 </div>
-                <button className="logout-text-btn" onClick={handleLogout}>
-                    Logout
-                </button>
             </header>
 
-            {/* Hero Section */}
-            <main className="luxury-content">
-                <h1 className="hero-heading">
-                    The Art of <br />
-                    <span className="gold-text">Delivery.</span>
-                </h1>
-                <p className="hero-subtext">
-                    Experience a seamless connection between luxury retail and world-class logistics.
-                </p>
+            {/* Main Content */}
+            <main className="omni-main">
 
-                <button className="cta-button" onClick={() => navigate('/')}>
-                    Go to Dashboard
-                </button>
+                {/* 3D Portal Ring */}
+                <div className="portal-assembly" style={portalStyle}>
+                    <div className="ring ring-1"></div>
+                    <div className="ring ring-2"></div>
+                    <div className="ring ring-3"></div>
 
-                {/* Sponsor / Member Perks Section */}
-                <div className="perks-section">
-                    <p className="section-label">EXCLUSIVE MEMBER PRIVILEGES</p>
-                    <div className="cards-grid">
-                        {sponsors.map((sponsor) => (
-                            <div
-                                key={sponsor.id}
-                                className={`member-card ${sponsor.style} ${hoveredCard === sponsor.id ? 'active' : ''}`}
-                                onMouseEnter={() => setHoveredCard(sponsor.id)}
-                                onMouseLeave={() => setHoveredCard(null)}
-                            >
-                                <div className="card-chip"></div>
-                                <div className="card-content">
-                                    <span className="card-tier">{sponsor.tier}</span>
-                                    <h3 className="card-partner">{sponsor.name}</h3>
-                                    <div className="card-perk">
-                                        <span className="perk-title">{sponsor.perk}</span>
-                                        <p className="perk-desc">{sponsor.description}</p>
-                                    </div>
-                                </div>
-                                <div className="card-logo-watermark">DW</div>
-                            </div>
-                        ))}
+                    {/* Central Interaction Point */}
+                    <div className="portal-core" onClick={() => navigate('/')}>
+                        <div className="core-energy"></div>
+                        <span className="enter-text">ENTER UNIVERSE</span>
                     </div>
                 </div>
+
+                {/* Floating Sponsor Orbs */}
+                <div className="sponsor-orbit" style={contentStyle}>
+                    {sponsors.map((sponsor, index) => (
+                        <div key={sponsor.id} className={`orb-container orb-${index}`}>
+                            <div className="orb-visual">
+                                <img src={sponsor.img} alt={sponsor.name} className="sponsor-img" />
+                                <div className="orb-glow"></div>
+                            </div>
+                            <div className="orb-label">
+                                <h3>{sponsor.name}</h3>
+                                <p>{sponsor.desc}</p>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+
+                <div className="hud-overlay">
+                    <div className="hud-corner top-left"></div>
+                    <div className="hud-corner top-right"></div>
+                    <div className="hud-corner bottom-left"></div>
+                    <div className="hud-corner bottom-right"></div>
+                    <div className="tracking-line"></div>
+                </div>
+
             </main>
         </div>
     );
