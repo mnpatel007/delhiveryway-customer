@@ -17,7 +17,6 @@ const LandingPage = () => {
     useEffect(() => {
         const handleMouseMove = (e) => {
             const { innerWidth, innerHeight } = window;
-            // Calculate normalized coordinates (-1 to 1)
             const x = (e.clientX - innerWidth / 2) / (innerWidth / 2);
             const y = (e.clientY - innerHeight / 2) / (innerHeight / 2);
             setMousePosition({ x, y });
@@ -31,92 +30,82 @@ const LandingPage = () => {
             id: 'quantum',
             name: 'Quantum Logistics',
             img: '/assets/sponsor-quantum.png',
-            desc: 'Hyperspeed Transport Network'
+            desc: 'Hyperspeed Transport',
+            position: 'top-left'
         },
         {
             id: 'aero',
             name: 'Aero-Shop',
             img: '/assets/sponsor-aero.png',
-            desc: 'Autonomous Aerial Delivery'
+            desc: 'Aerial Autonomous',
+            position: 'top-right'
         },
         {
             id: 'nexus',
             name: 'Nexus Retail',
             img: '/assets/sponsor-nexus.png',
-            desc: 'Global Digital Marketplace'
+            desc: 'Global Marketplace',
+            position: 'bottom-left'
+        },
+        {
+            id: 'eco',
+            name: 'Eco-Motion',
+            img: '/assets/sponsor-quantum.png', // Reusing with hue-rotate
+            desc: 'Sustainable Energy',
+            position: 'bottom-right',
+            className: 'hue-rotate-filter'
         }
     ];
 
-    // Compute parallax styles based on mouse position
     const bgStyle = {
-        transform: `translate(${mousePosition.x * -20}px, ${mousePosition.y * -20}px) scale(1.1)`
+        transform: `translate(${mousePosition.x * -30}px, ${mousePosition.y * -30}px) scale(1.1)`
     };
 
-    const portalStyle = {
-        transform: `rotateY(${mousePosition.x * 20}deg) rotateX(${mousePosition.y * -20}deg)`
-    };
-
-    const contentStyle = {
-        transform: `translate(${mousePosition.x * 10}px, ${mousePosition.y * 10}px)`
+    const text3DStyle = {
+        transform: `rotateY(${mousePosition.x * 10}deg) rotateX(${mousePosition.y * -10}deg)`
     };
 
     return (
         <div className="omni-container" ref={containerRef}>
-            {/* Parallax Background */}
             <div className="omni-bg" style={bgStyle}></div>
             <div className="omni-overlay"></div>
 
-            {/* Omni-Header */}
-            <header className="omni-header">
-                <div className="user-module">
-                    <span className="user-id">CMD: {user?.name}</span>
-                    <button className="logout-btn-glitch" onClick={handleLogout} data-text="DISCONNECT">
-                        DISCONNECT
-                    </button>
-                </div>
-            </header>
+            {/* Header (Avatar Only) */}
+            <div className="corner-user-profile" onClick={handleLogout}>
+                <div className="user-avatar-glitch" data-initial={user?.name?.charAt(0) || 'U'}></div>
+                <span className="logout-tooltip">LOGOUT</span>
+            </div>
 
-            {/* Main Content */}
+            {/* Main Centerpiece */}
             <main className="omni-main">
-
-                {/* 3D Portal Ring */}
-                <div className="portal-assembly" style={portalStyle}>
-                    <div className="ring ring-1"></div>
-                    <div className="ring ring-2"></div>
-                    <div className="ring ring-3"></div>
-
-                    {/* Central Interaction Point */}
-                    <div className="portal-core" onClick={() => navigate('/')}>
-                        <div className="core-energy"></div>
-                        <span className="enter-text">ENTER UNIVERSE</span>
-                    </div>
+                <div className="brand-assembly" style={text3DStyle} onClick={() => navigate('/')}>
+                    <h1 className="mega-brand" data-text="DELHIVERYWAY">DELHIVERYWAY</h1>
+                    <div className="brand-subtitle">ENTER THE FUTURE OF LOGISTICS</div>
+                    <div className="click-indicator">CLICK TO ENTER</div>
                 </div>
-
-                {/* Floating Sponsor Orbs */}
-                <div className="sponsor-orbit" style={contentStyle}>
-                    {sponsors.map((sponsor, index) => (
-                        <div key={sponsor.id} className={`orb-container orb-${index}`}>
-                            <div className="orb-visual">
-                                <img src={sponsor.img} alt={sponsor.name} className="sponsor-img" />
-                                <div className="orb-glow"></div>
-                            </div>
-                            <div className="orb-label">
-                                <h3>{sponsor.name}</h3>
-                                <p>{sponsor.desc}</p>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-
-                <div className="hud-overlay">
-                    <div className="hud-corner top-left"></div>
-                    <div className="hud-corner top-right"></div>
-                    <div className="hud-corner bottom-left"></div>
-                    <div className="hud-corner bottom-right"></div>
-                    <div className="tracking-line"></div>
-                </div>
-
             </main>
+
+            {/* 4 Corner Sponsors */}
+            <div className="corner-sponsors">
+                {sponsors.map((sponsor) => (
+                    <div key={sponsor.id} className={`floating-orb ${sponsor.position}`}>
+                        <div className="orb-glass-circle">
+                            <img
+                                src={sponsor.img}
+                                alt={sponsor.name}
+                                className={`orb-img ${sponsor.className || ''}`}
+                            />
+                            <div className="orb-shine"></div>
+                        </div>
+                        <div className="orb-tooltip">
+                            <h4>{sponsor.name}</h4>
+                            <p>{sponsor.desc}</p>
+                        </div>
+                    </div>
+                ))}
+            </div>
+
+            <div className="vignette-overlay"></div>
         </div>
     );
 };
