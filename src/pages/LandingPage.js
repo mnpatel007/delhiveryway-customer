@@ -25,36 +25,24 @@ const LandingPage = () => {
         return () => window.removeEventListener('mousemove', handleMouseMove);
     }, []);
 
-    const sponsors = [
-        { id: 'quantum', name: 'Quantum Logistics', img: '/assets/sponsor-quantum.png', position: 'top-left' },
-        { id: 'aero', name: 'Aero-Shop', img: '/assets/sponsor-aero.png', position: 'top-right' },
-        { id: 'nexus', name: 'Nexus Retail', img: '/assets/sponsor-nexus.png', position: 'bottom-left' },
-        { id: 'eco', name: 'Eco-Motion', img: '/assets/sponsor-quantum.png', position: 'bottom-right', className: 'hue-rotate-filter' }
+    const leftSponsors = [
+        { id: 'quantum', name: 'Quantum Logistics', img: '/assets/sponsor-quantum.png', desc: 'Hyperspeed Transport' },
+        { id: 'nexus', name: 'Nexus Retail', img: '/assets/sponsor-nexus.png', desc: 'Global Marketplace' }
+    ];
+
+    const rightSponsors = [
+        { id: 'aero', name: 'Aero-Shop', img: '/assets/sponsor-aero.png', desc: 'Aerial Systems' },
+        { id: 'eco', name: 'Eco-Motion', img: '/assets/sponsor-quantum.png', desc: 'Sustainable Power', className: 'hue-rotate-filter' }
     ];
 
     const stories = [
-        {
-            id: 1,
-            label: 'DIRECT PICKUP',
-            text: 'We collect directly from localized partners.',
-            img: '/assets/story-pickup-v2.png'
-        },
-        {
-            id: 2,
-            label: 'SWIFT TRANSIT',
-            text: 'Hyper-local fleet guarantees speed.',
-            img: '/assets/story-scooter.png'
-        },
-        {
-            id: 3,
-            label: 'DOORSTEP DELIGHT',
-            text: 'Verified safe delivery to your home.',
-            img: '/assets/story-customer.png'
-        }
+        { id: 1, label: 'DIRECT PICKUP', text: 'We collect directly from localized partners.', img: '/assets/story-pickup-v2.png' },
+        { id: 2, label: 'SWIFT TRANSIT', text: 'Hyper-local fleet guarantees speed.', img: '/assets/story-scooter.png' },
+        { id: 3, label: 'DOORSTEP DELIGHT', text: 'Verified safe delivery to your home.', img: '/assets/story-customer.png' }
     ];
 
     const bgStyle = {
-        transform: `translate(${mousePosition.x * -30}px, ${mousePosition.y * -30}px) scale(1.1)`
+        transform: `translate(${mousePosition.x * -20}px, ${mousePosition.y * -20}px) scale(1.1)`
     };
 
     const text3DStyle = {
@@ -76,19 +64,26 @@ const LandingPage = () => {
                 </div>
             </header>
 
-            {/* Labels */}
-            <h2 className="sponsor-label label-left">PROUD<br />SPONSORS</h2>
-            <h2 className="sponsor-label label-right">PROUD<br />SPONSORS</h2>
+            {/* LEFT PILLAR */}
+            <div className="side-pillar left-pillar">
+                <div className="pillar-header">PROUD SPONSORS</div>
+                {leftSponsors.map((sponsor) => (
+                    <div key={sponsor.id} className="sponsor-rect glass-panel">
+                        <div className="rect-content">
+                            <img src={sponsor.img} alt={sponsor.name} className={`rect-img ${sponsor.className || ''}`} />
+                            <h3>{sponsor.name}</h3>
+                            <p>{sponsor.desc}</p>
+                        </div>
+                    </div>
+                ))}
+            </div>
 
-            {/* Main Centerpiece (Scrollable container if needed on small screens) */}
-            <main className="omni-main">
+            {/* CENTER STAGE */}
+            <main className="omni-main-center">
                 <div className="center-stack" style={text3DStyle}>
-
-                    {/* 1. Title */}
                     <h1 className="mega-brand" data-text="DELHIVERYWAY">DELHIVERYWAY</h1>
                     <div className="brand-subtitle">HYPER-LOCAL • HYPER-FAST • AUTHENTIC</div>
 
-                    {/* 2. Story Deck (Above Button) */}
                     <div className="story-deck-inline">
                         {stories.map((story) => (
                             <div key={story.id} className="story-card">
@@ -103,30 +98,24 @@ const LandingPage = () => {
                         ))}
                     </div>
 
-                    {/* 3. The Big Vibrant Button */}
                     <div className="enter-btn-wrapper" onClick={() => navigate('/')}>
                         <button className="vibrant-enter-btn">
                             ENTER THE FUTURE
                             <div className="btn-glow"></div>
                         </button>
                     </div>
-
                 </div>
             </main>
 
-            {/* 4 Corner Sponsors (Fixed Absolute) */}
-            <div className="corner-sponsors">
-                {sponsors.map((sponsor) => (
-                    <div key={sponsor.id} className={`floating-orb ${sponsor.position}`}>
-                        <div className="orb-glass-circle">
-                            <img
-                                src={sponsor.img}
-                                alt={sponsor.name}
-                                className={`orb-img ${sponsor.className || ''}`}
-                            />
-                        </div>
-                        <div className="orb-tooltip-fixed">
-                            <h4>{sponsor.name}</h4>
+            {/* RIGHT PILLAR */}
+            <div className="side-pillar right-pillar">
+                <div className="pillar-header">PROUD SPONSORS</div>
+                {rightSponsors.map((sponsor) => (
+                    <div key={sponsor.id} className="sponsor-rect glass-panel">
+                        <div className="rect-content">
+                            <img src={sponsor.img} alt={sponsor.name} className={`rect-img ${sponsor.className || ''}`} />
+                            <h3>{sponsor.name}</h3>
+                            <p>{sponsor.desc}</p>
                         </div>
                     </div>
                 ))}

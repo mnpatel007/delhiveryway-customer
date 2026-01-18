@@ -4,7 +4,6 @@
     --neon-cyan: #00f3ff;
     --neon-pink: #bc13fe;
     --neon-gold: #ffd700;
-    --deep-blue: #0a1128;
 }
 
 body {
@@ -21,6 +20,8 @@ body {
     color: white;
     perspective: 1200px;
     overflow: hidden;
+    display: flex;
+    /* Flex container for 3 columns */
 }
 
 .omni-bg {
@@ -38,7 +39,7 @@ body {
 .omni-overlay {
     position: absolute;
     inset: 0;
-    background: radial-gradient(circle at center, transparent 0%, #000 85%);
+    background: radial-gradient(circle at center, transparent 0%, #000 90%);
     z-index: 1;
     pointer-events: none;
 }
@@ -60,7 +61,6 @@ body {
     align-items: center;
     gap: 2rem;
     backdrop-filter: blur(10px);
-    box-shadow: 0 0 15px rgba(0, 243, 255, 0.2);
 }
 
 .user-id {
@@ -87,17 +87,100 @@ body {
     box-shadow: 0 0 15px var(--neon-pink);
 }
 
-/* Layout Core */
-.omni-main {
-    position: relative;
+/* --- PILLARS (The New Layout) --- */
+.side-pillar {
+    width: 22%;
+    /* Approx 1/4 - margin */
+    height: 100vh;
     z-index: 50;
-    /* Higher than background but below overlay sponsors if needed */
-    width: 100%;
-    height: 100%;
     display: flex;
     flex-direction: column;
+    padding: 10px;
+    gap: 20px;
+    background: rgba(0, 0, 0, 0.2);
+    /* Slight tint for pillars */
+    border-right: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.right-pillar {
+    border-right: none;
+    border-left: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.pillar-header {
+    text-align: center;
+    font-family: 'Orbitron';
+    color: rgba(255, 255, 255, 0.7);
+    letter-spacing: 3px;
+    font-size: 0.9rem;
+    margin-top: 10px;
+    text-shadow: 0 0 10px var(--neon-cyan);
+}
+
+.sponsor-rect {
+    flex: 1;
+    /* Take up 50% height each */
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    backdrop-filter: blur(5px);
+    display: flex;
     justify-content: center;
     align-items: center;
+    transition: 0.4s;
+    cursor: pointer;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+}
+
+.sponsor-rect:hover {
+    background: rgba(0, 0, 0, 0.8);
+    border-color: var(--neon-cyan);
+    transform: scale(1.02);
+    box-shadow: 0 0 30px var(--neon-cyan), inset 0 0 20px rgba(0, 243, 255, 0.2);
+    z-index: 10;
+}
+
+.rect-content {
+    text-align: center;
+    padding: 1rem;
+}
+
+.rect-img {
+    width: 100%;
+    max-height: 120px;
+    object-fit: contain;
+    margin-bottom: 1rem;
+    filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));
+}
+
+.hue-rotate-filter {
+    filter: hue-rotate(90deg) drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));
+}
+
+.rect-content h3 {
+    margin: 0;
+    font-family: 'Orbitron';
+    color: white;
+    font-size: 1rem;
+}
+
+.rect-content p {
+    margin: 5px 0 0 0;
+    color: #bbb;
+    font-size: 0.8rem;
+}
+
+/* --- CENTER CONTENT --- */
+.omni-main-center {
+    flex: 1;
+    /* Occupy remaining space */
+    z-index: 50;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
 }
 
 .center-stack {
@@ -107,68 +190,64 @@ body {
     align-items: center;
     gap: 2rem;
     transform-style: preserve-3d;
+    max-width: 90%;
 }
 
-/* 1. Title */
 .mega-brand {
     font-family: 'Orbitron', sans-serif;
     font-weight: 900;
-    font-size: 5rem;
+    font-size: 4rem;
+    /* Slightly smaller to fit */
     margin: 0;
     color: #fff;
     text-shadow: 0 0 20px var(--neon-cyan);
-    letter-spacing: 10px;
+    letter-spacing: 8px;
 }
 
 .brand-subtitle {
-    font-size: 1.2rem;
-    letter-spacing: 8px;
+    font-size: 1rem;
+    letter-spacing: 6px;
     color: var(--neon-cyan);
     text-transform: uppercase;
 }
 
-/* 2. Story Deck (Inline) */
 .story-deck-inline {
     display: flex;
-    gap: 1.5rem;
+    gap: 1rem;
     margin: 1rem 0;
+    flex-wrap: wrap;
+    /* Wrap if needed on smaller screens */
+    justify-content: center;
 }
 
 .story-card {
     background: rgba(0, 0, 0, 0.7);
     border: 1px solid rgba(255, 255, 255, 0.15);
-    backdrop-filter: blur(15px);
-    padding: 15px;
+    padding: 10px;
     border-radius: 12px;
-    width: 220px;
+    width: 200px;
+    /* Slightly smaller */
     text-align: left;
     transition: 0.3s;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
 
 .story-card:hover {
     transform: translateY(-5px);
     border-color: var(--neon-gold);
-    box-shadow: 0 0 20px rgba(255, 215, 0, 0.2);
 }
 
 .story-img-frame {
     width: 100%;
-    height: 120px;
+    height: 100px;
     overflow: hidden;
     border-radius: 8px;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
 }
 
 .story-img-frame img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: 0.5s;
-}
-
-.story-card:hover img {
-    transform: scale(1.1);
 }
 
 .story-content h3 {
@@ -179,24 +258,19 @@ body {
 }
 
 .story-content p {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     color: #ccc;
-    line-height: 1.3;
     margin: 0;
+    line-height: 1.2;
 }
 
-/* 3. The Button (Vibrant) */
-.enter-btn-wrapper {
-    margin-top: 1rem;
-}
-
+/* Button */
 .vibrant-enter-btn {
     position: relative;
     background: linear-gradient(90deg, #ff00cc, #333399);
-    /* Vibrant Purple/Pink */
     border: none;
-    padding: 1rem 4rem;
-    font-size: 1.2rem;
+    padding: 1rem 3rem;
+    font-size: 1.1rem;
     font-family: 'Orbitron';
     font-weight: 700;
     color: white;
@@ -204,7 +278,6 @@ body {
     letter-spacing: 4px;
     cursor: pointer;
     border-radius: 50px;
-    /* Pill shape */
     overflow: hidden;
     transition: 0.4s;
     box-shadow: 0 0 20px rgba(188, 19, 254, 0.6);
@@ -213,209 +286,8 @@ body {
 .vibrant-enter-btn:hover {
     transform: scale(1.05);
     box-shadow: 0 0 40px rgba(188, 19, 254, 0.9);
-    filter: brightness(1.2);
 }
 
-.btn-glow {
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(circle, rgba(255, 255, 255, 0.3), transparent 60%);
-    animation: rotate 4s linear infinite;
-    pointer-events: none;
-}
-
-@keyframes rotate {
-    0% {
-        transform: rotate(0deg);
-    }
-
-    100% {
-        transform: rotate(360deg);
-    }
-}
-
-/* Sponsors & Layout */
-.corner-sponsors {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    z-index: 100;
-}
-
-.floating-orb {
-    position: absolute;
-    pointer-events: auto;
-    /* Enable hover */
-    cursor: pointer;
-    transition: 0.3s;
-}
-
-.floating-orb:hover {
-    transform: scale(1.1);
-}
-
-.orb-glass-circle {
-    width: 90px;
-    height: 90px;
-    border-radius: 50%;
-    background: rgba(0, 0, 0, 0.6);
-    border: 1px solid var(--neon-cyan);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    box-shadow: 0 0 15px var(--neon-cyan);
-}
-
-.floating-orb:hover .orb-glass-circle {
-    background: rgba(0, 243, 255, 0.2);
-    box-shadow: 0 0 30px var(--neon-cyan);
-}
-
-.orb-img {
-    width: 60%;
-    height: 60%;
-    object-fit: contain;
-}
-
-.hue-rotate-filter {
-    filter: hue-rotate(90deg);
-}
-
-.orb-tooltip-fixed {
-    position: absolute;
-    background: #000;
-    border: 1px solid var(--neon-cyan);
-    color: white;
-    padding: 5px 10px;
-    border-radius: 4px;
-    white-space: nowrap;
-    opacity: 0;
-    transition: 0.3s;
-    pointer-events: none;
-    z-index: 200;
-}
-
-.floating-orb:hover .orb-tooltip-fixed {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-/* Positions */
-.top-left {
-    top: 60px;
-    left: 40px;
-    animation: float1 6s infinite;
-}
-
-.top-left .orb-tooltip-fixed {
-    left: 100%;
-    top: 30%;
-    transform: translateX(10px);
-}
-
-.top-right {
-    top: 60px;
-    right: 40px;
-    animation: float2 7s infinite;
-}
-
-.top-right .orb-tooltip-fixed {
-    right: 100%;
-    top: 30%;
-    transform: translateX(-10px);
-}
-
-.bottom-left {
-    bottom: 60px;
-    left: 40px;
-    animation: float3 8s infinite;
-}
-
-.bottom-left .orb-tooltip-fixed {
-    left: 100%;
-    top: 30%;
-    transform: translateX(10px);
-}
-
-.bottom-right {
-    bottom: 60px;
-    right: 40px;
-    animation: float4 6s infinite;
-}
-
-.bottom-right .orb-tooltip-fixed {
-    right: 100%;
-    top: 30%;
-    transform: translateX(-10px);
-}
-
-.sponsor-label {
-    position: absolute;
-    top: 90px;
-    font-family: 'Orbitron';
-    font-size: 0.7rem;
-    color: rgba(255, 255, 255, 0.6);
-    z-index: 90;
-    letter-spacing: 3px;
-}
-
-.label-left {
-    left: 140px;
-    text-align: left;
-}
-
-.label-right {
-    right: 140px;
-    text-align: right;
-}
-
-@keyframes float1 {
-
-    0%,
-    100% {
-        transform: translate(0, 0);
-    }
-
-    50% {
-        transform: translate(0, -10px);
-    }
-}
-
-@keyframes float2 {
-
-    0%,
-    100% {
-        transform: translate(0, 0);
-    }
-
-    50% {
-        transform: translate(0, 10px);
-    }
-}
-
-@keyframes float3 {
-
-    0%,
-    100% {
-        transform: translate(0, 0);
-    }
-
-    50% {
-        transform: translate(5px, -5px);
-    }
-}
-
-@keyframes float4 {
-
-    0%,
-    100% {
-        transform: translate(0, 0);
-    }
-
-    50% {
-        transform: translate(-5px, -5px);
-    }
+input {
+    user-select: none;
 }
