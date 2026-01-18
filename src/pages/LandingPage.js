@@ -15,6 +15,18 @@ const LandingPage = () => {
     };
 
     useEffect(() => {
+        // Lock scroll and set background only for Landing Page
+        document.body.style.overflow = 'hidden';
+        document.body.style.background = '#000';
+
+        return () => {
+            // Cleanup: Restore default styles when leaving
+            document.body.style.overflow = 'auto';
+            document.body.style.background = '';
+        };
+    }, []);
+
+    useEffect(() => {
         const handleMouseMove = (e) => {
             const { innerWidth, innerHeight } = window;
             const x = (e.clientX - innerWidth / 2) / (innerWidth / 2);

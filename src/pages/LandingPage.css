@@ -6,11 +6,7 @@
     --neon-gold: #ffd700;
 }
 
-body {
-    margin: 0;
-    overflow: hidden;
-    background: #000;
-}
+/* Body styles moved to component lifecycle */
 
 .omni-container {
     width: 100vw;
