@@ -26,34 +26,30 @@ const LandingPage = () => {
     }, []);
 
     const sponsors = [
+        { id: 'quantum', name: 'Quantum Logistics', img: '/assets/sponsor-quantum.png', position: 'top-left' },
+        { id: 'aero', name: 'Aero-Shop', img: '/assets/sponsor-aero.png', position: 'top-right' },
+        { id: 'nexus', name: 'Nexus Retail', img: '/assets/sponsor-nexus.png', position: 'bottom-left' },
+        { id: 'eco', name: 'Eco-Motion', img: '/assets/sponsor-quantum.png', position: 'bottom-right', className: 'hue-rotate-filter' }
+    ];
+
+    const stories = [
         {
-            id: 'quantum',
-            name: 'Quantum Logistics',
-            img: '/assets/sponsor-quantum.png',
-            desc: 'Hyperspeed Transport',
-            position: 'top-left'
+            id: 1,
+            label: 'DIRECT PICKUP',
+            text: 'We collect directly from your favorite local shops.',
+            img: '/assets/story-pickup.png'
         },
         {
-            id: 'aero',
-            name: 'Aero-Shop',
-            img: '/assets/sponsor-aero.png',
-            desc: 'Aerial Autonomous',
-            position: 'top-right'
+            id: 2,
+            label: 'SWIFT TRANSIT',
+            text: 'Our hyper-local fleet ensures minutes-away delivery.',
+            img: '/assets/story-scooter.png'
         },
         {
-            id: 'nexus',
-            name: 'Nexus Retail',
-            img: '/assets/sponsor-nexus.png',
-            desc: 'Global Marketplace',
-            position: 'bottom-left'
-        },
-        {
-            id: 'eco',
-            name: 'Eco-Motion',
-            img: '/assets/sponsor-quantum.png', // Reusing with hue-rotate
-            desc: 'Sustainable Energy',
-            position: 'bottom-right',
-            className: 'hue-rotate-filter'
+            id: 3,
+            label: 'DOORSTEP DELIGHT',
+            text: 'Verified, safe, and contactless delivery to your door.',
+            img: '/assets/story-customer.png'
         }
     ];
 
@@ -70,20 +66,43 @@ const LandingPage = () => {
             <div className="omni-bg" style={bgStyle}></div>
             <div className="omni-overlay"></div>
 
-            {/* Header (Avatar Only) */}
-            <div className="corner-user-profile" onClick={handleLogout}>
-                <div className="user-avatar-glitch" data-initial={user?.name?.charAt(0) || 'U'}></div>
-                <span className="logout-tooltip">LOGOUT</span>
-            </div>
+            {/* Restored 4.0 Header */}
+            <header className="omni-header">
+                <div className="user-module">
+                    <span className="user-id">CMD: {user?.name}</span>
+                    <button className="logout-btn-glitch" onClick={handleLogout} data-text="DISCONNECT">
+                        DISCONNECT
+                    </button>
+                </div>
+            </header>
+
+            {/* "PROUD SPONSORS" Labels */}
+            <h2 className="sponsor-label label-left">PROUD<br />SPONSORS</h2>
+            <h2 className="sponsor-label label-right">PROUD<br />SPONSORS</h2>
 
             {/* Main Centerpiece */}
             <main className="omni-main">
                 <div className="brand-assembly" style={text3DStyle} onClick={() => navigate('/')}>
                     <h1 className="mega-brand" data-text="DELHIVERYWAY">DELHIVERYWAY</h1>
-                    <div className="brand-subtitle">ENTER THE FUTURE OF LOGISTICS</div>
+                    <div className="brand-subtitle">HYPER-LOCAL • HYPER-FAST • AUTHENTIC</div>
                     <div className="click-indicator">CLICK TO ENTER</div>
                 </div>
             </main>
+
+            {/* Visual Story Deck (Bottom) */}
+            <div className="story-deck">
+                {stories.map((story) => (
+                    <div key={story.id} className="story-card">
+                        <div className="story-img-frame">
+                            <img src={story.img} alt={story.label} />
+                        </div>
+                        <div className="story-content">
+                            <h3>{story.label}</h3>
+                            <p>{story.text}</p>
+                        </div>
+                    </div>
+                ))}
+            </div>
 
             {/* 4 Corner Sponsors */}
             <div className="corner-sponsors">
@@ -96,10 +115,6 @@ const LandingPage = () => {
                                 className={`orb-img ${sponsor.className || ''}`}
                             />
                             <div className="orb-shine"></div>
-                        </div>
-                        <div className="orb-tooltip">
-                            <h4>{sponsor.name}</h4>
-                            <p>{sponsor.desc}</p>
                         </div>
                     </div>
                 ))}
