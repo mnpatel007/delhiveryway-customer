@@ -36,19 +36,19 @@ const LandingPage = () => {
         {
             id: 1,
             label: 'DIRECT PICKUP',
-            text: 'We collect directly from your favorite local shops.',
-            img: '/assets/story-pickup.png'
+            text: 'We collect directly from localized partners.',
+            img: '/assets/story-pickup-v2.png'
         },
         {
             id: 2,
             label: 'SWIFT TRANSIT',
-            text: 'Our hyper-local fleet ensures minutes-away delivery.',
+            text: 'Hyper-local fleet guarantees speed.',
             img: '/assets/story-scooter.png'
         },
         {
             id: 3,
             label: 'DOORSTEP DELIGHT',
-            text: 'Verified, safe, and contactless delivery to your door.',
+            text: 'Verified safe delivery to your home.',
             img: '/assets/story-customer.png'
         }
     ];
@@ -58,7 +58,7 @@ const LandingPage = () => {
     };
 
     const text3DStyle = {
-        transform: `rotateY(${mousePosition.x * 10}deg) rotateX(${mousePosition.y * -10}deg)`
+        transform: `rotateY(${mousePosition.x * 5}deg) rotateX(${mousePosition.y * -5}deg)`
     };
 
     return (
@@ -66,7 +66,7 @@ const LandingPage = () => {
             <div className="omni-bg" style={bgStyle}></div>
             <div className="omni-overlay"></div>
 
-            {/* Restored 4.0 Header */}
+            {/* Header */}
             <header className="omni-header">
                 <div className="user-module">
                     <span className="user-id">CMD: {user?.name}</span>
@@ -76,35 +76,45 @@ const LandingPage = () => {
                 </div>
             </header>
 
-            {/* "PROUD SPONSORS" Labels */}
+            {/* Labels */}
             <h2 className="sponsor-label label-left">PROUD<br />SPONSORS</h2>
             <h2 className="sponsor-label label-right">PROUD<br />SPONSORS</h2>
 
-            {/* Main Centerpiece */}
+            {/* Main Centerpiece (Scrollable container if needed on small screens) */}
             <main className="omni-main">
-                <div className="brand-assembly" style={text3DStyle} onClick={() => navigate('/')}>
+                <div className="center-stack" style={text3DStyle}>
+
+                    {/* 1. Title */}
                     <h1 className="mega-brand" data-text="DELHIVERYWAY">DELHIVERYWAY</h1>
                     <div className="brand-subtitle">HYPER-LOCAL • HYPER-FAST • AUTHENTIC</div>
-                    <div className="click-indicator">CLICK TO ENTER</div>
+
+                    {/* 2. Story Deck (Above Button) */}
+                    <div className="story-deck-inline">
+                        {stories.map((story) => (
+                            <div key={story.id} className="story-card">
+                                <div className="story-img-frame">
+                                    <img src={story.img} alt={story.label} />
+                                </div>
+                                <div className="story-content">
+                                    <h3>{story.label}</h3>
+                                    <p>{story.text}</p>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* 3. The Big Vibrant Button */}
+                    <div className="enter-btn-wrapper" onClick={() => navigate('/')}>
+                        <button className="vibrant-enter-btn">
+                            ENTER THE FUTURE
+                            <div className="btn-glow"></div>
+                        </button>
+                    </div>
+
                 </div>
             </main>
 
-            {/* Visual Story Deck (Bottom) */}
-            <div className="story-deck">
-                {stories.map((story) => (
-                    <div key={story.id} className="story-card">
-                        <div className="story-img-frame">
-                            <img src={story.img} alt={story.label} />
-                        </div>
-                        <div className="story-content">
-                            <h3>{story.label}</h3>
-                            <p>{story.text}</p>
-                        </div>
-                    </div>
-                ))}
-            </div>
-
-            {/* 4 Corner Sponsors */}
+            {/* 4 Corner Sponsors (Fixed Absolute) */}
             <div className="corner-sponsors">
                 {sponsors.map((sponsor) => (
                     <div key={sponsor.id} className={`floating-orb ${sponsor.position}`}>
@@ -114,7 +124,9 @@ const LandingPage = () => {
                                 alt={sponsor.name}
                                 className={`orb-img ${sponsor.className || ''}`}
                             />
-                            <div className="orb-shine"></div>
+                        </div>
+                        <div className="orb-tooltip-fixed">
+                            <h4>{sponsor.name}</h4>
                         </div>
                     </div>
                 ))}

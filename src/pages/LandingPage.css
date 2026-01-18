@@ -4,6 +4,7 @@
     --neon-cyan: #00f3ff;
     --neon-pink: #bc13fe;
     --neon-gold: #ffd700;
+    --deep-blue: #0a1128;
 }
 
 body {
@@ -22,25 +23,22 @@ body {
     overflow: hidden;
 }
 
-/* Background */
 .omni-bg {
     position: absolute;
-    top: -5%;
-    left: -5%;
+    inset: -5%;
     width: 110%;
     height: 110%;
     background-image: url('../../public/assets/bg-cyberpunk.png');
     background-size: cover;
     background-position: center;
     z-index: 0;
-    filter: brightness(0.5);
-    transition: transform 0.15s ease-out;
+    filter: brightness(0.4);
 }
 
 .omni-overlay {
     position: absolute;
     inset: 0;
-    background: radial-gradient(circle at center, transparent 0%, #000 90%);
+    background: radial-gradient(circle at center, transparent 0%, #000 85%);
     z-index: 1;
     pointer-events: none;
 }
@@ -55,13 +53,14 @@ body {
 }
 
 .user-module {
-    background: rgba(0, 0, 0, 0.7);
+    background: rgba(0, 0, 0, 0.8);
     border: 1px solid var(--neon-cyan);
     padding: 0.5rem 1.5rem;
     display: flex;
     align-items: center;
     gap: 2rem;
     backdrop-filter: blur(10px);
+    box-shadow: 0 0 15px rgba(0, 243, 255, 0.2);
 }
 
 .user-id {
@@ -77,10 +76,10 @@ body {
     color: white;
     font-family: 'Rajdhani';
     font-size: 1rem;
-    padding: 0.3rem 1rem;
     cursor: pointer;
-    transition: 0.3s;
     font-weight: 700;
+    padding: 0.3rem 1rem;
+    transition: 0.3s;
 }
 
 .logout-btn-glitch:hover {
@@ -88,49 +87,29 @@ body {
     box-shadow: 0 0 15px var(--neon-pink);
 }
 
-/* Sponsor Labels */
-.sponsor-label {
-    position: absolute;
-    top: 50px;
-    font-family: 'Orbitron';
-    font-size: 0.8rem;
-    color: rgba(255, 255, 255, 0.5);
-    z-index: 40;
-    letter-spacing: 4px;
-    line-height: 1.5;
-}
-
-.label-left {
-    left: 160px;
-    text-align: left;
-}
-
-.label-right {
-    right: 160px;
-    text-align: right;
-}
-
-/* Main Brand */
+/* Layout Core */
 .omni-main {
     position: relative;
-    z-index: 10;
+    z-index: 50;
+    /* Higher than background but below overlay sponsors if needed */
     width: 100%;
-    height: 60%;
-    /* Adjusted height to make room for bottom deck */
+    height: 100%;
     display: flex;
+    flex-direction: column;
     justify-content: center;
-    align-items: flex-end;
-    /* Push text up slightly */
-    padding-bottom: 2rem;
+    align-items: center;
+}
+
+.center-stack {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
     transform-style: preserve-3d;
 }
 
-.brand-assembly {
-    text-align: center;
-    cursor: pointer;
-    transition: transform 0.2s ease-out;
-}
-
+/* 1. Title */
 .mega-brand {
     font-family: 'Orbitron', sans-serif;
     font-weight: 900;
@@ -138,83 +117,46 @@ body {
     margin: 0;
     color: #fff;
     text-shadow: 0 0 20px var(--neon-cyan);
-    position: relative;
     letter-spacing: 10px;
-}
-
-.mega-brand::before {
-    content: attr(data-text);
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    color: var(--neon-pink);
-    z-index: -1;
-    transform: translate(3px, 3px);
-    opacity: 0.5;
-    mix-blend-mode: hard-light;
 }
 
 .brand-subtitle {
     font-size: 1.2rem;
-    letter-spacing: 6px;
+    letter-spacing: 8px;
     color: var(--neon-cyan);
-    margin-top: 1rem;
     text-transform: uppercase;
 }
 
-.click-indicator {
-    margin-top: 2rem;
-    font-size: 0.8rem;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    display: inline-block;
-    padding: 0.5rem 2rem;
-    border-radius: 20px;
-    background: rgba(0, 0, 0, 0.5);
-    transition: 0.3s;
-}
-
-.brand-assembly:hover .click-indicator {
-    background: var(--neon-cyan);
-    color: black;
-}
-
-/* Visual Story Deck */
-.story-deck {
-    position: absolute;
-    bottom: 5%;
-    left: 50%;
-    transform: translateX(-50%);
+/* 2. Story Deck (Inline) */
+.story-deck-inline {
     display: flex;
-    gap: 2rem;
-    z-index: 60;
-    width: 80%;
-    justify-content: center;
+    gap: 1.5rem;
+    margin: 1rem 0;
 }
 
 .story-card {
-    background: rgba(0, 0, 0, 0.6);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-    padding: 10px;
-    border-radius: 10px;
-    width: 250px;
-    text-align: center;
+    background: rgba(0, 0, 0, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(15px);
+    padding: 15px;
+    border-radius: 12px;
+    width: 220px;
+    text-align: left;
     transition: 0.3s;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
 
 .story-card:hover {
-    transform: translateY(-10px);
-    border-color: var(--neon-cyan);
-    box-shadow: 0 0 20px rgba(0, 243, 255, 0.2);
+    transform: translateY(-5px);
+    border-color: var(--neon-gold);
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.2);
 }
 
 .story-img-frame {
     width: 100%;
-    height: 140px;
+    height: 120px;
     overflow: hidden;
-    border-radius: 5px;
+    border-radius: 8px;
     margin-bottom: 10px;
 }
 
@@ -232,52 +174,109 @@ body {
 .story-content h3 {
     margin: 5px 0;
     font-family: 'Orbitron';
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     color: var(--neon-gold);
 }
 
 .story-content p {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     color: #ccc;
-    margin: 0;
     line-height: 1.3;
+    margin: 0;
 }
 
-/* Corner Sponsors */
+/* 3. The Button (Vibrant) */
+.enter-btn-wrapper {
+    margin-top: 1rem;
+}
+
+.vibrant-enter-btn {
+    position: relative;
+    background: linear-gradient(90deg, #ff00cc, #333399);
+    /* Vibrant Purple/Pink */
+    border: none;
+    padding: 1rem 4rem;
+    font-size: 1.2rem;
+    font-family: 'Orbitron';
+    font-weight: 700;
+    color: white;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    cursor: pointer;
+    border-radius: 50px;
+    /* Pill shape */
+    overflow: hidden;
+    transition: 0.4s;
+    box-shadow: 0 0 20px rgba(188, 19, 254, 0.6);
+}
+
+.vibrant-enter-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 40px rgba(188, 19, 254, 0.9);
+    filter: brightness(1.2);
+}
+
+.btn-glow {
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.3), transparent 60%);
+    animation: rotate 4s linear infinite;
+    pointer-events: none;
+}
+
+@keyframes rotate {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Sponsors & Layout */
 .corner-sponsors {
     position: absolute;
     inset: 0;
     pointer-events: none;
-    z-index: 50;
+    z-index: 100;
 }
 
 .floating-orb {
     position: absolute;
     pointer-events: auto;
-    transition: 0.4s;
+    /* Enable hover */
+    cursor: pointer;
+    transition: 0.3s;
 }
 
 .floating-orb:hover {
     transform: scale(1.1);
-    z-index: 100;
 }
 
 .orb-glass-circle {
-    width: 100px;
-    height: 100px;
+    width: 90px;
+    height: 90px;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(5px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    box-shadow: 0 0 20px rgba(0, 243, 255, 0.1);
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid var(--neon-cyan);
     display: flex;
     justify-content: center;
     align-items: center;
+    box-shadow: 0 0 15px var(--neon-cyan);
+}
+
+.floating-orb:hover .orb-glass-circle {
+    background: rgba(0, 243, 255, 0.2);
+    box-shadow: 0 0 30px var(--neon-cyan);
 }
 
 .orb-img {
-    width: 70%;
-    height: 70%;
+    width: 60%;
+    height: 60%;
     object-fit: contain;
 }
 
@@ -285,28 +284,92 @@ body {
     filter: hue-rotate(90deg);
 }
 
+.orb-tooltip-fixed {
+    position: absolute;
+    background: #000;
+    border: 1px solid var(--neon-cyan);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    white-space: nowrap;
+    opacity: 0;
+    transition: 0.3s;
+    pointer-events: none;
+    z-index: 200;
+}
+
+.floating-orb:hover .orb-tooltip-fixed {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Positions */
 .top-left {
-    top: 30px;
-    left: 30px;
-    animation: float1 6s infinite ease-in-out;
+    top: 60px;
+    left: 40px;
+    animation: float1 6s infinite;
+}
+
+.top-left .orb-tooltip-fixed {
+    left: 100%;
+    top: 30%;
+    transform: translateX(10px);
 }
 
 .top-right {
-    top: 30px;
-    right: 30px;
-    animation: float2 7s infinite ease-in-out;
+    top: 60px;
+    right: 40px;
+    animation: float2 7s infinite;
+}
+
+.top-right .orb-tooltip-fixed {
+    right: 100%;
+    top: 30%;
+    transform: translateX(-10px);
 }
 
 .bottom-left {
-    bottom: 150px;
-    left: 50px;
-    animation: float3 8s infinite ease-in-out;
+    bottom: 60px;
+    left: 40px;
+    animation: float3 8s infinite;
+}
+
+.bottom-left .orb-tooltip-fixed {
+    left: 100%;
+    top: 30%;
+    transform: translateX(10px);
 }
 
 .bottom-right {
-    bottom: 150px;
-    right: 50px;
-    animation: float4 6s infinite ease-in-out;
+    bottom: 60px;
+    right: 40px;
+    animation: float4 6s infinite;
+}
+
+.bottom-right .orb-tooltip-fixed {
+    right: 100%;
+    top: 30%;
+    transform: translateX(-10px);
+}
+
+.sponsor-label {
+    position: absolute;
+    top: 90px;
+    font-family: 'Orbitron';
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.6);
+    z-index: 90;
+    letter-spacing: 3px;
+}
+
+.label-left {
+    left: 140px;
+    text-align: left;
+}
+
+.label-right {
+    right: 140px;
+    text-align: right;
 }
 
 @keyframes float1 {
@@ -329,7 +392,7 @@ body {
     }
 
     50% {
-        transform: translate(-5px, 10px);
+        transform: translate(0, 10px);
     }
 }
 
@@ -341,7 +404,7 @@ body {
     }
 
     50% {
-        transform: translate(10px, -5px);
+        transform: translate(5px, -5px);
     }
 }
 
@@ -353,47 +416,6 @@ body {
     }
 
     50% {
-        transform: translate(-5px, -10px);
-    }
-}
-
-@media (max-width: 1024px) {
-    .mega-brand {
-        font-size: 3rem;
-    }
-
-    .story-deck {
-        flex-direction: column;
-        width: 90%;
-        bottom: 2%;
-    }
-
-    .story-card {
-        width: 100%;
-        display: flex;
-        align-items: center;
-        text-align: left;
-        height: 80px;
-    }
-
-    .story-img-frame {
-        width: 80px;
-        height: 100%;
-        margin-bottom: 0;
-        margin-right: 10px;
-    }
-
-    .bottom-left,
-    .bottom-right {
-        display: none;
-    }
-
-    /* Hide bottom sponsors on mobile to make room */
-    .label-left,
-    .label-right {
-        font-size: 0.6rem;
-        top: 110px;
-        left: 20px;
-        right: 20px;
+        transform: translate(-5px, -5px);
     }
 }
