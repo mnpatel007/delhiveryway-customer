@@ -1,89 +1,151 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './LandingPage.css';
 
 const LandingPage = () => {
     const navigate = useNavigate();
+    const containerRef = useRef(null);
     const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+    const [activeSponsor, setActiveSponsor] = useState(null);
 
     useEffect(() => {
         const handleMouseMove = (e) => {
-            setMousePosition({
-                x: (e.clientX / window.innerWidth) * 20 - 10,
-                y: (e.clientY / window.innerHeight) * 20 - 10
-            });
+            if (!containerRef.current) return;
+            const { innerWidth, innerHeight } = window;
+            const x = (e.clientX - innerWidth / 2) / 25; // Sensitivity
+            const y = (e.clientY - innerHeight / 2) / 25;
+            setMousePosition({ x, y });
         };
         window.addEventListener('mousemove', handleMouseMove);
         return () => window.removeEventListener('mousemove', handleMouseMove);
     }, []);
 
+    const handleSponsorClick = (id) => {
+        setActiveSponsor(id === activeSponsor ? null : id);
+    };
+
     const sponsors = [
-        { id: 1, name: 'Quantum Logistics', tagline: 'Future of Freight', color: '#00f2ff' },
-        { id: 2, name: 'Aero-Shop', tagline: 'Sky-High Shopping', color: '#bc13fe' },
-        { id: 3, name: 'Nexus Retail', tagline: 'Connecting Worlds', color: '#01ff89' }
+        {
+            id: 1,
+            name: 'Quantum Logistics',
+            role: 'SPEED BOOSTER',
+            perk: 'FREE EXPRESS UPGRADE',
+            desc: 'Activate for hyper-speed processing on your next order.',
+            color: '#00f2ff',
+            icon: '⚡'
+        },
+        {
+            id: 2,
+            name: 'Aero-Shop',
+            role: 'SKYNET PARTNER',
+            perk: '15% DRONE DISCOUNT',
+            desc: 'Unlock exclusive aerial delivery rates today.',
+            color: '#bc13fe',
+            icon: '🛸'
+        },
+        {
+            id: 3,
+            name: 'Nexus Retail',
+            role: 'GLOBAL LINK',
+            perk: 'VIP ACCESS PASS',
+            desc: 'Early access to international flash sales.',
+            color: '#01ff89',
+            icon: '🌐'
+        }
     ];
 
     return (
-        <div className="landing-container">
-            {/* Dynamic Background */}
-            <div className="landing-bg">
-                <div className="orb orb-1"></div>
-                <div className="orb orb-2"></div>
-                <div className="grid-overlay"></div>
+        <div className="gateway-container" ref={containerRef}>
+            {/* Holographic Grid Background */}
+            <div className="holo-grid-plane top"></div>
+            <div className="holo-grid-plane bottom"></div>
+
+            {/* Particles */}
+            <div className="particles">
+                {[...Array(20)].map((_, i) => (
+                    <div key={i} className={`particle p${i}`}></div>
+                ))}
             </div>
 
-            <div className="landing-content" style={{ transform: `translate(${mousePosition.x}px, ${mousePosition.y}px)` }}>
-                {/* Hero Section */}
-                <div className="hero-section">
-                    <div className="brand-pill">DelhiveryWay Exclusive</div>
-                    <h1 className="hero-title">Experience the <span className="gradient-text">Future</span></h1>
-                    <p className="hero-subtitle">
-                        Smart Logistics. Seamless Shopping. Sustainable Tomorrow.
-                    </p>
+            <div
+                className="gateway-content"
+                style={{
+                    transform: `rotateY(${mousePosition.x}deg) rotateX(${-mousePosition.y}deg)`
+                }}
+            >
+                {/* HUD Header */}
+                <div className="hud-header">
+                    <div className="hud-corner-tl"></div>
+                    <div className="hud-corner-tr"></div>
+                    <div className="brand-scanner">
+                        <div className="scan-line"></div>
+                        <span>SYSTEM: ONLINE</span>
+                        <span>USER: AUTHENTICATED</span>
+                    </div>
+                    <h1>DELHIVERY<span className="hightlight">WAY</span></h1>
+                    <div className="sub-branding">ADVANCED LOGISTICS PROTOCOL</div>
+                </div>
 
-                    <button className="enter-portal-btn" onClick={() => navigate('/')}>
-                        <span className="btn-text">ENTER PORTAL</span>
-                        <div className="btn-glow"></div>
-                    </button>
+                {/* Main Deck */}
+                <div className="deck-layout">
+                    {/* Left Panel: Portal */}
+                    <div className="portal-panel">
+                        <div className="portal-ring-outer"></div>
+                        <div className="portal-ring-inner"></div>
+                        <div className="portal-core">
+                            <button className="hyper-jump-btn" onClick={() => navigate('/')}>
+                                <span className="btn-glitch-text" data-text="INITIATE JUMP">INITIATE JUMP</span>
+                            </button>
+                        </div>
+                        <div className="portal-status">
+                            <span>DESTINATION: MAIN HUB</span>
+                            <span>LATENCY: 0.1ms</span>
+                        </div>
+                    </div>
 
-                    <div className="scroll-indicator">
-                        <span>Explore Partners</span>
-                        <div className="arrow-down"></div>
+                    {/* Right Panel: Sponsor Modules */}
+                    <div className="modules-panel">
+                        <h2 className="modules-title">ACTIVE POWER-UPS <span className="blink">_</span></h2>
+                        <div className="modules-grid">
+                            {sponsors.map(sponsor => (
+                                <div
+                                    key={sponsor.id}
+                                    className={`module-card ${activeSponsor === sponsor.id ? 'active' : ''}`}
+                                    onClick={() => handleSponsorClick(sponsor.id)}
+                                    style={{ '--accent': sponsor.color }}
+                                >
+                                    <div className="module-header">
+                                        <span className="module-icon">{sponsor.icon}</span>
+                                        <div className="module-id">
+                                            <span className="name">{sponsor.name}</span>
+                                            <span className="role">{sponsor.role}</span>
+                                        </div>
+                                        <div className="status-light"></div>
+                                    </div>
+                                    <div className="module-body">
+                                        <div className="perk-box">
+                                            <span className="perk-label">REWARD DETECTED</span>
+                                            <span className="perk-value">{sponsor.perk}</span>
+                                        </div>
+                                        <p className="perk-desc">{sponsor.desc}</p>
+                                        <div className="activate-btn">
+                                            {activeSponsor === sponsor.id ? '>> PERK ACTIVE <<' : 'CLICK TO ACTIVATE'}
+                                        </div>
+                                    </div>
+                                    <div className="scan-overlay"></div>
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 </div>
 
-                {/* Right Panel - Sponsor Spotlight (Desktop) / Bottom (Mobile) */}
-                <div className="sponsor-section">
-                    <h2 className="section-title">Premium Partners</h2>
-                    <div className="sponsor-grid">
-                        {sponsors.map(sponsor => (
-                            <div key={sponsor.id} className="sponsor-card" style={{ '--accent-color': sponsor.color }}>
-                                <div className="sponsor-icon-placeholder">
-                                    <div className="inner-icon"></div>
-                                </div>
-                                <div className="sponsor-info">
-                                    <h3>{sponsor.name}</h3>
-                                    <p>{sponsor.tagline}</p>
-                                </div>
-                                <div className="shine-effect"></div>
-                            </div>
-                        ))}
+                {/* HUD Footer */}
+                <div className="hud-footer">
+                    <div className="data-stream">
+                        <span>LIVE TRAFFIC: 14,203 PACKETS</span> | <span>SECTOR 7: OPTIMAL</span> | <span>DRONE FLEET: AIRBORNE</span>
                     </div>
-
-                    <div className="about-preview">
-                        <div className="stat-item">
-                            <span className="stat-number">10k+</span>
-                            <span className="stat-label">Happy Shoppers</span>
-                        </div>
-                        <div className="stat-item">
-                            <span className="stat-number">99%</span>
-                            <span className="stat-label">On-Time Delivery</span>
-                        </div>
-                        <div className="stat-item">
-                            <span className="stat-number">24/7</span>
-                            <span className="stat-label">AI Support</span>
-                        </div>
-                    </div>
+                    <div className="hud-corner-bl"></div>
+                    <div className="hud-corner-br"></div>
                 </div>
             </div>
         </div>
