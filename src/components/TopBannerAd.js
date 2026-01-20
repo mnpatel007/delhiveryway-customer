@@ -12,7 +12,7 @@ const TopBannerAd = () => {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            marginBottom: '30px',
+            marginBottom: '15px',
             boxShadow: '0 4px 15px rgba(255, 165, 0, 0.3)',
             cursor: 'pointer',
             marginTop: '20px'

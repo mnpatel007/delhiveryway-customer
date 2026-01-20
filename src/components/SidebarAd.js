@@ -4,7 +4,8 @@ const SidebarAd = () => {
     const styles = {
         container: {
             width: '100%',
-            height: '600px', // Tall vertical ad
+            height: '100%', // Flexible height to fill sidebar
+            maxHeight: '100%',
             background: 'linear-gradient(180deg, #4158D0 0%, #C850C0 46%, #FFCC70 100%)',
             borderRadius: '12px',
             position: 'sticky',
