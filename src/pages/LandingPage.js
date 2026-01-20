@@ -1,139 +1,117 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import TopBannerAd from '../components/TopBannerAd';
+import SidebarAd from '../components/SidebarAd';
+import SponsoredSection from '../components/SponsoredSection';
+import HungryCTA from '../components/HungryCTA';
+import Logo from '../components/Logo';
 import './LandingPage.css';
 
 const LandingPage = () => {
     const navigate = useNavigate();
     const { user, logout } = useAuth();
-    const containerRef = useRef(null);
-    const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+    const [searchQuery, setSearchQuery] = useState('');
 
-    const handleLogout = () => {
-        logout();
-        navigate('/');
+    const handleSearch = (e) => {
+        e.preventDefault();
+        if (searchQuery.trim()) {
+            // Navigate to Home Page with search query
+            navigate(`/?search=${encodeURIComponent(searchQuery)}`);
+        }
     };
 
-    useEffect(() => {
-        // Lock scroll and set background only for Landing Page
-        document.body.style.overflow = 'hidden';
-        document.body.style.background = '#000';
-
-        return () => {
-            // Cleanup: Restore default styles when leaving
-            document.body.style.overflow = 'auto';
-            document.body.style.background = '';
-        };
-    }, []);
-
-    useEffect(() => {
-        const handleMouseMove = (e) => {
-            const { innerWidth, innerHeight } = window;
-            const x = (e.clientX - innerWidth / 2) / (innerWidth / 2);
-            const y = (e.clientY - innerHeight / 2) / (innerHeight / 2);
-            setMousePosition({ x, y });
-        };
-        window.addEventListener('mousemove', handleMouseMove);
-        return () => window.removeEventListener('mousemove', handleMouseMove);
-    }, []);
-
-    const leftSponsors = [
-        { id: 'quantum', name: 'Quantum Logistics', img: '/assets/sponsor-quantum.png', desc: 'Hyperspeed Transport' },
-        { id: 'nexus', name: 'Nexus Retail', img: '/assets/sponsor-nexus.png', desc: 'Global Marketplace' }
-    ];
-
-    const rightSponsors = [
-        { id: 'aero', name: 'Aero-Shop', img: '/assets/sponsor-aero.png', desc: 'Aerial Systems' },
-        { id: 'eco', name: 'Eco-Motion', img: '/assets/sponsor-quantum.png', desc: 'Sustainable Power', className: 'hue-rotate-filter' }
-    ];
-
-    const stories = [
-        { id: 1, label: 'DIRECT PICKUP', text: 'We collect directly from localized partners.', img: '/assets/story-pickup-v2.png' },
-        { id: 2, label: 'SWIFT TRANSIT', text: 'Hyper-local fleet guarantees speed.', img: '/assets/story-scooter.png' },
-        { id: 3, label: 'DOORSTEP DELIGHT', text: 'Verified safe delivery to your home.', img: '/assets/story-customer.png' }
-    ];
-
-    const bgStyle = {
-        transform: `translate(${mousePosition.x * -20}px, ${mousePosition.y * -20}px) scale(1.1)`
-    };
-
-    const text3DStyle = {
-        transform: `rotateY(${mousePosition.x * 5}deg) rotateX(${mousePosition.y * -5}deg)`
+    const handleShopClick = (shopId) => {
+        if (shopId.startsWith('s')) {
+            // For sponsored skeletons, just go to home
+            navigate(`/?highlight=${shopId}`);
+        } else {
+            navigate(`/shop/${shopId}`);
+        }
     };
 
     return (
-        <div className="omni-container" ref={containerRef}>
-            <div className="omni-bg" style={bgStyle}></div>
-            <div className="omni-overlay"></div>
+        <div className="landing-layout">
+            {/* 1. Navbar (Custom for Welcome Page) */}
+            <header className="landing-header">
+                <div className="header-container">
 
-            {/* Header */}
-            <header className="omni-header">
-                <div className="user-module">
-                    <span className="user-id">CMD: {user?.name}</span>
-                    <button className="logout-btn-glitch" onClick={handleLogout} data-text="DISCONNECT">
-                        DISCONNECT
+                    {/* Item 1: Logo */}
+                    <div className="header-logo" onClick={() => navigate('/')}>
+                        <Logo size="medium" showText={true} />
+                    </div>
+
+                    {/* Item 3: Shop List Button */}
+                    <button className="nav-btn shop-list-btn" onClick={() => navigate('/')}>
+                        Shop List
                     </button>
+
+                    {/* Item 4: Search Bar */}
+                    <form className="landing-search-form" onSubmit={handleSearch}>
+                        <input
+                            type="text"
+                            placeholder="Search..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                        />
+                        <button type="submit">🔍</button>
+                    </form>
+
+                    {/* Item 5: Cart */}
+                    <button className="nav-icon-btn" onClick={() => navigate('/cart')} title="Cart">
+                        🛒
+                    </button>
+
+                    {/* Item 6: User Settings */}
+                    <div className="user-settings-module">
+                        {user ? (
+                            <div className="user-dropdown">
+                                <button className="nav-icon-btn profile-btn">
+                                    👤
+                                </button>
+                                <div className="dropdown-menu">
+                                    <div className="user-info-sm">
+                                        <strong>{user.name}</strong>
+                                        <span>{user.email}</span>
+                                    </div>
+                                    <button onClick={() => navigate('/orders')}>Order History</button>
+                                    <button onClick={() => navigate('/contact')}>Contact Us</button>
+                                    <button onClick={logout} style={{ color: 'red' }}>Logout</button>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="auth-links">
+                                <button onClick={() => navigate('/login')} className="btn-text">Login</button>
+                                <button onClick={() => navigate('/signup')} className="btn-primary-sm">Sign Up</button>
+                            </div>
+                        )}
+                    </div>
+
                 </div>
             </header>
 
-            {/* LEFT PILLAR */}
-            <div className="side-pillar left-pillar">
-                <div className="pillar-header">PROUD SPONSORS</div>
-                {leftSponsors.map((sponsor) => (
-                    <div key={sponsor.id} className="sponsor-rect glass-panel">
-                        <div className="rect-content">
-                            <img src={sponsor.img} alt={sponsor.name} className={`rect-img ${sponsor.className || ''}`} />
-                            <h3>{sponsor.name}</h3>
-                            <p>{sponsor.desc}</p>
-                        </div>
-                    </div>
-                ))}
-            </div>
+            <div className="landing-container">
+                {/* 2. Top Banner Ad */}
+                <TopBannerAd />
 
-            {/* CENTER STAGE */}
-            <main className="omni-main-center">
-                <div className="center-stack" style={text3DStyle}>
-                    <h1 className="mega-brand" data-text="DELHIVERYWAY">DELHIVERYWAY</h1>
-                    <div className="brand-subtitle">HYPER-LOCAL • HYPER-FAST • AUTHENTIC</div>
+                <div className="landing-grid">
+                    {/* Main Content Area */}
+                    <div className="landing-main">
 
-                    <div className="story-deck-inline">
-                        {stories.map((story) => (
-                            <div key={story.id} className="story-card">
-                                <div className="story-img-frame">
-                                    <img src={story.img} alt={story.label} />
-                                </div>
-                                <div className="story-content">
-                                    <h3>{story.label}</h3>
-                                    <p>{story.text}</p>
-                                </div>
-                            </div>
-                        ))}
+                        {/* 9. Featured Restaurants */}
+                        <SponsoredSection onShopClick={handleShopClick} />
+
+                        {/* 10. Hungry CTA */}
+                        <HungryCTA onClick={() => navigate('/')} />
+
                     </div>
 
-                    <div className="enter-btn-wrapper" onClick={() => navigate('/')}>
-                        <button className="vibrant-enter-btn">
-                            ENTER THE FUTURE
-                            <div className="btn-glow"></div>
-                        </button>
+                    {/* 7. Sidebar Ad */}
+                    <div className="landing-sidebar">
+                        <SidebarAd />
                     </div>
                 </div>
-            </main>
-
-            {/* RIGHT PILLAR */}
-            <div className="side-pillar right-pillar">
-                <div className="pillar-header">PROUD SPONSORS</div>
-                {rightSponsors.map((sponsor) => (
-                    <div key={sponsor.id} className="sponsor-rect glass-panel">
-                        <div className="rect-content">
-                            <img src={sponsor.img} alt={sponsor.name} className={`rect-img ${sponsor.className || ''}`} />
-                            <h3>{sponsor.name}</h3>
-                            <p>{sponsor.desc}</p>
-                        </div>
-                    </div>
-                ))}
             </div>
-
-            <div className="vignette-overlay"></div>
         </div>
     );
 };
