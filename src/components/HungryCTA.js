@@ -4,7 +4,7 @@ const HungryCTA = ({ onClick }) => {
     const styles = {
         wrapper: {
             textAlign: 'center',
-            margin: '60px 0',
+            margin: '20px 0',
             position: 'relative'
         },
         bubble: {

@@ -1,33 +1,30 @@
-/* LandingPage.css (Redesign) */
+/* LandingPage.css (Redesign - Responsive Fit) */
 
-/* Reset global overrides if any */
-body {
-    overflow: auto !important;
-    /* Ensure scrolling is enabled */
-    background: #f4f6f8 !important;
-    /* Light background */
-}
-
+/* Default Mobile First (Scrolling enabled) */
 .landing-layout {
     min-height: 100vh;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     color: #333;
+    background: #f4f6f8;
+    display: flex;
+    flex-direction: column;
 }
 
 /* --- HEADER --- */
 .landing-header {
     background: white;
     border-bottom: 3px solid #FFD700;
-    /* Gold accent */
     height: 70px;
     position: sticky;
     top: 0;
     z-index: 1000;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    flex-shrink: 0;
+    /* Never shrink header */
 }
 
 .header-container {
-    max-width: 1400px;
+    max-width: 100%;
     margin: 0 auto;
     height: 100%;
     padding: 0 20px;
@@ -76,7 +73,6 @@ body {
     max-width: 500px;
     position: relative;
     border: 2px solid #333;
-    /* Sketch style border */
     border-radius: 8px;
     overflow: hidden;
 }
@@ -125,7 +121,6 @@ body {
 
 .user-settings-module {
     margin-left: auto;
-    /* Push to right just in case */
     display: flex;
     align-items: center;
 }
@@ -147,6 +142,7 @@ body {
     display: none;
     flex-direction: column;
     gap: 5px;
+    z-index: 1001;
 }
 
 .user-dropdown:hover .dropdown-menu {
@@ -194,42 +190,127 @@ body {
     font-weight: 600;
 }
 
-/* --- MAIN LAYOUT --- */
+/* --- MAIN CONTENT & MOBILE DEFAULT --- */
 .landing-container {
-    max-width: 1400px;
-    margin: 0 auto;
+    width: 100%;
     padding: 20px;
+    display: flex;
+    flex-direction: column;
 }
 
 .landing-grid {
-    display: grid;
-    grid-template-columns: 1fr 300px;
+    display: flex;
+    flex-direction: column;
     gap: 30px;
-    align-items: start;
-}
-
-.landing-main {
-    min-width: 0;
 }
 
 .landing-sidebar {
-    position: sticky;
-    top: 90px;
+    display: none;
+    /* Hidden on mobile by default or show at bottom */
 }
 
-/* Mobile */
-@media (max-width: 900px) {
+
+/* --- DESKTOP / LARGE TABLET LAYOUT (> 900px) --- */
+@media (min-width: 900px) {
+
+    /* Strict Fit-to-Screen enforcement */
+    html,
+    body,
+    #root {
+        height: 100vh;
+        overflow: hidden;
+        /* Prevent global scroll */
+        margin: 0;
+        padding: 0;
+    }
+
+    .landing-layout {
+        height: 100vh;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .landing-container {
+        flex: 1;
+        /* Fill remaining vertical space */
+        min-height: 0;
+        /* vital for flex scrolling/containment */
+        display: flex;
+        flex-direction: column;
+        padding: 10px 20px !important;
+        /* Reduce padding for tight fit */
+        max-width: 1600px;
+        margin: 0 auto;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    /* Adjust Top Banner to not take too much space */
+    .landing-container>div:first-child {
+        flex-shrink: 0;
+        /* Ensure banner doesn't get crushed but also doesn't dominate */
+    }
+
     .landing-grid {
-        grid-template-columns: 1fr;
+        flex: 1;
+        /* Fill remaining space below banner */
+        display: grid;
+        grid-template-columns: 1fr 320px;
+        /* Main content + Fixed sidebar */
+        gap: 20px;
+        min-height: 0;
+        /* vital for internal overflow handling */
+        height: 100%;
+        /* Ensure it takes full height */
+    }
+
+    .landing-main {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        /* Distribute content vertically */
+        height: 100%;
+        overflow: hidden;
+        /* Or auto if we allow internal scroll, but user said 'fit' */
+        padding-bottom: 10px;
     }
 
     .landing-sidebar {
-        display: none;
-        /* or block to show at bottom */
+        display: block;
+        height: 100%;
+        /* Fill the grid cell height */
+        overflow: hidden;
+    }
+
+    /* Ensure SidebarAd fills the container */
+    .landing-sidebar>div {
+        height: 100% !important;
+    }
+}
+
+/* Mobile Adjustments (< 900px) */
+@media (max-width: 899px) {
+
+    /* Restore scrolling */
+    html,
+    body {
+        overflow: auto !important;
+        height: auto !important;
+    }
+
+    .landing-layout {
+        height: auto;
     }
 
     .landing-search-form {
         display: none;
-        /* Hide on small screens or move */
+        /* Hide search on mobile header as requested/implied */
+    }
+
+    .landing-sidebar {
+        display: block;
+        /* Show sidebar at bottom on mobile */
+        height: auto;
     }
 }
