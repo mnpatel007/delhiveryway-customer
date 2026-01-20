@@ -801,7 +801,7 @@ const FinalCheckoutPage = () => {
                         <div className="pricing-row">
                             <span>Delivery Fee</span>
                             <span>
-                                {deliveryCalculationDetails?.originalDeliveryFee && deliveryCalculationDetails?.deliveryDiscountApplied ? (
+                                {deliveryCalculationDetails?.originalDeliveryFee && deliveryCalculationDetails?.discountApplied ? (
                                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
                                         <span style={{ textDecoration: 'line-through', color: '#999', fontSize: '0.9em' }}>
                                             {formatPrice(deliveryCalculationDetails.originalDeliveryFee)}
@@ -810,7 +810,7 @@ const FinalCheckoutPage = () => {
                                             {formatPrice(getOrderSummary().deliveryFee)}
                                         </span>
                                         <span style={{ fontSize: '0.75em', color: '#28a745' }}>
-                                            Saved {formatPrice(deliveryCalculationDetails.deliveryDiscount)}
+                                            Saved {formatPrice(deliveryCalculationDetails.discountApplied.amount)}
                                         </span>
                                     </div>
                                 ) : (
