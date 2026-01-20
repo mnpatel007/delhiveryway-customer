@@ -12,7 +12,7 @@ const SponsoredSection = ({ shops, onShopClick }) => {
 
     const styles = {
         container: {
-            marginBottom: '30px',
+            marginBottom: '10px',
         },
         header: {
             display: 'flex',
@@ -50,7 +50,9 @@ const SponsoredSection = ({ shops, onShopClick }) => {
         },
         image: {
             width: '100%',
-            height: '180px',
+            height: '15vh',
+            minHeight: '120px',
+            maxHeight: '180px',
             objectFit: 'cover',
             background: '#f0f0f0',
             display: 'flex',
