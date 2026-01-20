@@ -66,6 +66,51 @@
     border-color: #555;
 }
 
+/* Extra Extra Ordinary Button Style */
+.btn-extraordinary {
+    background: linear-gradient(135deg, #FFD700 0%, #FF8C00 100%);
+    color: white;
+    border: none;
+    padding: 10px 24px;
+    font-size: 1rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0 10px 20px rgba(255, 140, 0, 0.4), 0 6px 6px rgba(0, 0, 0, 0.1), inset 0 -4px 0 rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+}
+
+.btn-extraordinary::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+    transition: 0.5s;
+    z-index: -1;
+}
+
+.btn-extraordinary:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 15px 25px rgba(255, 140, 0, 0.5), 0 10px 10px rgba(0, 0, 0, 0.1), inset 0 -4px 0 rgba(0, 0, 0, 0.2);
+}
+
+.btn-extraordinary:hover::before {
+    left: 100%;
+}
+
+.btn-extraordinary:active {
+    transform: translateY(1px);
+    box-shadow: 0 5px 10px rgba(255, 140, 0, 0.4), inset 0 2px 0 rgba(0, 0, 0, 0.2);
+}
+
 /* Search */
 .landing-search-form {
     flex: 1;
