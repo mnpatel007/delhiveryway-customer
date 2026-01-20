@@ -4,7 +4,9 @@ const TopBannerAd = () => {
     const styles = {
         container: {
             width: '100%',
-            height: '140px',
+            height: '12vh',
+            minHeight: '100px',
+            maxHeight: '140px',
             background: 'linear-gradient(90deg, #FFD700, #FFA500)', // Gold/Orange Gradient
             borderRadius: '12px',
             position: 'relative',
@@ -12,7 +14,7 @@ const TopBannerAd = () => {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            marginBottom: '15px',
+            marginBottom: '10px',
             boxShadow: '0 4px 15px rgba(255, 165, 0, 0.3)',
             cursor: 'pointer',
             marginTop: '20px'

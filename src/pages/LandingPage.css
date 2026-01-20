@@ -268,12 +268,16 @@
     .landing-main {
         display: flex;
         flex-direction: column;
-        justify-content: space-between;
-        /* Distribute content vertically */
+        justify-content: space-evenly;
+        /* Evenly distribute space so nothing is squashed */
         height: 100%;
         overflow: hidden;
-        /* Or auto if we allow internal scroll, but user said 'fit' */
-        padding-bottom: 10px;
+        padding-bottom: 5px;
+    }
+
+    /* Ensure CTA doesn't get hidden */
+    .landing-main>div:last-child {
+        flex-shrink: 0;
     }
 
     .landing-sidebar {
