@@ -3,37 +3,39 @@ import React from 'react';
 const HungryCTA = ({ onClick }) => {
     const styles = {
         wrapper: {
-            textAlign: 'center',
-            margin: '20px 0',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '20px',
+            margin: '10px 0', // Compact margin
             position: 'relative'
         },
         bubble: {
             background: 'white',
             border: '2px solid #333',
-            display: 'inline-block',
-            padding: '10px 30px',
+            padding: '8px 20px',
             borderRadius: '20px',
-            fontSize: '1.5rem',
+            fontSize: '1.2rem',
             fontWeight: 'bold',
-            marginBottom: '15px',
             position: 'relative',
-            boxShadow: '4px 4px 0px #000',
-            transform: 'rotate(-2deg)'
+            boxShadow: '3px 3px 0px #000',
+            transform: 'rotate(-2deg)',
+            margin: 0
         },
         arrow: {
-            fontSize: '2.5rem',
+            fontSize: '1.5rem',
             lineHeight: '1',
-            margin: '10px 0'
+            margin: 0
         },
         button: {
             background: 'white',
             border: '2px solid #333',
-            padding: '20px 60px',
-            fontSize: '1.2rem',
+            padding: '10px 30px',
+            fontSize: '1rem',
             fontWeight: 'bold',
             borderRadius: '50px',
             cursor: 'pointer',
-            boxShadow: '5px 5px 0px #000',
+            boxShadow: '3px 3px 0px #000',
             transition: '0.2s',
             display: 'inline-flex',
             alignItems: 'center',
@@ -44,7 +46,7 @@ const HungryCTA = ({ onClick }) => {
     return (
         <div style={styles.wrapper}>
             <div style={styles.bubble}>Are you hungry?</div>
-            <div style={styles.arrow}>⬇️</div>
+            <div style={styles.arrow}>➡️</div>
             <button
                 style={styles.button}
                 onClick={onClick}
