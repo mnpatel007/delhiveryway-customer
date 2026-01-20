@@ -28,18 +28,22 @@ const HungryCTA = ({ onClick }) => {
             margin: 0
         },
         button: {
-            background: 'white',
-            border: '2px solid #333',
-            padding: '10px 30px',
-            fontSize: '1rem',
-            fontWeight: 'bold',
+            background: 'linear-gradient(135deg, #FFD700 0%, #FF8C00 100%)',
+            color: 'white',
+            border: 'none',
+            padding: '12px 40px',
+            fontSize: '1.2rem',
+            fontWeight: '800',
+            textTransform: 'uppercase',
+            letterSpacing: '1px',
             borderRadius: '50px',
             cursor: 'pointer',
-            boxShadow: '3px 3px 0px #000',
-            transition: '0.2s',
+            boxShadow: '0 10px 20px rgba(255, 140, 0, 0.4), inset 0 -4px 0 rgba(0,0,0,0.2)',
+            transition: 'all 0.3s ease',
             display: 'inline-flex',
             alignItems: 'center',
-            gap: '10px'
+            gap: '10px',
+            transform: 'scale(1)'
         }
     };
 

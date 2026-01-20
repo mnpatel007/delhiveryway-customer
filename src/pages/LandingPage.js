@@ -42,8 +42,8 @@ const LandingPage = () => {
                     </div>
 
                     {/* Item 3: Shop List Button */}
-                    <button className="nav-btn shop-list-btn" onClick={() => navigate('/')}>
-                        Shop List
+                    <button className="btn-extraordinary" onClick={() => navigate('/')}>
+                        Shop with DelhiveryWay
                     </button>
 
                     {/* Item 4: Search Bar */}
