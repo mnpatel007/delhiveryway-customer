@@ -539,7 +539,7 @@ const HomePage = () => {
                             <span className="shops-count">({filteredShops.length} shops)</span>
                         </h2>
 
-                        {/* <SidebarAd /> */}
+                        {/* Search placed under Available Shops header */}
                         <div className="search-section" style={{ marginTop: 16 }}>
                             <div className="search-content">
                                 <form className="search-form" onSubmit={handleSearch}>
