@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import ReactDOM from 'react-dom';
 import { useSocket } from '../context/SocketContext';
 import './OrderInquiry.css';
 
@@ -33,18 +34,7 @@ const OrderInquiry = ({ order, onClose }) => {
         return () => clearInterval(interval);
     }, [order]);
 
-    // Show notification when inquiry becomes available
-    useEffect(() => {
-        if (inquiryAvailable && !showContactInfo) {
-            addNotification({
-                id: Date.now(),
-                type: 'inquiry_available',
-                title: '📞 Need Help with Your Order?',
-                message: 'You can now contact your personal shopper for order updates!',
-                timestamp: new Date().toISOString()
-            });
-        }
-    }, [inquiryAvailable, showContactInfo, addNotification]);
+
 
     const getOrderStatusMessage = (status) => {
         const statusMessages = {
@@ -150,8 +140,8 @@ const OrderInquiry = ({ order, onClose }) => {
         );
     }
 
-    return (
-        <div className="order-inquiry-modal">
+    return ReactDOM.createPortal(
+        <div className="order-inquiry-modal" style={{ zIndex: 99999 }}>
             <div className="modal-backdrop" onClick={onClose}></div>
             <div className="inquiry-content">
                 <div className="inquiry-header">
@@ -275,7 +265,8 @@ const OrderInquiry = ({ order, onClose }) => {
                     </button>
                 </div>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 };
 

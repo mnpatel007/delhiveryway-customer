@@ -49,7 +49,7 @@ const LoginForm = () => {
             }
 
             login(result.data);
-            navigate('/');
+            navigate('/welcome');
         } catch (err) {
             console.error('❌ Login error:', err);
 
@@ -107,7 +107,7 @@ const LoginForm = () => {
                 }
 
                 login(result.data);
-                navigate('/');
+                navigate('/welcome');
             } catch (err) {
                 console.error('❌ Google login error:', err);
                 if (err.response) {
