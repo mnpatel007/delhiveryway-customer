@@ -44,7 +44,7 @@ const Navbar = () => {
                 <div className="navbar-menu">
                     <Link
                         to="/"
-                        className={`navbar - link ${isActive('/') ? 'active' : ''} `}
+                        className={`navbar-link ${isActive('/') ? 'active' : ''} `}
                     >
                         <span className="link-icon">🏠</span>
                         Home
@@ -54,7 +54,7 @@ const Navbar = () => {
                         <>
                             <Link
                                 to="/orders"
-                                className={`navbar - link ${isActive('/orders') ? 'active' : ''} `}
+                                className={`navbar-link ${isActive('/orders') ? 'active' : ''} `}
                             >
                                 <span className="link-icon">📦</span>
                                 Orders
@@ -62,7 +62,7 @@ const Navbar = () => {
 
                             <Link
                                 to="/cart"
-                                className={`navbar - link cart - link ${isActive('/cart') ? 'active' : ''} `}
+                                className={`navbar-link cart-link ${isActive('/cart') ? 'active' : ''} `}
                             >
                                 <span className="link-icon">🛒</span>
                                 Cart
@@ -75,7 +75,7 @@ const Navbar = () => {
 
                     <Link
                         to="/contact"
-                        className={`navbar - link ${isActive('/contact') ? 'active' : ''} `}
+                        className={`navbar-link ${isActive('/contact') ? 'active' : ''} `}
                     >
                         <span className="link-icon">📞</span>
                         Contact
@@ -126,11 +126,11 @@ const Navbar = () => {
             </div>
 
             {/* Mobile Menu */}
-            <div className={`mobile - menu ${isMenuOpen ? 'open' : ''} `}>
+            <div className={`mobile-menu ${isMenuOpen ? 'open' : ''} `}>
                 <div className="mobile-menu-content">
                     <Link
                         to="/"
-                        className={`mobile - link ${isActive('/') ? 'active' : ''} `}
+                        className={`mobile-link ${isActive('/') ? 'active' : ''} `}
                         onClick={() => setIsMenuOpen(false)}
                     >
                         <span className="link-icon">🏠</span>
@@ -141,7 +141,7 @@ const Navbar = () => {
                         <>
                             <Link
                                 to="/orders"
-                                className={`mobile - link ${isActive('/orders') ? 'active' : ''} `}
+                                className={`mobile-link ${isActive('/orders') ? 'active' : ''} `}
                                 onClick={() => setIsMenuOpen(false)}
                             >
                                 <span className="link-icon">📦</span>
@@ -150,7 +150,7 @@ const Navbar = () => {
 
                             <Link
                                 to="/cart"
-                                className={`mobile - link ${isActive('/cart') ? 'active' : ''} `}
+                                className={`mobile-link ${isActive('/cart') ? 'active' : ''} `}
                                 onClick={() => setIsMenuOpen(false)}
                             >
                                 <span className="link-icon">🛒</span>
@@ -164,7 +164,7 @@ const Navbar = () => {
 
                     <Link
                         to="/contact"
-                        className={`mobile - link ${isActive('/contact') ? 'active' : ''} `}
+                        className={`mobile-link ${isActive('/contact') ? 'active' : ''} `}
                         onClick={() => setIsMenuOpen(false)}
                     >
                         <span className="link-icon">📞</span>
