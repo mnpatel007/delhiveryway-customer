@@ -3,7 +3,6 @@ import { useAuth } from '../context/AuthContext';
 import { ordersAPI, apiCall } from '../services/api';
 import { useSocket } from '../context/SocketContext';
 import InquiryButton from './InquiryButton';
-import OrderTrackingMap from './OrderTrackingMap';
 import './ActiveOrdersWidget.css';
 
 const ActiveOrdersWidget = () => {
@@ -12,8 +11,7 @@ const ActiveOrdersWidget = () => {
     const [activeOrders, setActiveOrders] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [driverLocations, setDriverLocations] = useState({});
-    const [expandedMapOrderId, setExpandedMapOrderId] = useState(null);
+    const [updateTimeout, setUpdateTimeout] = useState(null);
 
     const fetchActiveOrders = async () => {
         if (!user) {
@@ -39,16 +37,9 @@ const ActiveOrdersWidget = () => {
                 );
 
                 console.log('Active orders loaded:', sortedOrders);
-
-                const initialDriverLocations = {};
                 sortedOrders.forEach(order => {
-                    if (order.personalShopperId?.currentLocation) {
-                        initialDriverLocations[order._id] = order.personalShopperId.currentLocation;
-                    } else if (order.shopperLocation) {
-                        initialDriverLocations[order._id] = order.shopperLocation;
-                    }
+                    console.log(`Order ${order.orderNumber}: Status = ${order.status}, Shop = ${order.shopId?.name}, InquiryTime = ${order.shopId?.inquiryAvailableTime}`);
                 });
-                setDriverLocations(prev => ({ ...prev, ...initialDriverLocations }));
 
                 setActiveOrders(sortedOrders);
                 setError(null);
@@ -101,16 +92,7 @@ const ActiveOrdersWidget = () => {
                 });
             } catch (error) {
                 console.error('Error handling socket order update:', error);
-            }
-        };
-
-        const handleLocationUpdate = (data) => {
-            console.log('Source Location update received:', data);
-            if (data && data.orderId && data.location) {
-                setDriverLocations(prev => ({
-                    ...prev,
-                    [data.orderId]: data.location
-                }));
+                // Don't crash the component, just log the error
             }
         };
 
@@ -118,17 +100,16 @@ const ActiveOrdersWidget = () => {
         socket.on('orderStatusUpdate', handleOrderUpdate);
         socket.on('orderUpdate', handleOrderUpdate);
         socket.on('shopperAction', handleOrderUpdate);
-        socket.on('shopperLocationUpdate', handleLocationUpdate);
-        socket.on('shopperLocation', handleLocationUpdate); // Listen to legacy alias as well if any
 
         return () => {
             socket.off('orderStatusUpdate', handleOrderUpdate);
             socket.off('orderUpdate', handleOrderUpdate);
             socket.off('shopperAction', handleOrderUpdate);
-            socket.off('shopperLocationUpdate', handleLocationUpdate);
-            socket.off('shopperLocation', handleLocationUpdate);
 
-
+            // Clear any pending timeouts
+            if (updateTimeout) {
+                clearTimeout(updateTimeout);
+            }
         };
     }, [socket, user]);
 
@@ -172,25 +153,6 @@ const ActiveOrdersWidget = () => {
             'out_for_delivery': '#6f42c1'
         };
         return colorMap[status] || '#6c757d';
-    };
-
-    // Helper to determine if map should be shown
-    const shouldShowMap = (status) => {
-        const showMapStatuses = [
-            'accepted_by_shopper',
-            'shopper_at_shop',
-            'shopping_in_progress',
-            'shopper_revised_order',
-            'customer_reviewing_revision',
-            'customer_approved_revision',
-            'bill_uploaded',
-            'bill_sent',
-            'bill_approved',
-            'picked_up',
-            'out_for_delivery',
-            'final_shopping'
-        ];
-        return showMapStatuses.includes(status);
     };
 
     // Don't show widget if user is not logged in
@@ -248,9 +210,6 @@ const ActiveOrdersWidget = () => {
                         return null;
                     }
 
-                    const showMap = shouldShowMap(order.status);
-                    const isMapExpanded = expandedMapOrderId === order._id;
-
                     try {
                         return (
                             <div key={order._id} className="active-order-item">
@@ -277,16 +236,6 @@ const ActiveOrdersWidget = () => {
                                             </span>
                                         )}
                                     </div>
-
-                                    {/* Map Integration */}
-                                    {showMap && (
-                                        <OrderTrackingMap
-                                            order={order}
-                                            driverLocation={driverLocations[order._id]}
-                                            isExpanded={isMapExpanded}
-                                            onToggleExpand={() => setExpandedMapOrderId(isMapExpanded ? null : order._id)}
-                                        />
-                                    )}
                                 </div>
 
                                 <div className="order-actions">
@@ -311,13 +260,6 @@ const ActiveOrdersWidget = () => {
                     </button>
                 </div>
             )}
-
-            {/* Render Expanded Map Modal if needed outside the list to avoid z-index issues, 
-                but CSS 'fixed' position handles that usually. 
-                However, to be clean, we can render the expanded map here if we want only one active at a time.
-                But the component handles its own expansion state visually. 
-                Let's stick to rendering it inside the list item for context, but using the portal or fixed position css.
-            */}
         </div>
     );
 };
