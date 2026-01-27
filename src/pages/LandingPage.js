@@ -11,15 +11,7 @@ import './LandingPage.css';
 const LandingPage = () => {
     const navigate = useNavigate();
     const { user, logout } = useAuth();
-    const [searchQuery, setSearchQuery] = useState('');
 
-    const handleSearch = (e) => {
-        e.preventDefault();
-        if (searchQuery.trim()) {
-            // Navigate to Home Page with search query
-            navigate(`/?search=${encodeURIComponent(searchQuery)}`);
-        }
-    };
 
     const handleShopClick = (shopId) => {
         if (shopId.startsWith('s')) {
@@ -73,28 +65,19 @@ const LandingPage = () => {
                         Shop with DelhiveryWay
                     </button>
 
-                    {/* Item 4: Search Bar */}
-                    <form className="landing-search-form" onSubmit={handleSearch}>
-                        <input
-                            type="text"
-                            placeholder="Search..."
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                        />
-                        <button type="submit">🔍</button>
-                    </form>
+                    {/* Search Bar Removed as per request */}
 
-                    {/* Item 5: Cart */}
+                    {/* Item 4: Cart */}
                     <button className="nav-icon-btn" onClick={() => navigate('/cart')} title="Cart">
                         🛒
                     </button>
 
-                    {/* Item 6: User Settings */}
+                    {/* Item 5: User Settings */}
                     <div className="user-settings-module">
                         {user ? (
                             <div className="user-dropdown">
-                                <button className="nav-icon-btn profile-btn">
-                                    👤
+                                <button className="nav-icon-btn profile-btn" style={{ fontSize: '1rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                    👤 {user.name}
                                 </button>
                                 <div className="dropdown-menu">
                                     <div className="user-info-sm">
