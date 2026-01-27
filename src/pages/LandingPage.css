@@ -259,15 +259,7 @@
 @media (min-width: 900px) {
 
     /* Strict Fit-to-Screen enforcement */
-    html,
-    body,
-    #root {
-        height: 100vh;
-        overflow: hidden;
-        /* Prevent global scroll */
-        margin: 0;
-        padding: 0;
-    }
+
 
     .landing-layout {
         height: 100vh;

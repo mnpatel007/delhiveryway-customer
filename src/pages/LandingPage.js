@@ -30,6 +30,33 @@ const LandingPage = () => {
         }
     };
 
+    // Fix: Only disable scrolling on this specific page
+    React.useEffect(() => {
+        // Save original styles
+        const originalStyle = window.getComputedStyle(document.body).overflow;
+
+        // Disable scroll only on desktop (> 900px)
+        const handleResize = () => {
+            if (window.innerWidth >= 900) {
+                document.body.style.overflow = 'hidden';
+            } else {
+                document.body.style.overflow = 'auto';
+            }
+        };
+
+        // Initial check
+        handleResize();
+
+        // Listen for resize
+        window.addEventListener('resize', handleResize);
+
+        // Cleanup: Restore scroll when leaving this page
+        return () => {
+            window.removeEventListener('resize', handleResize);
+            document.body.style.overflow = 'auto'; // Restore to auto/default
+        };
+    }, []);
+
     return (
         <div className="landing-layout">
             {/* 1. Navbar (Custom for Welcome Page) */}
