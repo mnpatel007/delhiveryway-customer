@@ -25,7 +25,6 @@ import OrderConfirmationPage from './pages/OrderConfirmationPage';
 import RevisedOrderPage from './pages/RevisedOrderPage';
 import OrderHistoryPage from './pages/OrderHistoryPage';
 import ContactPage from './pages/ContactPage';
-import LandingPage from './pages/LandingPage';
 
 import VerifyEmail from './pages/VerifyEmail';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
@@ -85,7 +84,7 @@ const GlobalCustomerAlert = () => {
 // Hide navbar on login/signup
 const Layout = ({ children }) => {
   const location = useLocation();
-  const hideNavbarPaths = ['/login', '/signup', '/welcome'];
+  const hideNavbarPaths = ['/login', '/signup'];
   const shouldHideNavbar = hideNavbarPaths.includes(location.pathname);
 
   return (
@@ -94,7 +93,7 @@ const Layout = ({ children }) => {
       {!shouldHideNavbar && <Navbar />}
       {!shouldHideNavbar && <NotificationCenter />}
       {!shouldHideNavbar && <NoticeAlert />}
-      {!shouldHideNavbar && <SocketDebugPanel />}
+      <SocketDebugPanel />
       {children}
     </>
   );
@@ -107,10 +106,9 @@ const AppContent = () => {
       <GlobalCustomerAlert />
       <BrowserRouter>
         <Layout>
-          <TermsModal />
-          <Routes>
+            <TermsModal />
+            <Routes>
             <Route path="/" element={<PrivateRoute><HomePage /></PrivateRoute>} />
-            <Route path="/welcome" element={<PrivateRoute><LandingPage /></PrivateRoute>} />
             <Route path="/search" element={<PrivateRoute><SearchPage /></PrivateRoute>} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignupPage />} />
