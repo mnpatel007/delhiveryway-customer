@@ -6,7 +6,7 @@ import { apiCall, ordersAPI, api } from '../../services/api';
 import './OrderSuccessPage.css';
 
 const OrderSuccessPage = () => {
-    const { clearCart } = useContext(CartContext);
+    const { clearCart } = useCart();
     const { user } = useAuth();
 
     const location = useLocation();

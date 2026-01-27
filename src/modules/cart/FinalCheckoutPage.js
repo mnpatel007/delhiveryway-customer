@@ -29,7 +29,7 @@ const FinalCheckoutPage = () => {
         calculateRealTimeDeliveryFee,
         isCalculatingDeliveryFee,
         deliveryCalculationDetails
-    } = useContext(CartContext);
+    } = useCart();
     const [loading, setLoading] = useState(false);
     const [shops, setShops] = useState([]);
     const [deliveryAddress, setDeliveryAddress] = useState({

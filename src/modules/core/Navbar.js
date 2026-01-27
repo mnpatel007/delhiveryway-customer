@@ -7,7 +7,7 @@ import './Navbar.css';
 
 const Navbar = () => {
     const { user, logout } = useAuth();
-    const { cartItems } = useContext(CartContext);
+    const { cartItems } = useCart();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const navigate = useNavigate();
     const location = useLocation();

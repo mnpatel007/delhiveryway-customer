@@ -19,7 +19,7 @@ const ShopPage = () => {
     const [sortBy, setSortBy] = useState('name');
     const [viewMode, setViewMode] = useState('grid');
     const [showMenu, setShowMenu] = useState(false);
-    const { addToCart, selectedShop, setSelectedShop } = useContext(CartContext);
+    const { addToCart, selectedShop, setSelectedShop } = useCart();
     const productRefsMap = useRef({});
 
     useEffect(() => {

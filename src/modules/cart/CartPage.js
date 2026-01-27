@@ -14,7 +14,7 @@ const formatPrice = (price) => {
 };
 
 const CartPage = () => {
-    const { cartItems, selectedShop, removeFromCart, updateQuantity, getOrderSummary, clearCart, deliveryCalculationDetails } = useContext(CartContext);
+    const { cartItems, selectedShop, removeFromCart, updateQuantity, getOrderSummary, clearCart, deliveryCalculationDetails } = useCart();
     const [toast, setToast] = useState('');
     const [removingItem, setRemovingItem] = useState(null);
     const navigate = useNavigate();
