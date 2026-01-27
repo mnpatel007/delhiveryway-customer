@@ -100,7 +100,7 @@ const NoticeAlert = () => {
         try {
             // Mark as viewed on server (if user is authenticated)
             try {
-                await api.post(`/ notices / ${noticeId}/view`);
+                await api.post(`/notices/${noticeId}/view`);
             } catch (error) {
                 // Ignore auth errors for non-authenticated users
                 console.log('Notice view tracking skipped (user not authenticated)');

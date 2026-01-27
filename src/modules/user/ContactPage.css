@@ -52,7 +52,7 @@
     margin: 0 0 1rem 0;
 }
 
-.contact-info > p {
+.contact-info>p {
     color: #64748b;
     font-size: 1.1rem;
     margin: 0 0 2rem 0;
@@ -229,8 +229,13 @@
 }
 
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 /* Mobile Responsive */
@@ -238,34 +243,34 @@
     .contact-hero {
         padding: 2rem 1rem;
     }
-    
+
     .contact-hero-content h1 {
         font-size: 2rem;
     }
-    
+
     .contact-container {
         padding: 0 1rem 2rem;
     }
-    
+
     .contact-content {
         grid-template-columns: 1fr;
         gap: 0;
     }
-    
+
     .contact-info,
     .contact-form-section {
         padding: 2rem 1.5rem;
     }
-    
+
     .form-row {
         grid-template-columns: 1fr;
         gap: 1.5rem;
     }
-    
+
     .contact-method {
         padding: 1rem;
     }
-    
+
     .method-icon {
         width: 50px;
         height: 50px;
@@ -277,16 +282,16 @@
     .contact-hero {
         padding: 1.5rem 0.75rem;
     }
-    
+
     .contact-hero-content h1 {
         font-size: 1.75rem;
     }
-    
+
     .contact-info,
     .contact-form-section {
         padding: 1.5rem 1rem;
     }
-    
+
     .contact-info h2,
     .contact-form h2 {
         font-size: 1.5rem;

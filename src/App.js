@@ -20,7 +20,7 @@ import ShopPage from './modules/shop/ShopPage';
 import SearchPage from './modules/home/SearchPage';
 import CartPage from './modules/cart/CartPage';
 import OrderSuccessPage from './modules/cart/OrderSuccessPage';
-import CheckoutPage from './modules/cart/CheckoutPage';
+import CheckoutPage from './modules/cart/FinalCheckoutPage';
 import OrderConfirmationPage from './modules/orders/OrderConfirmationPage';
 import RevisedOrderPage from './modules/orders/RevisedOrderPage';
 import OrderHistoryPage from './modules/orders/OrderHistoryPage';

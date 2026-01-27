@@ -6,7 +6,7 @@ import { apiCall, ordersAPI, api } from '../../services/api';
 import './OrderSuccessPage.css';
 
 const OrderSuccessPage = () => {
-    const { clearCart } = useCart();
+    const { clearCart } = useContext(CartContext);
     const { user } = useAuth();
 
     const location = useLocation();
@@ -27,7 +27,7 @@ const OrderSuccessPage = () => {
 
                 if (sessionId) {
                     // Fetch session details from backend
-                    const response = await api.get(`/ payment / session / ${sessionId} `);
+                    const response = await api.get(`/payment/session/${sessionId}`);
                     setOrderDetails(response.data);
                 } else if (location.state) {
                     // Fallback to location state
@@ -39,7 +39,7 @@ const OrderSuccessPage = () => {
                 const fallbackAmount = localStorage.getItem('lastOrderAmount') || 299;
                 setOrderDetails({
                     totalAmount: parseFloat(fallbackAmount),
-                    orderId: `${Date.now().toString().slice(-6)} `,
+                    orderId: `${Date.now().toString().slice(-6)}`,
                     paymentStatus: 'paid'
                 });
             } finally {
@@ -61,12 +61,12 @@ const OrderSuccessPage = () => {
     const generateOrderId = () => {
         // Use the same format as delivery app: #{orderId.slice(-6)}
         if (orderDetails?.orderId) {
-            return `#${orderDetails.orderId.slice(-6)} `;
+            return `#${orderDetails.orderId.slice(-6)}`;
         }
         if (orderDetails?.sessionId) {
-            return `#${orderDetails.sessionId.slice(-6)} `;
+            return `#${orderDetails.sessionId.slice(-6)}`;
         }
-        return `#${Date.now().toString().slice(-6)} `;
+        return `#${Date.now().toString().slice(-6)}`;
     };
 
     const formatAmount = (amount) => {

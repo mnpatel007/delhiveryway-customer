@@ -80,7 +80,7 @@ const OrderInquiry = ({ order, onClose }) => {
 
         try {
             // Track inquiry in backend
-            const response = await fetch(`/ api / orders / ${order._id}/inquiry`, {
+            const response = await fetch(`/api/orders/${order._id}/inquiry`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

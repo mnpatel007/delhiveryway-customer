@@ -433,8 +433,13 @@
 
 /* Highlight delivery fee when it changes */
 @keyframes highlight {
-    0% { background-color: #f0fdf4; }
-    100% { background-color: transparent; }
+    0% {
+        background-color: #f0fdf4;
+    }
+
+    100% {
+        background-color: transparent;
+    }
 }
 
 .summary-row.delivery-fee {
