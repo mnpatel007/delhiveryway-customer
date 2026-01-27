@@ -106,8 +106,8 @@ const AppContent = () => {
       <GlobalCustomerAlert />
       <BrowserRouter>
         <Layout>
-            <TermsModal />
-            <Routes>
+          <TermsModal />
+          <Routes>
             <Route path="/" element={<PrivateRoute><HomePage /></PrivateRoute>} />
             <Route path="/search" element={<PrivateRoute><SearchPage /></PrivateRoute>} />
             <Route path="/login" element={<LoginPage />} />
