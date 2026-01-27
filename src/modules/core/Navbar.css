@@ -144,21 +144,14 @@
 }
 
 .navbar-link.active {
-    color: #6366f1;
-    background-color: #eff6ff;
-    box-shadow: 0 1px 3px rgba(99, 102, 241, 0.2);
+    background-color: #6366f1;
+    color: white;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+    transform: translateY(-1px);
 }
 
 .navbar-link.active::after {
-    content: '';
-    position: absolute;
-    bottom: -1px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 20px;
-    height: 2px;
-    background: #6366f1;
-    border-radius: 1px;
+    display: none;
 }
 
 .link-icon {
