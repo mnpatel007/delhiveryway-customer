@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
-import api from '../services/api';
-import './CheckoutPage.css';
+import { useAuth } from '../../context/AuthContext';
+import { useSocket } from '../../context/SocketContext';
+import { apiCall, ordersAPI, api } from '../../services/api';
+import '../cart/CheckoutPage.css';
 
 const OrderConfirmationPage = () => {
     const { orderId } = useParams();
@@ -59,7 +61,7 @@ const OrderConfirmationPage = () => {
                     <div className="error-state">
                         <h2>❌ Error</h2>
                         <p>{error}</p>
-                        <button 
+                        <button
                             className="btn btn-primary"
                             onClick={() => navigate('/')}
                         >
@@ -168,13 +170,13 @@ const OrderConfirmationPage = () => {
                         </div>
 
                         <div className="confirmation-actions">
-                            <button 
+                            <button
                                 className="btn btn-secondary"
                                 onClick={() => navigate('/orders')}
                             >
                                 View My Orders
                             </button>
-                            <button 
+                            <button
                                 className="btn btn-primary"
                                 onClick={() => navigate('/')}
                             >

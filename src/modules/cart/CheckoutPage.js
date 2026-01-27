@@ -1,12 +1,12 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { useAuth } from '../context/AuthContext';
-import { CartContext } from '../context/CartContext';
-import { useSocket } from '../context/SocketContext';
+import { useAuth } from '../../context/AuthContext';
+import { useCart } from '../../context/CartContext';
+import { useSocket } from '../../context/SocketContext';
 import { useNavigate } from 'react-router-dom';
-import { shopsAPI, apiCall, api } from '../services/api';
-import { geocodeAddress } from '../utils/geocoding';
-import { getCurrentLocation } from '../utils/deliveryCalculator';
-import './FinalCheckoutPage.css';
+import { apiCall, paymentAPI, ordersAPI, api } from '../../services/api';
+import { geocodeAddress } from '../../utils/geocoding';
+import { getCurrentLocation } from '../../utils/deliveryCalculator';
+import './CheckoutPage.css';
 
 // Format price with Indian Rupee symbol and proper formatting
 const formatPrice = (price) => {
@@ -29,7 +29,7 @@ const FinalCheckoutPage = () => {
         calculateRealTimeDeliveryFee,
         isCalculatingDeliveryFee,
         deliveryCalculationDetails
-    } = useContext(CartContext);
+    } = useCart();
     const [loading, setLoading] = useState(false);
     const [shops, setShops] = useState([]);
     const [deliveryAddress, setDeliveryAddress] = useState({
@@ -99,7 +99,7 @@ const FinalCheckoutPage = () => {
                 // Extract shop ID from different possible structures
                 const shopId = selectedShop.data?.shop?._id || selectedShop._id;
 
-                const response = await api.get(`/orders/acceptance-time/${shopId}`);
+                const response = await api.get(`/ orders / acceptance - time / ${shopId} `);
 
                 if (response.data.success) {
                     setAcceptanceTime(response.data.data);
@@ -284,7 +284,7 @@ const FinalCheckoutPage = () => {
                     formattedAddress: fullAddress,
                     instructions: deliveryAddress.instructions,
                     contactName: deliveryAddress.contactName.trim(),
-                    contactPhone: `${deliveryAddress.countryCode}${deliveryAddress.contactPhone.replace(/\s+/g, '')}`
+                    contactPhone: `${deliveryAddress.countryCode}${deliveryAddress.contactPhone.replace(/\s+/g, '')} `
                 },
                 paymentMethod: 'cash', // Default to cash on delivery
                 confirmDuplicate: confirmDuplicate
@@ -295,7 +295,7 @@ const FinalCheckoutPage = () => {
                 clearCart();
 
                 // Navigate to order confirmation page
-                navigate(`/order-confirmation/${response.data.data.order._id}`, {
+                navigate(`/ order - confirmation / ${response.data.data.order._id} `, {
                     state: { orderNumber: response.data.data.order.orderNumber }
                 });
             } else {
@@ -330,7 +330,7 @@ const FinalCheckoutPage = () => {
             }
 
             const errorMessage = isGeocoding
-                ? `Error processing address: ${err.message || 'Could not determine location coordinates'}`
+                ? `Error processing address: ${err.message || 'Could not determine location coordinates'} `
                 : (err.response?.data?.message || 'Failed to place order. Please try again.');
 
             setGeocodingError(errorMessage);
@@ -370,7 +370,7 @@ const FinalCheckoutPage = () => {
 
             if (location) {
                 console.log('📍 Got GPS coordinates:', location);
-                console.log('📍 Location accuracy:', location.accuracy ? `±${Math.round(location.accuracy)}m` : 'Unknown');
+                console.log('📍 Location accuracy:', location.accuracy ? `±${Math.round(location.accuracy)} m` : 'Unknown');
 
                 // Try to reverse geocode to get address
                 try {

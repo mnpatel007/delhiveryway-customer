@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import './ContactPage.css';
-import { contactAPI } from '../services/api';
+import { contactAPI } from '../../services/api';
 
 const ContactPage = () => {
     const [formData, setFormData] = useState({

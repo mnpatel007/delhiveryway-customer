@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
-import { useSocket } from '../context/SocketContext';
+import { useSocket } from '../../context/SocketContext';
+import { useAuth } from '../../context/AuthContext';
 
 export default function CustomerSocketHandler({ onUpdate }) {
     const { notifications } = useSocket();

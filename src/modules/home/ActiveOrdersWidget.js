@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../context/AuthContext';
-import { ordersAPI, apiCall } from '../services/api';
-import { useSocket } from '../context/SocketContext';
-import InquiryButton from './InquiryButton';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
+import { apiCall, ordersAPI } from '../../services/api';
+import { useSocket } from '../../context/SocketContext';
+import InquiryButton from '../shop/InquiryButton';
 import './ActiveOrdersWidget.css';
 
 const ActiveOrdersWidget = () => {

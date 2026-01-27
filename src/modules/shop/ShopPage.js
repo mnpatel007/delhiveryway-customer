@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext, useRef } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
-import { shopsAPI, productsAPI, apiCall } from '../services/api';
-import { CartContext } from '../context/CartContext';
+import { shopsAPI, productsAPI, apiCall } from '../../services/api';
+import { useCart } from '../../context/CartContext';
 import './ShopPage.css';
 
 const ShopPage = () => {
@@ -19,7 +19,7 @@ const ShopPage = () => {
     const [sortBy, setSortBy] = useState('name');
     const [viewMode, setViewMode] = useState('grid');
     const [showMenu, setShowMenu] = useState(false);
-    const { addToCart, selectedShop, setSelectedShop } = useContext(CartContext);
+    const { addToCart, updateQuantity, updateNotes, cartItems, selectedShop, setSelectedShop } = useCart();
     const productRefsMap = useRef({});
 
     useEffect(() => {

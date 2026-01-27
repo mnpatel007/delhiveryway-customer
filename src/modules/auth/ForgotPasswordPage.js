@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { authAPI, apiCall } from '../services/api';
+import { useNavigate } from 'react-router-dom';
+import { authAPI, apiCall } from '../../services/api';
 
 const ForgotPasswordPage = () => {
     const [email, setEmail] = useState('');

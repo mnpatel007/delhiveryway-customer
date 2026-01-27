@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { useAuth } from '../context/AuthContext';
-import { ordersAPI, apiCall, api } from '../services/api';
+import { useAuth } from '../../context/AuthContext';
+import { ordersAPI, apiCall, api } from '../../services/api';
 import io from 'socket.io-client';
-import config from '../config/config';
+import config from '../../config/config';
 import './OrderHistoryPage.css';
 
 const OrderHistoryPage = () => {

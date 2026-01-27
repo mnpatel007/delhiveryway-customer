@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { useSocket } from '../context/SocketContext';
+import { apiCall, shopsAPI } from '../../services/api';
+import { useAuth } from '../../context/AuthContext';
+import { useSocket } from '../../context/SocketContext';
 import './OrderInquiry.css';
 
 const OrderInquiry = ({ order, onClose }) => {
@@ -78,7 +80,7 @@ const OrderInquiry = ({ order, onClose }) => {
 
         try {
             // Track inquiry in backend
-            const response = await fetch(`/api/orders/${order._id}/inquiry`, {
+            const response = await fetch(`/ api / orders / ${order._id}/inquiry`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { useSocket } from '../context/SocketContext';
-import { useAuth } from '../context/AuthContext';
-import config from '../config/config';
+import { useSocket } from '../../context/SocketContext';
+import { useAuth } from '../../context/AuthContext';
+import config from '../../config/config';
 import './SocketDebugPanel.css';
 
 const SocketDebugPanel = () => {

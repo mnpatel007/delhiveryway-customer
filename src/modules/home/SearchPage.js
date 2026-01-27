@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { productsAPI, apiCall } from '../services/api';
-import { useSearch } from '../context/SearchContext';
+import { useSearch } from '../../context/SearchContext';
+import { useAuth } from '../../context/AuthContext';
+import { useCart } from '../../context/CartContext';
+import { apiCall, shopsAPI, productsAPI } from '../../services/api';
 
 const SearchPage = () => {
     const [searchParams] = useSearchParams();

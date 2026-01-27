@@ -1,11 +1,12 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import { useSearch } from '../context/SearchContext';
-import PermanentNotices from '../components/PermanentNotices';
-import ActiveOrdersWidget from '../components/ActiveOrdersWidget';
-import Logo from '../components/Logo';
-import { calculateDeliveryFeesBulk, getDeliveryFeeDisplay, getCustomerLocation, getCurrentLocation } from '../utils/deliveryCalculator';
+import { useAuth } from '../../context/AuthContext';
+// import SidebarAd from '../../components/SidebarAd';
+import { useSearch } from '../../context/SearchContext';
+import PermanentNotices from './PermanentNotices';
+import ActiveOrdersWidget from './ActiveOrdersWidget';
+import Logo from '../core/Logo';
+import { calculateDeliveryFeesBulk, getDeliveryFeeDisplay, getCustomerLocation, getCurrentLocation } from '../../utils/deliveryCalculator';
 import axios from 'axios';
 import './HomePage.css';
 
@@ -538,7 +539,7 @@ const HomePage = () => {
                             <span className="shops-count">({filteredShops.length} shops)</span>
                         </h2>
 
-                        {/* Search placed under Available Shops header */}
+                        {/* <SidebarAd /> */}
                         <div className="search-section" style={{ marginTop: 16 }}>
                             <div className="search-content">
                                 <form className="search-form" onSubmit={handleSearch}>
