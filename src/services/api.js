@@ -217,7 +217,8 @@ export const handleApiError = (error) => {
             message = data?.message || 'Invalid request. Please check your input and try again.';
             break;
         case 401:
-            message = 'Authentication required. Please log in and try again.';
+            // Don't overwrite if backend provided a specific message (e.g. "Invalid email or password")
+            message = data?.message || 'Authentication required. Please log in and try again.';
             break;
         case 403:
             message = 'Access denied. You don\'t have permission to perform this action.';
