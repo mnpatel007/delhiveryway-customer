@@ -1,6 +1,21 @@
 import axios from 'axios';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+import { Capacitor } from '@capacitor/core';
+
+const getBaseUrl = () => {
+    if (process.env.REACT_APP_API_URL) return process.env.REACT_APP_API_URL;
+
+    // For Android App, use Production Backend
+    if (Capacitor.getPlatform() === 'android') {
+        return 'https://delhiveryway-backend-1.onrender.com/api';
+    }
+
+    // For iOS Simulator, localhost works fine
+    // For Web, localhost works fine
+    return 'http://localhost:5000/api';
+};
+
+const API_BASE_URL = getBaseUrl();
 
 // Create axios instance with better configuration
 const api = axios.create({
