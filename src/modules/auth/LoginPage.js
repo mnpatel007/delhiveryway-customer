@@ -110,6 +110,12 @@ const LoginForm = () => {
                 navigate('/');
             } catch (err) {
                 console.error('❌ Google login error:', err);
+
+                // DEBUG: Show exact error
+                const status = err.response ? err.response.status : 'No Response';
+                const msg = err.response && err.response.data ? (err.response.data.message || JSON.stringify(err.response.data)) : err.message;
+                alert(`Debug: Google Login Failed.\nStatus: ${status}\nMessage: ${msg}`);
+
                 if (err.response) {
                     console.error('Error Response Data:', err.response.data);
                     console.error('Error Response Status:', err.response.status);
