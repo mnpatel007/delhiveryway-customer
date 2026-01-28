@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { apiCall, paymentAPI, ordersAPI, api } from '../../services/api';
 import { geocodeAddress } from '../../utils/geocoding';
 import { getCurrentLocation } from '../../utils/deliveryCalculator';
-import './CheckoutPage.css';
+import './FinalCheckoutPage.css';
 
 // Format price with Indian Rupee symbol and proper formatting
 const formatPrice = (price) => {
