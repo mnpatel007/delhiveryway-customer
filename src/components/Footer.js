@@ -34,36 +34,36 @@ const Footer = () => {
                     <div className="footer-column">
                         <h4>Company</h4>
                         <ul>
-                            <li><Link to="/about">About Us</Link></li>
-                            <li><Link to="/careers">Careers</Link></li>
-                            <li><Link to="/blog">Blog</Link></li>
-                            <li><Link to="/press">Press</Link></li>
+                            <li><span>About Us</span></li>
+                            <li><span>Careers</span></li>
+                            <li><span>Blog</span></li>
+                            <li><span>Press</span></li>
                         </ul>
                     </div>
                     <div className="footer-column">
                         <h4>Support</h4>
                         <ul>
-                            <li><Link to="/help">Help Center</Link></li>
-                            <li><Link to="/contact">Contact Us</Link></li>
-                            <li><Link to="/safety">Safety Center</Link></li>
-                            <li><Link to="/guidelines">Community Guidelines</Link></li>
+                            <li><span>Help Center</span></li>
+                            <li><span>Contact Us</span></li>
+                            <li><span>Safety Center</span></li>
+                            <li><span>Community Guidelines</span></li>
                         </ul>
                     </div>
                     <div className="footer-column">
                         <h4>Legal</h4>
                         <ul>
-                            <li><Link to="/terms">Terms of Service</Link></li>
-                            <li><Link to="/privacy">Privacy Policy</Link></li>
-                            <li><Link to="/cookies">Cookie Policy</Link></li>
+                            <li><span>Terms of Service</span></li>
+                            <li><span>Privacy Policy</span></li>
+                            <li><span>Cookie Policy</span></li>
                         </ul>
                     </div>
                     <div className="footer-column">
                         <h4>Locations</h4>
                         <ul>
-                            <li><Link to="/mumbai">Mumbai</Link></li>
-                            <li><Link to="/delhi">Delhi</Link></li>
-                            <li><Link to="/bangalore">Bangalore</Link></li>
-                            <li><Link to="/all-cities">All Cities</Link></li>
+                            <li><span>Mumbai</span></li>
+                            <li><span>Delhi</span></li>
+                            <li><span>Bangalore</span></li>
+                            <li><span>All Cities</span></li>
                         </ul>
                     </div>
                 </div>

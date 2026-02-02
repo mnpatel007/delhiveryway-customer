@@ -118,15 +118,19 @@
     margin-bottom: 12px;
 }
 
-.footer-column a {
+.footer-column span {
     color: #64748b;
     text-decoration: none;
     font-size: 14px;
     transition: color 0.2s ease;
+    cursor: default;
+    /* Non-clickable */
 }
 
-.footer-column a:hover {
-    color: #0284c7;
+/* Optional: remove hover effect or keep it subtle */
+.footer-column span:hover {
+    color: #64748b;
+    /* No color change on hover */
 }
 
 /* Bottom Section */
