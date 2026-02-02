@@ -262,17 +262,15 @@
 
 
     .landing-layout {
-        height: 100vh;
-        overflow: hidden;
+        min-height: 100vh;
+        height: auto;
+        overflow-y: auto;
         display: flex;
         flex-direction: column;
     }
 
     .landing-container {
         flex: 1;
-        /* Fill remaining vertical space */
-        min-height: 0;
-        /* vital for flex scrolling/containment */
         display: flex;
         flex-direction: column;
         padding: 10px 20px !important;
@@ -290,25 +288,18 @@
     }
 
     .landing-grid {
-        flex: 1;
-        /* Fill remaining space below banner */
         display: grid;
         grid-template-columns: 1fr 320px;
         /* Main content + Fixed sidebar */
         gap: 20px;
-        min-height: 0;
-        /* vital for internal overflow handling */
-        height: 100%;
-        /* Ensure it takes full height */
+        width: 100%;
     }
 
     .landing-main {
         display: flex;
         flex-direction: column;
-        justify-content: space-evenly;
-        /* Evenly distribute space so nothing is squashed */
-        height: 100%;
-        overflow: hidden;
+        justify-content: flex-start;
+        gap: 20px;
         padding-bottom: 5px;
     }
 
