@@ -6,30 +6,31 @@ import { CartProvider } from './context/CartContext';
 import { SocketProvider, useSocket } from './context/SocketContext';
 import { SearchProvider } from './context/SearchContext';
 
-import ErrorBoundary from './components/ErrorBoundary';
-import Navbar from './components/Navbar';
-import NotificationCenter from './components/NotificationCenter';
-import NoticeAlert from './components/NoticeAlert';
-import TermsModal from './components/TermsModal';
+import ErrorBoundary from './modules/core/ErrorBoundary';
+import Navbar from './modules/core/Navbar';
+import NotificationCenter from './modules/core/NotificationCenter';
+import NoticeAlert from './modules/core/NoticeAlert';
+import TermsModal from './modules/core/TermsModal';
 
-import SocketDebugPanel from './components/SocketDebugPanel';
-import HomePage from './pages/HomePage';
-import LoginPage from './pages/LoginPage';
-import SignupPage from './pages/SignupPage';
-import ShopPage from './pages/ShopPage';
-import SearchPage from './pages/SearchPage';
-import CartPage from './pages/CartPage';
-import OrderSuccessPage from './pages/OrderSuccessPage';
-import CheckoutPage from './pages/FinalCheckoutPage';
-import OrderConfirmationPage from './pages/OrderConfirmationPage';
-import RevisedOrderPage from './pages/RevisedOrderPage';
-import OrderHistoryPage from './pages/OrderHistoryPage';
-import ContactPage from './pages/ContactPage';
-import LandingPage from './pages/LandingPage';
+import SocketDebugPanel from './modules/core/SocketDebugPanel';
+import HomePage from './modules/home/HomePage';
+import LandingPage from './modules/home/LandingPage';
+import LoginPage from './modules/auth/LoginPage';
+import SignupPage from './modules/auth/SignupPage';
+import ShopPage from './modules/shop/ShopPage';
+import SearchPage from './modules/home/SearchPage';
+import CartPage from './modules/cart/CartPage';
+import OrderSuccessPage from './modules/cart/OrderSuccessPage';
+import CheckoutPage from './modules/cart/FinalCheckoutPage';
+import OrderConfirmationPage from './modules/orders/OrderConfirmationPage';
+import RevisedOrderPage from './modules/orders/RevisedOrderPage';
+import OrderHistoryPage from './modules/orders/OrderHistoryPage';
+import CustomerSocketHandler from './modules/orders/CustomerSocketHandler';
+import ContactPage from './modules/user/ContactPage';
 
-import VerifyEmail from './pages/VerifyEmail';
-import ForgotPasswordPage from './pages/ForgotPasswordPage';
-import ResetPasswordPage from './pages/ResetPasswordPage';
+import VerifyEmail from './modules/auth/VerifyEmail';
+import ForgotPasswordPage from './modules/auth/ForgotPasswordPage';
+import ResetPasswordPage from './modules/auth/ResetPasswordPage';
 
 
 // Private route
