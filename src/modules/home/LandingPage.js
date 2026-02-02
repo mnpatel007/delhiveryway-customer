@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import TopBannerAd from '../components/TopBannerAd';
-import SidebarAd from '../components/SidebarAd';
-import SponsoredSection from '../components/SponsoredSection';
-import HungryCTA from '../components/HungryCTA';
-import Logo from '../components/Logo';
+import { useAuth } from '../../context/AuthContext';
+import TopBannerAd from '../core/TopBannerAd';
+import SidebarAd from '../core/SidebarAd';
+import SponsoredSection from '../core/SponsoredSection';
+import HungryCTA from '../core/HungryCTA';
+import Logo from '../core/Logo';
 import Footer from '../core/Footer';
 import './LandingPage.css';
 
