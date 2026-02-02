@@ -19,7 +19,7 @@ const Footer = () => {
                             Browse thousands of products, track orders in real-time, and get everything delivered to your doorstep.
                         </p>
                         <div className="promo-actions">
-                            <Link to="/signup" className="promo-btn primary">
+                            <Link to="/" className="promo-btn primary">
                                 <span>🚀</span> Get Started For Free
                             </Link>
                         </div>
