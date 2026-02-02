@@ -160,7 +160,6 @@
 
 .social-link {
     color: #94a3b8;
-    font-size: 20px;
     transition: all 0.3s ease;
     display: flex;
     align-items: center;
@@ -169,12 +168,19 @@
     height: 40px;
     border-radius: 50%;
     background: #f8fafc;
+    cursor: default;
+    /* Disabled cursor */
 }
 
+/* Optional: Slight hover effect without link behavior */
 .social-link:hover {
     background: #f0f9ff;
     color: #0284c7;
-    transform: translateY(-3px);
+}
+
+.social-link svg {
+    width: 20px;
+    height: 20px;
 }
 
 /* Responsive */
