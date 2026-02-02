@@ -20,16 +20,21 @@
     justify-content: space-between;
     align-items: center;
     background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-    padding: 40px;
+    padding: 0 40px;
+    /* Reduced vertical padding, relying on content/height */
     border-radius: 20px;
     margin-bottom: 60px;
     position: relative;
     overflow: hidden;
+    min-height: 300px;
+    gap: 40px;
 }
 
 .promo-content {
     z-index: 2;
-    max-width: 600px;
+    max-width: 500px;
+    padding: 40px 0;
+    /* Add vertical padding to text content */
 }
 
 .promo-title {
@@ -78,15 +83,51 @@
     transform: translateY(-2px);
 }
 
-.promo-btn.secondary {
-    background: white;
-    color: #0284c7;
-    border: 1px solid #bae6fd;
+/* Promo Images */
+.promo-images {
+    flex: 1;
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-end;
+    position: relative;
+    height: 300px;
+    /* Container height matching banner min-height */
 }
 
-.promo-btn.secondary:hover {
-    background: #f0f9ff;
-    transform: translateY(-2px);
+.promo-img {
+    position: absolute;
+    bottom: -10px;
+    /* Slight offset to look grounded */
+    transition: transform 0.3s ease;
+}
+
+.img-scooter {
+    width: 140px;
+    right: 220px;
+    z-index: 1;
+    transform: rotate(-5deg);
+}
+
+.img-pickup {
+    width: 120px;
+    right: 120px;
+    z-index: 2;
+    bottom: 10px;
+}
+
+.img-customer {
+    width: 130px;
+    right: 0;
+    z-index: 3;
+}
+
+/* Hover effect on images */
+.footer-promo:hover .img-scooter {
+    transform: translateX(-10px) rotate(-5deg);
+}
+
+.footer-promo:hover .img-customer {
+    transform: translateX(5px);
 }
 
 /* Links Section */

@@ -22,10 +22,12 @@ const Footer = () => {
                             <Link to="/signup" className="promo-btn primary">
                                 <span>🚀</span> Get Started For Free
                             </Link>
-                            <Link to="/about" className="promo-btn secondary">
-                                Learn More
-                            </Link>
                         </div>
+                    </div>
+                    <div className="promo-images">
+                        <img src="/assets/story-scooter.png" alt="Delivery Scooter" className="promo-img img-scooter" />
+                        <img src="/assets/story-pickup-v2.png" alt="Pickup" className="promo-img img-pickup" />
+                        <img src="/assets/story-customer.png" alt="Happy Customer" className="promo-img img-customer" />
                     </div>
                 </div>
 
