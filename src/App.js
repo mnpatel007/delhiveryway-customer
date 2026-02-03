@@ -82,15 +82,17 @@ const GlobalCustomerAlert = () => {
   );
 };
 
+import MidnightLogoutHandler from './modules/auth/MidnightLogoutHandler';
+
 // Hide navbar on login/signup
 const Layout = ({ children }) => {
   const location = useLocation();
-  const hideNavbarPaths = ['/login', '/signup'];
+  const hideNavbarPaths = ['/login', '/signup', '/welcome'];
   const shouldHideNavbar = hideNavbarPaths.includes(location.pathname);
 
   return (
     <>
-
+      <MidnightLogoutHandler />
       {!shouldHideNavbar && <Navbar />}
       {!shouldHideNavbar && <NotificationCenter />}
       {!shouldHideNavbar && <NoticeAlert />}
