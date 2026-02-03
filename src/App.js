@@ -30,6 +30,7 @@ import ContactPage from './modules/user/ContactPage';
 import VerifyEmail from './modules/auth/VerifyEmail';
 import ForgotPasswordPage from './modules/auth/ForgotPasswordPage';
 import ResetPasswordPage from './modules/auth/ResetPasswordPage';
+import MidnightLogoutHandler from './modules/auth/MidnightLogoutHandler';
 
 
 // Private route
@@ -82,7 +83,7 @@ const GlobalCustomerAlert = () => {
   );
 };
 
-import MidnightLogoutHandler from './modules/auth/MidnightLogoutHandler';
+
 
 // Hide navbar on login/signup
 const Layout = ({ children }) => {
