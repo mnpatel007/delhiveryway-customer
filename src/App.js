@@ -14,6 +14,7 @@ import TermsModal from './modules/core/TermsModal';
 
 import SocketDebugPanel from './modules/core/SocketDebugPanel';
 import HomePage from './modules/home/HomePage';
+import LandingPage from './modules/home/LandingPage';
 import LoginPage from './modules/auth/LoginPage';
 import SignupPage from './modules/auth/SignupPage';
 import ShopPage from './modules/shop/ShopPage';
@@ -88,7 +89,7 @@ const GlobalCustomerAlert = () => {
 // Hide navbar on login/signup
 const Layout = ({ children }) => {
   const location = useLocation();
-  const hideNavbarPaths = ['/login', '/signup'];
+  const hideNavbarPaths = ['/login', '/signup', '/welcome'];
   const shouldHideNavbar = hideNavbarPaths.includes(location.pathname);
 
   return (
@@ -97,7 +98,7 @@ const Layout = ({ children }) => {
       {!shouldHideNavbar && <Navbar />}
       {!shouldHideNavbar && <NotificationCenter />}
       {!shouldHideNavbar && <NoticeAlert />}
-      <SocketDebugPanel />
+      {!shouldHideNavbar && <SocketDebugPanel />}
       {children}
     </>
   );
@@ -113,6 +114,7 @@ const AppContent = () => {
           <TermsModal />
           <Routes>
             <Route path="/" element={<PrivateRoute><HomePage /></PrivateRoute>} />
+            <Route path="/welcome" element={<PrivateRoute><LandingPage /></PrivateRoute>} />
             <Route path="/search" element={<PrivateRoute><SearchPage /></PrivateRoute>} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignupPage />} />
