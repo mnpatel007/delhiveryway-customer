@@ -95,9 +95,14 @@ const Navbar = () => {
                                     <span className="user-email">{user.email}</span>
                                 </div>
                             </div>
-                            <button onClick={handleLogout} className="btn btn-secondary btn-sm">
-                                Logout
-                            </button>
+                            <div className="user-dropdown-actions" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                <Link to="/profile" className="btn btn-primary btn-sm" style={{ textAlign: 'center' }}>
+                                    My Profile
+                                </Link>
+                                <button onClick={handleLogout} className="btn btn-secondary btn-sm">
+                                    Logout
+                                </button>
+                            </div>
                         </div>
                     ) : (
                         <div className="auth-buttons">
@@ -183,6 +188,14 @@ const Navbar = () => {
                                 </div>
                             </div>
 
+                            <Link
+                                to="/profile"
+                                className="btn btn-primary mobile-logout-btn"
+                                onClick={() => setIsMenuOpen(false)}
+                                style={{ marginBottom: '10px' }}
+                            >
+                                My Profile
+                            </Link>
                             <button
                                 onClick={handleLogout}
                                 className="btn btn-secondary mobile-logout-btn"
