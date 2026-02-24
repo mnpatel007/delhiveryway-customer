@@ -290,7 +290,8 @@
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.2s ease, transform 0.2s ease;
-    z-index: 100;
+    z-index: 1050;
+    /* Increased to ensure it appears above notifications/alerts */
 }
 
 .user-tooltip::before {
