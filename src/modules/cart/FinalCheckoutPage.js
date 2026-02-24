@@ -674,11 +674,19 @@ const FinalCheckoutPage = () => {
                                         ⚠️ Contact name is required for delivery
                                     </small>
                                 )}
-                                {(user?.phone || user?.user?.phone) && (user?.phone !== '0000000000' && user?.user?.phone !== '0000000000') && (
-                                    <div style={{ marginTop: '8px', padding: '8px', backgroundColor: '#f8f9fa', borderRadius: '4px', border: '1px solid #e9ecef', fontSize: '0.9rem' }}>
-                                        <span style={{ fontWeight: 'bold', color: '#495057' }}>Registered Phone:</span> {user?.countryCode || user?.user?.countryCode || '+91'} {user?.phone || user?.user?.phone}
-                                    </div>
-                                )}
+                                {(() => {
+                                    const userPhone = user?.phone || user?.user?.phone;
+                                    const userCountryCode = user?.countryCode || user?.user?.countryCode || '+91';
+
+                                    if (userPhone && userPhone !== '0000000000' && userPhone.trim() !== '') {
+                                        return (
+                                            <div style={{ marginTop: '8px', padding: '8px', backgroundColor: '#f8f9fa', borderRadius: '4px', border: '1px solid #e9ecef', fontSize: '0.9rem' }}>
+                                                <span style={{ fontWeight: 'bold', color: '#495057' }}>Registered Phone:</span> {userCountryCode} {userPhone}
+                                            </div>
+                                        );
+                                    }
+                                    return null;
+                                })()}
                             </div>
                             <div className="form-group">
                                 <label>Contact Phone <span style={{ color: '#ff4444', fontWeight: 'bold' }}>*</span></label>
