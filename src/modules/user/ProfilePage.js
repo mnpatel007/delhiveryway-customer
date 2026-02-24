@@ -6,7 +6,7 @@ import './ProfilePage.css';
 
 const ProfilePage = () => {
     const navigate = useNavigate();
-    const { user, setUser } = useAuth();
+    const { user, updateUser } = useAuth();
 
     // Form state
     const [formData, setFormData] = useState({
@@ -101,7 +101,7 @@ const ProfilePage = () => {
 
                 // Update context globally so the Navbar reflects any name changes immediately
                 if (response.data.data && response.data.data.user) {
-                    setUser(response.data.data.user);
+                    updateUser(response.data.data.user);
                 }
             } else {
                 setError(response.data?.message || 'Failed to update profile.');
