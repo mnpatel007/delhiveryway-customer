@@ -28,9 +28,10 @@ const ProfilePage = () => {
                 const response = await authAPI.getProfile();
                 if (response.data && response.data.success) {
                     const profileData = response.data.data.user;
+                    const phoneVal = profileData.phone;
                     setFormData({
                         name: profileData.name || '',
-                        phone: profileData.phone || '',
+                        phone: (phoneVal === '0000000000' || !phoneVal) ? '' : phoneVal,
                         address: profileData.address?.street || ''
                     });
                 }
