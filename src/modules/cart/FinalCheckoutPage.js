@@ -55,7 +55,10 @@ const FinalCheckoutPage = () => {
     // Clean up user data and ensure phone field is empty if invalid
     useEffect(() => {
         if (user) {
-            const userPhone = user?.phone || user?.user?.phone || '';
+            const userObj = user?.user || user;
+            const userPhone = userObj?.phone || '';
+            const userAddress = userObj?.address || {};
+
             // Only use user phone if it's a valid 10-digit number and not a placeholder
             const isValidPhone = /^[0-9]{10}$/.test(userPhone) &&
                 userPhone !== '0000000000' &&
@@ -64,8 +67,12 @@ const FinalCheckoutPage = () => {
 
             setDeliveryAddress(prev => ({
                 ...prev,
-                contactName: user?.name || user?.user?.name || '',
-                contactPhone: isValidPhone ? userPhone : '' // Only use if valid, otherwise empty
+                contactName: prev.contactName || userObj?.name || '',
+                contactPhone: isValidPhone && !prev.contactPhone ? userPhone : prev.contactPhone,
+                street: prev.street || userAddress.street || '',
+                city: prev.city || userAddress.city || '',
+                state: prev.state || userAddress.state || '',
+                zipCode: prev.zipCode || userAddress.zipCode || ''
             }));
         }
     }, [user]);
@@ -678,7 +685,7 @@ const FinalCheckoutPage = () => {
                                     const userPhone = user?.phone || user?.user?.phone;
                                     const userCountryCode = user?.countryCode || user?.user?.countryCode || '+91';
 
-                                    if (userPhone && userPhone !== '0000000000' && userPhone.trim() !== '') {
+                                    if (userPhone && userPhone.trim() !== '') {
                                         return (
                                             <div style={{ marginTop: '8px', padding: '8px', backgroundColor: '#f8f9fa', borderRadius: '4px', border: '1px solid #e9ecef', fontSize: '0.9rem' }}>
                                                 <span style={{ fontWeight: 'bold', color: '#495057' }}>Registered Phone:</span> {userCountryCode} {userPhone}

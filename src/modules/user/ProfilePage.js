@@ -13,7 +13,10 @@ const ProfilePage = () => {
         name: '',
         countryCode: '+91',
         phone: '',
-        address: ''
+        street: '',
+        city: '',
+        state: '',
+        zipCode: ''
     });
 
     // Loading and message states
@@ -34,7 +37,10 @@ const ProfilePage = () => {
                         name: profileData.name || '',
                         countryCode: profileData.countryCode || '+91',
                         phone: (phoneVal === '0000000000' || !phoneVal) ? '' : phoneVal,
-                        address: profileData.address?.street || ''
+                        street: profileData.address?.street || '',
+                        city: profileData.address?.city || '',
+                        state: profileData.address?.state || '',
+                        zipCode: profileData.address?.zipCode || ''
                     });
                 }
             } catch (err) {
@@ -88,9 +94,11 @@ const ProfilePage = () => {
                 name: formData.name,
                 countryCode: formData.countryCode,
                 phone: formData.phone,
-                // Nested inside the `address` object and specifically setting `street`
                 address: {
-                    street: formData.address
+                    street: formData.street,
+                    city: formData.city,
+                    state: formData.state,
+                    zipCode: formData.zipCode
                 }
             };
 
@@ -176,19 +184,54 @@ const ProfilePage = () => {
                         <small className="field-hint">Used for order updates and delivery coordination.</small>
                     </div>
 
-                    {/* Permanent Address */}
+                    {/* Permanent Address Elements */}
                     <div className="form-group">
-                        <label htmlFor="address">Permanent Address</label>
-                        <textarea
-                            id="address"
-                            name="address"
-                            value={formData.address}
+                        <label htmlFor="street">Street Address</label>
+                        <input
+                            type="text"
+                            id="street"
+                            name="street"
+                            value={formData.street}
                             onChange={handleChange}
-                            placeholder="Enter your full permanent address (Street, City, Zip, etc.)"
-                            rows="4"
+                            placeholder="Enter street address"
                         />
-                        <small className="field-hint">Your primary address for billing and delivery reference.</small>
                     </div>
+                    <div className="form-group">
+                        <label htmlFor="city">City</label>
+                        <input
+                            type="text"
+                            id="city"
+                            name="city"
+                            value={formData.city}
+                            onChange={handleChange}
+                            placeholder="Enter city"
+                        />
+                    </div>
+                    <div className="form-group" style={{ display: 'flex', gap: '15px' }}>
+                        <div style={{ flex: 1 }}>
+                            <label htmlFor="state">State</label>
+                            <input
+                                type="text"
+                                id="state"
+                                name="state"
+                                value={formData.state}
+                                onChange={handleChange}
+                                placeholder="Enter state"
+                            />
+                        </div>
+                        <div style={{ flex: 1 }}>
+                            <label htmlFor="zipCode">ZIP Code</label>
+                            <input
+                                type="text"
+                                id="zipCode"
+                                name="zipCode"
+                                value={formData.zipCode}
+                                onChange={handleChange}
+                                placeholder="Enter ZIP code"
+                            />
+                        </div>
+                    </div>
+                    <small className="field-hint" style={{ display: 'block', marginBottom: '15px' }}>Your primary address for billing and delivery reference.</small>
 
                     {/* Feedback Messages */}
                     {message && <div className="profile-success-message">{message}</div>}
