@@ -738,31 +738,44 @@ const FinalCheckoutPage = () => {
 
                                     if (isValidPhone) {
                                         return (
-                                            <div style={{ marginTop: '10px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                                <input
-                                                    type="checkbox"
-                                                    id="useRegisteredPhone"
-                                                    checked={useRegisteredPhone}
-                                                    onChange={(e) => {
-                                                        const checked = e.target.checked;
-                                                        setUseRegisteredPhone(checked);
-                                                        // Immediately update the deliveryAddress state based on the toggle
-                                                        if (checked) {
-                                                            const userCountryCode = userObj?.countryCode || '+91';
-                                                            setDeliveryAddress(prev => ({
-                                                                ...prev,
-                                                                contactPhone: userPhone,
-                                                                countryCode: userCountryCode
-                                                            }));
-                                                        } else {
-                                                            setDeliveryAddress(prev => ({ ...prev, contactPhone: '' }));
-                                                        }
-                                                    }}
-                                                    style={{ width: '16px', height: '16px', cursor: 'pointer' }}
-                                                />
-                                                <label htmlFor="useRegisteredPhone" style={{ cursor: 'pointer', fontSize: '0.9rem', color: '#495057', margin: 0 }}>
+                                            <div
+                                                style={{ marginTop: '10px', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', userSelect: 'none' }}
+                                                onClick={() => {
+                                                    const checked = !useRegisteredPhone;
+                                                    setUseRegisteredPhone(checked);
+                                                    if (checked) {
+                                                        const userCountryCode = userObj?.countryCode || '+91';
+                                                        setDeliveryAddress(prev => ({
+                                                            ...prev,
+                                                            contactPhone: userPhone,
+                                                            countryCode: userCountryCode
+                                                        }));
+                                                    } else {
+                                                        setDeliveryAddress(prev => ({ ...prev, contactPhone: '' }));
+                                                    }
+                                                }}
+                                            >
+                                                <div style={{
+                                                    width: '18px',
+                                                    height: '18px',
+                                                    border: `2px solid ${useRegisteredPhone ? '#4f46e5' : '#d1d5db'}`,
+                                                    backgroundColor: useRegisteredPhone ? '#4f46e5' : '#ffffff',
+                                                    borderRadius: '4px',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    transition: 'all 0.2s',
+                                                    flexShrink: 0
+                                                }}>
+                                                    {useRegisteredPhone && (
+                                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
+                                                            <path d="M20 6L9 17l-5-5" />
+                                                        </svg>
+                                                    )}
+                                                </div>
+                                                <span style={{ fontSize: '0.9rem', color: '#495057', margin: 0, fontWeight: 500 }}>
                                                     Use registered number
-                                                </label>
+                                                </span>
                                             </div>
                                         );
                                     }
