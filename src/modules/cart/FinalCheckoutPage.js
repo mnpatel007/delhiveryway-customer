@@ -71,30 +71,7 @@ const FinalCheckoutPage = () => {
         }
     }, [user]);
 
-    // Handle "Use Registered Phone" checkbox
-    useEffect(() => {
-        if (useRegisteredPhone && user) {
-            const userObj = user?.user || user;
-            const userPhone = userObj?.phone || '';
-            const userCountryCode = userObj?.countryCode || '+91';
-
-            const isValidPhone = /^[0-9]{10}$/.test(userPhone) &&
-                userPhone !== '0000000000' &&
-                userPhone !== '1111111111' &&
-                userPhone !== '1234567890';
-
-            if (isValidPhone) {
-                setDeliveryAddress(prev => ({
-                    ...prev,
-                    contactPhone: userPhone,
-                    countryCode: userCountryCode
-                }));
-            } else {
-                // Prevent checking if no valid phone found globally
-                setUseRegisteredPhone(false);
-            }
-        }
-    }, [useRegisteredPhone, user]);
+    // Remove the fragile useEffect for checkbox-based logic
 
     useEffect(() => {
         const fetchShops = async () => {
@@ -769,8 +746,15 @@ const FinalCheckoutPage = () => {
                                                     onChange={(e) => {
                                                         const checked = e.target.checked;
                                                         setUseRegisteredPhone(checked);
-                                                        // If unchecked, clear the field so they can enter a new one
-                                                        if (!checked) {
+                                                        // Immediately update the deliveryAddress state based on the toggle
+                                                        if (checked) {
+                                                            const userCountryCode = userObj?.countryCode || '+91';
+                                                            setDeliveryAddress(prev => ({
+                                                                ...prev,
+                                                                contactPhone: userPhone,
+                                                                countryCode: userCountryCode
+                                                            }));
+                                                        } else {
                                                             setDeliveryAddress(prev => ({ ...prev, contactPhone: '' }));
                                                         }
                                                     }}
