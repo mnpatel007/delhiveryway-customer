@@ -11,6 +11,7 @@ const ProfilePage = () => {
     // Form state
     const [formData, setFormData] = useState({
         name: '',
+        countryCode: '+91',
         phone: '',
         address: ''
     });
@@ -31,6 +32,7 @@ const ProfilePage = () => {
                     const phoneVal = profileData.phone;
                     setFormData({
                         name: profileData.name || '',
+                        countryCode: profileData.countryCode || '+91',
                         phone: (phoneVal === '0000000000' || !phoneVal) ? '' : phoneVal,
                         address: profileData.address?.street || ''
                     });
@@ -84,6 +86,7 @@ const ProfilePage = () => {
         try {
             const updatePayload = {
                 name: formData.name,
+                countryCode: formData.countryCode,
                 phone: formData.phone,
                 // Nested inside the `address` object and specifically setting `street`
                 address: {
@@ -145,16 +148,31 @@ const ProfilePage = () => {
                     {/* Permanent Contact Number */}
                     <div className="form-group">
                         <label htmlFor="phone">Permanent Contact Number <span className="required-asterisk">*</span></label>
-                        <input
-                            type="tel"
-                            id="phone"
-                            name="phone"
-                            value={formData.phone}
-                            onChange={handleChange}
-                            placeholder="10-digit mobile number"
-                            maxLength="10"
-                            required
-                        />
+                        <div className="phone-input-container">
+                            <select
+                                name="countryCode"
+                                value={formData.countryCode}
+                                onChange={handleChange}
+                                className="country-code-select"
+                            >
+                                <option value="+91">IN (+91)</option>
+                                <option value="+1">US (+1)</option>
+                                <option value="+44">UK (+44)</option>
+                                <option value="+61">AU (+61)</option>
+                                <option value="+971">AE (+971)</option>
+                            </select>
+                            <input
+                                type="tel"
+                                id="phone"
+                                name="phone"
+                                value={formData.phone}
+                                onChange={handleChange}
+                                placeholder="10-digit mobile number"
+                                maxLength="10"
+                                required
+                                className="phone-number-input"
+                            />
+                        </div>
                         <small className="field-hint">Used for order updates and delivery coordination.</small>
                     </div>
 
