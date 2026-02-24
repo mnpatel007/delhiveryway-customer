@@ -50,25 +50,19 @@ const FinalCheckoutPage = () => {
     const [loadingAcceptanceTime, setLoadingAcceptanceTime] = useState(false);
     const [duplicateOrderInfo, setDuplicateOrderInfo] = useState(null);
     const [showDuplicateDialog, setShowDuplicateDialog] = useState(false);
+    const [useRegisteredPhone, setUseRegisteredPhone] = useState(false);
     const navigate = useNavigate();
 
     // Clean up user data and ensure phone field is empty if invalid
     useEffect(() => {
         if (user) {
             const userObj = user?.user || user;
-            const userPhone = userObj?.phone || '';
             const userAddress = userObj?.address || {};
-
-            // Only use user phone if it's a valid 10-digit number and not a placeholder
-            const isValidPhone = /^[0-9]{10}$/.test(userPhone) &&
-                userPhone !== '0000000000' &&
-                userPhone !== '1111111111' &&
-                userPhone !== '1234567890';
 
             setDeliveryAddress(prev => ({
                 ...prev,
                 contactName: prev.contactName || userObj?.name || '',
-                contactPhone: isValidPhone && !prev.contactPhone ? userPhone : prev.contactPhone,
+                // contactPhone intentionally left blank to require explicit checkbox or entry
                 street: prev.street || userAddress.street || '',
                 city: prev.city || userAddress.city || '',
                 state: prev.state || userAddress.state || '',
@@ -76,6 +70,31 @@ const FinalCheckoutPage = () => {
             }));
         }
     }, [user]);
+
+    // Handle "Use Registered Phone" checkbox
+    useEffect(() => {
+        if (useRegisteredPhone && user) {
+            const userObj = user?.user || user;
+            const userPhone = userObj?.phone || '';
+            const userCountryCode = userObj?.countryCode || '+91';
+
+            const isValidPhone = /^[0-9]{10}$/.test(userPhone) &&
+                userPhone !== '0000000000' &&
+                userPhone !== '1111111111' &&
+                userPhone !== '1234567890';
+
+            if (isValidPhone) {
+                setDeliveryAddress(prev => ({
+                    ...prev,
+                    contactPhone: userPhone,
+                    countryCode: userCountryCode
+                }));
+            } else {
+                // Prevent checking if no valid phone found globally
+                setUseRegisteredPhone(false);
+            }
+        }
+    }, [useRegisteredPhone, user]);
 
     useEffect(() => {
         const fetchShops = async () => {
@@ -731,6 +750,40 @@ const FinalCheckoutPage = () => {
                                             : `Phone number must be exactly 10 digits (currently ${deliveryAddress.contactPhone.length})`}
                                     </small>
                                 )}
+
+                                {(() => {
+                                    const userObj = user?.user || user;
+                                    const userPhone = userObj?.phone;
+                                    const isValidPhone = /^[0-9]{10}$/.test(userPhone) &&
+                                        userPhone !== '0000000000' &&
+                                        userPhone !== '1111111111' &&
+                                        userPhone !== '1234567890';
+
+                                    if (isValidPhone) {
+                                        return (
+                                            <div style={{ marginTop: '10px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                <input
+                                                    type="checkbox"
+                                                    id="useRegisteredPhone"
+                                                    checked={useRegisteredPhone}
+                                                    onChange={(e) => {
+                                                        const checked = e.target.checked;
+                                                        setUseRegisteredPhone(checked);
+                                                        // If unchecked, clear the field so they can enter a new one
+                                                        if (!checked) {
+                                                            setDeliveryAddress(prev => ({ ...prev, contactPhone: '' }));
+                                                        }
+                                                    }}
+                                                    style={{ width: '16px', height: '16px', cursor: 'pointer' }}
+                                                />
+                                                <label htmlFor="useRegisteredPhone" style={{ cursor: 'pointer', fontSize: '0.9rem', color: '#495057', margin: 0 }}>
+                                                    Use registered number
+                                                </label>
+                                            </div>
+                                        );
+                                    }
+                                    return null;
+                                })()}
                             </div>
                         </div>
                         <div className="form-row">
