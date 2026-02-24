@@ -102,21 +102,24 @@ const OrderConfirmationPage = () => {
                             </div>
                         </div>
 
-                        {order?.deliveryAddress && (
-                            <div className="confirmation-section">
-                                <h3>Delivery Address</h3>
-                                <div className="address-display">
-                                    <p>{order.deliveryAddress.street}</p>
-                                    <p>{order.deliveryAddress.city}, {order.deliveryAddress.state}</p>
-                                    {order.deliveryAddress.zipCode && <p>{order.deliveryAddress.zipCode}</p>}
-                                    {order.deliveryAddress.instructions && (
-                                        <p className="instructions">
-                                            <strong>Instructions:</strong> {order.deliveryAddress.instructions}
-                                        </p>
-                                    )}
-                                </div>
+                        <div className="confirmation-section">
+                            <h3>Delivery Details</h3>
+                            <div className="address-display">
+                                <strong>Recipient:</strong> {order.deliveryAddress.contactName || order.customerId?.name || 'N/A'}<br />
+                                <strong>Delivery Phone:</strong> {order.deliveryAddress.contactPhone || order.customerId?.phone || 'N/A'}<br />
+                                {(order.deliveryAddress.permanentContactPhone && order.deliveryAddress.permanentContactPhone !== order.deliveryAddress.contactPhone) && (
+                                    <><strong>Customer Phone:</strong> {order.deliveryAddress.permanentCountryCode || '+91'} {order.deliveryAddress.permanentContactPhone}<br /></>
+                                )}
+                                <strong>Address:</strong><br />
+                                {order.deliveryAddress.street}<br />
+                                {order.deliveryAddress.city}, {order.deliveryAddress.state} {order.deliveryAddress.zipCode}
+                                {order.deliveryAddress.instructions && (
+                                    <p className="instructions">
+                                        <strong>Instructions:</strong> {order.deliveryAddress.instructions}
+                                    </p>
+                                )}
                             </div>
-                        )}
+                        </div>
 
                         {order?.items && order.items.length > 0 && (
                             <div className="confirmation-section">

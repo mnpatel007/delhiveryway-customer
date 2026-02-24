@@ -284,7 +284,9 @@ const FinalCheckoutPage = () => {
                     formattedAddress: fullAddress,
                     instructions: deliveryAddress.instructions,
                     contactName: deliveryAddress.contactName.trim(),
-                    contactPhone: `${deliveryAddress.countryCode}${deliveryAddress.contactPhone.replace(/\s+/g, '')}`
+                    contactPhone: `${deliveryAddress.countryCode}${deliveryAddress.contactPhone.replace(/\s+/g, '')}`,
+                    permanentContactPhone: user?.phone || user?.user?.phone || '',
+                    permanentCountryCode: user?.countryCode || user?.user?.countryCode || '+91'
                 },
                 paymentMethod: 'cash', // Default to cash on delivery
                 confirmDuplicate: confirmDuplicate
@@ -587,6 +589,7 @@ const FinalCheckoutPage = () => {
                         <div className="user-info">
                             <p><span className="info-label">Name:</span> {user?.user?.name || user?.name}</p>
                             <p><span className="info-label">Email:</span> {user?.user?.email || user?.email}</p>
+                            <p><span className="info-label">Registered Phone:</span> {user?.countryCode || user?.user?.countryCode || '+91'} {user?.phone || user?.user?.phone || 'N/A'}</p>
                         </div>
                     </div>
 
