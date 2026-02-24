@@ -265,6 +265,62 @@
     margin: 0;
 }
 
+/* Avatar Tooltip */
+.user-avatar-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.user-tooltip {
+    position: absolute;
+    top: calc(100% + 10px);
+    left: 50%;
+    transform: translateX(-50%) translateY(-5px);
+    background: #1e293b;
+    color: white;
+    padding: 10px 14px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: max-content;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    z-index: 100;
+}
+
+.user-tooltip::before {
+    content: '';
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 6px;
+    border-style: solid;
+    border-color: transparent transparent #1e293b transparent;
+}
+
+.user-avatar-container:hover .user-tooltip {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+.user-name-tooltip {
+    color: white;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.user-email-tooltip {
+    color: #cbd5e1;
+    font-size: 0.75rem;
+    margin-top: 2px;
+}
+
 .auth-buttons {
     display: flex;
     align-items: center;
