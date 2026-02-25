@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import './CommunityPage.css';
 import { contactAPI } from '../../services/api';
+import { useAuth } from '../../context/AuthContext';
 
 const CommunityPage = () => {
+    const { user } = useAuth();
     const [formData, setFormData] = useState({
-        name: '',
-        email: '',
+        name: user?.name || '',
+        email: user?.email || '',
         subject: '',
         message: ''
     });
@@ -41,7 +43,12 @@ const CommunityPage = () => {
 
             if (res?.data?.success || res?.success) {
                 alert('✅ Message sent successfully. We will get back to you soon.');
-                setFormData({ name: '', email: '', subject: '', message: '' });
+                setFormData({
+                    name: user?.name || '',
+                    email: user?.email || '',
+                    subject: '',
+                    message: ''
+                });
             } else {
                 const msg = res?.data?.message || res?.message || 'Failed to send your message. Please try again later.';
                 alert(`❌ ${msg}`);
