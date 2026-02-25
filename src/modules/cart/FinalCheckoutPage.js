@@ -681,14 +681,24 @@ const FinalCheckoutPage = () => {
                                     const userPhone = user?.phone || user?.user?.phone;
                                     const userCountryCode = user?.countryCode || user?.user?.countryCode || '+91';
 
-                                    if (userPhone && userPhone.trim() !== '') {
+                                    const isValidPhone = userPhone && /^[0-9]{10}$/.test(userPhone.replace(/\D/g, '')) &&
+                                        userPhone !== '0000000000' &&
+                                        userPhone !== '1111111111' &&
+                                        userPhone !== '1234567890';
+
+                                    if (isValidPhone) {
                                         return (
                                             <div style={{ marginTop: '8px', padding: '8px', backgroundColor: '#f8f9fa', borderRadius: '4px', border: '1px solid #e9ecef', fontSize: '0.9rem' }}>
                                                 <span style={{ fontWeight: 'bold', color: '#495057' }}>Registered Phone:</span> {userCountryCode} {userPhone}
                                             </div>
                                         );
+                                    } else {
+                                        return (
+                                            <div style={{ marginTop: '8px', padding: '8px', backgroundColor: '#fff3cd', borderRadius: '4px', border: '1px solid #ffeeba', fontSize: '0.9rem', color: '#856404' }}>
+                                                ⚠️ No valid registered phone found. Please add your number in <a href="/profile" style={{ color: '#0056b3', textDecoration: 'underline', fontWeight: 'bold' }}>My Profile</a>.
+                                            </div>
+                                        );
                                     }
-                                    return null;
                                 })()}
                             </div>
                             <div className="form-group">
