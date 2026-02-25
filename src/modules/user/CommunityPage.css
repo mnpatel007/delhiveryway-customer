@@ -124,7 +124,7 @@
 
 /* Social Cards Section */
 .social-section {
-    margin: 40px 0 60px;
+    margin: 40px 0 20px;
 }
 
 .section-heading {
@@ -268,7 +268,7 @@
 
 /* Glassmorphism Contact Form */
 .contact-wrapper {
-    margin-top: 30px;
+    margin: 20px 0 60px;
 }
 
 .contact-glass-panel {

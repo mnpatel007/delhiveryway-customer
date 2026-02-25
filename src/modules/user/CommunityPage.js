@@ -73,42 +73,6 @@ const CommunityPage = () => {
             </div>
 
             <div className="community-container">
-                {/* Social Connect Section */}
-                <div className="social-section">
-                    <h2 className="section-heading">Connect & Follow</h2>
-                    <div className="social-cards">
-                        <a href="https://instagram.com/delhiveryway" target="_blank" rel="noopener noreferrer" className="social-card instagram-card">
-                            <div className="card-bg"></div>
-                            <div className="card-content">
-                                <div className="social-icon">
-                                    <svg viewBox="0 0 24 24" width="48" height="48" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round">
-                                        <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
-                                        <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
-                                        <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
-                                    </svg>
-                                </div>
-                                <h3>Instagram</h3>
-                                <p>@delhiveryway</p>
-                                <span className="action-text">Follow Us ➔</span>
-                            </div>
-                        </a>
-
-                        <a href="https://facebook.com/delhiveryway" target="_blank" rel="noopener noreferrer" className="social-card facebook-card">
-                            <div className="card-bg"></div>
-                            <div className="card-content">
-                                <div className="social-icon">
-                                    <svg viewBox="0 0 24 24" width="48" height="48" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round">
-                                        <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
-                                    </svg>
-                                </div>
-                                <h3>Facebook</h3>
-                                <p>DelhiveryWay</p>
-                                <span className="action-text">Like our Page ➔</span>
-                            </div>
-                        </a>
-                    </div>
-                </div>
-
                 {/* Direct Contact Form Section */}
                 <div className="contact-wrapper">
                     <div className="contact-glass-panel">
@@ -199,6 +163,42 @@ const CommunityPage = () => {
                                 </div>
                             </button>
                         </form>
+                    </div>
+                </div>
+
+                {/* Social Connect Section */}
+                <div className="social-section">
+                    <h2 className="section-heading">Connect & Follow</h2>
+                    <div className="social-cards">
+                        <a href="https://instagram.com/delhiveryway" target="_blank" rel="noopener noreferrer" className="social-card instagram-card">
+                            <div className="card-bg"></div>
+                            <div className="card-content">
+                                <div className="social-icon">
+                                    <svg viewBox="0 0 24 24" width="36" height="36" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round">
+                                        <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                                        <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                                        <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+                                    </svg>
+                                </div>
+                                <h3>Instagram</h3>
+                                <p>@delhiveryway</p>
+                                <span className="action-text">Follow Us ➔</span>
+                            </div>
+                        </a>
+
+                        <a href="https://facebook.com/delhiveryway" target="_blank" rel="noopener noreferrer" className="social-card facebook-card">
+                            <div className="card-bg"></div>
+                            <div className="card-content">
+                                <div className="social-icon">
+                                    <svg viewBox="0 0 24 24" width="36" height="36" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round">
+                                        <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
+                                    </svg>
+                                </div>
+                                <h3>Facebook</h3>
+                                <p>DelhiveryWay</p>
+                                <span className="action-text">Like our Page ➔</span>
+                            </div>
+                        </a>
                     </div>
                 </div>
             </div>
