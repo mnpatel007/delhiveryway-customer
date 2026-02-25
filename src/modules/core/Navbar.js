@@ -74,11 +74,11 @@ const Navbar = () => {
                     )}
 
                     <Link
-                        to="/contact"
-                        className={`navbar-link ${isActive('/contact') ? 'active' : ''}`}
+                        to="/community"
+                        className={`navbar-link ${isActive('/community') ? 'active' : ''}`}
                     >
-                        <span className="link-icon">📞</span>
-                        Contact
+                        <span className="link-icon">🤝</span>
+                        Community
                     </Link>
                 </div>
 
@@ -166,12 +166,12 @@ const Navbar = () => {
                     )}
 
                     <Link
-                        to="/contact"
-                        className={`mobile-link ${isActive('/contact') ? 'active' : ''}`}
+                        to="/community"
+                        className={`mobile-link ${isActive('/community') ? 'active' : ''}`}
                         onClick={() => setIsMenuOpen(false)}
                     >
-                        <span className="link-icon">📞</span>
-                        Contact
+                        <span className="link-icon">🤝</span>
+                        Community
                     </Link>
 
                     {user ? (
