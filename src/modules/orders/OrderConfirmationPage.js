@@ -106,10 +106,10 @@ const OrderConfirmationPage = () => {
                             <h3>Delivery Details</h3>
                             <div className="address-display">
                                 <strong>Recipient:</strong> {order.deliveryAddress.contactName || order.customerId?.name || 'N/A'}<br />
-                                <strong>Delivery Phone:</strong> {order.deliveryAddress.contactPhone || order.customerId?.phone || 'N/A'}<br />
                                 {(order.deliveryAddress.permanentContactPhone && order.deliveryAddress.permanentContactPhone !== order.deliveryAddress.contactPhone) && (
-                                    <><strong>Customer Phone:</strong> {order.deliveryAddress.permanentCountryCode || '+91'} {order.deliveryAddress.permanentContactPhone}<br /></>
+                                    <><strong>Registered Phone:</strong> {order.deliveryAddress.permanentCountryCode || '+91'} {order.deliveryAddress.permanentContactPhone}<br /></>
                                 )}
+                                <strong>Contact Number:</strong> {order.deliveryAddress.contactPhone || order.customerId?.phone || 'N/A'}<br />
                                 <strong>Address:</strong><br />
                                 {order.deliveryAddress.street}<br />
                                 {order.deliveryAddress.city}, {order.deliveryAddress.state} {order.deliveryAddress.zipCode}
