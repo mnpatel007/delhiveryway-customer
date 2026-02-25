@@ -25,7 +25,8 @@ import OrderConfirmationPage from './modules/orders/OrderConfirmationPage';
 import RevisedOrderPage from './modules/orders/RevisedOrderPage';
 import OrderHistoryPage from './modules/orders/OrderHistoryPage';
 import CustomerSocketHandler from './modules/orders/CustomerSocketHandler';
-import ContactPage from './modules/user/ContactPage';
+import CommunityPage from './modules/user/CommunityPage';
+import ProfilePage from './modules/user/ProfilePage';
 
 import VerifyEmail from './modules/auth/VerifyEmail';
 import ForgotPasswordPage from './modules/auth/ForgotPasswordPage';
@@ -124,7 +125,8 @@ const AppContent = () => {
             <Route path="/order-confirmation/:orderId" element={<PrivateRoute><OrderConfirmationPage /></PrivateRoute>} />
             <Route path="/revised-order/:orderId" element={<PrivateRoute><RevisedOrderPage /></PrivateRoute>} />
             <Route path="/orders" element={<PrivateRoute><OrderHistoryPage /></PrivateRoute>} />
-            <Route path="/contact" element={<ContactPage />} />
+            <Route path="/profile" element={<PrivateRoute><ProfilePage /></PrivateRoute>} />
+            <Route path="/community" element={<CommunityPage />} />
 
             <Route path="/verify-email" element={<VerifyEmail />} />
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />

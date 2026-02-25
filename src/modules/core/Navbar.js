@@ -74,11 +74,11 @@ const Navbar = () => {
                     )}
 
                     <Link
-                        to="/contact"
-                        className={`navbar-link ${isActive('/contact') ? 'active' : ''}`}
+                        to="/community"
+                        className={`navbar-link ${isActive('/community') ? 'active' : ''}`}
                     >
-                        <span className="link-icon">📞</span>
-                        Contact
+                        <span className="link-icon">🤝</span>
+                        Community
                     </Link>
                 </div>
 
@@ -86,16 +86,19 @@ const Navbar = () => {
                 <div className="navbar-user">
                     {user ? (
                         <div className="user-menu">
-                            <div className="user-info">
+                            <div className="user-avatar-container">
                                 <div className="user-avatar">
                                     {user.name?.charAt(0).toUpperCase() || 'U'}
                                 </div>
-                                <div className="user-details">
-                                    <span className="user-name">{user.name}</span>
-                                    <span className="user-email">{user.email}</span>
+                                <div className="user-tooltip">
+                                    <span className="user-name-tooltip">{user.name}</span>
+                                    <span className="user-email-tooltip">{user.email}</span>
                                 </div>
                             </div>
-                            <button onClick={handleLogout} className="btn btn-secondary btn-sm">
+                            <Link to="/profile" className={`navbar-link ${isActive('/profile') ? 'active' : ''}`} style={{ paddingLeft: '8px', paddingRight: '12px' }}>
+                                My Profile
+                            </Link>
+                            <button onClick={handleLogout} className="btn btn-secondary btn-sm" style={{ marginLeft: '4px' }}>
                                 Logout
                             </button>
                         </div>
@@ -163,12 +166,12 @@ const Navbar = () => {
                     )}
 
                     <Link
-                        to="/contact"
-                        className={`mobile-link ${isActive('/contact') ? 'active' : ''}`}
+                        to="/community"
+                        className={`mobile-link ${isActive('/community') ? 'active' : ''}`}
                         onClick={() => setIsMenuOpen(false)}
                     >
-                        <span className="link-icon">📞</span>
-                        Contact
+                        <span className="link-icon">🤝</span>
+                        Community
                     </Link>
 
                     {user ? (
@@ -183,6 +186,14 @@ const Navbar = () => {
                                 </div>
                             </div>
 
+                            <Link
+                                to="/profile"
+                                className="btn btn-primary mobile-logout-btn"
+                                onClick={() => setIsMenuOpen(false)}
+                                style={{ marginBottom: '10px' }}
+                            >
+                                My Profile
+                            </Link>
                             <button
                                 onClick={handleLogout}
                                 className="btn btn-secondary mobile-logout-btn"
