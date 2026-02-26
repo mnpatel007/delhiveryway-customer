@@ -50,25 +50,28 @@ const FinalCheckoutPage = () => {
     const [loadingAcceptanceTime, setLoadingAcceptanceTime] = useState(false);
     const [duplicateOrderInfo, setDuplicateOrderInfo] = useState(null);
     const [showDuplicateDialog, setShowDuplicateDialog] = useState(false);
+    const [useRegisteredPhone, setUseRegisteredPhone] = useState(false);
     const navigate = useNavigate();
 
     // Clean up user data and ensure phone field is empty if invalid
     useEffect(() => {
         if (user) {
-            const userPhone = user?.phone || user?.user?.phone || '';
-            // Only use user phone if it's a valid 10-digit number and not a placeholder
-            const isValidPhone = /^[0-9]{10}$/.test(userPhone) &&
-                userPhone !== '0000000000' &&
-                userPhone !== '1111111111' &&
-                userPhone !== '1234567890';
+            const userObj = user?.user || user;
+            const userAddress = userObj?.address || {};
 
             setDeliveryAddress(prev => ({
                 ...prev,
-                contactName: user?.name || user?.user?.name || '',
-                contactPhone: isValidPhone ? userPhone : '' // Only use if valid, otherwise empty
+                contactName: prev.contactName || userObj?.name || '',
+                // contactPhone intentionally left blank to require explicit checkbox or entry
+                street: prev.street || userAddress.street || '',
+                city: prev.city || userAddress.city || '',
+                state: prev.state || userAddress.state || '',
+                zipCode: prev.zipCode || userAddress.zipCode || ''
             }));
         }
     }, [user]);
+
+    // Remove the fragile useEffect for checkbox-based logic
 
     useEffect(() => {
         const fetchShops = async () => {
@@ -284,7 +287,9 @@ const FinalCheckoutPage = () => {
                     formattedAddress: fullAddress,
                     instructions: deliveryAddress.instructions,
                     contactName: deliveryAddress.contactName.trim(),
-                    contactPhone: `${deliveryAddress.countryCode}${deliveryAddress.contactPhone.replace(/\s+/g, '')}`
+                    contactPhone: `${deliveryAddress.countryCode}${deliveryAddress.contactPhone.replace(/\s+/g, '')}`,
+                    permanentContactPhone: user?.phone || user?.user?.phone || '',
+                    permanentCountryCode: user?.countryCode || user?.user?.countryCode || '+91'
                 },
                 paymentMethod: 'cash', // Default to cash on delivery
                 confirmDuplicate: confirmDuplicate
@@ -672,6 +677,29 @@ const FinalCheckoutPage = () => {
                                         ⚠️ Contact name is required for delivery
                                     </small>
                                 )}
+                                {(() => {
+                                    const userPhone = user?.phone || user?.user?.phone;
+                                    const userCountryCode = user?.countryCode || user?.user?.countryCode || '+91';
+
+                                    const isValidPhone = userPhone && /^[0-9]{10}$/.test(userPhone.replace(/\D/g, '')) &&
+                                        userPhone !== '0000000000' &&
+                                        userPhone !== '1111111111' &&
+                                        userPhone !== '1234567890';
+
+                                    if (isValidPhone) {
+                                        return (
+                                            <div style={{ marginTop: '8px', padding: '8px', backgroundColor: '#f8f9fa', borderRadius: '4px', border: '1px solid #e9ecef', fontSize: '0.9rem' }}>
+                                                <span style={{ fontWeight: 'bold', color: '#495057' }}>Registered Phone:</span> {userCountryCode} {userPhone}
+                                            </div>
+                                        );
+                                    } else {
+                                        return (
+                                            <div style={{ marginTop: '8px', padding: '8px', backgroundColor: '#fff3cd', borderRadius: '4px', border: '1px solid #ffeeba', fontSize: '0.9rem', color: '#856404' }}>
+                                                ⚠️ No valid registered phone found. Please add your number in <a href="/profile" style={{ color: '#0056b3', textDecoration: 'underline', fontWeight: 'bold' }}>My Profile</a>.
+                                            </div>
+                                        );
+                                    }
+                                })()}
                             </div>
                             <div className="form-group">
                                 <label>Contact Phone <span style={{ color: '#ff4444', fontWeight: 'bold' }}>*</span></label>
@@ -709,6 +737,60 @@ const FinalCheckoutPage = () => {
                                             : `Phone number must be exactly 10 digits (currently ${deliveryAddress.contactPhone.length})`}
                                     </small>
                                 )}
+
+                                {(() => {
+                                    const userObj = user?.user || user;
+                                    const userPhone = userObj?.phone;
+                                    const isValidPhone = /^[0-9]{10}$/.test(userPhone) &&
+                                        userPhone !== '0000000000' &&
+                                        userPhone !== '1111111111' &&
+                                        userPhone !== '1234567890';
+
+                                    if (isValidPhone) {
+                                        return (
+                                            <div
+                                                style={{ marginTop: '10px', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', userSelect: 'none' }}
+                                                onClick={() => {
+                                                    const checked = !useRegisteredPhone;
+                                                    setUseRegisteredPhone(checked);
+                                                    if (checked) {
+                                                        const userCountryCode = userObj?.countryCode || '+91';
+                                                        setDeliveryAddress(prev => ({
+                                                            ...prev,
+                                                            contactPhone: userPhone,
+                                                            countryCode: userCountryCode
+                                                        }));
+                                                    } else {
+                                                        setDeliveryAddress(prev => ({ ...prev, contactPhone: '' }));
+                                                    }
+                                                }}
+                                            >
+                                                <div style={{
+                                                    width: '18px',
+                                                    height: '18px',
+                                                    border: `2px solid ${useRegisteredPhone ? '#4f46e5' : '#d1d5db'}`,
+                                                    backgroundColor: useRegisteredPhone ? '#4f46e5' : '#ffffff',
+                                                    borderRadius: '4px',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    transition: 'all 0.2s',
+                                                    flexShrink: 0
+                                                }}>
+                                                    {useRegisteredPhone && (
+                                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
+                                                            <path d="M20 6L9 17l-5-5" />
+                                                        </svg>
+                                                    )}
+                                                </div>
+                                                <span style={{ fontSize: '0.9rem', color: '#495057', margin: 0, fontWeight: 500 }}>
+                                                    Use registered number
+                                                </span>
+                                            </div>
+                                        );
+                                    }
+                                    return null;
+                                })()}
                             </div>
                         </div>
                         <div className="form-row">

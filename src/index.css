@@ -631,9 +631,8 @@ textarea {
   transition: all var(--transition-fast);
 }
 
-/* Global in
-put styling for better visibility across all devices and browsers */
-input,
+/* Global input styling for better visibility across all devices and browsers */
+input:not([type="checkbox"]):not([type="radio"]),
 select,
 textarea {
   color: #000000 !important;
@@ -643,42 +642,42 @@ textarea {
   -webkit-opacity: 1 !important;
 }
 
-input:focus,
+input:not([type="checkbox"]):not([type="radio"]):focus,
 select:focus,
 textarea:focus {
   color: #000000 !important;
   -webkit-text-fill-color: #000000 !important;
 }
 
-input::placeholder,
+input:not([type="checkbox"]):not([type="radio"])::placeholder,
 textarea::placeholder {
   color: #666666 !important;
   opacity: 1 !important;
   -webkit-text-fill-color: #666666 !important;
 }
 
-input::-webkit-input-placeholder,
+input:not([type="checkbox"]):not([type="radio"])::-webkit-input-placeholder,
 textarea::-webkit-input-placeholder {
   color: #666666 !important;
   -webkit-text-fill-color: #666666 !important;
 }
 
-input::-moz-placeholder,
+input:not([type="checkbox"]):not([type="radio"])::-moz-placeholder,
 textarea::-moz-placeholder {
   color: #666666 !important;
   opacity: 1 !important;
 }
 
-input:-ms-input-placeholder,
+input:not([type="checkbox"]):not([type="radio"]):-ms-input-placeholder,
 textarea:-ms-input-placeholder {
   color: #666666 !important;
 }
 
 /* Ensure autocomplete doesn't override colors */
-input:-webkit-autofill,
-input:-webkit-autofill:hover,
-input:-webkit-autofill:focus,
-input:-webkit-autofill:active {
+input:not([type="checkbox"]):not([type="radio"]):-webkit-autofill,
+input:not([type="checkbox"]):not([type="radio"]):-webkit-autofill:hover,
+input:not([type="checkbox"]):not([type="radio"]):-webkit-autofill:focus,
+input:not([type="checkbox"]):not([type="radio"]):-webkit-autofill:active {
   -webkit-text-fill-color: #000000 !important;
   -webkit-box-shadow: 0 0 0 30px white inset !important;
 }
