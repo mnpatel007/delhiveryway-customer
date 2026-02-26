@@ -89,7 +89,7 @@ const GlobalCustomerAlert = () => {
 // Hide navbar on login/signup
 const Layout = ({ children }) => {
   const location = useLocation();
-  const hideNavbarPaths = ['/login', '/signup'];
+  const hideNavbarPaths = ['/login', '/signup', '/forgot-password', '/reset-password', '/verify-email'];
   const shouldHideNavbar = hideNavbarPaths.includes(location.pathname);
 
   return (
