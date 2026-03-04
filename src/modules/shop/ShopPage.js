@@ -42,7 +42,8 @@ const ShopPage = () => {
     const [showMenu, setShowMenu] = useState(false);
     const { addToCart, selectedShop, setSelectedShop } = useCart();
     const { user } = useAuth();
-    const isAdmin = user?.email === 'meetnp007@gmail.com' || user?.role === 'admin';
+    const adminEmails = ['meetnp007@gmail.com', 'ayupro916@gmail.com', 'ce230004015@iiti.ac.in'];
+    const isAdmin = adminEmails.includes(user?.email) || user?.role === 'admin';
     const [imageIndexes, setImageIndexes] = useState({});
     const productRefsMap = useRef({});
 
