@@ -14,7 +14,7 @@ const getCleanImgQuery = (name) => {
     if (!name) return 'delicious food gourmet';
     let q = name.replace(/\([^)]+\)/g, '').trim();
     q = q.replace(/[0-9]+(kg|g|ml|l|pcs|piece)/gi, '').trim();
-    return encodeURIComponent(q + ' authentic recipe food dish high resolution photography plate');
+    return encodeURIComponent(q + ' ready to eat dish plating food photography close up');
 };
 const HomePage = () => {
     const [shops, setShops] = useState([]);
