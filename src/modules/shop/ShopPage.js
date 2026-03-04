@@ -701,19 +701,24 @@ const ShopPage = () => {
                                             alignItems: 'center'
                                         }}>
                                             <div style={{ position: 'relative', width: 72, height: 72, borderRadius: 8, background: '#fafafa', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
-                                                <img
-                                                    src={(imageIndexes[item._id] > 0)
-                                                        ? `https://tse2.mm.bing.net/th?q=${getCleanImgQuery(item.name, imageIndexes[item._id])}&w=150&h=150&c=7&rs=1&p=0`
-                                                        : (item.aiImage || `https://tse2.mm.bing.net/th?q=${getCleanImgQuery(item.name, 0)}&w=150&h=150&c=7&rs=1&p=0`)}
-                                                    alt={item.name}
-                                                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                                                />
+                                                {item.aiImage === 'none' && !imageIndexes[item._id] ? (
+                                                    <span style={{ fontSize: 24 }}>📦</span>
+                                                ) : (
+                                                    <img
+                                                        src={(imageIndexes[item._id] > 0)
+                                                            ? `https://tse2.mm.bing.net/th?q=${getCleanImgQuery(item.name, imageIndexes[item._id])}&w=150&h=150&c=7&rs=1&p=0`
+                                                            : (item.aiImage || `https://tse2.mm.bing.net/th?q=${getCleanImgQuery(item.name, 0)}&w=150&h=150&c=7&rs=1&p=0`)}
+                                                        alt={item.name}
+                                                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                                    />
+                                                )}
                                                 {isAdmin && (
                                                     <div style={{ position: 'absolute', top: 2, right: 2, display: 'flex', flexWrap: 'wrap', gap: 2, background: 'rgba(0,0,0,0.6)', padding: '2px', borderRadius: '4px', zIndex: 10, maxWidth: '40px', justifyContent: 'center' }}>
                                                         <button title="Next Variant" onClick={(e) => { e.preventDefault(); e.stopPropagation(); setImageIndexes(prev => ({ ...prev, [item._id]: (prev[item._id] || 0) + 1 })) }} style={{ background: 'white', border: 'none', borderRadius: '2px', width: 16, height: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10 }}>⟩</button>
                                                         <button title="Save This Image" onClick={(e) => { e.preventDefault(); e.stopPropagation(); saveAiImage(item._id, `https://tse2.mm.bing.net/th?q=${getCleanImgQuery(item.name, imageIndexes[item._id] || 0)}&w=400&h=300&c=7&rs=1&p=0`) }} style={{ background: 'white', border: 'none', borderRadius: '2px', width: 16, height: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10 }}>💾</button>
+                                                        <button title="No Image" onClick={(e) => { e.preventDefault(); e.stopPropagation(); if (window.confirm('Hide image for this product?')) saveAiImage(item._id, 'none') }} style={{ background: 'white', border: 'none', borderRadius: '2px', width: 16, height: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10 }}>🚫</button>
                                                         {item.aiImage && (
-                                                            <button title="Clear Custom Image" onClick={(e) => { e.preventDefault(); e.stopPropagation(); if (window.confirm('Clear custom image?')) saveAiImage(item._id, '') }} style={{ background: '#ff4444', color: 'white', border: 'none', borderRadius: '2px', width: 16, height: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10 }}>↺</button>
+                                                            <button title="Clear Custom/None" onClick={(e) => { e.preventDefault(); e.stopPropagation(); if (window.confirm('Reset this product to dynamic AI images?')) saveAiImage(item._id, '') }} style={{ background: '#ff4444', color: 'white', border: 'none', borderRadius: '2px', width: 16, height: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10 }}>↺</button>
                                                         )}
                                                     </div>
                                                 )}
@@ -887,32 +892,46 @@ const ShopPage = () => {
                                 }}
                             >
                                 <div className="product-image-section" style={{ position: 'relative' }}>
-                                    <img
-                                        src={(imageIndexes[product._id] > 0)
-                                            ? `https://tse2.mm.bing.net/th?q=${getCleanImgQuery(product.name, imageIndexes[product._id])}&w=400&h=300&c=7&rs=1&p=0`
-                                            : (product.aiImage || `https://tse2.mm.bing.net/th?q=${getCleanImgQuery(product.name, 0)}&w=400&h=300&c=7&rs=1&p=0`)}
-                                        alt={product.name}
-                                        className="product-image"
-                                        onError={(e) => {
-                                            e.target.style.display = 'none';
-                                            if (e.target.nextSibling) e.target.nextSibling.style.display = 'flex';
-                                        }}
-                                    />
-                                    <div className="product-placeholder" style={{ display: 'none' }}>
-                                        <span className="product-icon">📦</span>
-                                    </div>
+                                    {product.aiImage === 'none' && !imageIndexes[product._id] ? (
+                                        <div className="product-placeholder" style={{ display: 'flex' }}>
+                                            <span className="product-icon">📦</span>
+                                        </div>
+                                    ) : (
+                                        <>
+                                            <img
+                                                src={(imageIndexes[product._id] > 0)
+                                                    ? `https://tse2.mm.bing.net/th?q=${getCleanImgQuery(product.name, imageIndexes[product._id])}&w=400&h=300&c=7&rs=1&p=0`
+                                                    : (product.aiImage || `https://tse2.mm.bing.net/th?q=${getCleanImgQuery(product.name, 0)}&w=400&h=300&c=7&rs=1&p=0`)}
+                                                alt={product.name}
+                                                className="product-image"
+                                                onError={(e) => {
+                                                    e.target.style.display = 'none';
+                                                    if (e.target.nextSibling) e.target.nextSibling.style.display = 'flex';
+                                                }}
+                                            />
+                                            <div className="product-placeholder" style={{ display: 'none' }}>
+                                                <span className="product-icon">📦</span>
+                                            </div>
+                                        </>
+                                    )}
                                     {isAdmin && (
                                         <div onClick={(e) => { e.preventDefault(); e.stopPropagation(); }} style={{ position: 'absolute', top: 8, right: 8, display: 'flex', gap: 4, background: 'rgba(0,0,0,0.6)', padding: '4px', borderRadius: '6px', zIndex: 10 }}>
                                             <button title="Cycle Through Images" onClick={(e) => { e.preventDefault(); e.stopPropagation(); setImageIndexes(prev => ({ ...prev, [product._id]: (prev[product._id] || 0) + 1 })) }} style={{ background: 'white', border: 'none', borderRadius: '4px', width: 28, height: 28, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, fontWeight: 'bold' }}>⟩</button>
                                             <button title="Save This Image" onClick={(e) => { e.preventDefault(); e.stopPropagation(); saveAiImage(product._id, `https://tse2.mm.bing.net/th?q=${getCleanImgQuery(product.name, imageIndexes[product._id] || 0)}&w=400&h=300&c=7&rs=1&p=0`) }} style={{ background: 'white', border: 'none', borderRadius: '4px', width: 28, height: 28, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>💾</button>
+                                            <button title="No Image" onClick={(e) => { e.preventDefault(); e.stopPropagation(); if (window.confirm('Hide image for this product?')) saveAiImage(product._id, 'none') }} style={{ background: 'white', border: 'none', borderRadius: '4px', width: 28, height: 28, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>🚫</button>
                                             {product.aiImage && (
                                                 <button title="Reset to AI Search" onClick={(e) => { e.preventDefault(); e.stopPropagation(); if (window.confirm('Reset this product to dynamic AI images?')) saveAiImage(product._id, '') }} style={{ background: '#ff4444', color: 'white', border: 'none', borderRadius: '4px', width: 28, height: 28, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>↺</button>
                                             )}
                                         </div>
                                     )}
-                                    {isAdmin && product.aiImage && !imageIndexes[product._id] && (
+                                    {isAdmin && product.aiImage && product.aiImage !== 'none' && !imageIndexes[product._id] && (
                                         <div style={{ position: 'absolute', bottom: 8, left: 8, background: 'rgba(0,128,0,0.8)', color: 'white', padding: '2px 8px', borderRadius: '4px', fontSize: 10, fontWeight: 'bold' }}>
                                             LOCKED IMAGE
+                                        </div>
+                                    )}
+                                    {isAdmin && product.aiImage === 'none' && !imageIndexes[product._id] && (
+                                        <div style={{ position: 'absolute', bottom: 8, left: 8, background: 'rgba(0,0,0,0.8)', color: 'white', padding: '2px 8px', borderRadius: '4px', fontSize: 10, fontWeight: 'bold' }}>
+                                            HIDDEN IMAGE
                                         </div>
                                     )}
                                 </div>

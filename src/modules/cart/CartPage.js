@@ -163,17 +163,25 @@ const CartPage = () => {
                                         className={`cart-item ${isRemoving ? 'removing' : ''}`}
                                     >
                                         <div className="item-image">
-                                            <img
-                                                src={item.aiImage || `https://tse2.mm.bing.net/th?q=${getCleanImgQuery(item.name)}&w=400&h=300&c=7&rs=1&p=0`}
-                                                alt={item.name}
-                                                onError={(e) => {
-                                                    e.target.style.display = 'none';
-                                                    if (e.target.nextSibling) e.target.nextSibling.style.display = 'flex';
-                                                }}
-                                            />
-                                            <div className="item-placeholder" style={{ display: 'none' }}>
-                                                <span>📦</span>
-                                            </div>
+                                            {item.aiImage === 'none' ? (
+                                                <div className="item-placeholder" style={{ display: 'flex' }}>
+                                                    <span>📦</span>
+                                                </div>
+                                            ) : (
+                                                <>
+                                                    <img
+                                                        src={item.aiImage || `https://tse2.mm.bing.net/th?q=${getCleanImgQuery(item.name)}&w=400&h=300&c=7&rs=1&p=0`}
+                                                        alt={item.name}
+                                                        onError={(e) => {
+                                                            e.target.style.display = 'none';
+                                                            if (e.target.nextSibling) e.target.nextSibling.style.display = 'flex';
+                                                        }}
+                                                    />
+                                                    <div className="item-placeholder" style={{ display: 'none' }}>
+                                                        <span>📦</span>
+                                                    </div>
+                                                </>
+                                            )}
                                         </div>
 
                                         <div className="item-details">
