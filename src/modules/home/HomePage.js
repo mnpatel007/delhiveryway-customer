@@ -581,7 +581,7 @@ const HomePage = () => {
                                                             {products.slice(0, 3).map(s => (
                                                                 <div key={s._id} role="option" tabIndex={0} className="suggestion-item" onClick={() => handleSuggestionClick(s)}>
                                                                     <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                                                                        <img src={`https://tse2.mm.bing.net/th?q=${getCleanImgQuery(s.name)}&w=100&h=100&c=7&rs=1&p=0`} alt={s.name} style={{ width: 48, height: 48, objectFit: 'cover', borderRadius: 6 }} />
+                                                                        <img src={s.aiImage || `https://tse2.mm.bing.net/th?q=${getCleanImgQuery(s.name)}&w=100&h=100&c=7&rs=1&p=0`} alt={s.name} style={{ width: 48, height: 48, objectFit: 'cover', borderRadius: 6 }} />
                                                                         <div>
                                                                             <div style={{ fontWeight: 600 }}>{s.name}</div>
                                                                             <div style={{ fontSize: 12, color: '#666' }}>₹{s.price}</div>

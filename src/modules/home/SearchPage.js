@@ -89,7 +89,7 @@ const SearchPage = () => {
                                     </div>
                                     <div>
                                         {products[0] && (
-                                            <img src={`https://tse2.mm.bing.net/th?q=${getCleanImgQuery(products[0].name)}&w=400&h=300&c=7&rs=1&p=0`} alt={products[0].name} style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: 6 }} />
+                                            <img src={products[0].aiImage || `https://tse2.mm.bing.net/th?q=${getCleanImgQuery(products[0].name)}&w=400&h=300&c=7&rs=1&p=0`} alt={products[0].name} style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: 6 }} />
                                         )}
                                     </div>
                                 </div>

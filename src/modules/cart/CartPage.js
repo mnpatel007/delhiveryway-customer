@@ -164,7 +164,7 @@ const CartPage = () => {
                                     >
                                         <div className="item-image">
                                             <img
-                                                src={`https://tse2.mm.bing.net/th?q=${getCleanImgQuery(item.name)}&w=400&h=300&c=7&rs=1&p=0`}
+                                                src={item.aiImage || `https://tse2.mm.bing.net/th?q=${getCleanImgQuery(item.name)}&w=400&h=300&c=7&rs=1&p=0`}
                                                 alt={item.name}
                                                 onError={(e) => {
                                                     e.target.style.display = 'none';
