@@ -658,7 +658,7 @@ const ShopPage = () => {
                                         }}>
                                             <div style={{ width: 72, height: 72, borderRadius: 8, background: '#fafafa', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
                                                 <img
-                                                    src={`https://api.dicebear.com/9.x/icons/svg?seed=${encodeURIComponent(item.name || 'product')}&backgroundColor=c0aede,d1d4f9,ffdfbf,b6e3f4`}
+                                                    src={`https://tse2.mm.bing.net/th?q=${encodeURIComponent(item.name || 'product')}&w=150&h=150&c=7&rs=1&p=0`}
                                                     alt={item.name}
                                                     style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                                                 />
@@ -833,7 +833,7 @@ const ShopPage = () => {
                             >
                                 <div className="product-image-section">
                                     <img
-                                        src={`https://api.dicebear.com/9.x/icons/svg?seed=${encodeURIComponent(product.name || 'product')}&backgroundColor=c0aede,d1d4f9,ffdfbf,b6e3f4`}
+                                        src={`https://tse2.mm.bing.net/th?q=${encodeURIComponent(product.name || 'product')}&w=400&h=300&c=7&rs=1&p=0`}
                                         alt={product.name}
                                         className="product-image"
                                         onError={(e) => {
