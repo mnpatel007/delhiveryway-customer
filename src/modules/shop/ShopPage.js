@@ -658,7 +658,7 @@ const ShopPage = () => {
                                         }}>
                                             <div style={{ width: 72, height: 72, borderRadius: 8, background: '#fafafa', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
                                                 <img
-                                                    src={`https://image.pollinations.ai/prompt/${encodeURIComponent(item.name || 'product')}?width=150&height=150&nologo=true`}
+                                                    src={`https://api.dicebear.com/9.x/icons/svg?seed=${encodeURIComponent(item.name || 'product')}&backgroundColor=c0aede,d1d4f9,ffdfbf,b6e3f4`}
                                                     alt={item.name}
                                                     style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                                                 />
@@ -833,7 +833,7 @@ const ShopPage = () => {
                             >
                                 <div className="product-image-section">
                                     <img
-                                        src={`https://image.pollinations.ai/prompt/${encodeURIComponent(product.name || 'product')}?width=400&height=300&nologo=true`}
+                                        src={`https://api.dicebear.com/9.x/icons/svg?seed=${encodeURIComponent(product.name || 'product')}&backgroundColor=c0aede,d1d4f9,ffdfbf,b6e3f4`}
                                         alt={product.name}
                                         className="product-image"
                                         onError={(e) => {

@@ -575,7 +575,7 @@ const HomePage = () => {
                                                             {products.slice(0, 3).map(s => (
                                                                 <div key={s._id} role="option" tabIndex={0} className="suggestion-item" onClick={() => handleSuggestionClick(s)}>
                                                                     <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                                                                        <img src={`https://image.pollinations.ai/prompt/${encodeURIComponent(s.name || 'product')}?width=100&height=100&nologo=true`} alt={s.name} style={{ width: 48, height: 48, objectFit: 'cover', borderRadius: 6 }} />
+                                                                        <img src={`https://api.dicebear.com/9.x/icons/svg?seed=${encodeURIComponent(s.name || 'product')}&backgroundColor=c0aede,d1d4f9,ffdfbf,b6e3f4`} alt={s.name} style={{ width: 48, height: 48, objectFit: 'cover', borderRadius: 6 }} />
                                                                         <div>
                                                                             <div style={{ fontWeight: 600 }}>{s.name}</div>
                                                                             <div style={{ fontSize: 12, color: '#666' }}>₹{s.price}</div>

@@ -158,7 +158,7 @@ const CartPage = () => {
                                     >
                                         <div className="item-image">
                                             <img
-                                                src={`https://image.pollinations.ai/prompt/${encodeURIComponent(item.name || 'product')}?width=400&height=300&nologo=true`}
+                                                src={`https://api.dicebear.com/9.x/icons/svg?seed=${encodeURIComponent(item.name || 'product')}&backgroundColor=c0aede,d1d4f9,ffdfbf,b6e3f4`}
                                                 alt={item.name}
                                                 onError={(e) => {
                                                     e.target.style.display = 'none';

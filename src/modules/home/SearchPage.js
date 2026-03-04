@@ -83,7 +83,7 @@ const SearchPage = () => {
                                     </div>
                                     <div>
                                         {products[0] && (
-                                            <img src={`https://image.pollinations.ai/prompt/${encodeURIComponent(products[0].name || 'product')}?width=160&height=160&nologo=true`} alt={products[0].name} style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: 6 }} />
+                                            <img src={`https://api.dicebear.com/9.x/icons/svg?seed=${encodeURIComponent(products[0].name || 'product')}&backgroundColor=c0aede,d1d4f9,ffdfbf,b6e3f4`} alt={products[0].name} style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: 6 }} />
                                         )}
                                     </div>
                                 </div>
