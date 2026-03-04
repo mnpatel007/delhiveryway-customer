@@ -5,6 +5,12 @@ import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
 import { apiCall, shopsAPI, productsAPI } from '../../services/api';
 
+const getCleanImgQuery = (name) => {
+    if (!name) return 'delicious food gourmet';
+    let q = name.replace(/\([^)]+\)/g, '').trim();
+    q = q.replace(/[0-9]+(kg|g|ml|l|pcs|piece)/gi, '').trim();
+    return encodeURIComponent(q + ' ready to eat dish plating food photography close up');
+};
 const SearchPage = () => {
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
@@ -83,7 +89,7 @@ const SearchPage = () => {
                                     </div>
                                     <div>
                                         {products[0] && (
-                                            <img src={`https://tse2.mm.bing.net/th?q=${encodeURIComponent(products[0].name || 'product')}&w=400&h=300&c=7&rs=1&p=0`} alt={products[0].name} style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: 6 }} />
+                                            <img src={`https://tse2.mm.bing.net/th?q=${getCleanImgQuery(products[0].name)}&w=400&h=300&c=7&rs=1&p=0`} alt={products[0].name} style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: 6 }} />
                                         )}
                                     </div>
                                 </div>

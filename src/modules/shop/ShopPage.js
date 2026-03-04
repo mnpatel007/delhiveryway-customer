@@ -4,6 +4,14 @@ import { shopsAPI, productsAPI, apiCall } from '../../services/api';
 import { useCart } from '../../context/CartContext';
 import './ShopPage.css';
 
+const getCleanImgQuery = (name) => {
+    if (!name) return 'delicious food gourmet';
+    let q = name.replace(/\([^)]+\)/g, '').trim();
+    q = q.replace(/[0-9]+(kg|g|ml|l|pcs|piece)/gi, '').trim();
+    return encodeURIComponent(q + ' ready to eat dish plating food photography close up');
+};
+
+
 const ShopPage = () => {
     const { id } = useParams();
     const [searchParams] = useSearchParams();
@@ -658,7 +666,7 @@ const ShopPage = () => {
                                         }}>
                                             <div style={{ width: 72, height: 72, borderRadius: 8, background: '#fafafa', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
                                                 <img
-                                                    src={`https://tse2.mm.bing.net/th?q=${encodeURIComponent(item.name || 'product')}&w=150&h=150&c=7&rs=1&p=0`}
+                                                    src={`https://tse2.mm.bing.net/th?q=${getCleanImgQuery(item.name)}&w=150&h=150&c=7&rs=1&p=0`}
                                                     alt={item.name}
                                                     style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                                                 />
@@ -833,7 +841,7 @@ const ShopPage = () => {
                             >
                                 <div className="product-image-section">
                                     <img
-                                        src={`https://tse2.mm.bing.net/th?q=${encodeURIComponent(product.name || 'product')}&w=400&h=300&c=7&rs=1&p=0`}
+                                        src={`https://tse2.mm.bing.net/th?q=${getCleanImgQuery(product.name)}&w=400&h=300&c=7&rs=1&p=0`}
                                         alt={product.name}
                                         className="product-image"
                                         onError={(e) => {

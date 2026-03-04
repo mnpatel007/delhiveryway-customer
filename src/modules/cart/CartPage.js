@@ -3,6 +3,12 @@ import { useCart } from '../../context/CartContext';
 import { useNavigate } from 'react-router-dom';
 import './CartPage.css';
 
+const getCleanImgQuery = (name) => {
+    if (!name) return 'delicious food gourmet';
+    let q = name.replace(/\([^)]+\)/g, '').trim();
+    q = q.replace(/[0-9]+(kg|g|ml|l|pcs|piece)/gi, '').trim();
+    return encodeURIComponent(q + ' ready to eat dish plating food photography close up');
+};
 // Format price with Indian Rupee symbol and proper formatting
 const formatPrice = (price) => {
     return new Intl.NumberFormat('en-IN', {
@@ -158,7 +164,7 @@ const CartPage = () => {
                                     >
                                         <div className="item-image">
                                             <img
-                                                src={`https://tse2.mm.bing.net/th?q=${encodeURIComponent(item.name || 'product')}&w=400&h=300&c=7&rs=1&p=0`}
+                                                src={`https://tse2.mm.bing.net/th?q=${getCleanImgQuery(item.name)}&w=400&h=300&c=7&rs=1&p=0`}
                                                 alt={item.name}
                                                 onError={(e) => {
                                                     e.target.style.display = 'none';
