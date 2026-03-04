@@ -157,17 +157,15 @@ const CartPage = () => {
                                         className={`cart-item ${isRemoving ? 'removing' : ''}`}
                                     >
                                         <div className="item-image">
-                                            {item.images && item.images.length > 0 ? (
-                                                <img
-                                                    src={item.images[0]}
-                                                    alt={item.name}
-                                                    onError={(e) => {
-                                                        e.target.style.display = 'none';
-                                                        e.target.nextSibling.style.display = 'flex';
-                                                    }}
-                                                />
-                                            ) : null}
-                                            <div className="item-placeholder" style={{ display: item.images && item.images.length > 0 ? 'none' : 'flex' }}>
+                                            <img
+                                                src={`https://image.pollinations.ai/prompt/${encodeURIComponent(item.name || 'product')}?width=400&height=300&nologo=true`}
+                                                alt={item.name}
+                                                onError={(e) => {
+                                                    e.target.style.display = 'none';
+                                                    if (e.target.nextSibling) e.target.nextSibling.style.display = 'flex';
+                                                }}
+                                            />
+                                            <div className="item-placeholder" style={{ display: 'none' }}>
                                                 <span>📦</span>
                                             </div>
                                         </div>

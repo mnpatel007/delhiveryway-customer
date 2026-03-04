@@ -657,11 +657,11 @@ const ShopPage = () => {
                                             alignItems: 'center'
                                         }}>
                                             <div style={{ width: 72, height: 72, borderRadius: 8, background: '#fafafa', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
-                                                {item.images && item.images[0] ? (
-                                                    <img src={item.images[0]} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                                                ) : (
-                                                    <span style={{ fontSize: 24 }}>📦</span>
-                                                )}
+                                                <img
+                                                    src={`https://image.pollinations.ai/prompt/${encodeURIComponent(item.name || 'product')}?width=150&height=150&nologo=true`}
+                                                    alt={item.name}
+                                                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                                />
                                             </div>
 
                                             <div>
@@ -832,18 +832,16 @@ const ShopPage = () => {
                                 }}
                             >
                                 <div className="product-image-section">
-                                    {product.images && product.images.length > 0 ? (
-                                        <img
-                                            src={product.images[0]}
-                                            alt={product.name}
-                                            className="product-image"
-                                            onError={(e) => {
-                                                e.target.style.display = 'none';
-                                                e.target.nextSibling.style.display = 'flex';
-                                            }}
-                                        />
-                                    ) : null}
-                                    <div className="product-placeholder" style={{ display: product.images && product.images.length > 0 ? 'none' : 'flex' }}>
+                                    <img
+                                        src={`https://image.pollinations.ai/prompt/${encodeURIComponent(product.name || 'product')}?width=400&height=300&nologo=true`}
+                                        alt={product.name}
+                                        className="product-image"
+                                        onError={(e) => {
+                                            e.target.style.display = 'none';
+                                            if (e.target.nextSibling) e.target.nextSibling.style.display = 'flex';
+                                        }}
+                                    />
+                                    <div className="product-placeholder" style={{ display: 'none' }}>
                                         <span className="product-icon">📦</span>
                                     </div>
                                 </div>

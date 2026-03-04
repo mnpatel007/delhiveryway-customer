@@ -82,8 +82,8 @@ const SearchPage = () => {
                                         <div style={{ color: '#666' }}>{products.length} matching product(s)</div>
                                     </div>
                                     <div>
-                                        {products[0]?.images?.[0] && (
-                                            <img src={products[0].images[0]} alt={products[0].name} style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: 6 }} />
+                                        {products[0] && (
+                                            <img src={`https://image.pollinations.ai/prompt/${encodeURIComponent(products[0].name || 'product')}?width=160&height=160&nologo=true`} alt={products[0].name} style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: 6 }} />
                                         )}
                                     </div>
                                 </div>
