@@ -7,7 +7,7 @@ const getCleanImgQuery = (name) => {
     if (!name) return 'delicious food gourmet';
     let q = name.replace(/\([^)]+\)/g, '').trim();
     q = q.replace(/[0-9]+(kg|g|ml|l|pcs|piece)/gi, '').trim();
-    return encodeURIComponent(q + ' ready to eat dish plating food photography close up');
+    return encodeURIComponent(q + ' authentic recipe food dish high resolution photography plate');
 };
 // Format price with Indian Rupee symbol and proper formatting
 const formatPrice = (price) => {
