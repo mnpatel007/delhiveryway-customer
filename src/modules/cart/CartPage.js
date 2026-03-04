@@ -3,6 +3,12 @@ import { useCart } from '../../context/CartContext';
 import { useNavigate } from 'react-router-dom';
 import './CartPage.css';
 
+const getCleanImgQuery = (name) => {
+    if (!name) return 'delicious food gourmet';
+    let q = name.replace(/\([^)]+\)/g, '').trim();
+    q = q.replace(/[0-9]+(kg|g|ml|l|pcs|piece)/gi, '').trim();
+    return encodeURIComponent(q + ' ready to eat dish plating food photography close up');
+};
 // Format price with Indian Rupee symbol and proper formatting
 const formatPrice = (price) => {
     return new Intl.NumberFormat('en-IN', {
@@ -157,19 +163,25 @@ const CartPage = () => {
                                         className={`cart-item ${isRemoving ? 'removing' : ''}`}
                                     >
                                         <div className="item-image">
-                                            {item.images && item.images.length > 0 ? (
-                                                <img
-                                                    src={item.images[0]}
-                                                    alt={item.name}
-                                                    onError={(e) => {
-                                                        e.target.style.display = 'none';
-                                                        e.target.nextSibling.style.display = 'flex';
-                                                    }}
-                                                />
-                                            ) : null}
-                                            <div className="item-placeholder" style={{ display: item.images && item.images.length > 0 ? 'none' : 'flex' }}>
-                                                <span>📦</span>
-                                            </div>
+                                            {item.aiImage === 'none' ? (
+                                                <div className="item-placeholder" style={{ display: 'flex' }}>
+                                                    <span>📦</span>
+                                                </div>
+                                            ) : (
+                                                <>
+                                                    <img
+                                                        src={item.aiImage || `https://tse2.mm.bing.net/th?q=${getCleanImgQuery(item.name)}&w=400&h=300&c=7&rs=1&p=0`}
+                                                        alt={item.name}
+                                                        onError={(e) => {
+                                                            e.target.style.display = 'none';
+                                                            if (e.target.nextSibling) e.target.nextSibling.style.display = 'flex';
+                                                        }}
+                                                    />
+                                                    <div className="item-placeholder" style={{ display: 'none' }}>
+                                                        <span>📦</span>
+                                                    </div>
+                                                </>
+                                            )}
                                         </div>
 
                                         <div className="item-details">

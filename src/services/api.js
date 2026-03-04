@@ -139,6 +139,7 @@ export const productsAPI = {
     index: (params = {}) => api.get('/products/index', { params }),
     getByCategory: (category, params = {}) => api.get(`/products/category/${category}`, { params }),
     getFeatured: (params = {}) => api.get('/products/featured', { params }),
+    update: (id, data) => api.put(`/products/${id}`, data),
 };
 
 // Orders API with comprehensive order management

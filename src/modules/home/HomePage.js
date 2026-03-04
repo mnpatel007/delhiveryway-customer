@@ -10,6 +10,12 @@ import { calculateDeliveryFeesBulk, getDeliveryFeeDisplay, getCustomerLocation, 
 import axios from 'axios';
 import './HomePage.css';
 
+const getCleanImgQuery = (name) => {
+    if (!name) return 'delicious food gourmet';
+    let q = name.replace(/\([^)]+\)/g, '').trim();
+    q = q.replace(/[0-9]+(kg|g|ml|l|pcs|piece)/gi, '').trim();
+    return encodeURIComponent(q + ' ready to eat dish plating food photography close up');
+};
 const HomePage = () => {
     const [shops, setShops] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -575,7 +581,11 @@ const HomePage = () => {
                                                             {products.slice(0, 3).map(s => (
                                                                 <div key={s._id} role="option" tabIndex={0} className="suggestion-item" onClick={() => handleSuggestionClick(s)}>
                                                                     <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                                                                        {s.images?.[0] && <img src={s.images[0]} alt={s.name} style={{ width: 48, height: 48, objectFit: 'cover', borderRadius: 6 }} />}
+                                                                        {s.aiImage === 'none' ? (
+                                                                            <div style={{ width: 48, height: 48, background: '#f5f5f5', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 6, fontSize: 20 }}>📦</div>
+                                                                        ) : (
+                                                                            <img src={s.aiImage || `https://tse2.mm.bing.net/th?q=${getCleanImgQuery(s.name)}&w=100&h=100&c=7&rs=1&p=0`} alt={s.name} style={{ width: 48, height: 48, objectFit: 'cover', borderRadius: 6 }} />
+                                                                        )}
                                                                         <div>
                                                                             <div style={{ fontWeight: 600 }}>{s.name}</div>
                                                                             <div style={{ fontSize: 12, color: '#666' }}>₹{s.price}</div>
