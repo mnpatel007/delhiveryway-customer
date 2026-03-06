@@ -78,7 +78,10 @@ const SearchPage = () => {
 
             {!loading && shopList.length > 0 && (
                 <div>
-                    <p>Found in {shopList.length} shop(s)</p>
+                    <p style={{ margin: '0 0 4px 0' }}>Found in {shopList.length} shop(s)</p>
+                    <div style={{ marginBottom: '16px', fontSize: '11px', color: '#666', fontStyle: 'italic' }}>
+                        * Image is just for show purpose, the actual appearance and taste may differ
+                    </div>
                     <ul style={{ listStyle: 'none', padding: 0 }}>
                         {shopList.map(({ shopInfo, products }) => (
                             <li key={shopInfo._id} style={{ border: '1px solid #eee', marginBottom: '12px', padding: '12px', borderRadius: '6px' }}>

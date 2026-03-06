@@ -852,6 +852,9 @@ const ShopPage = () => {
                         {filteredProducts.length} of {products.length} products
                     </span>
                 </div>
+                <div style={{ marginBottom: '16px', fontSize: '11px', color: '#666', fontStyle: 'italic', padding: '0 8px' }}>
+                    * Image is just for show purpose, the actual appearance and taste may differ
+                </div>
 
                 {/* Debug Section - Development Only */}
                 {process.env.NODE_ENV === 'development' && (
