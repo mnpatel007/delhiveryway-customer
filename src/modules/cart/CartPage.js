@@ -152,6 +152,9 @@ const CartPage = () => {
                         )}
 
                         {/* Cart Items */}
+                        <div style={{ marginBottom: '12px', fontSize: '11px', color: '#666', fontStyle: 'italic', padding: '0 4px' }}>
+                            * Image is just for show purpose, the actual appearance and taste may differ
+                        </div>
                         <div className="cart-items">
                             {cartItems.map(item => {
                                 const isRemoving = removingItem === item._id;

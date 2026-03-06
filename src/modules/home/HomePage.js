@@ -563,6 +563,9 @@ const HomePage = () => {
 
                                         {showSuggestions && suggestions.length > 0 && (
                                             <div className="home-search-suggestions" role="listbox">
+                                                <div style={{ padding: '8px 12px 4px 12px', fontSize: '10px', color: '#666', fontStyle: 'italic', borderBottom: '1px solid #eee' }}>
+                                                    * Image is just for show purpose, the actual appearance and taste may differ
+                                                </div>
                                                 {(() => {
                                                     // Group suggestions by shop
                                                     const grouped = {};
