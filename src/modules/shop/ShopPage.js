@@ -1,15 +1,14 @@
+```
 import React, { useEffect, useState, useContext, useRef } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { shopsAPI, productsAPI, apiCall } from '../../services/api';
-import { useCart } from '../../context/CartContext';
+import { shopsAPI, productsAPI } from '../../services/api'; // Keep shopsAPI and productsAPI if used later
+import { CartContext } from '../../context/CartContext';
 import './ShopPage.css';
+import { apiCall } from '../../utils/api';
 
-const imgVariants = [
-    'ready to eat dish plating food photography close up',
-    'authentic recipe food dish high resolution photography plate',
-    'bright natural light food photography 4k delicious',
-    'restaurant style presentation food portrait macro',
+const FOOD_PROMPTS = [
+    'professional food photography high resolution dark background',
     'gourmet meal editorial food magazine photo',
     'mouth-watering food photography dark mood lighting',
     'food blogging top down shot colorful',
@@ -20,32 +19,30 @@ const getCleanImgQuery = (name, index = 0) => {
     if (!name) return 'delicious food gourmet';
     let q = name.replace(/\([^)]+\)/g, '').trim();
     q = q.replace(/[0-9]+(kg|g|ml|l|pcs|piece)/gi, '').trim();
-    const variant = imgVariants[index % imgVariants.length];
+    const variant = FOOD_PROMPTS[index % FOOD_PROMPTS.length]; // Updated to use FOOD_PROMPTS
     return encodeURIComponent(q + ' ' + variant);
 };
 
 
 const ShopPage = () => {
     const { id } = useParams();
-    const [searchParams] = useSearchParams();
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
     const [shop, setShop] = useState(null);
     const [products, setProducts] = useState([]);
-    const [filteredProducts, setFilteredProducts] = useState([]);
-    const [toast, setToast] = useState('');
+    const [groupedProducts, setGroupedProducts] = useState({});
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState('');
+    const [error, setError] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
-    const [selectedCategory, setSelectedCategory] = useState('all');
-    const [sortBy, setSortBy] = useState('name');
-    const [viewMode, setViewMode] = useState('grid');
-    const [showMenu, setShowMenu] = useState(false);
-    const { addToCart, selectedShop, setSelectedShop } = useCart();
-    const { user } = useAuth();
-    const adminEmails = ['meetnp007@gmail.com', 'ayupro916@gmail.com', 'ce230004015@iiti.ac.in'];
-    const isAdmin = adminEmails.includes(user?.email) || user?.role === 'admin';
-    const [imageIndexes, setImageIndexes] = useState({});
-    const productRefsMap = useRef({});
+    const [activeCategory, setActiveCategory] = useState('');
+    const [toast, setToast] = useState('');
+
+    const { addToCart, setSelectedShop } = useContext(CartContext);
+    const { isAdmin } = useAuth(); // Assuming isAdmin is provided by useAuth
+
+    // Refs for scrolling and observing
+    const categoryRefs = useRef({});
+    const observerRef = useRef(null);
 
     const saveAiImage = async (productId, imageUrl) => {
         try {
@@ -95,7 +92,7 @@ const ShopPage = () => {
                     // Check if there are nested objects
                     Object.keys(shopResult.data).forEach(key => {
                         const value = shopResult.data[key];
-                        console.log(`🔍 Key "${key}":`, typeof value, value && typeof value === 'object' ? Object.keys(value) : value);
+                        console.log(`🔍 Key "${key}": `, typeof value, value && typeof value === 'object' ? Object.keys(value) : value);
                     });
 
                     // Extract the shop object - be more flexible with the structure
@@ -111,11 +108,11 @@ const ShopPage = () => {
 
                     for (let i = 0; i < possiblePaths.length; i++) {
                         const candidate = possiblePaths[i];
-                        console.log(`🔍 Trying path ${i}:`, candidate);
+                        console.log(`🔍 Trying path ${ i }: `, candidate);
 
                         if (candidate && candidate._id && candidate.name) {
                             shopData = candidate;
-                            console.log(`✅ Found valid shop data at path ${i}:`, {
+                            console.log(`✅ Found valid shop data at path ${ i }: `, {
                                 id: shopData._id,
                                 name: shopData.name
                             });
@@ -191,15 +188,15 @@ const ShopPage = () => {
                         console.log('🔍 Available keys:', keys);
                         for (const key of keys) {
                             if (Array.isArray(productResult.data[key])) {
-                                console.log(`🔍 Found array in key: ${key}`, productResult.data[key]);
+                                console.log(`🔍 Found array in key: ${ key } `, productResult.data[key]);
                                 productsData = productResult.data[key];
                                 break;
                             } else if (productResult.data[key] && typeof productResult.data[key] === 'object') {
                                 const subKeys = Object.keys(productResult.data[key]);
-                                console.log(`🔍 Sub-keys in ${key}:`, subKeys);
+                                console.log(`🔍 Sub - keys in ${ key }: `, subKeys);
                                 for (const subKey of subKeys) {
                                     if (Array.isArray(productResult.data[key][subKey])) {
-                                        console.log(`🔍 Found array in ${key}.${subKey}`, productResult.data[key][subKey]);
+                                        console.log(`🔍 Found array in ${ key }.${ subKey } `, productResult.data[key][subKey]);
                                         productsData = productResult.data[key][subKey];
                                         break;
                                     }
@@ -215,7 +212,7 @@ const ShopPage = () => {
                     // Log individual product details for debugging (disabled in production)
                     if (process.env.NODE_ENV === 'development') {
                         productsData.forEach((product, index) => {
-                            console.log(`📦 Product ${index + 1}:`, {
+                            console.log(`📦 Product ${ index + 1 }: `, {
                                 id: product._id,
                                 name: product.name,
                                 description: product.description,
@@ -246,7 +243,6 @@ const ShopPage = () => {
 
                 console.log('📦 Final products array:', productsData);
                 setProducts(productsData);
-                setFilteredProducts(productsData);
 
                 // If shop data doesn't have a name, try to get it from the first product
                 if (shop && (!shop.name || shop.name === 'Loading...') && productsData.length > 0) {
@@ -267,7 +263,6 @@ const ShopPage = () => {
                 console.error('❌ Error fetching data:', err);
                 setError('Failed to load data. Please check your connection and try again.');
                 setProducts([]);
-                setFilteredProducts([]);
             } finally {
                 setLoading(false);
             }
@@ -278,39 +273,16 @@ const ShopPage = () => {
         }
     }, [id]);
 
-    // Scroll to highlighted product when it loads
+    // Group products and setup intersection observer for scroll spy
     useEffect(() => {
-        const highlightId = searchParams.get('highlight');
-        if (highlightId && filteredProducts.length > 0 && productRefsMap.current[highlightId]) {
-            const element = productRefsMap.current[highlightId];
-            if (element) {
-                // Scroll with offset for smooth behavior
-                const elementRect = element.getBoundingClientRect();
-                const absoluteElementTop = elementRect.top + window.scrollY;
-                window.scrollTo({
-                    top: absoluteElementTop - 100,
-                    behavior: 'smooth'
-                });
-
-                // Add highlight animation
-                element.classList.add('highlighted');
-                setTimeout(() => {
-                    element.classList.remove('highlighted');
-                }, 2000);
-            }
-        }
-    }, [filteredProducts, searchParams]);
-
-    // Filter and sort products
-    useEffect(() => {
-        if (!Array.isArray(products)) {
-            setFilteredProducts([]);
+        if (!Array.isArray(products) || products.length === 0) {
+            setGroupedProducts({});
             return;
         }
 
         let filtered = [...products];
 
-        // Apply search filter
+        // Apply search filter globally
         if (searchTerm.trim()) {
             const searchLower = searchTerm.toLowerCase().trim();
             filtered = filtered.filter(product =>
@@ -320,31 +292,63 @@ const ShopPage = () => {
             );
         }
 
-        // Apply category filter
-        if (selectedCategory !== 'all') {
-            filtered = filtered.filter(product =>
-                product.category?.toLowerCase() === selectedCategory.toLowerCase()
-            );
-        }
-
-        // Apply sorting
-        filtered.sort((a, b) => {
-            switch (sortBy) {
-                case 'name':
-                    return (a.name || '').localeCompare(b.name || '');
-                case 'price-low':
-                    return (a.price || 0) - (b.price || 0);
-                case 'price-high':
-                    return (b.price || 0) - (a.price || 0);
-                case 'newest':
-                    return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
-                default:
-                    return 0;
+        // Group by category
+        const grouped = filtered.reduce((acc, product) => {
+            const cat = product.category || 'Uncategorized';
+            if (!acc[cat]) {
+                acc[cat] = [];
             }
+            acc[cat].push(product);
+            return acc;
+        }, {});
+
+        // Sort items within categories by name
+        Object.keys(grouped).forEach(cat => {
+            grouped[cat].sort((a, b) => (a.name || '').localeCompare(b.name || ''));
         });
 
-        setFilteredProducts(filtered);
-    }, [products, searchTerm, selectedCategory, sortBy]);
+        setGroupedProducts(grouped);
+
+        // Setup observer after grouping
+        // We defer this slightly so the DOM has time to render the new sections
+        setTimeout(() => {
+            if (observerRef.current) {
+                observerRef.current.disconnect();
+            }
+
+            observerRef.current = new IntersectionObserver((entries) => {
+                // Find the first intersecting entry
+                for (const entry of entries) {
+                    if (entry.isIntersecting) {
+                        setActiveCategory(entry.target.id);
+                        break;
+                    }
+                }
+            }, {
+                rootMargin: '-10% 0px -80% 0px' // Trigger when section is near the top
+            });
+
+            Object.values(categoryRefs.current).forEach(ref => {
+                if (ref) observerRef.current.observe(ref);
+            });
+        }, 100);
+
+        return () => {
+            if (observerRef.current) {
+                observerRef.current.disconnect();
+            }
+        };
+    }, [products, searchTerm]);
+
+    const scrollToCategory = (categoryId) => {
+        setActiveCategory(categoryId);
+        const element = categoryRefs.current[categoryId];
+        if (element) {
+            const yOffset = -20; // Slight offset so header doesn't get hidden under fixed elements if any
+            const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
+            window.scrollTo({ top: y, behavior: 'smooth' });
+        }
+    };
 
     // Update selected shop in cart context when shop data loads
     useEffect(() => {
@@ -389,7 +393,7 @@ const ShopPage = () => {
         if (!todayHours || todayHours.closed) {
             return {
                 isOpen: false,
-                message: `Closed on ${day}s`,
+                message: `Closed on ${ day } s`,
                 nextOpen: getNextOpenTime(shop, now)
             };
         }
@@ -403,19 +407,19 @@ const ShopPage = () => {
         if (isOpen) {
             return {
                 isOpen: true,
-                message: `Open until ${todayHours.close}`,
+                message: `Open until ${ todayHours.close } `,
                 closingTime: todayHours.close
             };
         } else if (currentTime < todayHours.open) {
             return {
                 isOpen: false,
-                message: `Opens at ${todayHours.open}`,
+                message: `Opens at ${ todayHours.open } `,
                 openingTime: todayHours.open
             };
         } else {
             return {
                 isOpen: false,
-                message: `Closed (was open until ${todayHours.close})`,
+                message: `Closed(was open until ${ todayHours.close })`,
                 nextOpen: getNextOpenTime(shop, now)
             };
         }
@@ -434,7 +438,7 @@ const ShopPage = () => {
             const dayHours = shop.operatingHours?.[dayName];
 
             if (dayHours && !dayHours.closed && dayHours.open) {
-                return `${dayNamesDisplay[dayIndex]} at ${dayHours.open}`;
+                return `${ dayNamesDisplay[dayIndex] } at ${ dayHours.open } `;
             }
         }
 
@@ -471,7 +475,7 @@ const ShopPage = () => {
             if (success) {
                 // Update the cart context with proper shop data
                 setSelectedShop(shopData);
-                setToast(`✅ ${product.name} added to cart`);
+                setToast(`✅ ${ product.name } added to cart`);
             } else {
                 setToast('❌ Failed to add to cart');
             }
@@ -592,423 +596,171 @@ const ShopPage = () => {
                             <div className="shop-meta">
                                 {shop.rating && (
                                     <div className="meta-item">
-                                        <span className="meta-icon">⭐</span>
-                                        <span className="meta-text">{shop.rating.average?.toFixed(1) || '4.0'} ({shop.rating.count || 0} reviews)</span>
+                                        <span className="meta-icon">★</span>
+                                        <span className="meta-text">{shop.rating.average?.toFixed(1) || '4.0'} ({shop.rating.count || 0}+ ratings)</span>
                                     </div>
                                 )}
 
-                                <div className="meta-item">
-                                    <span className="meta-icon">📦</span>
-                                    <span className="meta-text">{products.length} products</span>
-                                </div>
-
-                                {/* Shop Hours Status - CRITICAL INFORMATION */}
+                                {/* Shop Hours Status */}
                                 {(() => {
                                     const status = getShopStatusMessage(shop);
                                     return (
-                                        <div className={`meta-item shop-status ${status.isOpen ? 'open' : 'closed'}`}>
-                                            <span className="meta-icon">{status.isOpen ? '🟢' : '🔴'}</span>
+                                        <div className={`meta - item shop - status ${ status.isOpen ? 'open' : 'closed' } `}>
                                             <span className="meta-text shop-hours-text">
                                                 {status.message}
                                             </span>
                                         </div>
                                     );
                                 })()}
-
-                                {/* Hide delivery fee on shop page as requested */}
-                                {/* {shop.deliveryFee !== undefined && (
-                                    <div className="meta-item">
-                                        <span className="meta-icon">🚚</span>
-                                        <span className="meta-text">{shop.deliveryFee === 0 ? 'Free delivery' : `₹${shop.deliveryFee} delivery`}</span>
-                                    </div>
-                                )} */}
                             </div>
-
-                            {/* View Menu button moved to controls section */}
                         </div>
                     </div>
                 </div>
             </div>
 
-            {/* Full-screen Menu Overlay */}
-            {showMenu && (
-                <div
-                    className="menu-overlay"
-                    style={{
-                        position: 'fixed',
-                        inset: 0,
-                        background: 'rgba(0,0,0,0.4)',
-                        zIndex: 9998,
-                        display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'flex-start',
-                        overflowY: 'auto'
-                    }}
-                    onClick={(e) => {
-                        // close only when backdrop clicked
-                        if (e.target.classList.contains('menu-overlay')) setShowMenu(false);
-                    }}
-                >
-                    <div
-                        className="menu-panel"
-                        style={{
-                            background: '#fff',
-                            width: 'min(900px, 92vw)',
-                            margin: '40px 16px',
-                            borderRadius: '12px',
-                            boxShadow: '0 12px 32px rgba(0,0,0,0.2)'
-                        }}
-                    >
-                        <div style={{
-                            position: 'sticky', top: 0, zIndex: 1,
-                            background: '#ffffffee', backdropFilter: 'saturate(180%) blur(6px)',
-                            display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                            padding: '14px 16px', borderBottom: '1px solid #eee', borderTopLeftRadius: '12px', borderTopRightRadius: '12px'
-                        }}>
-                            <div style={{ fontWeight: 800, fontSize: '18px' }}>
-                                {shop?.name || 'Menu'} · {products.length} items
-                            </div>
-                            <div>
-                                <button
-                                    onClick={() => setShowMenu(false)}
-                                    style={{
-                                        background: 'transparent',
-                                        color: '#333',
-                                        border: '1px solid #ddd',
-                                        padding: '8px 12px',
-                                        borderRadius: '8px',
-                                        cursor: 'pointer',
-                                        fontWeight: 600
-                                    }}
-                                >
-                                    ✕ Close
-                                </button>
-                            </div>
+            {/* Main Shop Layout container: Sidebar + Content */}
+            <div className="shop-layout">
+                {/* Left Sticky Sidebar for Categories */}
+                <aside className="sticky-sidebar">
+                    <div className="search-container modern-search">
+                        <span className="search-icon">🔍</span>
+                        <input
+                            type="text"
+                            placeholder="Search in store..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="search-input"
+                        />
+                    </div>
+                    
+                    <ul className="category-nav-list">
+                        {Object.keys(groupedProducts).length === 0 && (
+                            <li className="category-nav-item">No categories</li>
+                        )}
+                        {Object.keys(groupedProducts).map(category => (
+                            <li 
+                                key={category} 
+                                className={`category - nav - item ${ activeCategory === category ? 'active' : '' } `}
+                                onClick={() => scrollToCategory(category)}
+                            >
+                                {category.charAt(0).toUpperCase() + category.slice(1)}
+                            </li>
+                        ))}
+                    </ul>
+                </aside>
+
+                {/* Products Section */}
+                <div className="products-section modern-products-feed">
+                    <div className="products-feed-header">
+                        <div style={{ fontSize: '12px', color: '#666', fontStyle: 'italic', paddingBottom: '16px' }}>
+                            * Image is just for show purpose, the actual appearance and taste may differ
                         </div>
+                    </div>
 
-                        {/* Simple one-page menu list */}
-                        <div style={{ padding: '8px 0 12px' }}>
-                            {products.length === 0 ? (
-                                <div style={{ padding: '24px', textAlign: 'center', color: '#666' }}>No items available.</div>
-                            ) : (
-                                <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
-                                    {products.map((item) => (
-                                        <li key={item._id} style={{
-                                            display: 'grid',
-                                            gridTemplateColumns: '72px 1fr auto',
-                                            gap: '12px',
-                                            padding: '12px 16px',
-                                            borderBottom: '1px solid #f0f0f0',
-                                            alignItems: 'center'
-                                        }}>
-                                            <div style={{ position: 'relative', width: 72, height: 72, borderRadius: 8, background: '#fafafa', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
-                                                {item.aiImage === 'none' && !imageIndexes[item._id] ? (
-                                                    <span style={{ fontSize: 24 }}>📦</span>
-                                                ) : (
-                                                    <img
-                                                        src={(imageIndexes[item._id] > 0)
-                                                            ? `https://tse2.mm.bing.net/th?q=${getCleanImgQuery(item.name, imageIndexes[item._id])}&w=150&h=150&c=7&rs=1&p=0`
-                                                            : (item.aiImage || `https://tse2.mm.bing.net/th?q=${getCleanImgQuery(item.name, 0)}&w=150&h=150&c=7&rs=1&p=0`)}
-                                                        alt={item.name}
-                                                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                                                    />
-                                                )}
-                                                {isAdmin && (
-                                                    <div style={{ position: 'absolute', top: 2, right: 2, display: 'flex', flexWrap: 'wrap', gap: 2, background: 'rgba(0,0,0,0.6)', padding: '2px', borderRadius: '4px', zIndex: 10, maxWidth: '40px', justifyContent: 'center' }}>
-                                                        <button title="Next Variant" onClick={(e) => { e.preventDefault(); e.stopPropagation(); setImageIndexes(prev => ({ ...prev, [item._id]: (prev[item._id] || 0) + 1 })) }} style={{ background: 'white', border: 'none', borderRadius: '2px', width: 16, height: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10 }}>⟩</button>
-                                                        <button title="Save This Image" onClick={(e) => { e.preventDefault(); e.stopPropagation(); saveAiImage(item._id, `https://tse2.mm.bing.net/th?q=${getCleanImgQuery(item.name, imageIndexes[item._id] || 0)}&w=400&h=300&c=7&rs=1&p=0`) }} style={{ background: 'white', border: 'none', borderRadius: '2px', width: 16, height: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10 }}>💾</button>
-                                                        <button title="No Image" onClick={(e) => { e.preventDefault(); e.stopPropagation(); if (window.confirm('Hide image for this product?')) saveAiImage(item._id, 'none') }} style={{ background: 'white', border: 'none', borderRadius: '2px', width: 16, height: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10 }}>🚫</button>
-                                                        {item.aiImage && (
-                                                            <button title="Clear Custom/None" onClick={(e) => { e.preventDefault(); e.stopPropagation(); if (window.confirm('Reset this product to dynamic AI images?')) saveAiImage(item._id, '') }} style={{ background: '#ff4444', color: 'white', border: 'none', borderRadius: '2px', width: 16, height: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10 }}>↺</button>
-                                                        )}
-                                                    </div>
-                                                )}
-                                            </div>
+                    {/* Debug Section - Development Only */}
+                    {process.env.NODE_ENV === 'development' && (
+                        <div className="debug-section" style={{ background: '#f5f5f5', padding: '1rem', margin: '0 0 2rem 0', borderRadius: '8px', fontSize: '12px' }}>
+                            <h4>🔍 Debug Info:</h4>
+                            <p><strong>Total Products:</strong> {products.length}</p>
+                            <p><strong>Categories:</strong> {Object.keys(groupedProducts).length}</p>
+                        </div>
+                    )}
 
-                                            <div>
-                                                <div style={{ fontWeight: 700 }}>{item.name}</div>
-                                                {item.description && (
-                                                    <div style={{ fontSize: 13, color: '#666', marginTop: 4 }}>
-                                                        {item.description}
-                                                    </div>
-                                                )}
-                                                <div style={{ display: 'flex', gap: 10, marginTop: 6, fontSize: 12, color: '#555' }}>
-                                                    {item.category && <span>🏷️ {item.category}</span>}
-                                                    {item.stockQuantity !== undefined && <span>📦 {item.stockQuantity} {item.unit || 'units'}</span>}
-                                                </div>
-                                            </div>
-
-                                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 8 }}>
-                                                <div style={{ fontWeight: 800, color: '#111' }}>₹{(item.price || 0).toFixed(2)}</div>
-                                                <button
-                                                    onClick={() => handleAddToCart(item)}
-                                                    disabled={!item.inStock}
-                                                    style={{
-                                                        background: item.inStock ? '#198754' : '#adb5bd',
-                                                        color: '#fff',
-                                                        border: 'none',
-                                                        padding: '8px 10px',
-                                                        borderRadius: '8px',
-                                                        cursor: item.inStock ? 'pointer' : 'not-allowed',
-                                                        fontWeight: 700,
-                                                        minWidth: 110
-                                                    }}
-                                                >
-                                                    {item.inStock ? 'Add' : 'Out of stock'}
-                                                </button>
-                                            </div>
-                                        </li>
-                                    ))}
-                                </ul>
+                    {Object.keys(groupedProducts).length === 0 ? (
+                        <div className="no-products">
+                            <div className="no-products-icon">🍽️</div>
+                            <h3>No Products Found</h3>
+                            <p>
+                                {searchTerm 
+                                    ? 'Try adjusting your search query'
+                                    : 'This shop doesn\'t have any products yet'
+                                }
+                            </p>
+                            {searchTerm && (
+                                <button onClick={clearSearch} className="clear-search-btn">
+                                    Clear Search
+                                </button>
                             )}
                         </div>
-                    </div>
-                </div>
+                    ) : (
+                        <div className="grouped-products-container">
+                            {Object.entries(groupedProducts).map(([category, items]) => (
+                                <section 
+                                    key={category} 
+                                    id={category} 
+                                    className="menu-category-section"
+                                    ref={el => categoryRefs.current[category] = el}
+                                >
+                                    <h2 className="category-title">{category.charAt(0).toUpperCase() + category.slice(1)}</h2>
+                                    
+                                    <div className="modern-product-grid">
+                                        {items.map(product => (
+                                            <div key={product._id} className="modern-product-card">
+                                                <div className="product-image-container">
+                                                    {product.aiImage === 'none' && !imageIndexes[product._id] ? (
+                                                        <div className="modern-product-placeholder"></div>
+                                                    ) : (
+                                                        <img
+                                                            src={(imageIndexes[product._id] > 0)
+                                                                ? `https://tse2.mm.bing.net/th?q=${getCleanImgQuery(product.name, imageIndexes[product._id])}&w=400&h=300&c=7&rs=1&p=0`
+                                                                : (product.aiImage || `https://tse2.mm.bing.net/th?q=${getCleanImgQuery(product.name, 0)}&w=400&h=300&c=7&rs=1&p=0`)}
+alt = { product.name }
+className = "modern-product-image"
+onError = {(e) => {
+    e.target.style.display = 'none';
+}}
+                                                        />
+                                                    )}
+
+{
+    isAdmin && (
+        <div onClick={(e) => { e.preventDefault(); e.stopPropagation(); }} className="admin-image-controls">
+            <button title="Cycle Through Images" onClick={(e) => { e.preventDefault(); e.stopPropagation(); setImageIndexes(prev => ({ ...prev, [product._id]: (prev[product._id] || 0) + 1 })) }}>⟩</button>
+            <button title="Save This Image" onClick={(e) => { e.preventDefault(); e.stopPropagation(); saveAiImage(product._id, `https://tse2.mm.bing.net/th?q=${getCleanImgQuery(product.name, imageIndexes[product._id] || 0)}&w=400&h=300&c=7&rs=1&p=0`) }}>💾</button>
+            <button title="No Image" onClick={(e) => { e.preventDefault(); e.stopPropagation(); if (window.confirm('Hide image for this product?')) saveAiImage(product._id, 'none') }}>🚫</button>
+            {product.aiImage && (
+                <button className="reset" title="Reset to AI Search" onClick={(e) => { e.preventDefault(); e.stopPropagation(); if (window.confirm('Reset this product to dynamic AI images?')) saveAiImage(product._id, '') }}>↺</button>
             )}
-
-            {/* Shop Controls Section */}
-            <div className="shop-controls">
-                <div className="controls-content">
-                    <div className="search-and-filters">
-                        <div className="search-container">
-                            <input
-                                type="text"
-                                placeholder="Search products..."
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                className="search-input"
-                            />
-                            <span className="search-icon">🔍</span>
-                        </div>
-
-                        <div className="filters-container">
-                            <select
-                                value={selectedCategory}
-                                onChange={(e) => setSelectedCategory(e.target.value)}
-                                className="category-filter"
-                            >
-                                {getCategories().map(category => (
-                                    <option key={category} value={category}>
-                                        {category === 'all' ? 'All Categories' :
-                                            category.charAt(0).toUpperCase() + category.slice(1)}
-                                    </option>
-                                ))}
-                            </select>
-
-                            <select
-                                value={sortBy}
-                                onChange={(e) => setSortBy(e.target.value)}
-                                className="sort-filter"
-                            >
-                                <option value="name">Sort by Name</option>
-                                <option value="price">Sort by Price</option>
-                                <option value="price-desc">Sort by Price (High to Low)</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div className="view-controls" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        {/* View Menu button placed to the left of Grid/List */}
-                        <button
-                            onClick={() => setShowMenu(true)}
-                            className="view-menu-btn"
-                            style={{
-                                background: '#0d6efd',
-                                color: '#fff',
-                                border: 'none',
-                                padding: '10px 14px',
-                                borderRadius: '8px',
-                                cursor: 'pointer',
-                                fontWeight: 600
-                            }}
-                        >
-                            📖 View Menu
-                        </button>
-                        <button
-                            onClick={() => setViewMode('grid')}
-                            className={`view-btn ${viewMode === 'grid' ? 'active' : ''}`}
-                        >
-                            <span className="view-icon">⊞</span>
-                            Grid
-                        </button>
-                        <button
-                            onClick={() => setViewMode('list')}
-                            className={`view-btn ${viewMode === 'list' ? 'active' : ''}`}
-                        >
-                            <span className="view-icon">☰</span>
-                            List
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            {/* Products Section */}
-            <div className="products-section">
-                <div className="products-header">
-                    <h2 className="products-title">
-                        {searchTerm ? `Search Results for "${searchTerm}"` : 'Our Products'}
-                    </h2>
-                    <span className="products-count">
-                        {filteredProducts.length} of {products.length} products
-                    </span>
-                </div>
-                <div style={{ marginBottom: '16px', fontSize: '11px', color: '#666', fontStyle: 'italic', padding: '0 8px' }}>
-                    * Image is just for show purpose, the actual appearance and taste may differ
-                </div>
-
-                {/* Debug Section - Development Only */}
-                {process.env.NODE_ENV === 'development' && (
-                    <div className="debug-section" style={{ background: '#f5f5f5', padding: '1rem', margin: '1rem 0', borderRadius: '8px', fontSize: '12px' }}>
-                        <h4>🔍 Debug Info:</h4>
-                        <p><strong>Total Products:</strong> {products.length}</p>
-                        <p><strong>Filtered Products:</strong> {filteredProducts.length}</p>
-                        <p><strong>Raw Products Data:</strong></p>
-                        <pre style={{ background: 'white', padding: '0.5rem', borderRadius: '4px', overflow: 'auto', maxHeight: '200px' }}>
-                            {JSON.stringify(products, null, 2)}
-                        </pre>
-                    </div>
-                )}
-
-                {filteredProducts.length === 0 ? (
-                    <div className="no-products">
-                        <div className="no-products-icon">📦</div>
-                        <h3>No Products Found</h3>
-                        <p>
-                            {searchTerm || selectedCategory !== 'all'
-                                ? 'Try adjusting your search or filters'
-                                : 'This shop doesn\'t have any products yet'
-                            }
-                        </p>
-                        {(searchTerm || selectedCategory !== 'all') && (
-                            <button onClick={clearSearch} className="clear-search-btn">
-                                Clear Filters
-                            </button>
-                        )}
-                    </div>
-                ) : (
-                    <div className={`products-container ${viewMode === 'grid' ? 'grid-view' : 'list-view'}`}>
-                        {filteredProducts.map(product => (
-                            <div
-                                key={product._id}
-                                className="product-card"
-                                ref={(el) => {
-                                    if (el) productRefsMap.current[product._id] = el;
-                                }}
-                            >
-                                <div className="product-image-section" style={{ position: 'relative' }}>
-                                    {product.aiImage === 'none' && !imageIndexes[product._id] ? (
-                                        <div className="product-placeholder" style={{ display: 'flex' }}>
-                                            <span className="product-icon">📦</span>
-                                        </div>
-                                    ) : (
-                                        <>
-                                            <img
-                                                src={(imageIndexes[product._id] > 0)
-                                                    ? `https://tse2.mm.bing.net/th?q=${getCleanImgQuery(product.name, imageIndexes[product._id])}&w=400&h=300&c=7&rs=1&p=0`
-                                                    : (product.aiImage || `https://tse2.mm.bing.net/th?q=${getCleanImgQuery(product.name, 0)}&w=400&h=300&c=7&rs=1&p=0`)}
-                                                alt={product.name}
-                                                className="product-image"
-                                                onError={(e) => {
-                                                    e.target.style.display = 'none';
-                                                    if (e.target.nextSibling) e.target.nextSibling.style.display = 'flex';
-                                                }}
-                                            />
-                                            <div className="product-placeholder" style={{ display: 'none' }}>
-                                                <span className="product-icon">📦</span>
-                                            </div>
-                                        </>
-                                    )}
-                                    {isAdmin && (
-                                        <div onClick={(e) => { e.preventDefault(); e.stopPropagation(); }} style={{ position: 'absolute', top: 8, right: 8, display: 'flex', gap: 4, background: 'rgba(0,0,0,0.6)', padding: '4px', borderRadius: '6px', zIndex: 10 }}>
-                                            <button title="Cycle Through Images" onClick={(e) => { e.preventDefault(); e.stopPropagation(); setImageIndexes(prev => ({ ...prev, [product._id]: (prev[product._id] || 0) + 1 })) }} style={{ background: 'white', border: 'none', borderRadius: '4px', width: 28, height: 28, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, fontWeight: 'bold' }}>⟩</button>
-                                            <button title="Save This Image" onClick={(e) => { e.preventDefault(); e.stopPropagation(); saveAiImage(product._id, `https://tse2.mm.bing.net/th?q=${getCleanImgQuery(product.name, imageIndexes[product._id] || 0)}&w=400&h=300&c=7&rs=1&p=0`) }} style={{ background: 'white', border: 'none', borderRadius: '4px', width: 28, height: 28, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>💾</button>
-                                            <button title="No Image" onClick={(e) => { e.preventDefault(); e.stopPropagation(); if (window.confirm('Hide image for this product?')) saveAiImage(product._id, 'none') }} style={{ background: 'white', border: 'none', borderRadius: '4px', width: 28, height: 28, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>🚫</button>
-                                            {product.aiImage && (
-                                                <button title="Reset to AI Search" onClick={(e) => { e.preventDefault(); e.stopPropagation(); if (window.confirm('Reset this product to dynamic AI images?')) saveAiImage(product._id, '') }} style={{ background: '#ff4444', color: 'white', border: 'none', borderRadius: '4px', width: 28, height: 28, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>↺</button>
-                                            )}
-                                        </div>
-                                    )}
-                                    {isAdmin && product.aiImage && product.aiImage !== 'none' && !imageIndexes[product._id] && (
-                                        <div style={{ position: 'absolute', bottom: 8, left: 8, background: 'rgba(0,128,0,0.8)', color: 'white', padding: '2px 8px', borderRadius: '4px', fontSize: 10, fontWeight: 'bold' }}>
-                                            LOCKED IMAGE
-                                        </div>
-                                    )}
-                                    {isAdmin && product.aiImage === 'none' && !imageIndexes[product._id] && (
-                                        <div style={{ position: 'absolute', bottom: 8, left: 8, background: 'rgba(0,0,0,0.8)', color: 'white', padding: '2px 8px', borderRadius: '4px', fontSize: 10, fontWeight: 'bold' }}>
-                                            HIDDEN IMAGE
-                                        </div>
-                                    )}
-                                </div>
-
-                                <div className="product-content">
-                                    <div className="product-header">
-                                        <h3 className="product-name">
-                                            <span className="product-name-main">
-                                                {product.name || 'Unnamed Product'}
-                                            </span>
-                                        </h3>
-
-                                        {product.description ? (
-                                            <p className="product-description">
-                                                {product.description.length > 80
-                                                    ? `${product.description.substring(0, 80)}...`
-                                                    : product.description
-                                                }
-                                            </p>
-                                        ) : (
-                                            <p className="product-description no-description">
-                                                No description available
-                                            </p>
-                                        )}
-                                    </div>
-
-                                    {/* Product details section */}
-                                    <div className="product-details">
-                                        {product.stockQuantity !== undefined && (
-                                            <span className="stock-info">
-                                                📦 Stock: {product.stockQuantity} {product.unit || 'units'}
-                                            </span>
-                                        )}
-
-                                        {product.tags && product.tags.length > 0 && (
-                                            <div className="product-tags">
-                                                {product.tags.slice(0, 3).map((tag, index) => (
-                                                    <span key={index} className="tag">
-                                                        {tag}
-                                                    </span>
-                                                ))}
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    <div className="product-footer">
-                                        <div className="product-price-section">
-                                            <span className="product-price">
-                                                ₹{product.price?.toFixed(2) || '0.00'}
-                                            </span>
-                                            {product.originalPrice && product.originalPrice > product.price && (
-                                                <span className="original-price">
-                                                    ₹{product.originalPrice.toFixed(2)}
-                                                </span>
-                                            )}
-                                        </div>
-
-                                        <button
-                                            onClick={() => handleAddToCart(product)}
-                                            className="add-to-cart-btn"
-                                            disabled={!product.inStock}
-                                        >
-                                            <span className="cart-icon">🛒</span>
-                                            {product.inStock ? 'Add to Cart' : 'Out of Stock'}
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                )}
-            </div>
         </div>
+    )
+}
+                                                </div >
+
+    <div className="modern-product-info">
+        <div className="modern-product-text">
+            <h3 className="modern-product-name">{product.name || 'Unnamed Product'}</h3>
+            <div className="modern-product-price">
+                ₹{product.price?.toFixed(2) || '0.00'}
+            </div>
+            {product.description && (
+                <p className="modern-product-desc">
+                    {product.description.length > 60
+                        ? `${product.description.substring(0, 60)}...`
+                        : product.description}
+                </p>
+            )}
+        </div>
+
+        <button
+            onClick={() => handleAddToCart(product)}
+            className={`modern-add-btn ${!product.inStock ? 'disabled' : ''}`}
+            disabled={!product.inStock}
+            aria-label="Add to cart"
+        >
+            {product.inStock ? '+' : 'Out'}
+        </button>
+    </div>
+                                            </div >
+                                        ))}
+                                    </div >
+    <div className="category-divider"></div>
+                                </section >
+                            ))}
+                        </div >
+                    )}
+                </div >
+            </div >
+        </div >
     );
 };
 
