@@ -37,7 +37,11 @@ const ShopPage = () => {
     const [imageIndexes, setImageIndexes] = useState({});
 
     const { addToCart, setSelectedShop } = useContext(CartContext);
-    const { isAdmin } = useAuth(); // Assuming isAdmin is provided by useAuth
+    const { user } = useAuth();
+    
+    // Check if the current user is an admin allowed to edit images
+    const adminEmails = ['meetnp007@gmail.com', 'admin@delhiveryway.com', 'test@admin.com'];
+    const isAdmin = user && user.email && adminEmails.includes(user.email);
 
     // Refs for scrolling and observing
     const categoryRefs = useRef({});
@@ -631,14 +635,14 @@ const ShopPage = () => {
                         />
                     </div>
 
-                    <ul className="category-nav-list">
+                    <ul className="sidebar-nav">
                         {Object.keys(groupedProducts).length === 0 && (
-                            <li className="category-nav-item">No categories</li>
+                            <li className="sidebar-link">No categories</li>
                         )}
                         {Object.keys(groupedProducts).map(category => (
                             <li
                                 key={category}
-                                className={'category-nav-item ' + (activeCategory === category ? 'active' : '')}
+                                className={'sidebar-link ' + (activeCategory === category ? 'active' : '')}
                                 onClick={() => scrollToCategory(category)}
                             >
                                 {category.charAt(0).toUpperCase() + category.slice(1)}
@@ -694,34 +698,6 @@ const ShopPage = () => {
                                     <div className="modern-product-grid">
                                         {items.map(product => (
                                             <div key={product._id} className="modern-product-card">
-                                                <div className="product-image-container">
-                                                    {product.aiImage === 'none' && !imageIndexes[product._id] ? (
-                                                        <div className="modern-product-placeholder"></div>
-                                                    ) : (
-                                                        <img
-                                                            src={(imageIndexes[product._id] > 0)
-                                                                ? ('https://tse2.mm.bing.net/th?q=' + getCleanImgQuery(product.name, imageIndexes[product._id]) + '&w=400&h=300&c=7&rs=1&p=0')
-                                                                : (product.aiImage || ('https://tse2.mm.bing.net/th?q=' + getCleanImgQuery(product.name, 0) + '&w=400&h=300&c=7&rs=1&p=0'))}
-                                                            alt={product.name}
-                                                            className="modern-product-image"
-                                                            onError={(e) => {
-                                                                e.target.style.display = 'none';
-                                                            }}
-                                                        />
-                                                    )}
-
-                                                    {isAdmin && (
-                                                        <div onClick={(e) => { e.preventDefault(); e.stopPropagation(); }} className="admin-image-controls">
-                                                            <button title="Cycle Through Images" onClick={(e) => { e.preventDefault(); e.stopPropagation(); setImageIndexes(prev => ({ ...prev, [product._id]: (prev[product._id] || 0) + 1 })) }}>⟩</button>
-                                                            <button title="Save This Image" onClick={(e) => { e.preventDefault(); e.stopPropagation(); saveAiImage(product._id, 'https://tse2.mm.bing.net/th?q=' + getCleanImgQuery(product.name, imageIndexes[product._id] || 0) + '&w=400&h=300&c=7&rs=1&p=0') }}>&#x1F4BE;</button>
-                                                            <button title="No Image" onClick={(e) => { e.preventDefault(); e.stopPropagation(); if (window.confirm('Hide image for this product?')) saveAiImage(product._id, 'none') }}>&#x1F6AB;</button>
-                                                            {product.aiImage && (
-                                                                <button className="reset" title="Reset to AI Search" onClick={(e) => { e.preventDefault(); e.stopPropagation(); if (window.confirm('Reset this product to dynamic AI images?')) saveAiImage(product._id, '') }}>↺</button>
-                                                            )}
-                                                        </div>
-                                                    )}
-                                                </div>
-
                                                 <div className="modern-product-info">
                                                     <div className="modern-product-text">
                                                         <h3 className="modern-product-name">{product.name || 'Unnamed Product'}</h3>
@@ -745,6 +721,35 @@ const ShopPage = () => {
                                                     >
                                                         {product.inStock ? '+' : 'Out'}
                                                     </button>
+                                                </div>
+
+                                                <div className="product-image-container">
+                                                    {product.aiImage === 'none' && !imageIndexes[product._id] ? (
+                                                        <div className="modern-product-placeholder"></div>
+                                                    ) : (
+                                                        <img
+                                                            src={(imageIndexes[product._id] > 0)
+                                                                ? ('https://tse2.mm.bing.net/th?q=' + getCleanImgQuery(product.name, imageIndexes[product._id]) + '&w=400&h=300&c=7&rs=1&p=0')
+                                                                : (product.aiImage || ('https://tse2.mm.bing.net/th?q=' + getCleanImgQuery(product.name, 0) + '&w=400&h=300&c=7&rs=1&p=0'))}
+                                                            alt={product.name}
+                                                            className="modern-product-image"
+                                                            onError={(e) => {
+                                                                e.target.onerror = null; // prevents looping
+                                                                e.target.style.opacity = 0;
+                                                            }}
+                                                        />
+                                                    )}
+
+                                                    {isAdmin && (
+                                                        <div onClick={(e) => { e.preventDefault(); e.stopPropagation(); }} className="admin-image-controls">
+                                                            <button title="Cycle Through Images" onClick={(e) => { e.preventDefault(); e.stopPropagation(); setImageIndexes(prev => ({ ...prev, [product._id]: (prev[product._id] || 0) + 1 })) }}>⟩</button>
+                                                            <button title="Save This Image" onClick={(e) => { e.preventDefault(); e.stopPropagation(); saveAiImage(product._id, 'https://tse2.mm.bing.net/th?q=' + getCleanImgQuery(product.name, imageIndexes[product._id] || 0) + '&w=400&h=300&c=7&rs=1&p=0') }}>&#x1F4BE;</button>
+                                                            <button title="No Image" onClick={(e) => { e.preventDefault(); e.stopPropagation(); if (window.confirm('Hide image for this product?')) saveAiImage(product._id, 'none') }}>&#x1F6AB;</button>
+                                                            {product.aiImage && (
+                                                                <button className="reset" title="Reset to AI Search" onClick={(e) => { e.preventDefault(); e.stopPropagation(); if (window.confirm('Reset this product to dynamic AI images?')) saveAiImage(product._id, '') }}>↺</button>
+                                                            )}
+                                                        </div>
+                                                    )}
                                                 </div>
                                             </div>
                                         ))}
