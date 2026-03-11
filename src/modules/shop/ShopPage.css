@@ -104,40 +104,40 @@
     font-size: 2.5rem;
 }
 
-.shop-details {
+.modern-shop-container .shop-details {
     flex: 1;
 }
 
-.shop-name {
+.modern-shop-container .shop-name {
     font-size: 2.25rem;
     font-weight: 800;
     margin: 0 0 0.25rem 0;
     letter-spacing: -0.5px;
-    color: #ffffff;
+    color: #ffffff !important;
     text-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-.shop-description {
+.modern-shop-container .shop-description {
     font-size: 1.05rem;
-    color: rgba(255, 255, 255, 0.9);
+    color: rgba(255, 255, 255, 0.9) !important;
     margin: 0 0 0.5rem 0;
     max-width: 600px;
     line-height: 1.5;
 }
 
-.shop-meta {
+.modern-shop-container .shop-meta {
     display: flex;
     gap: 1.25rem;
     flex-wrap: wrap;
     align-items: center;
 }
 
-.meta-item {
+.modern-shop-container .meta-item {
     display: flex;
     align-items: center;
     gap: 0.35rem;
     font-size: 0.9rem;
-    color: rgba(255, 255, 255, 0.85);
+    color: rgba(255, 255, 255, 0.85) !important;
     font-weight: 500;
     background: rgba(0, 0, 0, 0.1);
     padding: 0.25rem 0.75rem;
