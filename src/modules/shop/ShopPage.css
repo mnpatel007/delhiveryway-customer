@@ -1,31 +1,33 @@
 /* Modern ShopPage Styling - Uber Eats Inspired */
 :root {
-    --primary-color: #000000;
-    --primary-hover: #333333;
-    --primary-light: #f6f6f6;
-    --secondary-color: #06c167;
-    --secondary-hover: #049f55;
-
-    --background-primary: #ffffff;
-    --background-secondary: #f3f3f3;
-    --background-tertiary: #fafafa;
-
-    --text-primary: #000000;
-    --text-secondary: #545454;
-    --text-muted: #757575;
-
-    --border-color: #e2e2e2;
-    --border-light: #eeeeee;
-
-    --shadow-sm: 0 2px 4px 0 rgba(0, 0, 0, 0.04);
-    --shadow-md: 0 4px 12px 0 rgba(0, 0, 0, 0.06);
-    --shadow-lg: 0 12px 24px -4px rgba(0, 0, 0, 0.08);
-
-    --border-radius-sm: 8px;
-    --border-radius: 12px;
-    --border-radius-lg: 16px;
-
-    --transition: all 0.2s ease-in-out;
+    /* Vibrant & Bold Color Palette */
+    --primary-color: #FF4B2B; /* Vibrant Red/Orange */
+    --primary-hover: #FF416C; /* Vivid Pinkish Red */
+    --primary-light: #FFE8E5;
+    
+    --secondary-color: #6C5CE7; /* Bright Purple Accent */
+    --secondary-hover: #5A4FCF;
+    
+    --background-primary: #FAFAFB; /* Soft off-white for main content readability */
+    --background-secondary: #FFFFFF; /* High contrast cards */
+    --background-tertiary: #F0F2F5; /* Neutral borders */
+    
+    --text-primary: #2D3436;
+    --text-secondary: #636E72;
+    --text-muted: #B2BEC3;
+    
+    --border-color: #DFE6E9;
+    --border-light: #F1F2F6;
+    
+    --shadow-sm: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08); /* Punchier shadows */
+    --shadow-md: 0 13px 27px -5px rgba(50, 50, 93, 0.25), 0 8px 16px -8px rgba(0, 0, 0, 0.3), 0 -6px 16px -6px rgba(0, 0, 0, 0.025);
+    --shadow-lg: 0 30px 60px -12px rgba(50, 50, 93, 0.25), 0 18px 36px -18px rgba(0, 0, 0, 0.3), 0 -12px 36px -8px rgba(0, 0, 0, 0.025);
+    
+    --border-radius-sm: 10px;
+    --border-radius: 16px;
+    --border-radius-lg: 24px;
+    
+    --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 /* Base Styles */
@@ -38,13 +40,14 @@
 
 /* Hero Section */
 .shop-hero {
-    background-color: var(--background-primary);
-    color: var(--text-primary);
-    padding: 2rem;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%);
+    color: #ffffff;
+    padding: 2.5rem 2rem;
     position: relative;
-    border-bottom: 1px solid var(--border-light);
+    border-bottom: none;
     display: flex;
     flex-direction: column;
+    box-shadow: var(--shadow-md);
 }
 
 .shop-hero-content {
@@ -63,20 +66,22 @@
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    background: white;
-    color: var(--text-primary);
-    border: 1px solid var(--border-color);
+    background: rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(10px);
     padding: 0.5rem 1rem;
     border-radius: 50px;
     font-size: 0.9rem;
-    font-weight: 500;
+    font-weight: 600;
     cursor: pointer;
     box-shadow: var(--shadow-sm);
     transition: var(--transition);
 }
 
 .back-button:hover {
-    background: var(--background-tertiary);
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
 }
 
 .shop-main-info {
@@ -86,12 +91,12 @@
 }
 
 .shop-avatar {
-    width: 80px;
-    height: 80px;
+    width: 90px;
+    height: 90px;
     border-radius: 50%;
     background: white;
-    border: 2px solid var(--border-light);
-    box-shadow: var(--shadow-sm);
+    border: 3px solid rgba(255, 255, 255, 0.8);
+    box-shadow: var(--shadow-lg);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -104,23 +109,25 @@
 }
 
 .shop-name {
-    font-size: 2rem;
-    font-weight: 700;
+    font-size: 2.25rem;
+    font-weight: 800;
     margin: 0 0 0.25rem 0;
     letter-spacing: -0.5px;
+    color: #ffffff;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .shop-description {
-    font-size: 1rem;
-    color: var(--text-secondary);
+    font-size: 1.05rem;
+    color: rgba(255, 255, 255, 0.9);
     margin: 0 0 0.5rem 0;
     max-width: 600px;
-    line-height: 1.4;
+    line-height: 1.5;
 }
 
 .shop-meta {
     display: flex;
-    gap: 1rem;
+    gap: 1.25rem;
     flex-wrap: wrap;
     align-items: center;
 }
@@ -128,14 +135,17 @@
 .meta-item {
     display: flex;
     align-items: center;
-    gap: 0.25rem;
-    font-size: 0.85rem;
-    color: var(--text-secondary);
+    gap: 0.35rem;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.85);
     font-weight: 500;
+    background: rgba(0, 0, 0, 0.1);
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
 }
 
 .meta-icon {
-    color: var(--text-primary);
+    color: #ffffff;
 }
 
 /* 2-Column Layout */
@@ -204,10 +214,10 @@
 }
 
 .sidebar-link.active {
-    color: var(--text-primary);
+    color: var(--primary-color);
     font-weight: 700;
-    border-left: 3px solid var(--text-primary);
-    background-color: transparent;
+    border-left: 4px solid var(--primary-color);
+    background-color: var(--primary-light);
 }
 
 .shop-main-content {
@@ -226,18 +236,20 @@
 .modern-search-input {
     width: 100%;
     padding: 1rem 1rem 1rem 3rem;
-    border: none;
+    border: 2px solid transparent;
     border-radius: 50px;
     background-color: var(--background-secondary);
     font-size: 1rem;
     font-weight: 500;
     transition: var(--transition);
+    box-shadow: var(--shadow-sm);
 }
 
 .modern-search-input:focus {
     outline: none;
-    background-color: var(--border-light);
-    box-shadow: inset 0 0 0 2px var(--text-primary);
+    background-color: #ffffff;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 4px var(--primary-light);
 }
 
 .modern-search-btn {
@@ -247,7 +259,7 @@
     transform: translateY(-50%);
     background: none;
     border: none;
-    color: var(--text-primary);
+    color: var(--text-secondary);
     font-size: 1.1rem;
     padding: 0;
 }
@@ -261,9 +273,22 @@
 
 .category-title {
     font-size: 1.75rem;
-    font-weight: 700;
+    font-weight: 800;
     margin: 0 0 1.5rem 0;
     color: var(--text-primary);
+    position: relative;
+    display: inline-block;
+}
+
+.category-title::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 40px;
+    height: 4px;
+    background: var(--primary-color);
+    border-radius: 2px;
 }
 
 .modern-product-grid {
@@ -276,7 +301,7 @@
     background: white;
     border: 1px solid var(--border-light);
     border-radius: var(--border-radius-lg);
-    padding: 1rem;
+    padding: 1.25rem;
     display: flex;
     flex-direction: row;
     gap: 1rem;
@@ -287,6 +312,8 @@
 
 .modern-product-card:hover {
     box-shadow: var(--shadow-lg);
+    transform: translateY(-4px);
+    border-color: var(--primary-light);
 }
 
 /* Content layout within a card */
@@ -315,9 +342,9 @@
 }
 
 .modern-product-price {
-    font-size: 1rem;
-    color: var(--text-secondary);
-    font-weight: 500;
+    font-size: 1.1rem;
+    color: var(--primary-color);
+    font-weight: 700;
     margin-bottom: 0.5rem;
 }
 
@@ -337,36 +364,39 @@
 .modern-add-btn {
     align-self: flex-start;
     margin-top: 0.75rem;
-    width: 32px;
-    height: 32px;
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
-    background-color: var(--background-secondary);
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%);
     border: none;
-    color: var(--text-primary);
+    color: #ffffff;
     font-size: 1.25rem;
-    font-weight: 500;
+    font-weight: 600;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     transition: var(--transition);
+    box-shadow: 0 4px 10px rgba(255, 75, 43, 0.3);
 }
 
 .modern-add-btn:hover:not(:disabled) {
-    background-color: var(--border-light);
-    transform: scale(1.05);
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 6px 15px rgba(255, 75, 43, 0.4);
 }
 
 .modern-add-btn:focus {
     outline: none;
-    box-shadow: 0 0 0 2px var(--background-primary), 0 0 0 4px var(--text-primary);
+    box-shadow: 0 0 0 4px var(--primary-light);
 }
 
 .modern-add-btn:disabled,
 .modern-add-btn.disabled {
     opacity: 0.5;
     cursor: not-allowed;
-    background-color: var(--background-secondary);
+    background: var(--text-muted);
+    box-shadow: none;
+    transform: none;
 }
 
 /* Product Image Box */
