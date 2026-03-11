@@ -39,9 +39,8 @@ const ShopPage = () => {
     const { addToCart, setSelectedShop } = useContext(CartContext);
     const { user } = useAuth();
     
-    // Check if the current user is an admin allowed to edit images
     const adminEmails = ['meetnp007@gmail.com', 'admin@delhiveryway.com', 'test@admin.com'];
-    const isAdmin = user && user.email && adminEmails.includes(user.email);
+    const isAdmin = user && user.email && adminEmails.includes(user.email.toLowerCase());
 
     // Refs for scrolling and observing
     const categoryRefs = useRef({});
@@ -652,7 +651,7 @@ const ShopPage = () => {
                 </aside>
 
                 {/* Products Section */}
-                <div className="products-section modern-products-feed">
+                <div className="shop-main-content products-section modern-products-feed">
                     <div className="products-feed-header">
                         <div style={{ fontSize: '12px', color: '#666', fontStyle: 'italic', paddingBottom: '16px' }}>
                             * Image is just for show purpose, the actual appearance and taste may differ
