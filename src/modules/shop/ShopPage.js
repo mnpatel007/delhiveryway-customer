@@ -21,6 +21,61 @@ const getCleanImgQuery = (name, index = 0) => {
     return encodeURIComponent(q + ' ' + variant);
 };
 
+// AI-powered fallback generator to write mouth-watering 1-2 liner descriptions
+const generateAIDescription = (productName) => {
+    if (!productName) return "A delicious premium offering, crafted with the finest ingredients for an unforgettable taste.";
+    
+    const nameStr = productName.split('(')[0].trim();
+    const name = nameStr.toLowerCase();
+    
+    // Sweets & Desserts
+    if (name.includes('cake') || name.includes('pastry')) {
+        return `Indulge in our freshly baked ${nameStr}, featuring rich, premium layers and a melt-in-your-mouth texture.`;
+    }
+    if (name.includes('kalakand') || name.includes('rasmalai') || name.includes('peda') || name.includes('halwa')) {
+        return `A traditional Indian masterpiece. This ${nameStr} is authentically prepared with rich milk and top-quality ingredients for a royal treat.`;
+    }
+    if (name.includes('ladoo') || name.includes('laddu') || name.includes('barfi')) {
+        return `Classic ${nameStr} crafted with pure desi ghee and roasted to perfection. The ultimate satisfaction for your sweet cravings.`;
+    }
+    
+    // Salads & Raita
+    if (name.includes('salad')) {
+        return `Stay healthy and refreshed with our crisp, garden-fresh ${nameStr}, tossed perfectly with zesty natural seasonings.`;
+    }
+    if (name.includes('raita') || name.includes('rayta')) {
+        return `Cool and creamy ${nameStr}, perfectly balanced with chilled whisked yogurt and roasted spices.`;
+    }
+    
+    // Beverages
+    if (name.includes('lassi') || name.includes('chaach') || name.includes('milk') || name.includes('shake')) {
+        return `A truly classic and thirst-quenching glass of ${nameStr}, churned to thick, frothy perfection and served perfectly chilled.`;
+    }
+    
+    // Main Course & Curries
+    if (name.includes('sev') || name.includes('masala') || name.includes('bhaji') || name.includes('paneer') || name.includes('dal')) {
+        return `A savory, aromatic culinary delight. Our ${nameStr} is slow-cooked with signature roasted spices for a deep, rich flavor profile.`;
+    }
+    if (name.includes('roti') || name.includes('naan') || name.includes('paratha')) {
+        return `Hot, soft, and freshly prepared ${nameStr}, made to order and brushed generously with premium butter.`;
+    }
+    
+    // Fast Food / Cafe
+    if (name.includes('pizza') || name.includes('burger') || name.includes('sandwich') || name.includes('fries') || name.includes('roll')) {
+        return `Hot, fresh, and irresistibly craving-worthy. This signature ${nameStr} is packed with an explosion of mouth-watering flavors.`;
+    }
+    
+    // Specific Fallbacks
+    if (name.includes('thali')) {
+        return `A complete wholesome feast! Enjoy an authentic array of premium dishes served together in this special ${nameStr}.`;
+    }
+    if (name.includes('chips') || name.includes('namkeen') || name.includes('bhujia')) {
+        return `Crispy, crunchy, and packed with savory flavor. The perfect addictive snack to enjoy anytime.`;
+    }
+
+    // Generic fallback for any other items
+    return `Experience the exceptional premium taste of our ${nameStr}. Carefully prepared daily using only the highest quality, fresh ingredients.`;
+};
 
 const ShopPage = () => {
     const { id } = useParams();
@@ -703,13 +758,12 @@ const ShopPage = () => {
                                                         <div className="modern-product-price">
                                                             ₹{product.price?.toFixed(2) || '0.00'}
                                                         </div>
-                                                        {product.description && (
-                                                            <p className="modern-product-desc">
-                                                                {product.description.length > 60
-                                                                    ? product.description.substring(0, 60) + '...'
-                                                                    : product.description}
-                                                            </p>
-                                                        )}
+                                                        <p className="modern-product-desc" title={generateAIDescription(product.name)}>
+                                                            {(() => {
+                                                                const desc = generateAIDescription(product.name);
+                                                                return desc.length > 95 ? desc.substring(0, 95) + '...' : desc;
+                                                            })()}
+                                                        </p>
                                                     </div>
 
                                                     {cartItems.find(item => item._id === product._id) ? (
