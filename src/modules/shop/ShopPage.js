@@ -1,12 +1,10 @@
-```
+
 import React, { useEffect, useState, useContext, useRef } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { shopsAPI, productsAPI } from '../../services/api'; // Keep shopsAPI and productsAPI if used later
+import { shopsAPI, productsAPI, apiCall } from '../../services/api'; // Keep shopsAPI and productsAPI if used later
 import { CartContext } from '../../context/CartContext';
 import './ShopPage.css';
-import { apiCall } from '../../utils/api';
-
 const FOOD_PROMPTS = [
     'professional food photography high resolution dark background',
     'gourmet meal editorial food magazine photo',
@@ -36,6 +34,7 @@ const ShopPage = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [activeCategory, setActiveCategory] = useState('');
     const [toast, setToast] = useState('');
+    const [imageIndexes, setImageIndexes] = useState({});
 
     const { addToCart, setSelectedShop } = useContext(CartContext);
     const { isAdmin } = useAuth(); // Assuming isAdmin is provided by useAuth
@@ -50,7 +49,6 @@ const ShopPage = () => {
             if (res.success) {
                 const updatedProducts = products.map(p => p._id === productId ? { ...p, aiImage: imageUrl } : p);
                 setProducts(updatedProducts);
-                setFilteredProducts(filteredProducts.map(p => p._id === productId ? { ...p, aiImage: imageUrl } : p));
                 setToast('Image saved permanently for all users!');
                 setTimeout(() => setToast(''), 3000);
             } else {
@@ -70,29 +68,30 @@ const ShopPage = () => {
                 setLoading(true);
                 setError('');
 
-                console.log('🔄 Fetching shop and products for shop ID:', id);
+                console.log('� Fetching shop and products for shop ID:', id);
 
                 // Fetch shop details
                 const shopResult = await apiCall(shopsAPI.getById, id);
-                console.log('🏪 Shop API response:', shopResult);
-                console.log('🏪 Shop API response data:', JSON.stringify(shopResult.data, null, 2));
+                console.log(' Shop API response:', shopResult);
+                console.log(' Shop API response data:', JSON.stringify(shopResult.data, null, 2));
 
                 if (shopResult.success && shopResult.data) {
-                    console.log('✅ Shop data loaded successfully:', shopResult.data);
-                    console.log('🔍 shopResult.data type:', typeof shopResult.data);
-                    console.log('🔍 shopResult.data keys:', Object.keys(shopResult.data));
-                    console.log('🔍 shopResult.data.shop exists?', !!shopResult.data.shop);
-                    console.log('🔍 shopResult.data.shop value:', shopResult.data.shop);
-                    console.log('🔍 shopResult.data._id exists?', !!shopResult.data._id);
-                    console.log('🔍 shopResult.data.name exists?', !!shopResult.data.name);
+                    console.log('[SUCCESS] Shop data loaded successfully:', shopResult.data);
+                    console.log('[DEBUG] shopResult.data type:', typeof shopResult.data);
+                    console.log('[DEBUG] shopResult.data keys:', Object.keys(shopResult.data));
+                    console.log('[DEBUG] shopResult.data.shop exists?', !!shopResult.data.shop);
+                    console.log('[DEBUG] shopResult.data.shop value:', shopResult.data.shop);
+                    console.log('[DEBUG] shopResult.data._id exists?', !!shopResult.data._id);
+                    console.log('[DEBUG] shopResult.data.name exists?', !!shopResult.data.name);
 
                     // Let's see what keys are actually available
-                    console.log('🔍 Available keys in shopResult.data:', Object.keys(shopResult.data));
+                    console.log('[DEBUG] Available keys in shopResult.data:', Object.keys(shopResult.data));
 
                     // Check if there are nested objects
                     Object.keys(shopResult.data).forEach(key => {
                         const value = shopResult.data[key];
-                        console.log(`🔍 Key "${key}": `, typeof value, value && typeof value === 'object' ? Object.keys(value) : value);
+                        const logVal = value && typeof value === 'object' ? Object.keys(value) : value;
+                        console.log('[DEBUG] Key "' + key + '": ', typeof value, logVal);
                     });
 
                     // Extract the shop object - be more flexible with the structure
@@ -108,11 +107,11 @@ const ShopPage = () => {
 
                     for (let i = 0; i < possiblePaths.length; i++) {
                         const candidate = possiblePaths[i];
-                        console.log(`🔍 Trying path ${ i }: `, candidate);
+                        console.log('[DEBUG] Trying path ' + i + ': ', candidate);
 
                         if (candidate && candidate._id && candidate.name) {
                             shopData = candidate;
-                            console.log(`✅ Found valid shop data at path ${ i }: `, {
+                            console.log('[SUCCESS] Found valid shop data at path ' + i + ': ', {
                                 id: shopData._id,
                                 name: shopData.name
                             });
@@ -121,13 +120,13 @@ const ShopPage = () => {
                     }
 
                     if (!shopData) {
-                        console.log('❌ No valid shop data found in any path, using raw data...');
+                        console.log('[ERROR] No valid shop data found in any path, using raw data...');
                         shopData = shopResult.data;
                     }
 
                     // Validate we got valid shop data
                     if (!shopData || !shopData._id || !shopData.name) {
-                        console.error('❌ Invalid shop data structure:', {
+                        console.error('[ERROR] Invalid shop data structure:', {
                             hasShopData: !!shopData,
                             hasId: !!shopData?._id,
                             hasName: !!shopData?.name,
@@ -139,7 +138,7 @@ const ShopPage = () => {
                         return;
                     }
 
-                    console.log('✅ Shop extracted successfully:', {
+                    console.log(' Shop extracted successfully:', {
                         id: shopData._id,
                         name: shopData.name,
                         description: shopData.description
@@ -148,7 +147,7 @@ const ShopPage = () => {
                     setShop(shopData);
 
                     // Immediately update cart context with proper shop data
-                    console.log('🔄 Immediately updating cart context with shop:', shopData.name);
+                    console.log('� Immediately updating cart context with shop:', shopData.name);
                     setSelectedShop(shopData);
                 } else {
                     console.error('Failed to fetch shop:', shopResult.message);
@@ -158,45 +157,45 @@ const ShopPage = () => {
                 }
 
                 // Fetch products with better error handling
-                console.log('📦 Fetching products for shop:', id);
+                console.log(' Fetching products for shop:', id);
                 const productResult = await apiCall(productsAPI.getByShop, id);
-                console.log('📦 Products API response:', productResult);
-                console.log('📦 Product result success:', productResult.success);
-                console.log('📦 Product result data:', productResult.data);
-                console.log('📦 Product result data type:', typeof productResult.data);
-                console.log('📦 Product result data is array:', Array.isArray(productResult.data));
+                console.log(' Products API response:', productResult);
+                console.log(' Product result success:', productResult.success);
+                console.log(' Product result data:', productResult.data);
+                console.log(' Product result data type:', typeof productResult.data);
+                console.log(' Product result data is array:', Array.isArray(productResult.data));
 
                 let productsData = [];
                 if (productResult.success && productResult.data) {
                     // Handle different response formats
                     if (Array.isArray(productResult.data)) {
                         productsData = productResult.data;
-                        console.log('✅ Using direct array format');
+                        console.log(' Using direct array format');
                     } else if (productResult.data.products && Array.isArray(productResult.data.products)) {
                         productsData = productResult.data.products;
-                        console.log('✅ Using products.products format');
+                        console.log(' Using products.products format');
                     } else if (productResult.data.data && productResult.data.data.products && Array.isArray(productResult.data.data.products)) {
                         productsData = productResult.data.data.products;
-                        console.log('✅ Using products.data.products format');
+                        console.log(' Using products.data.products format');
                     } else if (productResult.data.data && Array.isArray(productResult.data.data)) {
                         productsData = productResult.data.data;
-                        console.log('✅ Using products.data format');
+                        console.log(' Using products.data format');
                     } else {
-                        console.log('⚠️ Unknown data format:', productResult.data);
+                        console.log(' Unknown data format:', productResult.data);
                         // Try to find any array in the response
                         const keys = Object.keys(productResult.data);
-                        console.log('🔍 Available keys:', keys);
+                        console.log(' Available keys:', keys);
                         for (const key of keys) {
                             if (Array.isArray(productResult.data[key])) {
-                                console.log(`🔍 Found array in key: ${ key } `, productResult.data[key]);
+                                console.log(' Found array in key: ' + key + ' ', productResult.data[key]);
                                 productsData = productResult.data[key];
                                 break;
                             } else if (productResult.data[key] && typeof productResult.data[key] === 'object') {
                                 const subKeys = Object.keys(productResult.data[key]);
-                                console.log(`🔍 Sub - keys in ${ key }: `, subKeys);
+                                console.log(' Sub - keys in ' + key + ': ', subKeys);
                                 for (const subKey of subKeys) {
                                     if (Array.isArray(productResult.data[key][subKey])) {
-                                        console.log(`🔍 Found array in ${ key }.${ subKey } `, productResult.data[key][subKey]);
+                                        console.log(' Found array in ' + key + '.' + subKey + ' ', productResult.data[key][subKey]);
                                         productsData = productResult.data[key][subKey];
                                         break;
                                     }
@@ -206,13 +205,13 @@ const ShopPage = () => {
                         }
                     }
 
-                    console.log('✅ Products loaded successfully:', productsData.length);
-                    // console.log('📦 Raw products data:', productsData);
+                    console.log(' Products loaded successfully:', productsData.length);
+                    // console.log(' Raw products data:', productsData);
 
                     // Log individual product details for debugging (disabled in production)
                     if (process.env.NODE_ENV === 'development') {
                         productsData.forEach((product, index) => {
-                            console.log(`📦 Product ${ index + 1 }: `, {
+                            console.log(' Product ' + (index + 1) + ': ', {
                                 id: product._id,
                                 name: product.name,
                                 description: product.description,
@@ -227,8 +226,8 @@ const ShopPage = () => {
                         });
                     }
                 } else {
-                    console.warn('⚠️ API returned no products');
-                    console.log('❌ Product result:', productResult);
+                    console.warn(' API returned no products');
+                    console.log(' Product result:', productResult);
                     setError('No products found - API may be updating');
                 }
 
@@ -241,14 +240,14 @@ const ShopPage = () => {
                     originalPrice: parseFloat(product.originalPrice || product.price || 0)
                 }));
 
-                console.log('📦 Final products array:', productsData);
+                console.log(' Final products array:', productsData);
                 setProducts(productsData);
 
                 // If shop data doesn't have a name, try to get it from the first product
                 if (shop && (!shop.name || shop.name === 'Loading...') && productsData.length > 0) {
                     const firstProduct = productsData[0];
                     if (firstProduct.shopId && firstProduct.shopId.name) {
-                        console.log('🔄 Updating shop name from product data:', firstProduct.shopId.name);
+                        console.log('� Updating shop name from product data:', firstProduct.shopId.name);
                         const updatedShop = {
                             ...shop,
                             name: firstProduct.shopId.name
@@ -260,7 +259,7 @@ const ShopPage = () => {
                 }
 
             } catch (err) {
-                console.error('❌ Error fetching data:', err);
+                console.error(' Error fetching data:', err);
                 setError('Failed to load data. Please check your connection and try again.');
                 setProducts([]);
             } finally {
@@ -353,7 +352,7 @@ const ShopPage = () => {
     // Update selected shop in cart context when shop data loads
     useEffect(() => {
         if (shop && shop._id && shop.name && shop.name !== 'Loading...') {
-            console.log('🔄 Shop data loaded, updating cart context:', shop.name);
+            console.log('� Shop data loaded, updating cart context:', shop.name);
             setSelectedShop(shop);
         }
     }, [shop, setSelectedShop]);
@@ -393,7 +392,7 @@ const ShopPage = () => {
         if (!todayHours || todayHours.closed) {
             return {
                 isOpen: false,
-                message: `Closed on ${ day } s`,
+                message: 'Closed on ' + day + 's',
                 nextOpen: getNextOpenTime(shop, now)
             };
         }
@@ -407,19 +406,19 @@ const ShopPage = () => {
         if (isOpen) {
             return {
                 isOpen: true,
-                message: `Open until ${ todayHours.close } `,
+                message: 'Open until ' + todayHours.close + ' ',
                 closingTime: todayHours.close
             };
         } else if (currentTime < todayHours.open) {
             return {
                 isOpen: false,
-                message: `Opens at ${ todayHours.open } `,
+                message: 'Opens at ' + todayHours.open + ' ',
                 openingTime: todayHours.open
             };
         } else {
             return {
                 isOpen: false,
-                message: `Closed(was open until ${ todayHours.close })`,
+                message: 'Closed(was open until ' + todayHours.close + ')',
                 nextOpen: getNextOpenTime(shop, now)
             };
         }
@@ -438,7 +437,7 @@ const ShopPage = () => {
             const dayHours = shop.operatingHours?.[dayName];
 
             if (dayHours && !dayHours.closed && dayHours.open) {
-                return `${ dayNamesDisplay[dayIndex] } at ${ dayHours.open } `;
+                return dayNamesDisplay[dayIndex] + ' at ' + dayHours.open + ' ';
             }
         }
 
@@ -475,13 +474,13 @@ const ShopPage = () => {
             if (success) {
                 // Update the cart context with proper shop data
                 setSelectedShop(shopData);
-                setToast(`✅ ${ product.name } added to cart`);
+                setToast(' ' + product.name + ' added to cart');
             } else {
-                setToast('❌ Failed to add to cart');
+                setToast(' Failed to add to cart');
             }
         } catch (error) {
             console.error('Error adding to cart:', error);
-            setToast('❌ Error adding to cart');
+            setToast(' Error adding to cart');
         }
 
         setTimeout(() => setToast(''), 3000);
@@ -506,7 +505,7 @@ const ShopPage = () => {
 
     const clearSearch = () => {
         setSearchTerm('');
-        setSelectedCategory('all');
+        setActiveCategory('');
     };
 
     if (loading) {
@@ -525,7 +524,7 @@ const ShopPage = () => {
         return (
             <div className="modern-shop-container">
                 <div className="error-state">
-                    <div className="error-icon">❌</div>
+                    <div className="error-icon"></div>
                     <h2>Oops! Something went wrong</h2>
                     <p>{error}</p>
                     <button onClick={() => window.history.back()} className="back-btn">
@@ -541,7 +540,7 @@ const ShopPage = () => {
         return (
             <div className="modern-shop-container">
                 <div className="error-state">
-                    <div className="error-icon">🏪</div>
+                    <div className="error-icon"></div>
                     <h2>Shop not found</h2>
                     <p>The shop you're looking for doesn't exist or has been removed.</p>
                     <button onClick={() => navigate('/')} className="back-btn">
@@ -559,7 +558,7 @@ const ShopPage = () => {
             {toast && (
                 <div className="toast-notification">
                     <div className="toast-content">
-                        <span className="toast-icon">✅</span>
+                        <span className="toast-icon"></span>
                         <span className="toast-message">{toast}</span>
                     </div>
                 </div>
@@ -578,7 +577,7 @@ const ShopPage = () => {
                             {shop.images && shop.images.length > 0 ? (
                                 <img src={shop.images[0]} alt={shop.name} />
                             ) : (
-                                <span className="shop-emoji">🏪</span>
+                                <span className="shop-emoji"></span>
                             )}
                         </div>
 
@@ -605,7 +604,7 @@ const ShopPage = () => {
                                 {(() => {
                                     const status = getShopStatusMessage(shop);
                                     return (
-                                        <div className={`meta - item shop - status ${ status.isOpen ? 'open' : 'closed' } `}>
+                                        <div className={'meta-item shop-status ' + (status.isOpen ? 'open' : 'closed')}>
                                             <span className="meta-text shop-hours-text">
                                                 {status.message}
                                             </span>
@@ -623,7 +622,7 @@ const ShopPage = () => {
                 {/* Left Sticky Sidebar for Categories */}
                 <aside className="sticky-sidebar">
                     <div className="search-container modern-search">
-                        <span className="search-icon">🔍</span>
+                        <span className="search-icon"></span>
                         <input
                             type="text"
                             placeholder="Search in store..."
@@ -632,15 +631,15 @@ const ShopPage = () => {
                             className="search-input"
                         />
                     </div>
-                    
+
                     <ul className="category-nav-list">
                         {Object.keys(groupedProducts).length === 0 && (
                             <li className="category-nav-item">No categories</li>
                         )}
                         {Object.keys(groupedProducts).map(category => (
-                            <li 
-                                key={category} 
-                                className={`category - nav - item ${ activeCategory === category ? 'active' : '' } `}
+                            <li
+                                key={category}
+                                className={'category-nav-item ' + (activeCategory === category ? 'active' : '')}
                                 onClick={() => scrollToCategory(category)}
                             >
                                 {category.charAt(0).toUpperCase() + category.slice(1)}
@@ -660,7 +659,7 @@ const ShopPage = () => {
                     {/* Debug Section - Development Only */}
                     {process.env.NODE_ENV === 'development' && (
                         <div className="debug-section" style={{ background: '#f5f5f5', padding: '1rem', margin: '0 0 2rem 0', borderRadius: '8px', fontSize: '12px' }}>
-                            <h4>🔍 Debug Info:</h4>
+                            <h4> Debug Info:</h4>
                             <p><strong>Total Products:</strong> {products.length}</p>
                             <p><strong>Categories:</strong> {Object.keys(groupedProducts).length}</p>
                         </div>
@@ -668,10 +667,10 @@ const ShopPage = () => {
 
                     {Object.keys(groupedProducts).length === 0 ? (
                         <div className="no-products">
-                            <div className="no-products-icon">🍽️</div>
+                            <div className="no-products-icon">�</div>
                             <h3>No Products Found</h3>
                             <p>
-                                {searchTerm 
+                                {searchTerm
                                     ? 'Try adjusting your search query'
                                     : 'This shop doesn\'t have any products yet'
                                 }
@@ -685,14 +684,14 @@ const ShopPage = () => {
                     ) : (
                         <div className="grouped-products-container">
                             {Object.entries(groupedProducts).map(([category, items]) => (
-                                <section 
-                                    key={category} 
-                                    id={category} 
+                                <section
+                                    key={category}
+                                    id={category}
                                     className="menu-category-section"
                                     ref={el => categoryRefs.current[category] = el}
                                 >
                                     <h2 className="category-title">{category.charAt(0).toUpperCase() + category.slice(1)}</h2>
-                                    
+
                                     <div className="modern-product-grid">
                                         {items.map(product => (
                                             <div key={product._id} className="modern-product-card">
@@ -702,65 +701,63 @@ const ShopPage = () => {
                                                     ) : (
                                                         <img
                                                             src={(imageIndexes[product._id] > 0)
-                                                                ? `https://tse2.mm.bing.net/th?q=${getCleanImgQuery(product.name, imageIndexes[product._id])}&w=400&h=300&c=7&rs=1&p=0`
-                                                                : (product.aiImage || `https://tse2.mm.bing.net/th?q=${getCleanImgQuery(product.name, 0)}&w=400&h=300&c=7&rs=1&p=0`)}
-alt = { product.name }
-className = "modern-product-image"
-onError = {(e) => {
-    e.target.style.display = 'none';
-}}
+                                                                ? ('https://tse2.mm.bing.net/th?q=' + getCleanImgQuery(product.name, imageIndexes[product._id]) + '&w=400&h=300&c=7&rs=1&p=0')
+                                                                : (product.aiImage || ('https://tse2.mm.bing.net/th?q=' + getCleanImgQuery(product.name, 0) + '&w=400&h=300&c=7&rs=1&p=0'))}
+                                                            alt={product.name}
+                                                            className="modern-product-image"
+                                                            onError={(e) => {
+                                                                e.target.style.display = 'none';
+                                                            }}
                                                         />
                                                     )}
 
-{
-    isAdmin && (
-        <div onClick={(e) => { e.preventDefault(); e.stopPropagation(); }} className="admin-image-controls">
-            <button title="Cycle Through Images" onClick={(e) => { e.preventDefault(); e.stopPropagation(); setImageIndexes(prev => ({ ...prev, [product._id]: (prev[product._id] || 0) + 1 })) }}>⟩</button>
-            <button title="Save This Image" onClick={(e) => { e.preventDefault(); e.stopPropagation(); saveAiImage(product._id, `https://tse2.mm.bing.net/th?q=${getCleanImgQuery(product.name, imageIndexes[product._id] || 0)}&w=400&h=300&c=7&rs=1&p=0`) }}>💾</button>
-            <button title="No Image" onClick={(e) => { e.preventDefault(); e.stopPropagation(); if (window.confirm('Hide image for this product?')) saveAiImage(product._id, 'none') }}>🚫</button>
-            {product.aiImage && (
-                <button className="reset" title="Reset to AI Search" onClick={(e) => { e.preventDefault(); e.stopPropagation(); if (window.confirm('Reset this product to dynamic AI images?')) saveAiImage(product._id, '') }}>↺</button>
-            )}
-        </div>
-    )
-}
-                                                </div >
+                                                    {isAdmin && (
+                                                        <div onClick={(e) => { e.preventDefault(); e.stopPropagation(); }} className="admin-image-controls">
+                                                            <button title="Cycle Through Images" onClick={(e) => { e.preventDefault(); e.stopPropagation(); setImageIndexes(prev => ({ ...prev, [product._id]: (prev[product._id] || 0) + 1 })) }}>⟩</button>
+                                                            <button title="Save This Image" onClick={(e) => { e.preventDefault(); e.stopPropagation(); saveAiImage(product._id, 'https://tse2.mm.bing.net/th?q=' + getCleanImgQuery(product.name, imageIndexes[product._id] || 0) + '&w=400&h=300&c=7&rs=1&p=0') }}>&#x1F4BE;</button>
+                                                            <button title="No Image" onClick={(e) => { e.preventDefault(); e.stopPropagation(); if (window.confirm('Hide image for this product?')) saveAiImage(product._id, 'none') }}>&#x1F6AB;</button>
+                                                            {product.aiImage && (
+                                                                <button className="reset" title="Reset to AI Search" onClick={(e) => { e.preventDefault(); e.stopPropagation(); if (window.confirm('Reset this product to dynamic AI images?')) saveAiImage(product._id, '') }}>↺</button>
+                                                            )}
+                                                        </div>
+                                                    )}
+                                                </div>
 
-    <div className="modern-product-info">
-        <div className="modern-product-text">
-            <h3 className="modern-product-name">{product.name || 'Unnamed Product'}</h3>
-            <div className="modern-product-price">
-                ₹{product.price?.toFixed(2) || '0.00'}
-            </div>
-            {product.description && (
-                <p className="modern-product-desc">
-                    {product.description.length > 60
-                        ? `${product.description.substring(0, 60)}...`
-                        : product.description}
-                </p>
-            )}
-        </div>
+                                                <div className="modern-product-info">
+                                                    <div className="modern-product-text">
+                                                        <h3 className="modern-product-name">{product.name || 'Unnamed Product'}</h3>
+                                                        <div className="modern-product-price">
+                                                            ₹{product.price?.toFixed(2) || '0.00'}
+                                                        </div>
+                                                        {product.description && (
+                                                            <p className="modern-product-desc">
+                                                                {product.description.length > 60
+                                                                    ? product.description.substring(0, 60) + '...'
+                                                                    : product.description}
+                                                            </p>
+                                                        )}
+                                                    </div>
 
-        <button
-            onClick={() => handleAddToCart(product)}
-            className={`modern-add-btn ${!product.inStock ? 'disabled' : ''}`}
-            disabled={!product.inStock}
-            aria-label="Add to cart"
-        >
-            {product.inStock ? '+' : 'Out'}
-        </button>
-    </div>
-                                            </div >
+                                                    <button
+                                                        onClick={() => handleAddToCart(product)}
+                                                        className={'modern-add-btn ' + (!product.inStock ? 'disabled' : '')}
+                                                        disabled={!product.inStock}
+                                                        aria-label="Add to cart"
+                                                    >
+                                                        {product.inStock ? '+' : 'Out'}
+                                                    </button>
+                                                </div>
+                                            </div>
                                         ))}
-                                    </div >
-    <div className="category-divider"></div>
-                                </section >
+                                    </div>
+                                    <div className="category-divider"></div>
+                                </section>
                             ))}
-                        </div >
+                        </div>
                     )}
-                </div >
-            </div >
-        </div >
+                </div>
+            </div>
+        </div>
     );
 };
 
