@@ -759,10 +759,7 @@ const ShopPage = () => {
                                                             ₹{product.price?.toFixed(2) || '0.00'}
                                                         </div>
                                                         <p className="modern-product-desc" title={generateAIDescription(product.name)}>
-                                                            {(() => {
-                                                                const desc = generateAIDescription(product.name);
-                                                                return desc.length > 95 ? desc.substring(0, 95) + '...' : desc;
-                                                            })()}
+                                                            {generateAIDescription(product.name)}
                                                         </p>
                                                     </div>
 
