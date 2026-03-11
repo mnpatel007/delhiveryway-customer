@@ -399,6 +399,51 @@
     transform: none;
 }
 
+/* Inline Quantity Controls */
+.modern-qty-controls {
+    align-self: flex-start;
+    margin-top: 0.75rem;
+    display: flex;
+    align-items: center;
+    background-color: var(--primary-light);
+    border-radius: 50px;
+    padding: 0.25rem;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--primary-color);
+}
+
+.qty-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #ffffff;
+    border: none;
+    color: var(--primary-color);
+    font-size: 1.2rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition);
+    box-shadow: 0 2px 4px rgba(255, 75, 43, 0.2);
+}
+
+.qty-btn:hover {
+    background: var(--primary-color);
+    color: #ffffff;
+    transform: scale(1.05);
+}
+
+.qty-display {
+    min-width: 30px;
+    text-align: center;
+    font-weight: 700;
+    color: var(--primary-color);
+    font-size: 1rem;
+    margin: 0 0.25rem;
+}
+
 /* Product Image Box */
 .product-image-container {
     width: 140px;

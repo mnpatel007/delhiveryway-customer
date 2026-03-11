@@ -36,7 +36,7 @@ const ShopPage = () => {
     const [toast, setToast] = useState('');
     const [imageIndexes, setImageIndexes] = useState({});
 
-    const { addToCart, setSelectedShop } = useContext(CartContext);
+    const { cartItems, addToCart, removeFromCart, updateQuantity, setSelectedShop } = useContext(CartContext);
     const { user } = useAuth();
     
     const adminEmails = ['meetnp007@gmail.com', 'admin@delhiveryway.com', 'test@admin.com'];
@@ -712,14 +712,49 @@ const ShopPage = () => {
                                                         )}
                                                     </div>
 
-                                                    <button
-                                                        onClick={() => handleAddToCart(product)}
-                                                        className={'modern-add-btn ' + (!product.inStock ? 'disabled' : '')}
-                                                        disabled={!product.inStock}
-                                                        aria-label="Add to cart"
-                                                    >
-                                                        {product.inStock ? '+' : 'Out'}
-                                                    </button>
+                                                    {cartItems.find(item => item._id === product._id) ? (
+                                                        <div className="modern-qty-controls">
+                                                            <button
+                                                                className="qty-btn"
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    const item = cartItems.find(i => i._id === product._id);
+                                                                    if (item.quantity > 1) {
+                                                                        updateQuantity(product._id, item.quantity - 1);
+                                                                    } else {
+                                                                        removeFromCart(product._id);
+                                                                    }
+                                                                }}
+                                                            >
+                                                                −
+                                                            </button>
+                                                            <span className="qty-display">
+                                                                {cartItems.find(item => item._id === product._id).quantity}
+                                                            </span>
+                                                            <button
+                                                                className="qty-btn"
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    const item = cartItems.find(i => i._id === product._id);
+                                                                    updateQuantity(product._id, item.quantity + 1);
+                                                                }}
+                                                            >
+                                                                +
+                                                            </button>
+                                                        </div>
+                                                    ) : (
+                                                        <button
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                handleAddToCart(product);
+                                                            }}
+                                                            className={'modern-add-btn ' + (!product.inStock ? 'disabled' : '')}
+                                                            disabled={!product.inStock}
+                                                            aria-label="Add to cart"
+                                                        >
+                                                            {product.inStock ? '+' : 'Out'}
+                                                        </button>
+                                                    )}
                                                 </div>
 
                                                 <div className="product-image-container">
