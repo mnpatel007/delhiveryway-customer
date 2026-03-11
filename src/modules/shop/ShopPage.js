@@ -571,13 +571,12 @@ const ShopPage = () => {
                         <span>←</span> Back to Shops
                     </button>
 
-
                     <div className="shop-main-info">
                         <div className="shop-avatar">
                             {shop.images && shop.images.length > 0 ? (
                                 <img src={shop.images[0]} alt={shop.name} />
                             ) : (
-                                <span className="shop-emoji"></span>
+                                <span className="shop-emoji">🍔</span>
                             )}
                         </div>
 
