@@ -26,8 +26,8 @@ export function initMagneticButtons(container = document) {
       if (dist < threshold) {
         // Advanced elastic strength curve
         const strength = Math.pow(1 - dist / threshold, 2) * MAX;
-        const targetX = (dx / dist) * strength;
-        const targetY = (dy / dist) * strength;
+        const targetX = (dx / (dist || 1)) * strength;
+        const targetY = (dy / (dist || 1)) * strength;
         
         el.style.transform = `translate3d(${targetX}px, ${targetY}px, 0) scale(1.02)`;
         el.style.transition = 'transform 0.25s cubic-bezier(0.23, 1, 0.32, 1)';

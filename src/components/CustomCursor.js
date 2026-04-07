@@ -37,6 +37,11 @@ export default function CustomCursor() {
     const lerp = (a, b, t) => a + (b - a) * t;
 
     const tick = () => {
+      if (!dot || !ring || !dot.parentNode || !ring.parentNode) {
+        cancelAnimationFrame(rafId);
+        return;
+      }
+
       const dx = mouseX - ringX;
       const dy = mouseY - ringY;
       
