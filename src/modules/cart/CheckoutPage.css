@@ -1,10 +1,10 @@
 :root {
-    --primary-color: #4a90e2;
-    --secondary-color: #2ecc71;
-    --background-color: #f4f6f9;
-    --text-color: #2c3e50;
-    --card-background: #ffffff;
-    --card-shadow: rgba(0, 0, 0, 0.08);
+    --primary-color: #00d4ff;
+    --secondary-color: #10b981;
+    --background-color: #0a0e17;
+    --text-color: #ffffff;
+    --card-background: #111827;
+    --card-shadow: rgba(0, 0, 0, 0.5);
     --border-radius: 12px;
     --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
@@ -21,7 +21,7 @@ html {
 /* Main container */
 .checkout-container {
     min-height: 100vh;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: #0a0e17;
     padding: 20px;
     display: flex;
     justify-content: center;
@@ -36,14 +36,14 @@ html {
 .checkout-container h4,
 .checkout-container h5,
 .checkout-container h6 {
-    color: #2c3e50 !important;
+    color: #ffffff !important;
     text-shadow: none !important;
 }
 
 .checkout-container p,
 .checkout-container span,
 .checkout-container div {
-    color: #2c3e50 !important;
+    color: #94a3b8 !important;
 }
 
 /* Additional section headers that might appear faded */
@@ -52,7 +52,7 @@ html {
 .checkout-container .order-section h3,
 .checkout-container .items-section h3,
 .checkout-container .next-section h3 {
-    color: #2c3e50 !important;
+    color: #ffffff !important;
     font-weight: 700 !important;
     text-shadow: none !important;
 }
@@ -68,11 +68,12 @@ html {
     display: flex;
     flex-direction: column;
     gap: 2.5rem;
+    border: 1px solid #1e293b;
     transition: box-shadow 0.3s ease;
 }
 
 .checkout-wrapper:hover {
-    box-shadow: 0 18px 55px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 18px 55px rgba(0, 0, 0, 0.6);
 }
 
 /* Header */
@@ -91,13 +92,13 @@ html {
 
 .checkout-header p {
     font-size: 1.15rem;
-    color: #2c3e50;
+    color: #ffffff;
     font-weight: 600;
-    background: rgba(255, 255, 255, 0.9);
+    background: #1e293b;
     padding: 10px 20px;
     border-radius: 8px;
     margin: 10px 0;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 
 /* Content: User Details, Address, Order Summary */
@@ -111,10 +112,11 @@ html {
 .checkout-user-details,
 .checkout-address,
 .checkout-order-summary {
-    background-color: #fafafa;
+    background-color: #1a1f2e;
     border-radius: var(--border-radius);
     padding: 2rem 2.5rem;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    border: 1px solid #1e293b;
 }
 
 /* Section titles */
@@ -141,7 +143,7 @@ html {
 .user-info p {
     margin: 0;
     font-size: 1.1rem;
-    color: #333;
+    color: #94a3b8;
 }
 
 .info-label {
@@ -177,11 +179,12 @@ html {
 
 /* Order Summary */
 .shop-order-section {
-    background-color: white;
+    background-color: #1a1f2e;
     border-radius: var(--border-radius);
     padding: 1.5rem 2rem;
     margin-bottom: 1.4rem;
-    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.07);
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.5);
+    border: 1px solid #1e293b;
 }
 
 .shop-name {
@@ -189,7 +192,7 @@ html {
     margin-bottom: 1rem;
     font-weight: 600;
     font-size: 1.3rem;
-    border-bottom: 2px solid #eee;
+    border-bottom: 2px solid #1e293b;
     padding-bottom: 0.6rem;
 }
 
@@ -249,9 +252,10 @@ html {
     display: flex;
     justify-content: space-between;
     padding: 0.7rem 0;
-    border-bottom: 1px solid #efefef;
+    border-bottom: 1px solid #1e293b;
     font-weight: 500;
     letter-spacing: 0.02em;
+    color: #94a3b8;
 }
 
 .total-row:last-child {
@@ -432,12 +436,12 @@ html {
 }
 
 .confirmation-section .info-label {
-    color: #495057 !important;
+    color: #94a3b8 !important;
     font-weight: 600;
 }
 
 .confirmation-section .info-value {
-    color: #2c3e50 !important;
+    color: #ffffff !important;
     font-weight: 600;
 }
 
@@ -489,9 +493,9 @@ html {
     justify-content: space-between;
     align-items: center;
     padding: 12px;
-    background: white;
+    background: #111827;
     border-radius: 10px;
-    border: 1px solid #e9ecef;
+    border: 1px solid #1e293b;
 }
 
 .info-value {
@@ -508,15 +512,15 @@ html {
 }
 
 .address-display {
-    background: white;
+    background: #111827;
     padding: 15px;
     border-radius: 10px;
-    border: 1px solid #e9ecef;
+    border: 1px solid #1e293b;
 }
 
 .address-display p {
     margin: 5px 0;
-    color: #495057;
+    color: #94a3b8;
 }
 
 .instructions {
@@ -537,9 +541,9 @@ html {
     align-items: flex-start;
     gap: 15px;
     padding: 15px;
-    background: white;
+    background: #111827;
     border-radius: 10px;
-    border: 1px solid #e9ecef;
+    border: 1px solid #1e293b;
 }
 
 .step-number {
@@ -563,7 +567,7 @@ html {
 
 .step-content p {
     margin: 0;
-    color: #6c757d;
+    color: #94a3b8;
     font-size: 0.9rem;
     line-height: 1.4;
 }

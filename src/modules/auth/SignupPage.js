@@ -123,7 +123,7 @@ const SignupPage = () => {
         if (/[@$!%*?&]/.test(password)) score++;
 
         const labels = ['Very Weak', 'Weak', 'Fair', 'Good', 'Strong'];
-        const colors = ['#ff4444', '#ff8800', '#ffbb33', '#00C851', '#007E33'];
+        const colors = ['#ef4444', '#f59e0b', '#fbbf24', '#10b981', '#059669'];
 
         return {
             score: Math.min(score, 5),
@@ -277,7 +277,7 @@ const SignupPage = () => {
                                                 <div
                                                     key={level}
                                                     className={`strength-bar ${level <= passwordStrength.score ? 'active' : ''}`}
-                                                    style={{ backgroundColor: level <= passwordStrength.score ? passwordStrength.color : '#e1e5e9' }}
+                                                    style={{ backgroundColor: level <= passwordStrength.score ? passwordStrength.color : '#1e293b' }}
                                                 ></div>
                                             ))}
                                         </div>

@@ -27,10 +27,10 @@ class ErrorBoundary extends React.Component {
                 <div style={{
                     padding: '20px',
                     margin: '20px',
-                    border: '1px solid #ff6b6b',
+                    border: '1px solid rgba(239, 68, 68, 0.3)',
                     borderRadius: '8px',
-                    backgroundColor: '#ffe0e0',
-                    color: '#d63031'
+                    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                    color: '#f87171'
                 }}>
                     <h2>🚨 Something went wrong</h2>
                     <p>We're sorry, but something unexpected happened. Please try refreshing the page.</p>
@@ -41,8 +41,8 @@ class ErrorBoundary extends React.Component {
                             <pre style={{
                                 marginTop: '10px',
                                 padding: '10px',
-                                backgroundColor: '#f8f9fa',
-                                border: '1px solid #dee2e6',
+                                backgroundColor: '#111827',
+                                border: '1px solid #1e293b',
                                 borderRadius: '4px',
                                 fontSize: '12px',
                                 overflow: 'auto'
@@ -59,7 +59,7 @@ class ErrorBoundary extends React.Component {
                         style={{
                             marginTop: '15px',
                             padding: '10px 20px',
-                            backgroundColor: '#0984e3',
+                            backgroundColor: '#10b981',
                             color: 'white',
                             border: 'none',
                             borderRadius: '4px',

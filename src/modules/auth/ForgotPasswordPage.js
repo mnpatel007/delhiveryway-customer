@@ -92,7 +92,7 @@ const ForgotPasswordPage = () => {
                         )}
 
                         {message && (
-                            <div className="error-banner" style={{ background: 'linear-gradient(135deg, #10b981, #059669)' }}>
+                            <div className="error-banner" style={{ background: 'rgba(16, 185, 129, 0.15)', border: '1px solid rgba(16, 185, 129, 0.3)', color: '#10b981' }}>
                                 <div className="error-icon">✨</div>
                                 <span>{message}</span>
                             </div>

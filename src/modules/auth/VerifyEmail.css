@@ -5,16 +5,17 @@
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    background: #0a0e17;
     font-family: 'Inter', sans-serif;
     padding: 20px;
     box-sizing: border-box;
 }
 
 .verify-email-card {
-    background: white;
+    background: #111827;
     border-radius: 16px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    border: 1px solid #1e293b;
     padding: 40px;
     max-width: 500px;
     width: 100%;
@@ -24,7 +25,7 @@
 }
 
 .verify-email-card.success {
-    border-top: 5px solid #4CAF50;
+    border-top: 5px solid var(--cta-green, #10b981);
 }
 
 .verify-email-card.error {
@@ -35,11 +36,11 @@
     width: 100px;
     height: 100px;
     margin: 0 auto 20px;
-    color: #4CAF50;
+    color: var(--cta-green, #10b981);
 }
 
 .verify-email-card.error .verify-email-icon {
-    color: #f44336;
+    color: var(--cta-red, #ef4444);
 }
 
 .verify-email-icon svg {
@@ -50,20 +51,21 @@
 
 .verify-email-card h2 {
     margin-bottom: 15px;
-    color: #333;
+    color: #ffffff;
 }
 
 .verify-email-message {
-    color: #666;
+    color: #94a3b8;
     margin-bottom: 20px;
 }
 
 .redirect-countdown {
-    background-color: #f0f0f0;
+    background-color: #1e293b;
     padding: 10px;
     border-radius: 8px;
     margin-top: 20px;
-    color: #333;
+    color: #ffffff;
+    border: 1px solid #334155;
 }
 
 .verify-email-actions {
@@ -84,21 +86,25 @@
 }
 
 .btn-back-to-login {
-    background-color: #4CAF50;
-    color: white;
+    background-color: var(--cta-green, #10b981);
+    color: #0a0e17;
+    font-weight: 600;
 }
 
 .btn-resend-verification {
-    background-color: #f0f0f0;
-    color: #333;
+    background-color: transparent;
+    color: #94a3b8;
+    border: 2px solid #1e293b;
 }
 
 .btn-back-to-login:hover {
-    background-color: #45a049;
+    box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
+    transform: translateY(-2px);
 }
 
 .btn-resend-verification:hover {
-    background-color: #e0e0e0;
+    background-color: #1e293b;
+    color: #ffffff;
 }
 
 @media (max-width: 600px) {

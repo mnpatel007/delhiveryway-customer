@@ -44,13 +44,14 @@
     bottom: 50px;
     left: 0;
     width: 350px;
-    background: white;
+    background: #111827;
+    color: #94a3b8;
     border-radius: 10px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
     overflow: hidden;
     animation: slideUp 0.3s ease;
     z-index: 999999;
-    border: 2px solid #333;
+    border: 1px solid #1e293b;
 }
 
 @keyframes slideUp {
@@ -101,7 +102,7 @@
     justify-content: space-between;
     align-items: center;
     padding: 15px 20px;
-    background: #333;
+    background: #1e293b;
     color: white;
 }
 
@@ -120,8 +121,8 @@
 
 .debug-status {
     padding: 15px 20px;
-    background: #f5f5f5;
-    border-bottom: 1px solid #e0e0e0;
+    background: #111827;
+    border-bottom: 1px solid #1e293b;
 }
 
 .status-item {
@@ -191,7 +192,7 @@
     padding: 15px 20px;
     max-height: 200px;
     overflow-y: auto;
-    border-top: 1px solid #e0e0e0;
+    border-top: 1px solid #1e293b;
 }
 
 .test-results h5 {
@@ -217,12 +218,12 @@
 }
 
 .test-result.success {
-    background: #e8f5e8;
+    background: rgba(16, 185, 129, 0.15);
     border-left: 3px solid #4CAF50;
 }
 
 .test-result.failure {
-    background: #ffe8e8;
+    background: rgba(239, 68, 68, 0.15);
     border-left: 3px solid #f44336;
 }
 
@@ -265,7 +266,7 @@ hanced Debug Panel Styles */
 
 .debug-section {
     padding: 12px 20px;
-    border-bottom: 1px solid #e0e0e0;
+    border-bottom: 1px solid #1e293b;
 }
 
 .debug-section:last-child {
@@ -276,7 +277,7 @@ hanced Debug Panel Styles */
     margin: 0 0 10px 0;
     font-size: 13px;
     font-weight: 600;
-    color: #333;
+    color: #ffffff;
 }
 
 .status-item,
@@ -298,7 +299,7 @@ hanced Debug Panel Styles */
 .config-value,
 .user-value {
     font-family: monospace;
-    background: #f5f5f5;
+    background: #1e293b;
     padding: 2px 6px;
     border-radius: 3px;
     font-size: 11px;
@@ -306,6 +307,7 @@ hanced Debug Panel Styles */
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    color: #94a3b8;
 }
 
 .debug-action-btn {
@@ -345,7 +347,7 @@ hanced Debug Panel Styles */
     justify-content: space-between;
     align-items: center;
     padding: 4px 8px;
-    background: #f8f9fa;
+    background: #1e293b;
     border-radius: 3px;
     margin-bottom: 4px;
     font-size: 10px;

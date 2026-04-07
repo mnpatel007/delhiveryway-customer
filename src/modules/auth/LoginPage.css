@@ -2,7 +2,7 @@
 
 .modern-login-container {
     min-height: 100vh;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: #0a0e17;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -77,10 +77,10 @@
     grid-template-columns: 1fr 1fr;
     max-width: 1200px;
     width: 100%;
-    background: rgba(255, 255, 255, 0.95);
+    background: #111827;
+    border: 1px solid #1e293b;
     border-radius: 24px;
-    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
-    backdrop-filter: blur(20px);
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
     overflow: hidden;
     position: relative;
     z-index: 2;
@@ -88,7 +88,8 @@
 
 /* Left Side - Branding Section */
 .branding-section {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: radial-gradient(circle at 50% 50%, rgba(0, 212, 255, 0.1) 0%, #0a0e17 70%);
+    border-right: 1px solid #1e293b;
     padding: 60px 40px;
     display: flex;
     align-items: center;
@@ -201,7 +202,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: white;
+    background: #111827;
 }
 
 .form-container {
@@ -217,13 +218,13 @@
 .welcome-text {
     font-size: 32px;
     font-weight: 700;
-    color: #1a1a1a;
+    color: #ffffff;
     margin: 0 0 10px;
 }
 
 .login-subtitle {
     font-size: 16px;
-    color: #666;
+    color: #94a3b8;
     margin: 0;
     font-weight: 400;
 }
@@ -265,7 +266,7 @@
     position: absolute;
     left: 16px;
     font-size: 18px;
-    color: #667eea;
+    color: #00d4ff;
     z-index: 2;
 }
 
@@ -273,24 +274,24 @@
     width: 100%;
     box-sizing: border-box !important;
     padding: 18px 50px 18px 50px !important;
-    border: 2px solid #e1e5e9;
+    border: 2px solid #1e293b;
     border-radius: 12px;
     font-size: 16px;
     font-weight: 500;
-    color: #1a1a1a;
-    background: #f8fafc;
+    color: #ffffff;
+    background: #0f172a;
     transition: all 0.3s ease;
     outline: none;
 }
 
 .modern-input:focus {
-    border-color: #667eea;
-    background: white;
-    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+    border-color: #00d4ff;
+    background: #0f172a;
+    box-shadow: 0 0 10px rgba(0, 212, 255, 0.2);
 }
 
 .modern-input::placeholder {
-    color: #9ca3af;
+    color: #64748b;
     font-weight: 400;
 }
 
@@ -300,7 +301,7 @@
     background: none;
     border: none;
     font-size: 18px;
-    color: #667eea;
+    color: #00d4ff;
     cursor: pointer;
     padding: 5px;
     border-radius: 6px;
@@ -308,7 +309,7 @@
 }
 
 .password-toggle:hover {
-    background: rgba(102, 126, 234, 0.1);
+    background: rgba(0, 212, 255, 0.1);
 }
 
 /* Form Actions */
@@ -318,7 +319,7 @@
 }
 
 .forgot-link {
-    color: #667eea;
+    color: #00d4ff;
     text-decoration: none;
     font-weight: 500;
     font-size: 14px;
@@ -326,7 +327,7 @@
 }
 
 .forgot-link:hover {
-    color: #5a67d8;
+    color: #ffffff;
     text-decoration: underline;
 }
 
@@ -334,7 +335,7 @@
 .login-button {
     width: 100%;
     padding: 18px 24px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: var(--cta-green, #10b981);
     color: white;
     border: none;
     border-radius: 12px;
@@ -344,11 +345,14 @@
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
 }
 
 .login-button:hover:not(:disabled) {
     transform: translateY(-2px);
-    box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 0 25px rgba(16, 185, 129, 0.5);
 }
 
 .login-button:active {
@@ -405,15 +409,14 @@
     left: 0;
     right: 0;
     height: 1px;
-    background: #e1e5e9;
+    background: #1e293b;
     z-index: 1;
 }
 
 .divider span {
-    background: white;
+    background: #111827;
     padding: 0 20px;
-    color: #9ca3af;
-    font-size: 14px;
+    color: #64748b;
     font-weight: 500;
     position: relative;
     font-size: 14px;
@@ -434,21 +437,21 @@
     justify-content: center;
     gap: 12px;
     padding: 14px 24px;
-    background: white;
-    border: 2px solid #e1e5e9;
+    background: #1e293b;
+    border: 2px solid #334155;
     border-radius: 12px;
     font-size: 16px;
     font-weight: 600;
-    color: #1f2937;
+    color: #ffffff;
     cursor: pointer;
     transition: all 0.3s ease;
 }
 
 .google-btn:hover {
-    background: #f9fafb;
-    border-color: #d1d5db;
+    background: #334155;
+    border-color: #475569;
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .google-btn:active {
@@ -469,12 +472,12 @@
 /* Signup Prompt */
 .signup-prompt {
     text-align: center;
-    color: #666;
+    color: #94a3b8;
     font-size: 14px;
 }
 
 .signup-link {
-    color: #667eea;
+    color: #00d4ff;
     text-decoration: none;
     font-weight: 600;
     margin-left: 5px;
@@ -482,7 +485,7 @@
 }
 
 .signup-link:hover {
-    color: #5a67d8;
+    color: #ffffff;
     text-decoration: underline;
 }
 
@@ -530,49 +533,4 @@
     }
 }
 
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-    .form-section {
-        background: #1a1a1a;
-    }
-
-    .welcome-text {
-        color: #ffffff;
-    }
-
-    .login-subtitle {
-        color: #a0a0a0;
-    }
-
-    .modern-input {
-        background: #2a2a2a;
-        border-color: #404040;
-        color: #ffffff;
-    }
-
-    .modern-input:focus {
-        background: #2a2a2a;
-    }
-
-    .modern-input::placeholder {
-        color: #808080;
-    }
-
-    .divider span {
-        background: #1a1a1a;
-        position: relative;
-        z-index: 2;
-        display: inline-block;
-    }
-
-    .google-btn {
-        background: #2a2a2a;
-        border-color: #404040;
-        color: #ffffff;
-    }
-
-    .google-btn:hover {
-        background: #333333;
-        border-color: #505050;
-    }
-}
+/* Removed dark media query since default is dark */

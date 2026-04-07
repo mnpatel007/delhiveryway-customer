@@ -1,7 +1,7 @@
 /* Clean and Modern HomePage Styles */
 .home-container {
     min-height: 100vh;
-    background: #f8fafc;
+    background: #0a0e17;
 }
 
 /* Loading State */
@@ -35,19 +35,20 @@
 }
 
 .loading-state h3 {
-    color: #374151;
+    color: #ffffff;
     margin-bottom: 0.5rem;
     font-size: 1.5rem;
 }
 
 .loading-state p {
-    color: #6b7280;
+    color: #94a3b8;
     margin: 0;
 }
 
 /* Header Section */
 .home-header {
-    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+    background: radial-gradient(circle at 50% 50%, rgba(0, 212, 255, 0.1) 0%, #0a0e17 70%);
+    border-bottom: 1px solid #1e293b;
     color: white;
     padding: 2rem 2rem 2rem;
     position: relative;
@@ -76,10 +77,9 @@
     font-size: 2.5rem;
     font-weight: 700;
     margin: 0 0 0.5rem 0;
-    background: linear-gradient(45deg, #fff, #f0f0f0);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: #ffffff;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
 }
 
 .home-header p {
@@ -116,9 +116,8 @@
 
 /* Search Section */
 .search-section {
-    background: white;
+    background: transparent;
     padding: 3rem 2rem;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
 }
 
 .search-content {
@@ -130,10 +129,11 @@
     display: flex;
     gap: 1rem;
     margin-bottom: 2rem;
-    background: #f8fafc;
+    background: #111827;
+    border: 1px solid #1e293b;
     padding: 0.5rem;
     border-radius: 16px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
 .search-container {
@@ -146,9 +146,9 @@
     position: absolute;
     left: 0;
     top: calc(100% + 8px);
-    background: white;
-    border: 1px solid #e6e9ef;
-    box-shadow: 0 8px 24px rgba(16, 24, 40, 0.12);
+    background: #111827;
+    border: 1px solid #1e293b;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
     width: 100%;
     max-height: 420px;
     overflow: auto;
@@ -159,7 +159,7 @@
 
 .suggestion-shop-group {
     margin-bottom: 12px;
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid #1e293b;
     padding-bottom: 8px;
 }
 
@@ -172,7 +172,7 @@
 .suggestion-shop-header {
     font-weight: 700;
     font-size: 12px;
-    color: #6366f1;
+    color: #00d4ff;
     text-transform: uppercase;
     letter-spacing: 0.5px;
     padding: 6px 8px;
@@ -183,24 +183,26 @@
     padding: 8px;
     border-radius: 6px;
     cursor: pointer;
+    color: #ffffff;
 }
 
 .home-search-suggestions .suggestion-item:hover {
-    background: #f8fafc;
+    background: #1e293b;
 }
 
 .search-input {
     width: 100%;
     padding: 1rem 1.5rem 1rem 3rem;
-    border: none;
+    border: 1px solid #1e293b;
     border-radius: 12px;
     font-size: 1rem;
-    background: transparent;
+    background: #0f172a;
+    color: #ffffff;
     outline: none;
 }
 
 .search-input::placeholder {
-    color: #6b7280;
+    color: #64748b;
 }
 
 .search-icon {
@@ -209,13 +211,13 @@
     top: 50%;
     transform: translateY(-50%);
     font-size: 1.1rem;
-    color: #6b7280;
+    color: #64748b;
 }
 
 .search-btn {
     padding: 1rem 2rem;
-    background: linear-gradient(135deg, #6366f1, #4f46e5);
-    color: white;
+    background: #00d4ff;
+    color: #0a0e17;
     border: none;
     border-radius: 12px;
     font-size: 1rem;
@@ -223,11 +225,12 @@
     cursor: pointer;
     transition: all 0.3s ease;
     min-width: 120px;
+    box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
 }
 
 .search-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+    box-shadow: 0 0 25px rgba(0, 212, 255, 0.5);
 }
 
 .category-filters {
@@ -240,9 +243,9 @@
 
 .category-btn {
     padding: 0.75rem 1.5rem;
-    background: #f1f5f9;
-    color: #475569;
-    border: 2px solid transparent;
+    background: #111827;
+    color: #94a3b8;
+    border: 1px solid #1e293b;
     border-radius: 25px;
     font-weight: 500;
     cursor: pointer;
@@ -251,23 +254,25 @@
 }
 
 .category-btn:hover {
-    background: #e2e8f0;
+    background: #1e293b;
+    color: #ffffff;
+    border-color: rgba(0, 212, 255, 0.3);
     transform: translateY(-2px);
 }
 
 .category-btn.active {
-    background: linear-gradient(135deg, #6366f1, #4f46e5);
-    color: white;
-    border-color: #6366f1;
+    background: rgba(0, 212, 255, 0.1);
+    color: #00d4ff;
+    border-color: #00d4ff;
     transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+    box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
 }
 
 .clear-filters-btn {
     padding: 0.5rem 1rem;
-    background: #ef4444;
-    color: white;
-    border: none;
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.3);
     border-radius: 8px;
     font-size: 0.9rem;
     font-weight: 500;
@@ -276,14 +281,14 @@
 }
 
 .clear-filters-btn:hover {
-    background: #dc2626;
+    background: rgba(239, 68, 68, 0.2);
     transform: translateY(-1px);
 }
 
 /* Shops Section */
 .shops-section {
     padding: 4rem 2rem;
-    background: #f8fafc;
+    background: #0a0e17;
 }
 
 .shops-content {
@@ -299,13 +304,14 @@
 .section-header h2 {
     font-size: 2.5rem;
     font-weight: 700;
-    color: #374151;
+    color: #ffffff;
     margin: 0 0 1rem 0;
 }
 
 .shops-count {
-    background: linear-gradient(135deg, #6366f1, #4f46e5);
-    color: white;
+    background: rgba(0, 212, 255, 0.1);
+    color: #00d4ff;
+    border: 1px solid #00d4ff;
     padding: 0.5rem 1rem;
     border-radius: 20px;
     font-size: 1rem;
@@ -316,9 +322,10 @@
 .no-shops {
     text-align: center;
     padding: 4rem 2rem;
-    background: white;
+    background: #111827;
     border-radius: 20px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    border: 1px solid #1e293b;
     max-width: 600px;
     margin: 0 auto;
 }
@@ -331,13 +338,13 @@
 
 .no-shops h3 {
     font-size: 2rem;
-    color: #374151;
+    color: #ffffff;
     margin: 0 0 1rem 0;
 }
 
 .no-shops p {
     font-size: 1.1rem;
-    color: #6b7280;
+    color: #94a3b8;
     margin: 0 0 2rem 0;
 }
 
@@ -370,11 +377,11 @@
 
 /* Shop Card */
 .shop-card {
-    background: white;
+    background: #111827;
     border-radius: 20px;
     overflow: hidden;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-    border: 1px solid #e5e7eb;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    border: 1px solid #1e293b;
     cursor: pointer;
     transition: all 0.3s ease;
     position: relative;
@@ -387,15 +394,15 @@
     left: 0;
     right: 0;
     height: 4px;
-    background: linear-gradient(135deg, #6366f1, #4f46e5);
+    background: #00d4ff;
     transform: scaleX(0);
     transition: transform 0.3s ease;
 }
 
 .shop-card:hover {
     transform: translateY(-8px);
-    box-shadow: 0 20px 25px rgba(0, 0, 0, 0.1);
-    border-color: #6366f1;
+    box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
+    border-color: rgba(0, 212, 255, 0.5);
 }
 
 .shop-card:hover::before {
@@ -404,7 +411,7 @@
 
 .shop-image {
     height: 200px;
-    background: #f3f4f6;
+    background: #0f172a;
     position: relative;
     overflow: hidden;
 }
@@ -425,12 +432,12 @@
     align-items: center;
     justify-content: center;
     height: 100%;
-    background: linear-gradient(135deg, #6366f1, #4f46e5);
+    background: #1e293b;
 }
 
 .shop-icon {
     font-size: 4rem;
-    color: white;
+    color: #94a3b8;
 }
 
 .shop-content {
@@ -447,13 +454,14 @@
 .shop-name {
     font-size: 1.5rem;
     font-weight: 700;
-    color: #374151;
+    color: #ffffff;
     margin: 0;
 }
 
 .shop-category {
-    background: linear-gradient(135deg, #6366f1, #4f46e5);
-    color: white;
+    background: rgba(0, 212, 255, 0.1);
+    color: #00d4ff;
+    border: 1px solid rgba(0, 212, 255, 0.3);
     padding: 0.25rem 0.75rem;
     border-radius: 15px;
     font-size: 0.8rem;
@@ -462,7 +470,7 @@
 }
 
 .shop-description {
-    color: #6b7280;
+    color: #94a3b8;
     font-size: 0.95rem;
     line-height: 1.6;
     margin: 0 0 1.5rem 0;
@@ -479,7 +487,7 @@
     align-items: center;
     gap: 0.5rem;
     font-size: 0.9rem;
-    color: #6b7280;
+    color: #94a3b8;
 }
 
 .rating-stars {
@@ -491,7 +499,7 @@
 }
 
 .delivery-fee {
-    color: #059669 !important;
+    color: #10b981 !important;
     font-weight: 600;
 }
 
@@ -506,13 +514,13 @@
 }
 
 .shop-status.open {
-    background: #dcfce7;
-    color: #166534;
+    background: rgba(16, 185, 129, 0.1);
+    color: #10b981;
 }
 
 .shop-status.closed {
-    background: #fee2e2;
-    color: #991b1b;
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
 }
 
 /* Button Styles */
@@ -531,25 +539,25 @@
 }
 
 .btn-primary {
-    background: #6366f1;
-    color: white;
+    background: #00d4ff;
+    color: #0a0e17;
 }
 
 .btn-primary:hover {
-    background: #4f46e5;
+    background: #00d4ff;
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+    box-shadow: 0 0 15px rgba(0, 212, 255, 0.4);
 }
 
 .btn-secondary {
-    background: #f3f4f6;
-    color: #6b7280;
-    border: 2px solid #e5e7eb;
+    background: transparent;
+    color: #94a3b8;
+    border: 2px solid #1e293b;
 }
 
 .btn-secondary:hover {
-    background: #e5e7eb;
-    color: #374151;
+    background: #1e293b;
+    color: #ffffff;
 }
 
 /* Responsive Design */
@@ -667,13 +675,14 @@
 /* Locati
 on Prompt */
 .location-prompt {
-    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
-    color: white;
+    background: rgba(245, 158, 11, 0.1);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    color: #fbbf24;
     padding: 1rem 1.5rem;
     border-radius: 12px;
     margin-top: 1rem;
     text-align: center;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
 }
 
 .location-prompt p {

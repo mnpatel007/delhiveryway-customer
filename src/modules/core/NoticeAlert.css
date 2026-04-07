@@ -154,55 +154,59 @@
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
-/* Type-based styling */
+/* Type-based styling - Dark Premium Glass */
 .notice-info {
-    background: linear-gradient(135deg, #e3f2fd, #bbdefb);
-    color: #0d47a1;
-    border-color: #2196f3;
+    background: rgba(33, 150, 243, 0.15);
+    color: #64b5f6;
+    border-color: rgba(33, 150, 243, 0.3);
+    backdrop-filter: blur(20px);
 }
 
 .notice-info .notice-dismiss:hover {
-    background: rgba(13, 71, 161, 0.1);
+    background: rgba(33, 150, 243, 0.25);
 }
 
 .notice-success {
-    background: linear-gradient(135deg, #e8f5e8, #c8e6c9);
-    color: #1b5e20;
-    border-color: #4caf50;
+    background: rgba(16, 185, 129, 0.15);
+    color: var(--cta-green);
+    border-color: rgba(16, 185, 129, 0.3);
+    backdrop-filter: blur(20px);
 }
 
 .notice-success .notice-dismiss:hover {
-    background: rgba(27, 94, 32, 0.1);
+    background: rgba(16, 185, 129, 0.25);
 }
 
 .notice-warning {
-    background: linear-gradient(135deg, #fff8e1, #ffecb3);
-    color: #e65100;
-    border-color: #ff9800;
+    background: rgba(245, 158, 11, 0.15);
+    color: #fbbf24;
+    border-color: rgba(245, 158, 11, 0.3);
+    backdrop-filter: blur(20px);
 }
 
 .notice-warning .notice-dismiss:hover {
-    background: rgba(230, 81, 0, 0.1);
+    background: rgba(245, 158, 11, 0.25);
 }
 
 .notice-error {
-    background: linear-gradient(135deg, #ffebee, #ffcdd2);
-    color: #b71c1c;
-    border-color: #f44336;
+    background: rgba(239, 68, 68, 0.15);
+    color: var(--cta-red);
+    border-color: rgba(239, 68, 68, 0.3);
+    backdrop-filter: blur(20px);
 }
 
 .notice-error .notice-dismiss:hover {
-    background: rgba(183, 28, 28, 0.1);
+    background: rgba(239, 68, 68, 0.25);
 }
 
 /* Priority-based styling */
 .priority-urgent {
     border-width: 4px;
-    box-shadow: 0 30px 60px rgba(255, 0, 0, 0.4);
+    box-shadow: 0 30px 60px rgba(239, 68, 68, 0.4);
     animation: urgentPulse 1.5s infinite, attentionPulse 3s infinite;
     transform: scale(1.1) !important;
-    border-color: #ff4444 !important;
-    background: linear-gradient(135deg, rgba(255, 68, 68, 0.2), rgba(220, 38, 38, 0.2)) !important;
+    border-color: var(--cta-red) !important;
+    background: rgba(239, 68, 68, 0.25) !important;
 }
 
 @keyframes urgentPulse {
@@ -324,29 +328,7 @@
     }
 }
 
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-    .notice-info {
-        background: linear-gradient(135deg, #1a237e, #283593);
-        color: #e3f2fd;
-    }
-
-    .notice-success {
-        background: linear-gradient(135deg, #1b5e20, #388e3c);
-        color: #e8f5e8;
-    }
-
-    .notice-warning {
-        background: linear-gradient(135deg, #e65100, #f57c00);
-        color: #fff8e1;
-    }
-
-    .notice-error {
-        background: linear-gradient(135deg, #b71c1c, #d32f2f);
-        color: #ffebee;
-    }
-}
-
+/* Removed dark mode support block since theme IS always dark */
 /* Accessibility */
 @media (prefers-reduced-motion: reduce) {
     .notice-alert {

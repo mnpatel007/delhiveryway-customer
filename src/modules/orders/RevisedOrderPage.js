@@ -233,7 +233,7 @@ const RevisedOrderPage = () => {
                                     <span className="info-value">
                                         {order?.customerId?.name || 'Assigned'}
                                         {order?.deliveryAddress?.permanentContactPhone && (
-                                            <div style={{ fontSize: '0.85em', color: '#666', marginTop: '4px' }}>
+                                            <div style={{ fontSize: '0.85em', color: '#94a3b8', marginTop: '4px' }}>
                                                 <strong>Registered Phone:</strong> {order.deliveryAddress.permanentCountryCode || '+91'} {order.deliveryAddress.permanentContactPhone}
                                             </div>
                                         )}

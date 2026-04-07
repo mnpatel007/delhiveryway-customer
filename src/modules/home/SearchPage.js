@@ -61,25 +61,25 @@ const SearchPage = () => {
 
     return (
         <div style={{ padding: '20px' }}>
-            <h2>Search results for "{q}"</h2>
+            <h2 style={{ color: '#ffffff' }}>Search results for "{q}"</h2>
 
-            {loading && <p>Loading results…</p>}
-            {error && <p style={{ color: 'red' }}>{error}</p>}
+            {loading && <p style={{ color: '#94a3b8' }}>Loading results…</p>}
+            {error && <p style={{ color: '#ef4444' }}>{error}</p>}
 
             {!loading && !error && q && shopList.length === 0 && (
-                <p>No shops found with matching products.</p>
+                <p style={{ color: '#94a3b8' }}>No shops found with matching products.</p>
             )}
 
             {!loading && shopList.length > 0 && (
                 <div>
-                    <p>Found in {shopList.length} shop(s)</p>
+                    <p style={{ color: '#94a3b8' }}>Found in {shopList.length} shop(s)</p>
                     <ul style={{ listStyle: 'none', padding: 0 }}>
                         {shopList.map(({ shopInfo, products }) => (
-                            <li key={shopInfo._id} style={{ border: '1px solid #eee', marginBottom: '12px', padding: '12px', borderRadius: '6px' }}>
+                            <li key={shopInfo._id} style={{ backgroundColor: '#111827', border: '1px solid #1e293b', marginBottom: '12px', padding: '12px', borderRadius: '6px' }}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                     <div>
-                                        <h3 style={{ margin: 0, cursor: 'pointer', color: '#007bff' }} onClick={() => navigate(`/shop/${shopInfo._id}`)}>{shopInfo.name || 'Shop'}</h3>
-                                        <div style={{ color: '#666' }}>{products.length} matching product(s)</div>
+                                        <h3 style={{ margin: 0, cursor: 'pointer', color: '#00d4ff' }} onClick={() => navigate(`/shop/${shopInfo._id}`)}>{shopInfo.name || 'Shop'}</h3>
+                                        <div style={{ color: '#94a3b8', marginTop: '4px' }}>{products.length} matching product(s)</div>
                                     </div>
                                     <div>
                                         {products[0]?.images?.[0] && (
@@ -88,11 +88,11 @@ const SearchPage = () => {
                                     </div>
                                 </div>
 
-                                <div style={{ marginTop: '8px', display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                                <div style={{ marginTop: '12px', display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                                     {products.slice(0, 6).map(p => (
-                                        <div key={p._id} style={{ border: '1px solid #f0f0f0', padding: '6px 8px', borderRadius: 4 }}>
-                                            <strong>{p.name}</strong>
-                                            <div style={{ color: '#666' }}>₹{p.price}</div>
+                                        <div key={p._id} style={{ backgroundColor: '#1a1f2e', border: '1px solid #1e293b', padding: '6px 8px', borderRadius: 4 }}>
+                                            <strong style={{ color: '#ffffff' }}>{p.name}</strong>
+                                            <div style={{ color: '#94a3b8', marginTop: '2px' }}>₹{p.price}</div>
                                         </div>
                                     ))}
                                 </div>

@@ -688,14 +688,14 @@ const FinalCheckoutPage = () => {
 
                                     if (isValidPhone) {
                                         return (
-                                            <div style={{ marginTop: '8px', padding: '8px', backgroundColor: '#f8f9fa', borderRadius: '4px', border: '1px solid #e9ecef', fontSize: '0.9rem' }}>
-                                                <span style={{ fontWeight: 'bold', color: '#495057' }}>Registered Phone:</span> {userCountryCode} {userPhone}
+                                            <div style={{ marginTop: '8px', padding: '8px', backgroundColor: '#1a1f2e', borderRadius: '4px', border: '1px solid #1e293b', fontSize: '0.9rem' }}>
+                                                <span style={{ fontWeight: 'bold', color: '#ffffff' }}>Registered Phone:</span> {userCountryCode} {userPhone}
                                             </div>
                                         );
                                     } else {
                                         return (
-                                            <div style={{ marginTop: '8px', padding: '8px', backgroundColor: '#fff3cd', borderRadius: '4px', border: '1px solid #ffeeba', fontSize: '0.9rem', color: '#856404' }}>
-                                                ⚠️ No valid registered phone found. Please add your number in <a href="/profile" style={{ color: '#0056b3', textDecoration: 'underline', fontWeight: 'bold' }}>My Profile</a>.
+                                            <div style={{ marginTop: '8px', padding: '8px', backgroundColor: 'rgba(234, 179, 8, 0.1)', borderRadius: '4px', border: '1px solid rgba(234, 179, 8, 0.3)', fontSize: '0.9rem', color: '#fbbf24' }}>
+                                                ⚠️ No valid registered phone found. Please add your number in <a href="/profile" style={{ color: '#00d4ff', textDecoration: 'underline', fontWeight: 'bold' }}>My Profile</a>.
                                             </div>
                                         );
                                     }
@@ -768,8 +768,8 @@ const FinalCheckoutPage = () => {
                                                 <div style={{
                                                     width: '18px',
                                                     height: '18px',
-                                                    border: `2px solid ${useRegisteredPhone ? '#4f46e5' : '#d1d5db'}`,
-                                                    backgroundColor: useRegisteredPhone ? '#4f46e5' : '#ffffff',
+                                                    border: `2px solid ${useRegisteredPhone ? '#00d4ff' : '#1e293b'}`,
+                                                    backgroundColor: useRegisteredPhone ? '#00d4ff' : '#1a1f2e',
                                                     borderRadius: '4px',
                                                     display: 'flex',
                                                     alignItems: 'center',
@@ -783,7 +783,7 @@ const FinalCheckoutPage = () => {
                                                         </svg>
                                                     )}
                                                 </div>
-                                                <span style={{ fontSize: '0.9rem', color: '#495057', margin: 0, fontWeight: 500 }}>
+                                                <span style={{ fontSize: '0.9rem', color: '#94a3b8', margin: 0, fontWeight: 500 }}>
                                                     Use registered number
                                                 </span>
                                             </div>
@@ -957,13 +957,13 @@ const FinalCheckoutPage = () => {
                         backdropFilter: 'blur(2px)'
                     }}>
                         <div className="duplicate-order-dialog" style={{
-                            backgroundColor: 'white',
+                            backgroundColor: '#111827',
                             padding: '2.5rem',
                             borderRadius: '12px',
                             maxWidth: '520px',
                             width: '90%',
-                            boxShadow: '0 10px 40px rgba(0, 0, 0, 0.2)',
-                            border: '1px solid #e9ecef',
+                            boxShadow: '0 10px 40px rgba(0, 0, 0, 0.5)',
+                            border: '1px solid #1e293b',
                             animation: 'slideIn 0.3s ease-out'
                         }}>
                             <h3 style={{
@@ -982,7 +982,7 @@ const FinalCheckoutPage = () => {
                                 marginBottom: '1.5rem',
                                 lineHeight: '1.6',
                                 fontSize: '16px',
-                                color: '#333',
+                                color: '#ffffff',
                                 textAlign: 'center'
                             }}>
                                 You have a similar order in progress<br />
@@ -990,18 +990,18 @@ const FinalCheckoutPage = () => {
                             </p>
 
                             <div style={{
-                                backgroundColor: '#f8f9fa',
+                                backgroundColor: '#1a1f2e',
                                 padding: '1.25rem',
                                 borderRadius: '8px',
                                 marginBottom: '1.5rem',
-                                border: '1px solid #e9ecef',
+                                border: '1px solid #1e293b',
                                 borderLeft: '4px solid #ff6b35'
                             }}>
                                 <p style={{ margin: '0 0 0.75rem 0', fontWeight: '600', fontSize: '15px' }}>
                                     📋 Previous Order Status: <span style={{
-                                        color: duplicateOrderInfo.existingOrderStatus === 'pending_shopper' ? '#ff6b35' : '#28a745',
+                                        color: duplicateOrderInfo.existingOrderStatus === 'pending_shopper' ? '#ff6b35' : '#10b981',
                                         textTransform: 'capitalize',
-                                        backgroundColor: duplicateOrderInfo.existingOrderStatus === 'pending_shopper' ? '#fff3e0' : '#e8f5e8',
+                                        backgroundColor: duplicateOrderInfo.existingOrderStatus === 'pending_shopper' ? 'rgba(255, 107, 53, 0.1)' : 'rgba(16, 185, 129, 0.1)',
                                         padding: '2px 8px',
                                         borderRadius: '4px',
                                         fontSize: '14px'
@@ -1009,7 +1009,7 @@ const FinalCheckoutPage = () => {
                                         {duplicateOrderInfo.existingOrderStatus.replace(/_/g, ' ')}
                                     </span>
                                 </p>
-                                <p style={{ margin: '0', fontSize: '14px', color: '#666' }}>
+                                <p style={{ margin: '0', fontSize: '14px', color: '#94a3b8' }}>
                                     🔍 Similarity: <strong>{duplicateOrderInfo.similarityPercentage}%</strong>
                                 </p>
                             </div>
@@ -1018,12 +1018,12 @@ const FinalCheckoutPage = () => {
                                 marginBottom: '2rem',
                                 fontWeight: '600',
                                 fontSize: '16px',
-                                color: '#333',
+                                color: '#ffffff',
                                 textAlign: 'center',
-                                backgroundColor: '#fff3e0',
+                                backgroundColor: 'rgba(255, 107, 53, 0.1)',
                                 padding: '1rem',
                                 borderRadius: '6px',
-                                border: '1px solid #ffcc80'
+                                border: '1px solid rgba(255, 107, 53, 0.3)'
                             }}>
                                 🤔 Are you sure you want to place another similar order?
                             </p>
@@ -1038,9 +1038,9 @@ const FinalCheckoutPage = () => {
                                     onClick={handleCancelDuplicateOrder}
                                     style={{
                                         padding: '0.75rem 1.5rem',
-                                        border: '2px solid #6c757d',
-                                        backgroundColor: 'white',
-                                        color: '#6c757d',
+                                        border: '2px solid #64748b',
+                                        backgroundColor: 'transparent',
+                                        color: '#94a3b8',
                                         borderRadius: '6px',
                                         cursor: 'pointer',
                                         fontSize: '14px',
@@ -1050,14 +1050,14 @@ const FinalCheckoutPage = () => {
                                         boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
                                     }}
                                     onMouseOver={(e) => {
-                                        e.target.style.backgroundColor = '#6c757d';
-                                        e.target.style.color = 'white';
+                                        e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
+                                        e.target.style.color = '#ffffff';
                                         e.target.style.transform = 'translateY(-1px)';
                                         e.target.style.boxShadow = '0 4px 8px rgba(0,0,0,0.15)';
                                     }}
                                     onMouseOut={(e) => {
-                                        e.target.style.backgroundColor = 'white';
-                                        e.target.style.color = '#6c757d';
+                                        e.target.style.backgroundColor = 'transparent';
+                                        e.target.style.color = '#94a3b8';
                                         e.target.style.transform = 'translateY(0)';
                                         e.target.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
                                     }}

@@ -578,7 +578,7 @@ const HomePage = () => {
                                                                         {s.images?.[0] && <img src={s.images[0]} alt={s.name} style={{ width: 48, height: 48, objectFit: 'cover', borderRadius: 6 }} />}
                                                                         <div>
                                                                             <div style={{ fontWeight: 600 }}>{s.name}</div>
-                                                                            <div style={{ fontSize: 12, color: '#666' }}>₹{s.price}</div>
+                                                                            <div style={{ fontSize: 12, color: '#94a3b8' }}>₹{s.price}</div>
                                                                         </div>
                                                                     </div>
                                                                 </div>
@@ -689,13 +689,13 @@ const HomePage = () => {
                                                             if (hasDiscount) {
                                                                 return (
                                                                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                                                                        <span style={{ textDecoration: 'line-through', color: '#999', fontSize: '0.9em' }}>
+                                                                        <span style={{ textDecoration: 'line-through', color: '#64748b', fontSize: '0.9em' }}>
                                                                             🚚 ₹{feeResult.originalDeliveryFee}
                                                                         </span>
-                                                                        <span style={{ color: '#28a745', fontWeight: 'bold', fontSize: '1em' }}>
+                                                                        <span style={{ color: '#10b981', fontWeight: 'bold', fontSize: '1em' }}>
                                                                             ₹{feeResult.deliveryFee}
                                                                         </span>
-                                                                        <span style={{ fontSize: '0.85em', color: '#28a745', fontWeight: '600' }}>
+                                                                        <span style={{ fontSize: '0.85em', color: '#10b981', fontWeight: '600' }}>
                                                                             💰 Save ₹{feeResult.originalDeliveryFee - feeResult.deliveryFee}
                                                                         </span>
                                                                     </div>

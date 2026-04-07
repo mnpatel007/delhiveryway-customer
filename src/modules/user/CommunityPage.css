@@ -1,16 +1,16 @@
 /* Core Glassmorphism theme setup */
 :root {
-    --glass-bg: rgba(255, 255, 255, 0.7);
-    --glass-border: rgba(255, 255, 255, 0.5);
-    --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
-    --primary-gradient: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+    --glass-bg: rgba(17, 24, 39, 0.7);
+    --glass-border: rgba(0, 212, 255, 0.15);
+    --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+    --primary-gradient: linear-gradient(135deg, #00d4ff 0%, #10b981 100%);
     --insta-gradient: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
     --fb-gradient: linear-gradient(135deg, #1877F2 0%, #155bb5 100%);
 }
 
 .community-page {
     min-height: 100vh;
-    background-color: #f8faff;
+    background-color: #0a0e17;
     position: relative;
     overflow: hidden;
     padding-bottom: 80px;
@@ -81,7 +81,7 @@
     font-size: 2.5rem;
     font-weight: 800;
     line-height: 1.1;
-    color: #1f2937;
+    color: #ffffff;
     margin-bottom: 15px;
     letter-spacing: -1px;
 }
@@ -98,7 +98,7 @@
     font-size: 2.8rem;
     letter-spacing: -1px;
     text-transform: uppercase;
-    background: linear-gradient(to right, #2563eb, #7c3aed);
+    background: linear-gradient(to right, #00d4ff, #10b981);
     background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -108,7 +108,7 @@
 
 .hero-subtitle {
     font-size: 1.1rem;
-    color: #6b7280;
+    color: #94a3b8;
     max-width: 600px;
     margin: 0 auto;
     line-height: 1.6;
@@ -131,7 +131,7 @@
     text-align: center;
     font-size: 1.75rem;
     font-weight: 700;
-    color: #1f2937;
+    color: #ffffff;
     margin-bottom: 30px;
     position: relative;
     display: inline-block;
@@ -168,12 +168,15 @@
     justify-content: center;
     transform: translateY(0);
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.05);
+    background: #111827;
+    border: 1px solid #1e293b;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
 }
 
 .social-card:hover {
     transform: translateY(-8px);
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+    border-color: rgba(0, 212, 255, 0.3);
 }
 
 .card-bg {
@@ -206,24 +209,25 @@
     flex-direction: column;
     align-items: center;
     text-align: center;
-    color: #4b5563;
+    color: #94a3b8;
     transition: color 0.3s;
 }
 
 .social-card:hover .card-content {
-    color: white;
+    color: #ffffff;
 }
 
 .social-icon {
     width: 65px;
     height: 65px;
     border-radius: 50%;
-    background: white;
+    background: #1a1f2e;
+    border: 1px solid #1e293b;
     display: flex;
     align-items: center;
     justify-content: center;
     margin-bottom: 15px;
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
     transition: transform 0.3s;
 }
 
@@ -291,12 +295,12 @@
 .contact-header h2 {
     font-size: 2rem;
     font-weight: 800;
-    color: #1f2937;
+    color: #ffffff;
     margin-bottom: 8px;
 }
 
 .contact-header p {
-    color: #6b7280;
+    color: #94a3b8;
     font-size: 1rem;
 }
 
@@ -322,10 +326,10 @@
     width: 100%;
     padding: 12px 0;
     font-size: 1rem;
-    color: #1f2937;
+    color: #ffffff;
     background: transparent;
     border: none;
-    border-bottom: 2px solid #e5e7eb;
+    border-bottom: 2px solid #1e293b;
     transition: all 0.3s;
     outline: none;
     font-family: inherit;
@@ -340,7 +344,7 @@
     position: absolute;
     top: 12px;
     left: 0;
-    color: #9ca3af;
+    color: #64748b;
     font-size: 1rem;
     pointer-events: none;
     transition: all 0.3s ease;
@@ -361,7 +365,7 @@
 .is-focused .modern-label,
 .has-value .modern-label {
     transform: translateY(-25px) scale(0.85);
-    color: #4f46e5;
+    color: #00d4ff;
     font-weight: 600;
 }
 
@@ -385,7 +389,7 @@
     margin: 15px auto 0;
     min-width: 200px;
     transition: all 0.3s;
-    box-shadow: 0 10px 20px rgba(79, 70, 229, 0.3);
+    box-shadow: 0 10px 20px rgba(0, 212, 255, 0.2);
     position: relative;
     overflow: hidden;
 }
@@ -403,7 +407,7 @@
 
 .modern-submit-btn:hover {
     transform: translateY(-3px);
-    box-shadow: 0 15px 25px rgba(79, 70, 229, 0.4);
+    box-shadow: 0 15px 25px rgba(0, 212, 255, 0.3);
 }
 
 .modern-submit-btn:hover::before {

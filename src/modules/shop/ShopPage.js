@@ -592,7 +592,7 @@ const ShopPage = () => {
                     style={{
                         position: 'fixed',
                         inset: 0,
-                        background: 'rgba(0,0,0,0.4)',
+                        background: 'rgba(0,0,0,0.8)',
                         zIndex: 9998,
                         display: 'flex',
                         justifyContent: 'center',
@@ -607,20 +607,21 @@ const ShopPage = () => {
                     <div
                         className="menu-panel"
                         style={{
-                            background: '#fff',
+                            background: '#111827',
+                            border: '1px solid #1e293b',
                             width: 'min(900px, 92vw)',
                             margin: '40px 16px',
                             borderRadius: '12px',
-                            boxShadow: '0 12px 32px rgba(0,0,0,0.2)'
+                            boxShadow: '0 25px 50px rgba(0,0,0,0.5)'
                         }}
                     >
                         <div style={{
                             position: 'sticky', top: 0, zIndex: 1,
-                            background: '#ffffffee', backdropFilter: 'saturate(180%) blur(6px)',
+                            background: 'rgba(17, 24, 39, 0.9)', backdropFilter: 'saturate(180%) blur(10px)',
                             display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                            padding: '14px 16px', borderBottom: '1px solid #eee', borderTopLeftRadius: '12px', borderTopRightRadius: '12px'
+                            padding: '14px 16px', borderBottom: '1px solid #1e293b', borderTopLeftRadius: '12px', borderTopRightRadius: '12px'
                         }}>
-                            <div style={{ fontWeight: 800, fontSize: '18px' }}>
+                            <div style={{ fontWeight: 800, fontSize: '18px', color: '#ffffff' }}>
                                 {shop?.name || 'Menu'} · {products.length} items
                             </div>
                             <div>
@@ -628,8 +629,8 @@ const ShopPage = () => {
                                     onClick={() => setShowMenu(false)}
                                     style={{
                                         background: 'transparent',
-                                        color: '#333',
-                                        border: '1px solid #ddd',
+                                        color: '#00d4ff',
+                                        border: '1px solid #1e293b',
                                         padding: '8px 12px',
                                         borderRadius: '8px',
                                         cursor: 'pointer',
@@ -644,7 +645,7 @@ const ShopPage = () => {
                         {/* Simple one-page menu list */}
                         <div style={{ padding: '8px 0 12px' }}>
                             {products.length === 0 ? (
-                                <div style={{ padding: '24px', textAlign: 'center', color: '#666' }}>No items available.</div>
+                                <div style={{ padding: '24px', textAlign: 'center', color: '#94a3b8' }}>No items available.</div>
                             ) : (
                                 <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
                                     {products.map((item) => (
@@ -653,10 +654,10 @@ const ShopPage = () => {
                                             gridTemplateColumns: '72px 1fr auto',
                                             gap: '12px',
                                             padding: '12px 16px',
-                                            borderBottom: '1px solid #f0f0f0',
+                                            borderBottom: '1px solid #1e293b',
                                             alignItems: 'center'
                                         }}>
-                                            <div style={{ width: 72, height: 72, borderRadius: 8, background: '#fafafa', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                                            <div style={{ width: 72, height: 72, borderRadius: 8, background: '#1a1f2e', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
                                                 {item.images && item.images[0] ? (
                                                     <img src={item.images[0]} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                                 ) : (
@@ -665,25 +666,25 @@ const ShopPage = () => {
                                             </div>
 
                                             <div>
-                                                <div style={{ fontWeight: 700 }}>{item.name}</div>
+                                                <div style={{ fontWeight: 700, color: '#ffffff' }}>{item.name}</div>
                                                 {item.description && (
-                                                    <div style={{ fontSize: 13, color: '#666', marginTop: 4 }}>
+                                                    <div style={{ fontSize: 13, color: '#94a3b8', marginTop: 4 }}>
                                                         {item.description}
                                                     </div>
                                                 )}
-                                                <div style={{ display: 'flex', gap: 10, marginTop: 6, fontSize: 12, color: '#555' }}>
+                                                <div style={{ display: 'flex', gap: 10, marginTop: 6, fontSize: 12, color: '#64748b' }}>
                                                     {item.category && <span>🏷️ {item.category}</span>}
                                                     {item.stockQuantity !== undefined && <span>📦 {item.stockQuantity} {item.unit || 'units'}</span>}
                                                 </div>
                                             </div>
 
                                             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 8 }}>
-                                                <div style={{ fontWeight: 800, color: '#111' }}>₹{(item.price || 0).toFixed(2)}</div>
+                                                <div style={{ fontWeight: 800, color: '#ffffff' }}>₹{(item.price || 0).toFixed(2)}</div>
                                                 <button
                                                     onClick={() => handleAddToCart(item)}
                                                     disabled={!item.inStock}
                                                     style={{
-                                                        background: item.inStock ? '#198754' : '#adb5bd',
+                                                        background: item.inStock ? '#10b981' : '#334155',
                                                         color: '#fff',
                                                         border: 'none',
                                                         padding: '8px 10px',
@@ -752,8 +753,8 @@ const ShopPage = () => {
                             onClick={() => setShowMenu(true)}
                             className="view-menu-btn"
                             style={{
-                                background: '#0d6efd',
-                                color: '#fff',
+                                background: 'rgba(0, 212, 255, 0.1)',
+                                color: '#00d4ff',
                                 border: 'none',
                                 padding: '10px 14px',
                                 borderRadius: '8px',

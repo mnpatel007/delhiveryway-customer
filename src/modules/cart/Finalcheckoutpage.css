@@ -6,14 +6,16 @@
 }
 
 .checkout-wrapper {
-    background: white;
+    background: #111827;
     border-radius: 16px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+    border: 1px solid #1e293b;
     overflow: hidden;
 }
 
 .checkout-header {
-    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+    background: #1a1f2e;
+    border-bottom: 1px solid #1e293b;
     color: white;
     padding: 2rem;
     text-align: center;
@@ -33,20 +35,20 @@
 .shipping-section,
 .payment-section,
 .order-summary-section {
-    background: white;
+    background: #111827;
     border-radius: 12px;
     padding: 1.5rem;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-    border: 1px solid #e5e7eb;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    border: 1px solid #1e293b;
 }
 
 .section-title {
     font-size: 1.25rem;
     font-weight: 600;
-    color: #1f2937;
+    color: #ffffff;
     margin: 0 0 1.5rem 0;
     padding-bottom: 0.75rem;
-    border-bottom: 1px solid #e5e7eb;
+    border-bottom: 1px solid #1e293b;
 }
 
 .form-group {
@@ -57,58 +59,58 @@
     display: block;
     margin-bottom: 0.5rem;
     font-weight: 500;
-    color: #374151;
+    color: #94a3b8;
 }
 
 .form-control {
     width: 100%;
     padding: 0.75rem 1rem;
-    border: 1px solid #d1d5db;
+    border: 1px solid #1e293b;
     border-radius: 8px;
     font-size: 1rem;
     transition: border-color 0.2s, box-shadow 0.2s;
-    color: #000000 !important;
-    background-color: #ffffff !important;
-    -webkit-text-fill-color: #000000 !important;
+    color: #ffffff !important;
+    background-color: #0f172a !important;
+    -webkit-text-fill-color: #ffffff !important;
 }
 
 .form-control:focus {
     outline: none;
-    border-color: #6366f1;
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    border-color: #00d4ff;
+    box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.1);
 }
 
 .form-control::placeholder {
-    color: #666666 !important;
+    color: #64748b !important;
     opacity: 1 !important;
-    -webkit-text-fill-color: #666666 !important;
+    -webkit-text-fill-color: #64748b !important;
 }
 
 .form-control::-webkit-input-placeholder {
-    color: #666666 !important;
-    -webkit-text-fill-color: #666666 !important;
+    color: #64748b !important;
+    -webkit-text-fill-color: #64748b !important;
 }
 
 .form-control::-moz-placeholder {
-    color: #666666 !important;
+    color: #64748b !important;
     opacity: 1 !important;
 }
 
 .form-control:-ms-input-placeholder {
-    color: #666666 !important;
+    color: #64748b !important;
 }
 
 /* Order Summary Styles */
 .shop-order-section {
     margin-bottom: 1.5rem;
     padding-bottom: 1.5rem;
-    border-bottom: 1px solid #e5e7eb;
+    border-bottom: 1px solid #1e293b;
 }
 
 .shop-name {
     font-size: 1.1rem;
     font-weight: 600;
-    color: #1f2937;
+    color: #ffffff;
     margin: 0 0 1rem 0;
 }
 
@@ -117,7 +119,7 @@
     justify-content: space-between;
     align-items: center;
     padding: 0.75rem 0;
-    border-bottom: 1px solid #f3f4f6;
+    border-bottom: 1px solid #1e293b;
 }
 
 .order-item:last-child {
@@ -131,18 +133,18 @@
 
 .product-name {
     font-weight: 500;
-    color: #1f2937;
+    color: #ffffff;
     margin-bottom: 0.25rem;
 }
 
 .product-quantity {
     font-size: 0.875rem;
-    color: #6b7280;
+    color: #94a3b8;
 }
 
 .product-price {
     font-weight: 600;
-    color: #1f2937;
+    color: #10b981;
 }
 
 /* Order Total Breakdown */
@@ -155,22 +157,22 @@
     justify-content: space-between;
     align-items: center;
     padding: 0.5rem 0;
-    color: #4b5563;
+    color: #cbd5e1;
     font-size: 0.95rem;
 }
 
 .total-row.total-grand {
     font-weight: 700;
-    color: #1f2937;
+    color: #ffffff;
     font-size: 1.2rem;
     padding: 1.25rem 0 0;
     margin-top: 1rem;
-    border-top: 2px solid #f3f4f6;
+    border-top: 2px solid #1e293b;
 }
 
 .summary-divider {
     height: 1px;
-    background: #f3f4f6;
+    background: #1e293b;
     margin: 0.5rem 0;
 }
 
@@ -178,7 +180,7 @@
 .place-order-btn {
     width: 100%;
     padding: 1rem;
-    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+    background: var(--cta-green, #10b981);
     color: white;
     border: none;
     border-radius: 12px;
@@ -190,9 +192,9 @@
 }
 
 .place-order-btn:hover:not(:disabled) {
-    background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+    background: #059669;
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
 }
 
 .place-order-btn:disabled {
@@ -346,7 +348,7 @@ textarea:-ms-input-placeholder {
     display: block;
     margin-bottom: 8px;
     font-weight: 600;
-    color: #333 !important;
+    color: #94a3b8 !important;
 }
 
 .form-group label::after {

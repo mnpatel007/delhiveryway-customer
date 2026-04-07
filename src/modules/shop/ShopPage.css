@@ -1,33 +1,33 @@
 /* Modern ShopPage Styling - Enhanced Version */
 :root {
-    --primary-color: #6366f1;
-    --primary-dark: #4f46e5;
-    --primary-light: #a5b4fc;
+    --primary-color: #00d4ff;
+    --primary-dark: #0088cc;
+    --primary-light: rgba(0, 212, 255, 0.2);
     --secondary-color: #10b981;
     --secondary-dark: #059669;
-    --accent-color: #f59e0b;
-    --accent-dark: #d97706;
-    --success-color: #22c55e;
+    --accent-color: #00d4ff;
+    --accent-dark: #0088cc;
+    --success-color: #10b981;
     --danger-color: #ef4444;
     --warning-color: #f59e0b;
-    --info-color: #3b82f6;
+    --info-color: #00d4ff;
 
-    --background-primary: #ffffff;
-    --background-secondary: #f8fafc;
-    --background-tertiary: #f1f5f9;
+    --background-primary: #0a0e17;
+    --background-secondary: #111827;
+    --background-tertiary: #1a1f2e;
 
-    --text-primary: #1e293b;
-    --text-secondary: #475569;
+    --text-primary: #ffffff;
+    --text-secondary: #94a3b8;
     --text-muted: #64748b;
     --text-light: #94a3b8;
 
-    --border-color: #e2e8f0;
-    --border-light: #f1f5f9;
+    --border-color: #1e293b;
+    --border-light: rgba(255, 255, 255, 0.1);
 
-    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.4);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.6), 0 10px 10px -5px rgba(0, 0, 0, 0.5);
 
     --border-radius: 16px;
     --border-radius-sm: 8px;
@@ -37,25 +37,12 @@
     --transition-fast: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-    :root {
-        --background-primary: #0f172a;
-        --background-secondary: #1e293b;
-        --background-tertiary: #334155;
-        --text-primary: #f8fafc;
-        --text-secondary: #e2e8f0;
-        --text-muted: #cbd5e1;
-        --text-light: #94a3b8;
-        --border-color: #334155;
-        --border-light: #475569;
-    }
-}
+/* Removed dark mode media query as we enforce global dark mode */
 
 /* Base Styles */
 .modern-shop-container {
     min-height: 100vh;
-    background: linear-gradient(135deg, var(--background-primary) 0%, var(--background-secondary) 100%);
+    background: #0a0e17;
 }
 
 /* Error Banner */
@@ -211,7 +198,8 @@
 
 /* Shop Hero Section */
 .shop-hero {
-    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    background: #111827;
+    border-bottom: 1px solid #1e293b;
     color: white;
     padding: 3rem 2rem;
     position: relative;
@@ -225,8 +213,8 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="75" cy="75" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="50" cy="10" r="0.5" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
-    opacity: 0.3;
+    background: radial-gradient(circle at 50% 50%, rgba(0, 212, 255, 0.1) 0%, transparent 70%);
+    opacity: 0.5;
 }
 
 .shop-hero-content {
@@ -298,12 +286,11 @@
 
 .shop-description {
     font-size: 1.25rem;
-    color: #000000 !important;
+    color: var(--text-secondary);
     margin: 0 0 2rem 0;
     line-height: 1.6;
     max-width: 600px;
-    font-weight: 700;
-    text-shadow: none;
+    font-weight: 500;
 }
 
 .shop-meta {

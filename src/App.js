@@ -61,12 +61,12 @@ const GlobalCustomerAlert = () => {
 
   return (
     <div style={{
-      backgroundColor: '#ffe6e6',
-      color: '#990000',
+      backgroundColor: 'rgba(239, 68, 68, 0.1)',
+      color: '#f87171',
       padding: '15px',
       textAlign: 'center',
       fontWeight: 'bold',
-      borderBottom: '1px solid #cc0000'
+      borderBottom: '1px solid rgba(239, 68, 68, 0.3)'
     }}>
       ❌ Your order was cancelled.<br />
       💬 Reason: {cancelAlert.reason || 'No reason provided'}<br />
@@ -75,7 +75,7 @@ const GlobalCustomerAlert = () => {
         marginLeft: '20px',
         background: 'none',
         border: 'none',
-        color: '#990000',
+        color: '#fca5a5',
         fontWeight: 'bold',
         fontSize: '16px',
         cursor: 'pointer'
