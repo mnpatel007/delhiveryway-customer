@@ -5,8 +5,16 @@
  */
 
 /* ── Magnetic Buttons ─────────────────────────────────────── */
-export function initMagneticButtons(container = document) {
-  const els = container.querySelectorAll('[data-magnetic]');
+export function initMagneticButtons(container = document, selector = '[data-magnetic]') {
+  let targetContainer = container;
+  let targetSelector = selector;
+
+  if (typeof container === 'string') {
+    targetContainer = document;
+    targetSelector = container;
+  }
+
+  const els = targetContainer.querySelectorAll(targetSelector);
   const MAX = 14;
 
   const handlers = [];
@@ -56,8 +64,16 @@ export function initMagneticButtons(container = document) {
 }
 
 /* ── Ripple Effect ────────────────────────────────────────── */
-export function initRipple(container = document) {
-  const els = container.querySelectorAll('[data-ripple]');
+export function initRipple(container = document, selector = '[data-ripple]') {
+  let targetContainer = container;
+  let targetSelector = selector;
+
+  if (typeof container === 'string') {
+    targetContainer = document;
+    targetSelector = container;
+  }
+
+  const els = targetContainer.querySelectorAll(targetSelector);
 
   const handlers = [];
 
@@ -118,11 +134,20 @@ export function initRipple(container = document) {
 
 /* ── 3D Tilt Effect ───────────────────────────────────────── */
 export function init3DTilt(container = document, selector = '[data-tilt]') {
+  let targetContainer = container;
+  let targetSelector = selector;
+
+  // Handle case where only a selector string is passed
+  if (typeof container === 'string') {
+    targetContainer = document;
+    targetSelector = container;
+  }
+
   let els;
-  if (typeof selector === 'string') {
-    els = (container === document ? document : container).querySelectorAll(selector);
+  if (typeof targetSelector === 'string') {
+    els = (targetContainer === document ? document : targetContainer).querySelectorAll(targetSelector);
   } else {
-    els = [container];
+    els = [targetContainer];
   }
 
   const MAX_TILT = 8;
