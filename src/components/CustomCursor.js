@@ -37,36 +37,43 @@ export default function CustomCursor() {
     const lerp = (a, b, t) => a + (b - a) * t;
 
     const tick = () => {
-      if (!dot || !ring || !dot.parentNode || !ring.parentNode) {
-        cancelAnimationFrame(rafId);
-        return;
+      try {
+        if (!dot || !ring || !dot.parentNode || !ring.parentNode) {
+          cancelAnimationFrame(rafId);
+          return;
+        }
+
+        const dx = mouseX - ringX;
+        const dy = mouseY - ringY;
+        
+        // Calculate velocity for stretching effect
+        const deltaX = mouseX - lastX;
+        const deltaY = mouseY - lastY;
+        const vel = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+        velocity = lerp(velocity, vel, 0.1);
+        
+        // Update ring position with inertia
+        ringX = lerp(ringX, mouseX, 0.16);
+        ringY = lerp(ringY, mouseY, 0.16);
+        
+        // Calculate rotation for direction
+        const angle = Math.atan2(deltaY, deltaX) * (180 / Math.PI);
+        
+        // Dynamic scaling and rotation based on speed
+        const v = isFinite(velocity) ? velocity : 0;
+        const scaleX = 1 + v * 0.008;
+        const scaleY = 1 - v * 0.004;
+        const rot = isFinite(angle) ? angle : 0;
+
+        ring.style.transform = `translate3d(${ringX - 15}px, ${ringY - 15}px, 0) rotate(${rot}deg) scale(${scaleX}, ${scaleY})`;
+        
+        lastX = mouseX;
+        lastY = mouseY;
+        rafId = requestAnimationFrame(tick);
+      } catch (err) {
+        // Silent recovery - avoid crashing the whole app for cursor issues
+        rafId = requestAnimationFrame(tick);
       }
-
-      const dx = mouseX - ringX;
-      const dy = mouseY - ringY;
-      
-      // Calculate velocity for stretching effect
-      const deltaX = mouseX - lastX;
-      const deltaY = mouseY - lastY;
-      const vel = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-      velocity = lerp(velocity, vel, 0.1);
-      
-      // Update ring position with inertia
-      ringX = lerp(ringX, mouseX, 0.16);
-      ringY = lerp(ringY, mouseY, 0.16);
-      
-      // Calculate rotation for direction
-      const angle = Math.atan2(deltaY, deltaX) * (180 / Math.PI);
-      
-      // Dynamic scaling and rotation based on speed
-      const scaleX = 1 + velocity * 0.008;
-      const scaleY = 1 - velocity * 0.004;
-
-      ring.style.transform = `translate3d(${ringX - 15}px, ${ringY - 15}px, 0) rotate(${angle}deg) scale(${scaleX}, ${scaleY})`;
-      
-      lastX = mouseX;
-      lastY = mouseY;
-      rafId = requestAnimationFrame(tick);
     };
 
     rafId = requestAnimationFrame(tick);

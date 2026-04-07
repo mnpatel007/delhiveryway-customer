@@ -126,38 +126,52 @@ export default function ParticleBackground({ style = {} }) {
 
     // Render loop
     const render = (time) => {
-      if (!state.running) return;
+      try {
+        if (!state.running) return;
+        if (!ctx) return;
 
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      const { particles, mouseX, mouseY } = state;
+        const { particles, mouseX, mouseY } = state;
 
-      // Update particles
-      particles.forEach((p) => p.update(canvas.width, canvas.height, mouseX, mouseY, time));
+        // Update particles
+        particles.forEach((p) => {
+          if (p && p.update) p.update(canvas.width, canvas.height, mouseX, mouseY, time);
+        });
 
-      // Draw connections
-      ctx.lineWidth = 0.5;
-      for (let i = 0; i < particles.length; i++) {
-        for (let j = i + 1; j < particles.length; j++) {
-          const dx = particles[i].x - particles[j].x;
-          const dy = particles[i].y - particles[j].y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
+        // Draw connections
+        ctx.lineWidth = 0.5;
+        for (let i = 0; i < particles.length; i++) {
+          for (let j = i + 1; j < particles.length; j++) {
+            const p1 = particles[i];
+            const p2 = particles[j];
+            if (!p1 || !p2) continue;
 
-          if (dist < CONNECTION_DISTANCE) {
-            const opacity = ((1 - dist / CONNECTION_DISTANCE) * 0.25).toFixed(3);
-            ctx.strokeStyle = `rgba(0, 212, 255, ${opacity})`;
-            ctx.beginPath();
-            ctx.moveTo(particles[i].x, particles[i].y);
-            ctx.lineTo(particles[j].x, particles[j].y);
-            ctx.stroke();
+            const dx = p1.x - p2.x;
+            const dy = p1.y - p2.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+
+            if (dist < CONNECTION_DISTANCE) {
+              const op = ((1 - dist / CONNECTION_DISTANCE) * 0.25).toFixed(3);
+              ctx.strokeStyle = `rgba(0, 212, 255, ${op})`;
+              ctx.beginPath();
+              ctx.moveTo(p1.x, p1.y);
+              ctx.lineTo(p2.x, p2.y);
+              ctx.stroke();
+            }
           }
         }
+
+        // Draw particles
+        particles.forEach((p) => {
+          if (p && p.draw) p.draw(ctx);
+        });
+
+        state.rafId = requestAnimationFrame(render);
+      } catch (err) {
+        // Silent recovery for animation glitch
+        state.rafId = requestAnimationFrame(render);
       }
-
-      // Draw particles
-      particles.forEach((p) => p.draw(ctx));
-
-      state.rafId = requestAnimationFrame(render);
     };
 
     state.rafId = requestAnimationFrame(render);

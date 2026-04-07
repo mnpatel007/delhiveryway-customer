@@ -131,19 +131,22 @@ export function init3DTilt(container = document, selector = '[data-tilt]') {
 
   els.forEach((el) => {
     el.style.willChange = 'transform';
-    // Inject shine element
-    const shine = document.createElement('div');
-    shine.className = 'card-shine';
-    shine.style.cssText = `
-      position: absolute; inset: 0; border-radius: inherit;
-      background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.08) 0%, transparent 70%);
-      opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
-      z-index: 1;
-    `;
-
     const pos = getComputedStyle(el).position;
     if (pos === 'static') el.style.position = 'relative';
-    el.appendChild(shine);
+
+    // Prevent duplicate shines
+    let shine = el.querySelector('.card-shine');
+    if (!shine) {
+      shine = document.createElement('div');
+      shine.className = 'card-shine';
+      shine.style.cssText = `
+        position: absolute; inset: 0; border-radius: inherit;
+        background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.08) 0%, transparent 70%);
+        opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+        z-index: 1;
+      `;
+      el.appendChild(shine);
+    }
 
     const onMove = (e) => {
       const rect = el.getBoundingClientRect();
@@ -171,8 +174,12 @@ export function init3DTilt(container = document, selector = '[data-tilt]') {
 
   return () => {
     handlers.forEach(({ el, onMove, onLeave }) => {
-      el.removeEventListener('mousemove', onMove);
-      el.removeEventListener('mouseleave', onLeave);
+      if (el) {
+        el.removeEventListener('mousemove', onMove);
+        el.removeEventListener('mouseleave', onLeave);
+        // Optional: remove shine on cleanup if needed, but keeping it for performance
+        // if re-mounting happens frequently with same elements.
+      }
     });
   };
 }
