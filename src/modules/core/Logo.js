@@ -43,7 +43,10 @@ const Logo = ({
     );
 
     const LogoText = () => (
-        <span className="logo-text">Delhivery<span className="logo-text-accent">Way</span></span>
+        <span className="logo-text">
+            <span style={{color: 'var(--text-heading)'}}>Delhivery</span>
+            <span className="logo-text-accent">Way</span>
+        </span>
     );
 
     const LogoContent = () => (

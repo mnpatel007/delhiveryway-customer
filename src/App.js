@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import CustomCursor from './components/CustomCursor';
 import { clearProblematicStorage } from './utils/clearStorage';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
@@ -61,12 +62,12 @@ const GlobalCustomerAlert = () => {
 
   return (
     <div style={{
-      backgroundColor: 'rgba(239, 68, 68, 0.1)',
+      backgroundColor: 'rgba(239,68,68,0.08)',
       color: '#f87171',
       padding: '15px',
       textAlign: 'center',
       fontWeight: 'bold',
-      borderBottom: '1px solid rgba(239, 68, 68, 0.3)'
+      borderBottom: '1px solid rgba(239,68,68,0.2)'
     }}>
       ❌ Your order was cancelled.<br />
       💬 Reason: {cancelAlert.reason || 'No reason provided'}<br />
@@ -146,6 +147,7 @@ function App() {
 
   return (
     <ErrorBoundary>
+      <CustomCursor />
       <AuthProvider>
         <CartProvider>
           <SocketProvider>

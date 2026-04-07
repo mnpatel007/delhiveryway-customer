@@ -2,6 +2,9 @@ import React, { useEffect, useState, useContext, useRef } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { shopsAPI, productsAPI, apiCall } from '../../services/api';
 import { useCart } from '../../context/CartContext';
+import ParticleBackground from '../../components/ParticleBackground';
+import { init3DTilt, initRipple } from '../../utils/animations';
+import useScrollReveal from '../../utils/useScrollReveal';
 import './ShopPage.css';
 
 const ShopPage = () => {
@@ -21,6 +24,19 @@ const ShopPage = () => {
     const [showMenu, setShowMenu] = useState(false);
     const { addToCart, selectedShop, setSelectedShop } = useCart();
     const productRefsMap = useRef({});
+
+    const revealRef = useScrollReveal();
+
+    useEffect(() => {
+        if (!loading && filteredProducts.length > 0) {
+            const cleanupTilt = init3DTilt('.product-card');
+            const cleanupRipple = initRipple('.product-card');
+            return () => {
+                if (cleanupTilt) cleanupTilt();
+                if (cleanupRipple) cleanupRipple();
+            };
+        }
+    }, [loading, filteredProducts, viewMode]);
 
     useEffect(() => {
         const fetchShopAndProducts = async () => {
@@ -518,6 +534,7 @@ const ShopPage = () => {
 
             {/* Shop Hero Section */}
             <div className="shop-hero">
+                <ParticleBackground />
                 <div className="shop-hero-content">
                     <button onClick={handleBackToShops} className="back-button">
                         <span>←</span> Back to Shops
@@ -823,11 +840,12 @@ const ShopPage = () => {
                         )}
                     </div>
                 ) : (
-                    <div className={`products-container ${viewMode === 'grid' ? 'grid-view' : 'list-view'}`}>
-                        {filteredProducts.map(product => (
+                    <div className={`products-container ${viewMode === 'grid' ? 'grid-view' : 'list-view'}`} ref={revealRef}>
+                        {filteredProducts.map((product, index) => (
                             <div
                                 key={product._id}
                                 className="product-card"
+                                style={{ '--card-index': index }}
                                 ref={(el) => {
                                     if (el) productRefsMap.current[product._id] = el;
                                 }}

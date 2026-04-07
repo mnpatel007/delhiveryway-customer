@@ -6,6 +6,9 @@ import { useSearch } from '../../context/SearchContext';
 import PermanentNotices from './PermanentNotices';
 import ActiveOrdersWidget from './ActiveOrdersWidget';
 import Logo from '../core/Logo';
+import ParticleBackground from '../../components/ParticleBackground';
+import { init3DTilt, initRipple, initCounters } from '../../utils/animations';
+import useScrollReveal from '../../utils/useScrollReveal';
 import { calculateDeliveryFeesBulk, getDeliveryFeeDisplay, getCustomerLocation, getCurrentLocation } from '../../utils/deliveryCalculator';
 import axios from 'axios';
 import './HomePage.css';
@@ -33,6 +36,20 @@ const HomePage = () => {
     const { indexLoaded, searchLocal } = useSearch();
     const [suggestions, setSuggestions] = useState([]);
     const [showSuggestions, setShowSuggestions] = useState(false);
+    
+    const revealRef = useScrollReveal();
+    useEffect(() => {
+        if (!loading && shops.length > 0) {
+            const cleanupTilt = init3DTilt('.shop-card');
+            const cleanupRipple = initRipple('.shop-card');
+            const cleanupCounters = initCounters(document.querySelector('.home-stats-strip'));
+            return () => {
+                if (cleanupTilt) cleanupTilt();
+                if (cleanupRipple) cleanupRipple();
+                if (cleanupCounters) cleanupCounters();
+            };
+        }
+    }, [loading, shops]);
 
     // Sample shops as fallback
     const sampleShops = [
@@ -481,12 +498,19 @@ const HomePage = () => {
             <PermanentNotices />
             {/* Header Section */}
             <div className="home-header">
+                <ParticleBackground />
                 <div className="header-content">
                     <div className="header-logo">
                         <Logo size="large" showText={true} variant="white" />
                     </div>
                     <h1>Welcome to DelhiveryWay</h1>
-                    {user && <p>Hello, {user.name}! Find shops near you.</p>}
+                    {user ? (
+                        <p className="hero-subtitle">
+                            Hello, {user.name}! <span className="reveal-letter" style={{'--stagger-delay': '0.1s'}}>F</span><span className="reveal-letter" style={{'--stagger-delay': '0.15s'}}>i</span><span className="reveal-letter" style={{'--stagger-delay': '0.2s'}}>n</span><span className="reveal-letter" style={{'--stagger-delay': '0.25s'}}>d</span> shops near you.
+                        </p>
+                    ) : (
+                        <p className="hero-subtitle">Experience extraordinary delivery.</p>
+                    )}
                     {error && (
                         <div className="error-banner">
                             <p>ℹ️ {error}</p>
@@ -524,6 +548,34 @@ const HomePage = () => {
                             <p>📍 Location detected - showing accurate delivery fees</p>
                         </div>
                     )}
+                </div>
+            </div>
+
+            {/* Stats Strip */}
+            <div className="home-stats-strip">
+                <div className="stat-item">
+                    <div className="stat-number" data-counter="1500" data-duration="2000">0</div>
+                    <div className="stat-label">HAPPY CUSTOMERS</div>
+                </div>
+                <div className="stat-divider"></div>
+                <div className="stat-item">
+                    <div className="stat-number" data-counter="45" data-duration="2000">0</div>
+                    <div className="stat-label">PARTNER SHOPS</div>
+                </div>
+                <div className="stat-divider"></div>
+                <div className="stat-item">
+                    <div className="stat-number" data-counter="12000" data-duration="2500">0</div>
+                    <div className="stat-label">DELIVERIES</div>
+                </div>
+                <div className="stat-divider"></div>
+                <div className="stat-item">
+                    <div className="stat-number" data-counter="4.9" data-duration="1500">0</div>
+                    <div className="stat-label">AVG RATING</div>
+                </div>
+                <div className="stat-divider"></div>
+                <div className="stat-item">
+                    <div className="stat-number" data-counter="15" data-duration="1800">0</div>
+                    <div className="stat-label">MIN DELIVERY</div>
                 </div>
             </div>
 
@@ -616,11 +668,12 @@ const HomePage = () => {
                             </div>
                         </div>
                     ) : (
-                        <div className="shops-grid">
-                            {filteredShops.map(shop => (
+                        <div className="shops-grid" ref={revealRef}>
+                            {filteredShops.map((shop, index) => (
                                 <div
                                     key={shop._id}
                                     className="shop-card"
+                                    style={{ '--card-index': index }}
                                     onClick={() => handleShopClick(shop._id)}
                                     tabIndex={0}
                                     onKeyDown={e => {
