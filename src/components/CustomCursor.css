@@ -1,4 +1,4 @@
-/* ── Custom Glowing Cursor ────────────────────────────────── */
+/* ── Custom Glowing Cursor — Cinematic Gold Luxe ────────────────────────────────── */
 body.cursor-active,
 body.cursor-active * {
   cursor: none !important;
@@ -10,15 +10,15 @@ body.cursor-active * {
   left: 0;
   width: 8px;
   height: 8px;
-  background: var(--accent-cyan, #00d4ff);
+  background: var(--gold-400, #facc15);
   border-radius: 50%;
   pointer-events: none;
   z-index: 999999;
   will-change: transform;
   box-shadow: 
-    0 0 10px rgba(0, 212, 255, 1), 
-    0 0 20px rgba(0, 212, 255, 0.6), 
-    0 0 30px rgba(0, 212, 255, 0.2);
+    0 0 10px rgba(234, 179, 8, 1), 
+    0 0 20px rgba(234, 179, 8, 0.6), 
+    0 0 30px rgba(234, 179, 8, 0.2);
   transition: width 0.15s ease, height 0.15s ease, background 0.15s ease;
 }
 
@@ -28,14 +28,14 @@ body.cursor-active * {
   left: 0;
   width: 30px;
   height: 30px;
-  border: 1px solid rgba(0, 212, 255, 0.5);
+  border: 1px solid rgba(234, 179, 8, 0.4);
   border-radius: 50%;
   pointer-events: none;
   z-index: 999998;
   will-change: transform;
   box-shadow: 
-    0 0 12px rgba(0, 212, 255, 0.15),
-    inset 0 0 8px rgba(0, 212, 255, 0.05);
+    0 0 12px rgba(234, 179, 8, 0.15),
+    inset 0 0 8px rgba(234, 179, 8, 0.05);
   transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1),
               height 0.3s cubic-bezier(0.16, 1, 0.3, 1),
               border-color 0.2s ease,
@@ -46,8 +46,8 @@ body.cursor-active * {
 .cursor-ring--hover {
   width: 44px;
   height: 44px;
-  border-color: rgba(0, 212, 255, 0.9);
-  box-shadow: 0 0 20px rgba(0, 212, 255, 0.4), 0 0 40px rgba(0, 212, 255, 0.15);
+  border-color: rgba(234, 179, 8, 0.8);
+  box-shadow: 0 0 20px rgba(234, 179, 8, 0.35), 0 0 40px rgba(234, 179, 8, 0.15);
 }
 
 .cursor-dot--hover {
@@ -62,15 +62,15 @@ body.cursor-active * {
   width: 4px;
   height: 4px;
   transform: scale(0.7);
-  background: var(--cta-green, #10b981);
-  box-shadow: 0 0 10px rgba(16, 185, 129, 0.8);
+  background: var(--gold-500, #eab308);
+  box-shadow: 0 0 10px rgba(234, 179, 8, 0.8);
 }
 
 .cursor-ring--click {
   width: 20px;
   height: 20px;
-  border-color: rgba(16, 185, 129, 0.8);
-  box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
+  border-color: rgba(234, 179, 8, 0.8);
+  box-shadow: 0 0 15px rgba(234, 179, 8, 0.4);
 }
 
 /* Hide on touch/mobile */
