@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════
-   NOTIFICATION CENTER — Dark Glass
+   NOTIFICATION CENTER — Light Theme
    ═══════════════════════════════════════ */
 
 .notification-center {
@@ -12,13 +12,12 @@
 }
 
 .notification-panel {
-  background: var(--bg-elevated);
-  border-radius: var(--radius-xl);
-  border: 1px solid var(--glass-border);
-  box-shadow: var(--shadow-xl);
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #e6e6e6;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.10);
   overflow: hidden;
-  backdrop-filter: blur(24px);
-  animation: fadeInDown 0.3s var(--ease-out);
+  animation: fadeInDown 0.3s ease;
 }
 
 .notification-header {
@@ -26,31 +25,42 @@
   justify-content: space-between;
   align-items: center;
   padding: 1rem 1.25rem;
-  border-bottom: 1px solid rgba(255,255,255,0.04);
+  border-bottom: 1px solid #e6e6e6;
 }
 
 .notification-header h3 {
   margin: 0;
-  color: var(--text-primary);
+  color: #000000;
   font-size: 0.95rem;
-  font-family: var(--font-display);
+  font-family: 'Inter', system-ui, sans-serif;
 }
 
-.notification-actions { display: flex; gap: 0.5rem; }
+.notification-actions {
+  display: flex;
+  gap: 0.5rem;
+}
 
-.clear-btn, .close-btn {
+.clear-btn,
+.close-btn {
   background: none;
   border: none;
   cursor: pointer;
   padding: 0.25rem 0.5rem;
-  border-radius: var(--radius-sm);
+  border-radius: 6px;
   font-size: 0.75rem;
-  color: var(--text-muted);
+  color: #757575;
   transition: all 0.2s ease;
 }
 
-.clear-btn:hover { background: var(--error-soft); color: #fca5a5; }
-.close-btn:hover { background: rgba(255,255,255,0.05); }
+.clear-btn:hover {
+  background: #fff0f0;
+  color: #e53935;
+}
+
+.close-btn:hover {
+  background: #f6f6f6;
+  color: #000;
+}
 
 .notification-list {
   max-height: 400px;
@@ -60,38 +70,45 @@
 .no-notifications {
   padding: 2.5rem 1.5rem;
   text-align: center;
-  color: var(--text-muted);
+  color: #757575;
 }
 
 .notification-item {
   display: flex;
   padding: 0.875rem 1.25rem;
-  border-bottom: 1px solid rgba(255,255,255,0.03);
+  border-bottom: 1px solid #f0f0f0;
   transition: background 0.2s ease;
   position: relative;
 }
 
-.notification-item:hover { background: rgba(255,255,255,0.02); }
-.notification-item:last-child { border-bottom: none; }
+.notification-item:hover {
+  background: #f6f6f6;
+}
 
-.notification-content { flex: 1; }
+.notification-item:last-child {
+  border-bottom: none;
+}
+
+.notification-content {
+  flex: 1;
+}
 
 .notification-title {
   font-weight: 600;
-  color: var(--text-primary);
+  color: #000000;
   margin-bottom: 0.25rem;
   font-size: 0.85rem;
 }
 
 .notification-message {
-  color: var(--text-muted);
+  color: #757575;
   font-size: 0.8rem;
   line-height: 1.4;
   margin-bottom: 0.25rem;
 }
 
 .notification-time {
-  color: var(--text-muted);
+  color: #757575;
   font-size: 0.7rem;
   opacity: 0.7;
 }
@@ -100,32 +117,58 @@
   background: none;
   border: none;
   cursor: pointer;
-  color: var(--text-muted);
+  color: #757575;
   font-size: 0.75rem;
   padding: 0.25rem;
   transition: color 0.2s;
   opacity: 0.5;
 }
 
-.remove-notification:hover { color: var(--error); opacity: 1; }
+.remove-notification:hover {
+  color: #e53935;
+  opacity: 1;
+}
 
 /* Type indicators */
-.notification-item.status_update { border-left: 3px solid var(--info); }
-.notification-item.shopper_response { border-left: 3px solid var(--success); }
-.notification-item.shopping_completed { border-left: 3px solid var(--success); }
-.notification-item.order_revised { border-left: 3px solid var(--warning); }
-.notification-item.order_cancelled { border-left: 3px solid var(--error); }
+.notification-item.status_update {
+  border-left: 3px solid #2196f3;
+}
 
-.notification-item.clickable { cursor: pointer; }
-.notification-item.clickable:hover { background: rgba(255,255,255,0.04); }
+.notification-item.shopper_response {
+  border-left: 3px solid #00b14f;
+}
+
+.notification-item.shopping_completed {
+  border-left: 3px solid #00b14f;
+}
+
+.notification-item.order_revised {
+  border-left: 3px solid #f59e0b;
+}
+
+.notification-item.order_cancelled {
+  border-left: 3px solid #e53935;
+}
+
+.notification-item.clickable {
+  cursor: pointer;
+}
+
+.notification-item.clickable:hover {
+  background: #f6f6f6;
+}
 
 .notification-action {
-  color: var(--gold-400);
+  color: #00b14f;
   font-size: 0.75rem;
   font-weight: 600;
   margin-top: 0.25rem;
 }
 
 @media (max-width: 480px) {
-  .notification-center { right: 0.5rem; top: 4rem; max-width: calc(100vw - 1rem); }
+  .notification-center {
+    right: 0.5rem;
+    top: 4rem;
+    max-width: calc(100vw - 1rem);
+  }
 }

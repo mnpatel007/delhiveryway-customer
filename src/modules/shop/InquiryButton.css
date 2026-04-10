@@ -1,41 +1,97 @@
-/* Inquiry Button - Dark Luxe */
+/* Inquiry Button - Light Theme */
 .inquiry-button {
-  display: inline-flex; align-items: center; gap: 0.5rem;
-  padding: 0.5rem 0.875rem; background: rgba(234,179,8,0.1);
-  color: var(--gold-400); border: 1px solid rgba(234,179,8,0.15);
-  border-radius: var(--radius-sm); font-size: 0.8rem; font-weight: 600;
-  cursor: pointer; transition: all 0.3s ease; position: relative; overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.875rem;
+  background: rgba(0, 177, 79, 0.08);
+  color: #00b14f;
+  border: 1px solid rgba(0, 177, 79, 0.2);
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
 }
-.inquiry-button:hover { background: rgba(234,179,8,0.2); transform: translateY(-1px); }
 
-.inquiry-icon { font-size: 0.9rem; }
-.inquiry-text { font-size: 0.8rem; }
+.inquiry-button:hover {
+  background: rgba(0, 177, 79, 0.15);
+  transform: translateY(-1px);
+}
+
+.inquiry-icon {
+  font-size: 0.9rem;
+}
+
+.inquiry-text {
+  font-size: 0.8rem;
+}
 
 .inquiry-pulse {
-  position: absolute; top: 50%; left: 50%; width: 100%; height: 100%;
-  border-radius: var(--radius-sm); background: rgba(234,179,8,0.15);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  border-radius: 6px;
+  background: rgba(0, 177, 79, 0.12);
   transform: translate(-50%, -50%) scale(0);
   animation: inquiryPulse 2s ease-out infinite;
 }
+
 @keyframes inquiryPulse {
-  0% { transform: translate(-50%, -50%) scale(0); opacity: 1; }
-  100% { transform: translate(-50%, -50%) scale(1.5); opacity: 0; }
+  0% {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translate(-50%, -50%) scale(1.5);
+    opacity: 0;
+  }
 }
 
 .inquiry-timer-widget {
-  display: inline-flex; flex-direction: column;
-  padding: 0.375rem 0.625rem; background: rgba(245,158,11,0.1);
-  color: var(--gold-400); border-radius: var(--radius-sm);
-  font-size: 0.7rem; font-weight: 600;
-  border: 1px solid rgba(245,158,11,0.15);
+  display: inline-flex;
+  flex-direction: column;
+  padding: 0.375rem 0.625rem;
+  background: rgba(0, 177, 79, 0.08);
+  color: #00b14f;
+  border-radius: 6px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  border: 1px solid rgba(0, 177, 79, 0.15);
 }
 
-.timer-content { display: flex; align-items: center; gap: 0.375rem; }
-.timer-icon { font-size: 0.8rem; }
-.timer-text { font-size: 0.7rem; white-space: nowrap; }
+.timer-content {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.timer-icon {
+  font-size: 0.8rem;
+}
+
+.timer-text {
+  font-size: 0.7rem;
+  white-space: nowrap;
+}
 
 .timer-progress-bar {
-  width: 100%; height: 2px; background: rgba(255,255,255,0.06);
-  border-radius: 1px; margin-top: 0.375rem; overflow: hidden;
+  width: 100%;
+  height: 2px;
+  background: #e6e6e6;
+  border-radius: 1px;
+  margin-top: 0.375rem;
+  overflow: hidden;
 }
-.timer-progress-fill { height: 100%; background: var(--gold-400); border-radius: 1px; transition: width 0.3s; }
+
+.timer-progress-fill {
+  height: 100%;
+  background: #00b14f;
+  border-radius: 1px;
+  transition: width 0.3s;
+}
