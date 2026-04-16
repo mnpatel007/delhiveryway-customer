@@ -251,6 +251,13 @@ const CartPage = () => {
                                     </div>
                                 )}
 
+                                {orderSummary.packagingCharges > 0 && (
+                                    <div className="summary-row">
+                                        <span>Packaging Charges</span>
+                                        <span>{formatPrice(orderSummary.packagingCharges)}</span>
+                                    </div>
+                                )}
+
                                 <div className="summary-divider"></div>
 
                                 <div className="summary-row total-row">
