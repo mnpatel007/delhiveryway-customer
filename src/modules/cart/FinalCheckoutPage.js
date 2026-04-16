@@ -240,6 +240,21 @@ const FinalCheckoutPage = () => {
                 'India'
             ].filter(Boolean).join(', ');
 
+            // EXTREME CART INTEGRITY CHECK (Frontend Shield)
+            // Ensure every single item in the cart belongs to the exact same shop before proceeding
+            const referenceItemShopId = cartItems[0].shopId;
+            const absoluteShopRef = typeof referenceItemShopId === 'object' ? (referenceItemShopId._id || referenceItemShopId.toString()) : referenceItemShopId;
+
+            for (const item of cartItems) {
+                const currentItemShopId = item.shopId;
+                const absoluteItemShopId = typeof currentItemShopId === 'object' ? (currentItemShopId._id || currentItemShopId.toString()) : currentItemShopId;
+                
+                if (String(absoluteItemShopId) !== String(absoluteShopRef)) {
+                    clearCart();
+                    throw new Error('CRITICAL DATA INTEGRITY ERROR: Cart contains items from mixed shops. Your cart has been automatically cleared for security.');
+                }
+            }
+
             // Format items for order placement
             const formattedItems = cartItems.map(item => ({
                 productId: item._id,
