@@ -249,28 +249,28 @@ const FinalCheckoutPage = () => {
                 notes: item.notes || ''
             }));
 
-            // Place order without payment
-            console.log('🛒 Selected shop:', selectedShop);
-
-            // Extract the actual shop ID from the shop object
+            // Extract the actual shop ID STRICTLY from the items themselves to prevent cross-shop corruption
             let shopId;
 
-            // Handle different shop data structures
-            if (selectedShop.data && selectedShop.data.shop && selectedShop.data.shop._id) {
-                // Structure: {success: true, data: {shop: {_id: "...", ...}}}
-                shopId = selectedShop.data.shop._id;
-            } else if (typeof selectedShop._id === 'string') {
-                // Structure: {_id: "...", ...}
-                shopId = selectedShop._id;
-            } else if (selectedShop._id && selectedShop._id._id) {
-                // Structure: {_id: {_id: "...", ...}}
-                shopId = selectedShop._id._id;
-            } else {
-                console.error('🛒 Invalid shop structure:', selectedShop);
-                throw new Error('Invalid shop ID format');
+            if (!cartItems || cartItems.length === 0) {
+                throw new Error('Cart is empty. Cannot determine shop.');
             }
 
-            console.log('🛒 Extracted shop ID:', shopId);
+            const itemShopId = cartItems[0].shopId;
+            if (typeof itemShopId === 'string') {
+                shopId = itemShopId;
+            } else if (itemShopId && typeof itemShopId === 'object' && itemShopId._id) {
+                shopId = itemShopId._id;
+            } else if (itemShopId && typeof itemShopId === 'object' && typeof itemShopId.toString === 'function') {
+                shopId = itemShopId.toString();
+            } else if (cartItems[0].shopData && cartItems[0].shopData._id) {
+                shopId = cartItems[0].shopData._id;
+            } else {
+                console.error('🛒 Invalid cart item structure, missing shopId:', cartItems[0]);
+                throw new Error('Could not identify the shop for these items');
+            }
+
+            console.log('🛒 Extracted absolute true shop ID from cart items:', shopId);
 
             const response = await api.post('/orders', {
                 shopId: shopId,

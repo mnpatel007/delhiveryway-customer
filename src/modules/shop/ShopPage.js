@@ -104,10 +104,6 @@ const ShopPage = () => {
                     });
 
                     setShop(shopData);
-
-                    // Immediately update cart context with proper shop data
-                    console.log('🔄 Immediately updating cart context with shop:', shopData.name);
-                    setSelectedShop(shopData);
                 } else {
                     console.error('Failed to fetch shop:', shopResult.message);
                     setShop(null);
@@ -213,8 +209,6 @@ const ShopPage = () => {
                             name: firstProduct.shopId.name
                         };
                         setShop(updatedShop);
-                        // Also update the cart context
-                        setSelectedShop(updatedShop);
                     }
                 }
 
@@ -301,13 +295,8 @@ const ShopPage = () => {
         setFilteredProducts(filtered);
     }, [products, searchTerm, selectedCategory, sortBy]);
 
-    // Update selected shop in cart context when shop data loads
-    useEffect(() => {
-        if (shop && shop._id && shop.name && shop.name !== 'Loading...') {
-            console.log('🔄 Shop data loaded, updating cart context:', shop.name);
-            setSelectedShop(shop);
-        }
-    }, [shop, setSelectedShop]);
+    // Unnecessary useEffect to update selected shop in cart context on load 
+    // has been removed to prevent state mismatch when users browse other shops.
 
     // Helper function to check if shop is currently open
     const isShopOpen = (shop) => {
