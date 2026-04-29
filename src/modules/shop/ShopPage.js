@@ -21,6 +21,7 @@ const ShopPage = () => {
     const [showMenu, setShowMenu] = useState(false);
     const { addToCart, selectedShop, setSelectedShop } = useCart();
     const productRefsMap = useRef({});
+    const [globalClosure, setGlobalClosure] = useState({ isClosed: false });
 
     useEffect(() => {
         const fetchShopAndProducts = async () => {
@@ -104,6 +105,9 @@ const ShopPage = () => {
                     });
 
                     setShop(shopData);
+
+                    const closureInfo = shopResult.data?.globalClosure || shopResult.data?.data?.globalClosure || { isClosed: false };
+                    setGlobalClosure(closureInfo);
                 } else {
                     console.error('Failed to fetch shop:', shopResult.message);
                     setShop(null);
@@ -319,6 +323,15 @@ const ShopPage = () => {
 
     // Helper function to get shop status message
     const getShopStatusMessage = (shop) => {
+        if (globalClosure?.isClosed) {
+            let message = 'Temporarily closed';
+            if (globalClosure.mode === 'until_time' && globalClosure.reopenAt) {
+                message = `Closed until ${new Date(globalClosure.reopenAt).toLocaleString()}`;
+            } else if (globalClosure.mode === 'next_day' && globalClosure.reopenAt) {
+                message = `Closed — reopens ${new Date(globalClosure.reopenAt).toLocaleDateString()}`;
+            }
+            return { isOpen: false, message };
+        }
         if (!shop?.operatingHours) return { isOpen: true, message: 'Open' };
 
         // Get current time in IST (Indian Standard Time)

@@ -33,6 +33,7 @@ const HomePage = () => {
     const { indexLoaded, searchLocal } = useSearch();
     const [suggestions, setSuggestions] = useState([]);
     const [showSuggestions, setShowSuggestions] = useState(false);
+    const [globalClosure, setGlobalClosure] = useState({ isClosed: false });
 
     // Sample shops as fallback
     const sampleShops = [
@@ -156,6 +157,9 @@ const HomePage = () => {
             } else if (response.data.shops) {
                 shopsData = response.data.shops;
             }
+
+            const closureInfo = response.data?.data?.globalClosure || response.data?.globalClosure || { isClosed: false };
+            setGlobalClosure(closureInfo);
 
             if (shopsData.length > 0) {
                 // Sort shops: highest orders first, then open shops, then number of items
@@ -479,6 +483,22 @@ const HomePage = () => {
     return (
         <div className="home-container">
             <PermanentNotices />
+            {globalClosure?.isClosed && (
+                <div className="global-closure-banner">
+                    <span className="global-closure-icon">🚫</span>
+                    <div>
+                        <strong>All shops are currently closed.</strong>{' '}
+                        {globalClosure.mode === 'manual' && 'Please check back later.'}
+                        {globalClosure.mode === 'until_time' && globalClosure.reopenAt && (
+                            <>Reopening at {new Date(globalClosure.reopenAt).toLocaleString()}.</>
+                        )}
+                        {globalClosure.mode === 'next_day' && globalClosure.reopenAt && (
+                            <>Reopening on {new Date(globalClosure.reopenAt).toLocaleDateString()}.</>
+                        )}
+                        {globalClosure.reason ? <div className="global-closure-reason">{globalClosure.reason}</div> : null}
+                    </div>
+                </div>
+            )}
             {/* Header Section */}
             <div className="home-header">
                 <div className="header-content">
