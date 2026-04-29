@@ -4,6 +4,34 @@
     background: #f8fafc;
 }
 
+.global-closure-banner {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    margin: 12px 16px;
+    padding: 14px 16px;
+    background: #fff5f5;
+    border: 1px solid #fecaca;
+    color: #991b1b;
+    border-radius: 10px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.global-closure-banner strong {
+    color: #991b1b;
+}
+
+.global-closure-icon {
+    font-size: 1.4rem;
+    line-height: 1.2;
+}
+
+.global-closure-reason {
+    margin-top: 4px;
+    font-size: 0.9rem;
+    color: #7f1d1d;
+}
+
 /* Loading State */
 .loading-state {
     display: flex;
