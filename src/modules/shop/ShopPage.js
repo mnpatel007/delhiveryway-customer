@@ -164,26 +164,6 @@ const ShopPage = () => {
                         }
                     }
 
-                    console.log('✅ Products loaded successfully:', productsData.length);
-                    // console.log('📦 Raw products data:', productsData);
-
-                    // Log individual product details for debugging (disabled in production)
-                    if (process.env.NODE_ENV === 'development') {
-                        productsData.forEach((product, index) => {
-                            console.log(`📦 Product ${index + 1}:`, {
-                                id: product._id,
-                                name: product.name,
-                                description: product.description,
-                                price: product.price,
-                                category: product.category,
-                                stockQuantity: product.stockQuantity,
-                                unit: product.unit,
-                                tags: product.tags,
-                                images: product.images,
-                                inStock: product.inStock
-                            });
-                        });
-                    }
                 } else {
                     console.warn('⚠️ API returned no products');
                     console.log('❌ Product result:', productResult);
@@ -538,11 +518,6 @@ const ShopPage = () => {
                         <div className="shop-details">
                             <h1 className="shop-name">
                                 {shop.name}
-                                {process.env.NODE_ENV === 'development' && (
-                                    <small style={{ display: 'block', fontSize: '12px', color: 'rgba(255,255,255,0.7)' }}>
-                                        Debug: "{shop.name}" (ID: {shop._id})
-                                    </small>
-                                )}
                             </h1>
                             <p className="shop-description">{shop.description || 'Welcome to our shop!'}</p>
 
@@ -793,19 +768,6 @@ const ShopPage = () => {
                         {filteredProducts.length} of {products.length} products
                     </span>
                 </div>
-
-                {/* Debug Section - Development Only */}
-                {process.env.NODE_ENV === 'development' && (
-                    <div className="debug-section" style={{ background: '#f5f5f5', padding: '1rem', margin: '1rem 0', borderRadius: '8px', fontSize: '12px' }}>
-                        <h4>🔍 Debug Info:</h4>
-                        <p><strong>Total Products:</strong> {products.length}</p>
-                        <p><strong>Filtered Products:</strong> {filteredProducts.length}</p>
-                        <p><strong>Raw Products Data:</strong></p>
-                        <pre style={{ background: 'white', padding: '0.5rem', borderRadius: '4px', overflow: 'auto', maxHeight: '200px' }}>
-                            {JSON.stringify(products, null, 2)}
-                        </pre>
-                    </div>
-                )}
 
                 {filteredProducts.length === 0 ? (
                     <div className="no-products">

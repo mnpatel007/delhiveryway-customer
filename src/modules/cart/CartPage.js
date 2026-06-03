@@ -130,11 +130,6 @@ const CartPage = () => {
                                     <div className="shop-details">
                                         <h3>
                                             {selectedShop.name}
-                                            {process.env.NODE_ENV === 'development' && (
-                                                <small style={{ display: 'block', fontSize: '10px', color: '#666' }}>
-                                                    Debug: "{selectedShop.name}" (ID: {selectedShop._id})
-                                                </small>
-                                            )}
                                         </h3>
                                         <p>{cartItems.length} item{cartItems.length > 1 ? 's' : ''}</p>
                                     </div>
