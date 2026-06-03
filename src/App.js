@@ -12,7 +12,6 @@ import NotificationCenter from './modules/core/NotificationCenter';
 import NoticeAlert from './modules/core/NoticeAlert';
 import TermsModal from './modules/core/TermsModal';
 
-import SocketDebugPanel from './modules/core/SocketDebugPanel';
 import HomePage from './modules/home/HomePage';
 import LoginPage from './modules/auth/LoginPage';
 import SignupPage from './modules/auth/SignupPage';
@@ -98,7 +97,6 @@ const Layout = ({ children }) => {
       {!shouldHideNavbar && <Navbar />}
       {!shouldHideNavbar && <NotificationCenter />}
       {!shouldHideNavbar && <NoticeAlert />}
-      <SocketDebugPanel />
       {children}
     </>
   );
