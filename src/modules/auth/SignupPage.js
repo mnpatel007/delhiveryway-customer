@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authAPI, apiCall } from '../../services/api';
 
+import './LoginPage.css';
 import './SignupPage.css';
 
 const SignupPage = () => {
@@ -92,9 +93,7 @@ const SignupPage = () => {
         // Use the backend's message so it stays accurate across environments
         // (in development accounts are auto-verified and no email is sent).
         const backendMessage = result.data?.message;
-        setSuccessMessage(
-          `✅ ${backendMessage || 'Account created successfully! You can now sign in.'}`
-        );
+        setSuccessMessage(backendMessage || 'Account created successfully! You can now sign in.');
         setErrors({});
         setFormData({ name: '', email: '', password: '', confirmPassword: '' });
 
@@ -164,15 +163,30 @@ const SignupPage = () => {
             <p className="brand-subtitle">Start your personal shopping journey today</p>
             <div className="brand-features">
               <div className="feature-item">
-                <div className="feature-icon">🎯</div>
+                <div className="feature-icon">
+                  <svg className="auth-svg" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="9" />
+                    <circle cx="12" cy="12" r="5" />
+                    <circle cx="12" cy="12" r="1" />
+                  </svg>
+                </div>
                 <span>Personalized Experience</span>
               </div>
               <div className="feature-item">
-                <div className="feature-icon">⚡</div>
+                <div className="feature-icon">
+                  <svg className="auth-svg" viewBox="0 0 24 24">
+                    <path d="M13 2L4.5 13H11l-1 9 8.5-11H12l1-9z" />
+                  </svg>
+                </div>
                 <span>Lightning Fast</span>
               </div>
               <div className="feature-item">
-                <div className="feature-icon">🛡️</div>
+                <div className="feature-icon">
+                  <svg className="auth-svg" viewBox="0 0 24 24">
+                    <path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6l8-3z" />
+                    <path d="M9 12l2 2 4-4" />
+                  </svg>
+                </div>
                 <span>100% Secure</span>
               </div>
             </div>
@@ -189,14 +203,24 @@ const SignupPage = () => {
 
             {successMessage && (
               <div className="success-banner">
-                <div className="success-icon">🎉</div>
+                <div className="success-icon">
+                  <svg className="auth-svg" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="9" />
+                    <path d="M8 12l3 3 5-5" />
+                  </svg>
+                </div>
                 <span>{successMessage}</span>
               </div>
             )}
 
             {errors.submit && (
               <div className="error-banner">
-                <div className="error-icon">⚠️</div>
+                <div className="error-icon">
+                  <svg className="auth-svg" viewBox="0 0 24 24">
+                    <path d="M12 9v4M12 17h.01" />
+                    <path d="M10.3 3.9L2 18a2 2 0 001.7 3h16.6a2 2 0 001.7-3L13.7 3.9a2 2 0 00-3.4 0z" />
+                  </svg>
+                </div>
                 <span>{errors.submit}</span>
               </div>
             )}
@@ -204,7 +228,12 @@ const SignupPage = () => {
             <form className="modern-signup-form" onSubmit={handleSignup}>
               <div className="input-group">
                 <div className="input-wrapper">
-                  <div className="input-icon">👤</div>
+                  <div className="input-icon">
+                    <svg className="auth-svg" viewBox="0 0 24 24">
+                      <circle cx="12" cy="8" r="4" />
+                      <path d="M4 21a8 8 0 0116 0" />
+                    </svg>
+                  </div>
                   <input
                     type="text"
                     name="name"
@@ -220,7 +249,12 @@ const SignupPage = () => {
 
               <div className="input-group">
                 <div className="input-wrapper">
-                  <div className="input-icon">📧</div>
+                  <div className="input-icon">
+                    <svg className="auth-svg" viewBox="0 0 24 24">
+                      <rect x="3" y="5" width="18" height="14" rx="2" />
+                      <path d="M3 7l9 6 9-6" />
+                    </svg>
+                  </div>
                   <input
                     type="email"
                     name="email"
@@ -236,7 +270,12 @@ const SignupPage = () => {
 
               <div className="input-group">
                 <div className="input-wrapper">
-                  <div className="input-icon">📱</div>
+                  <div className="input-icon">
+                    <svg className="auth-svg" viewBox="0 0 24 24">
+                      <rect x="7" y="2" width="10" height="20" rx="2" />
+                      <path d="M11 18h2" />
+                    </svg>
+                  </div>
                   <input
                     type="tel"
                     name="phone"
@@ -255,7 +294,12 @@ const SignupPage = () => {
 
               <div className="input-group">
                 <div className="input-wrapper">
-                  <div className="input-icon">🔒</div>
+                  <div className="input-icon">
+                    <svg className="auth-svg" viewBox="0 0 24 24">
+                      <rect x="5" y="11" width="14" height="10" rx="2" />
+                      <path d="M8 11V8a4 4 0 018 0v3" />
+                    </svg>
+                  </div>
                   <input
                     type={showPassword ? 'text' : 'password'}
                     name="password"
@@ -269,8 +313,20 @@ const SignupPage = () => {
                     type="button"
                     className="password-toggle"
                     onClick={() => setShowPassword(!showPassword)}
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
                   >
-                    {showPassword ? '👁️' : '👁️‍🗨️'}
+                    {showPassword ? (
+                      <svg className="auth-svg" viewBox="0 0 24 24">
+                        <path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z" />
+                        <circle cx="12" cy="12" r="3" />
+                      </svg>
+                    ) : (
+                      <svg className="auth-svg" viewBox="0 0 24 24">
+                        <path d="M3 3l18 18" />
+                        <path d="M10.6 10.6a3 3 0 004.2 4.2" />
+                        <path d="M9.9 4.6A10.8 10.8 0 0112 4c6 0 10 7 10 7a17 17 0 01-3.3 3.9M6.6 6.6A17 17 0 002 11s4 7 10 7a10.8 10.8 0 003.3-.5" />
+                      </svg>
+                    )}
                   </button>
                 </div>
                 {errors.password && <span className="error-text">{errors.password}</span>}
@@ -318,7 +374,13 @@ const SignupPage = () => {
 
               <div className="input-group">
                 <div className="input-wrapper">
-                  <div className="input-icon">🔐</div>
+                  <div className="input-icon">
+                    <svg className="auth-svg" viewBox="0 0 24 24">
+                      <rect x="5" y="11" width="14" height="10" rx="2" />
+                      <path d="M8 11V8a4 4 0 018 0v3" />
+                      <path d="M9.5 16l1.5 1.5 3-3" />
+                    </svg>
+                  </div>
                   <input
                     type={showConfirmPassword ? 'text' : 'password'}
                     name="confirmPassword"
@@ -332,8 +394,20 @@ const SignupPage = () => {
                     type="button"
                     className="password-toggle"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
                   >
-                    {showConfirmPassword ? '👁️' : '👁️‍🗨️'}
+                    {showConfirmPassword ? (
+                      <svg className="auth-svg" viewBox="0 0 24 24">
+                        <path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z" />
+                        <circle cx="12" cy="12" r="3" />
+                      </svg>
+                    ) : (
+                      <svg className="auth-svg" viewBox="0 0 24 24">
+                        <path d="M3 3l18 18" />
+                        <path d="M10.6 10.6a3 3 0 004.2 4.2" />
+                        <path d="M9.9 4.6A10.8 10.8 0 0112 4c6 0 10 7 10 7a17 17 0 01-3.3 3.9M6.6 6.6A17 17 0 002 11s4 7 10 7a10.8 10.8 0 003.3-.5" />
+                      </svg>
+                    )}
                   </button>
                 </div>
                 {errors.confirmPassword && (

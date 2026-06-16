@@ -1,228 +1,232 @@
-import React, { useState, useContext } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
-import Logo from './Logo';
 import './Navbar.css';
 
+const Ico = ({ d, ...p }) => (
+  <svg viewBox="0 0 24 24" className="nv-ic" {...p}>
+    {d}
+  </svg>
+);
+
 const Navbar = () => {
-    const { user, logout } = useAuth();
-    const { cartItems } = useCart();
-    const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const navigate = useNavigate();
-    const location = useLocation();
+  const { user, logout } = useAuth();
+  const { cartItems } = useCart();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [q, setQ] = useState('');
+  const navigate = useNavigate();
+  const location = useLocation();
 
-    const cartItemCount = cartItems.reduce((total, item) => total + item.quantity, 0);
+  const cartItemCount = cartItems.reduce((total, item) => total + item.quantity, 0);
+  const isActive = (path) => location.pathname === path;
 
-    const handleLogout = () => {
-        logout();
-        navigate('/');
-        setIsMenuOpen(false);
-    };
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+    setIsMenuOpen(false);
+  };
 
-    const isActive = (path) => location.pathname === path;
+  const submitSearch = (e) => {
+    e.preventDefault();
+    if (q.trim()) navigate(`/search?q=${encodeURIComponent(q.trim())}`);
+  };
 
-    const toggleMenu = () => {
-        const newMenuState = !isMenuOpen;
-        setIsMenuOpen(newMenuState);
+  const toggleMenu = () => {
+    const next = !isMenuOpen;
+    setIsMenuOpen(next);
+    window.dispatchEvent(new CustomEvent('mobileMenuToggle', { detail: { isOpen: next } }));
+  };
 
-        // Dispatch custom event for mobile menu state change
-        window.dispatchEvent(new CustomEvent('mobileMenuToggle', {
-            detail: { isOpen: newMenuState }
-        }));
-    };
+  return (
+    <header className="nv-header">
+      <div className="nv-bar">
+        <Link to="/" className="nv-logo">
+          <span className="nv-logo-dot">
+            <Ico
+              d={
+                <>
+                  <path d="M3 7l9-4 9 4-9 4-9-4z" />
+                  <path d="M3 7v10l9 4 9-4V7" />
+                </>
+              }
+            />
+          </span>
+          Delhivery<b>Way</b>
+        </Link>
 
-    return (
-        <nav className="navbar">
-            <div className="navbar-container">
-                {/* Logo */}
-                <Link to="/" className="navbar-logo">
-                    <Logo size="large" showText={true} />
-                </Link>
+        <button
+          className="nv-addr"
+          onClick={() => navigate('/profile')}
+          title="Manage delivery address"
+        >
+          <Ico
+            className="nv-ic nv-pin"
+            d={
+              <>
+                <path d="M12 21s-7-5.5-7-11a7 7 0 0114 0c0 5.5-7 11-7 11z" />
+                <circle cx="12" cy="10" r="2.5" />
+              </>
+            }
+          />
+          <span className="nv-addr-txt">
+            <span className="nv-addr-lbl">Deliver to</span>
+            <span className="nv-addr-val">
+              {user?.name ? `${user.name.split(' ')[0]}'s location` : 'Set your location'}
+              <Ico className="nv-ic nv-chev" d={<path d="M6 9l6 6 6-6" />} />
+            </span>
+          </span>
+        </button>
 
-                {/* Desktop Navigation */}
-                <div className="navbar-menu">
-                    <Link
-                        to="/"
-                        className={`navbar-link ${isActive('/') ? 'active' : ''}`}
-                    >
-                        <span className="link-icon">🏠</span>
-                        Home
-                    </Link>
+        <form className="nv-search" onSubmit={submitSearch}>
+          <Ico
+            d={
+              <>
+                <circle cx="11" cy="11" r="7" />
+                <path d="M21 21l-4-4" />
+              </>
+            }
+          />
+          <input
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            placeholder="Search 'biryani', 'fresh milk', 'paracetamol'…"
+            aria-label="Search"
+          />
+        </form>
 
-                    {user && (
-                        <>
-                            <Link
-                                to="/orders"
-                                className={`navbar-link ${isActive('/orders') ? 'active' : ''}`}
-                            >
-                                <span className="link-icon">📦</span>
-                                Orders
-                            </Link>
+        <Link to="/orders" className="nv-btn" aria-label="Orders" title="Orders">
+          <Ico
+            d={
+              <>
+                <path d="M3 7l9-4 9 4-9 4-9-4z" />
+                <path d="M3 7v10l9 4 9-4V7" />
+                <path d="M12 11v10" />
+              </>
+            }
+          />
+        </Link>
 
-                            <Link
-                                to="/cart"
-                                className={`navbar-link cart-link ${isActive('/cart') ? 'active' : ''}`}
-                            >
-                                <span className="link-icon">🛒</span>
-                                Cart
-                                {cartItemCount > 0 && (
-                                    <span className="cart-badge">{cartItemCount}</span>
-                                )}
-                            </Link>
-                        </>
-                    )}
+        <Link to="/cart" className="nv-btn" aria-label="Cart" title="Cart">
+          <Ico
+            d={
+              <>
+                <circle cx="9" cy="20" r="1.5" />
+                <circle cx="18" cy="20" r="1.5" />
+                <path d="M2 3h3l2.4 12.4a1.5 1.5 0 001.5 1.2h8.7a1.5 1.5 0 001.5-1.2L22 7H6" />
+              </>
+            }
+          />
+          {cartItemCount > 0 && <span className="nv-badge">{cartItemCount}</span>}
+        </Link>
 
-                    <Link
-                        to="/community"
-                        className={`navbar-link ${isActive('/community') ? 'active' : ''}`}
-                    >
-                        <span className="link-icon">🤝</span>
-                        Community
-                    </Link>
-                </div>
+        {user ? (
+          <div className="nv-user">
+            <Link to="/profile" className="nv-avatar" title={user.name}>
+              {user.name?.charAt(0).toUpperCase() || 'U'}
+            </Link>
+            <button onClick={handleLogout} className="nv-logout">
+              Logout
+            </button>
+          </div>
+        ) : (
+          <div className="nv-auth">
+            <Link to="/login" className="nv-login">
+              Login
+            </Link>
+            <Link to="/signup" className="nv-signup">
+              Sign up
+            </Link>
+          </div>
+        )}
 
-                {/* User Menu */}
-                <div className="navbar-user">
-                    {user ? (
-                        <div className="user-menu">
-                            <div className="user-avatar-container">
-                                <div className="user-avatar">
-                                    {user.name?.charAt(0).toUpperCase() || 'U'}
-                                </div>
-                                <div className="user-tooltip">
-                                    <span className="user-name-tooltip">{user.name}</span>
-                                    <span className="user-email-tooltip">{user.email}</span>
-                                </div>
-                            </div>
-                            <Link to="/profile" className={`navbar-link ${isActive('/profile') ? 'active' : ''}`} style={{ paddingLeft: '8px', paddingRight: '12px' }}>
-                                My Profile
-                            </Link>
-                            <button onClick={handleLogout} className="btn btn-secondary btn-sm" style={{ marginLeft: '4px' }}>
-                                Logout
-                            </button>
-                        </div>
-                    ) : (
-                        <div className="auth-buttons">
-                            <Link to="/login" className="btn btn-secondary btn-sm">
-                                Login
-                            </Link>
-                            <Link to="/signup" className="btn btn-primary btn-sm">
-                                Sign Up
-                            </Link>
-                        </div>
-                    )}
-                </div>
+        <button className="nv-hamburger" onClick={toggleMenu} aria-label="Toggle menu">
+          <span className={isMenuOpen ? 'open' : ''}>
+            <span></span>
+            <span></span>
+            <span></span>
+          </span>
+        </button>
+      </div>
 
-                {/* Mobile Menu Button */}
-                <button
-                    className="mobile-menu-btn"
-                    onClick={toggleMenu}
-                    aria-label="Toggle menu"
-                >
-                    <span className={`hamburger ${isMenuOpen ? 'open' : ''}`}>
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                    </span>
-                </button>
-            </div>
-
-            {/* Mobile Menu */}
-            <div className={`mobile-menu ${isMenuOpen ? 'open' : ''}`}>
-                <div className="mobile-menu-content">
-                    <Link
-                        to="/"
-                        className={`mobile-link ${isActive('/') ? 'active' : ''}`}
-                        onClick={() => setIsMenuOpen(false)}
-                    >
-                        <span className="link-icon">🏠</span>
-                        Home
-                    </Link>
-
-                    {user && (
-                        <>
-                            <Link
-                                to="/orders"
-                                className={`mobile-link ${isActive('/orders') ? 'active' : ''}`}
-                                onClick={() => setIsMenuOpen(false)}
-                            >
-                                <span className="link-icon">📦</span>
-                                Orders
-                            </Link>
-
-                            <Link
-                                to="/cart"
-                                className={`mobile-link ${isActive('/cart') ? 'active' : ''}`}
-                                onClick={() => setIsMenuOpen(false)}
-                            >
-                                <span className="link-icon">🛒</span>
-                                Cart
-                                {cartItemCount > 0 && (
-                                    <span className="cart-badge">{cartItemCount}</span>
-                                )}
-                            </Link>
-                        </>
-                    )}
-
-                    <Link
-                        to="/community"
-                        className={`mobile-link ${isActive('/community') ? 'active' : ''}`}
-                        onClick={() => setIsMenuOpen(false)}
-                    >
-                        <span className="link-icon">🤝</span>
-                        Community
-                    </Link>
-
-                    {user ? (
-                        <>
-                            <div className="mobile-user-info">
-                                <div className="user-avatar">
-                                    {user.name?.charAt(0).toUpperCase() || 'U'}
-                                </div>
-                                <div className="user-details">
-                                    <span className="user-name">{user.name}</span>
-                                    <span className="user-email">{user.email}</span>
-                                </div>
-                            </div>
-
-                            <Link
-                                to="/profile"
-                                className="btn btn-primary mobile-logout-btn"
-                                onClick={() => setIsMenuOpen(false)}
-                                style={{ marginBottom: '10px' }}
-                            >
-                                My Profile
-                            </Link>
-                            <button
-                                onClick={handleLogout}
-                                className="btn btn-secondary mobile-logout-btn"
-                            >
-                                Logout
-                            </button>
-                        </>
-                    ) : (
-                        <div className="mobile-auth-buttons">
-                            <Link
-                                to="/login"
-                                className="btn btn-secondary"
-                                onClick={() => setIsMenuOpen(false)}
-                            >
-                                Login
-                            </Link>
-                            <Link
-                                to="/signup"
-                                className="btn btn-primary"
-                                onClick={() => setIsMenuOpen(false)}
-                            >
-                                Sign Up
-                            </Link>
-                        </div>
-                    )}
-                </div>
-            </div>
-        </nav>
-    );
+      <div className={`nv-mobile ${isMenuOpen ? 'open' : ''}`}>
+        <form
+          className="nv-search nv-search-m"
+          onSubmit={(e) => {
+            submitSearch(e);
+            setIsMenuOpen(false);
+          }}
+        >
+          <Ico
+            d={
+              <>
+                <circle cx="11" cy="11" r="7" />
+                <path d="M21 21l-4-4" />
+              </>
+            }
+          />
+          <input
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            placeholder="Search dishes, shops…"
+            aria-label="Search"
+          />
+        </form>
+        <Link
+          to="/"
+          className={`nv-mlink ${isActive('/') ? 'active' : ''}`}
+          onClick={() => setIsMenuOpen(false)}
+        >
+          Home
+        </Link>
+        {user && (
+          <Link
+            to="/orders"
+            className={`nv-mlink ${isActive('/orders') ? 'active' : ''}`}
+            onClick={() => setIsMenuOpen(false)}
+          >
+            Orders
+          </Link>
+        )}
+        {user && (
+          <Link
+            to="/cart"
+            className={`nv-mlink ${isActive('/cart') ? 'active' : ''}`}
+            onClick={() => setIsMenuOpen(false)}
+          >
+            Cart{' '}
+            {cartItemCount > 0 && <span className="nv-badge nv-badge-inline">{cartItemCount}</span>}
+          </Link>
+        )}
+        <Link
+          to="/community"
+          className={`nv-mlink ${isActive('/community') ? 'active' : ''}`}
+          onClick={() => setIsMenuOpen(false)}
+        >
+          Community
+        </Link>
+        {user ? (
+          <>
+            <Link to="/profile" className="nv-mlink" onClick={() => setIsMenuOpen(false)}>
+              My profile
+            </Link>
+            <button onClick={handleLogout} className="nv-mlogout">
+              Logout
+            </button>
+          </>
+        ) : (
+          <div className="nv-mauth">
+            <Link to="/login" className="nv-login" onClick={() => setIsMenuOpen(false)}>
+              Login
+            </Link>
+            <Link to="/signup" className="nv-signup" onClick={() => setIsMenuOpen(false)}>
+              Sign up
+            </Link>
+          </div>
+        )}
+      </div>
+    </header>
+  );
 };
 
 export default Navbar;
