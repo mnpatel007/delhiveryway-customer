@@ -759,7 +759,7 @@ const FinalCheckoutPage = () => {
                       display: 'block',
                     }}
                   >
-                    ⚠️ Contact name is required for delivery
+                    Contact name is required for delivery
                   </small>
                 )}
                 {(() => {
@@ -804,7 +804,7 @@ const FinalCheckoutPage = () => {
                           color: '#856404',
                         }}
                       >
-                        ⚠️ No valid registered phone found. Please add your number in{' '}
+                        No valid registered phone found. Please add your number in{' '}
                         <a
                           href="/profile"
                           style={{
@@ -862,7 +862,6 @@ const FinalCheckoutPage = () => {
                       display: 'block',
                     }}
                   >
-                    ⚠️{' '}
                     {!deliveryAddress.contactPhone.trim()
                       ? 'Phone number is required for delivery coordination'
                       : `Phone number must be exactly 10 digits (currently ${deliveryAddress.contactPhone.length})`}
@@ -908,8 +907,8 @@ const FinalCheckoutPage = () => {
                           style={{
                             width: '18px',
                             height: '18px',
-                            border: `2px solid ${useRegisteredPhone ? '#4f46e5' : '#d1d5db'}`,
-                            backgroundColor: useRegisteredPhone ? '#4f46e5' : '#ffffff',
+                            border: `2px solid ${useRegisteredPhone ? 'var(--brand)' : '#d1d5db'}`,
+                            backgroundColor: useRegisteredPhone ? 'var(--brand)' : '#ffffff',
                             borderRadius: '4px',
                             display: 'flex',
                             alignItems: 'center',
@@ -997,8 +996,24 @@ const FinalCheckoutPage = () => {
             <div className="acceptance-time-section">
               <div className="acceptance-time-card">
                 <div className="acceptance-time-header">
-                  <span className="time-icon">⏱️</span>
-                  <h3>Order Acceptance Time</h3>
+                  <span className="time-icon">
+                    <svg
+                      viewBox="0 0 24 24"
+                      style={{
+                        width: 20,
+                        height: 20,
+                        stroke: 'currentColor',
+                        fill: 'none',
+                        strokeWidth: 1.9,
+                        strokeLinecap: 'round',
+                        strokeLinejoin: 'round',
+                      }}
+                    >
+                      <circle cx="12" cy="12" r="9" />
+                      <path d="M12 7v5l3 2" />
+                    </svg>
+                  </span>
+                  <h3>Order acceptance time</h3>
                 </div>
                 <div className="acceptance-time-content">
                   <div className="estimated-time">
@@ -1011,7 +1026,22 @@ const FinalCheckoutPage = () => {
                   </div>
                 </div>
                 <div className="acceptance-time-note">
-                  <span className="note-icon">💡</span>
+                  <span className="note-icon">
+                    <svg
+                      viewBox="0 0 24 24"
+                      style={{
+                        width: 18,
+                        height: 18,
+                        stroke: 'currentColor',
+                        fill: 'none',
+                        strokeWidth: 1.9,
+                        strokeLinecap: 'round',
+                        strokeLinejoin: 'round',
+                      }}
+                    >
+                      <path d="M9 18h6M10 22h4M12 2a7 7 0 00-4 12.7V17h8v-2.3A7 7 0 0012 2z" />
+                    </svg>
+                  </span>
                   <p>
                     This is an estimate based on current order queue. Your order will be accepted by
                     a personal shopper within this timeframe.

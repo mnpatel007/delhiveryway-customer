@@ -628,41 +628,6 @@ a.underline-link:focus {
   }
 }
 
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --gray-50: #121212;
-    --gray-100: #1e1e1e;
-    --gray-200: #2a2a2a;
-    --gray-300: #3a3a3a;
-    --gray-400: #555555;
-    --gray-500: #999999;
-    --gray-600: #cccccc;
-    --gray-700: #e1e1e1;
-    --gray-900: #ffffff;
-
-    --primary-600: #818cf8;
-    --primary-700: #a5b4fc;
-
-    --background: #121212;
-    color-scheme: dark;
-  }
-
-  body {
-    background-color: var(--gray-100);
-    color: var(--gray-900);
-  }
-
-  a {
-    color: var(--primary-700);
-  }
-
-  .card {
-    background-color: var(--gray-200);
-    border-color: var(--gray-300);
-  }
-}
-
 /* Smooth interactive transitions on buttons, links, inputs */
 button,
 a,

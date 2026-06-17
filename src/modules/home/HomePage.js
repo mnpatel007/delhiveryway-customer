@@ -18,9 +18,6 @@ const UN = 'https://images.unsplash.com/';
 const CATEGORIES = [
   { key: 'restaurant', label: 'Food', img: 'photo-1504674900247-0877df9cc836' },
   { key: 'grocery', label: 'Grocery', img: 'photo-1542838132-92c53300491e' },
-  { key: 'pharmacy', label: 'Pharmacy', img: 'photo-1576091160550-2173dba999ef' },
-  { key: 'clothing', label: 'Fashion', img: 'photo-1445205170230-053b83016050' },
-  { key: 'electronics', label: 'Electronics', img: 'photo-1498049794561-7780e7231661' },
 ];
 const FILTERS = ['Sort', 'Top rated', 'Fastest', 'Offers', 'Open now'];
 
@@ -315,9 +312,12 @@ const HomePage = () => {
   const feeInfo = (shop) => {
     const fr = deliveryFees[shop._id];
     if (fr && typeof fr === 'object' && fr.deliveryFee !== undefined) {
+      const discountApplied = fr.discountApplied || fr.originalDeliveryFee > fr.deliveryFee;
       return {
         free: fr.deliveryFee === 0,
         text: fr.deliveryFee === 0 ? 'Free delivery' : `₹${fr.deliveryFee} delivery`,
+        originalFee: fr.originalDeliveryFee,
+        discountApplied,
       };
     }
     if (typeof fr === 'number') {
@@ -327,7 +327,35 @@ const HomePage = () => {
     return { free: /free/i.test(d), text: d };
   };
 
-  const filteredShops = shops;
+  const filteredShops = [...shops]
+    .filter((shop) => {
+      const open = shop.isOpenNow ?? isShopOpen(shop);
+      const fee = feeInfo(shop);
+
+      if (activeFilter === 'Open now' && !open) {
+        return false;
+      }
+      if (activeFilter === 'Top rated' && (!shop.rating?.average || shop.rating.average < 4.0)) {
+        return false;
+      }
+      if (activeFilter === 'Offers' && !fee.discountApplied && !fee.free) {
+        return false;
+      }
+      return true;
+    })
+    .sort((a, b) => {
+      if (activeFilter === 'Top rated') {
+        const aRating = a.rating?.average || 0;
+        const bRating = b.rating?.average || 0;
+        return bRating - aRating;
+      }
+      if (activeFilter === 'Fastest') {
+        const aTime = a.preparationTime || 30;
+        const bTime = b.preparationTime || 30;
+        return aTime - bTime;
+      }
+      return 0;
+    });
 
   if (loading) {
     return (
@@ -368,15 +396,15 @@ const HomePage = () => {
       <div className="dw-hero">
         <div className="dw-wrap dw-hero-grid">
           <div>
-            <div className="dw-eyebrow">Groceries · Food · Pharmacy · More</div>
+            <div className="dw-eyebrow">Groceries · Food</div>
             <h1>
               Everything you crave,
               <br />
               <span className="dw-grad">delivered in minutes.</span>
             </h1>
             <p className="dw-sub">
-              {user?.name ? `Hi ${user.name.split(' ')[0]} — ` : ''}fresh food, daily essentials and
-              medicines from shops around the corner.
+              {user?.name ? `Hi ${user.name.split(' ')[0]} — ` : ''}fresh food and daily essentials
+              from shops around the corner.
             </p>
 
             <form className="dw-herosearch" onSubmit={handleSearch}>
@@ -517,19 +545,19 @@ const HomePage = () => {
           <div className="dw-promo dw-p1">
             <div>
               <h3>50% OFF</h3>
-              <p>up to ₹100 on your first 3 orders</p>
+              <p>Coming soon on your first 3 orders</p>
             </div>
           </div>
           <div className="dw-promo dw-p2">
             <div>
-              <h3>Free delivery</h3>
-              <p>on orders above ₹199 this week</p>
+              <h3>Special Offers</h3>
+              <p>Free item above ₹500 &amp; festive discounts</p>
             </div>
           </div>
           <div className="dw-promo dw-p3">
             <div>
               <h3>Fresh &amp; fast</h3>
-              <p>groceries in 30 min, guaranteed</p>
+              <p>delivered within 30 min of order pickup</p>
             </div>
           </div>
         </div>
@@ -603,22 +631,24 @@ const HomePage = () => {
                   }}
                 >
                   <div className="dw-media">
-                    {shop.images && shop.images.length > 0 ? (
-                      <img
-                        src={shop.images[0]}
-                        alt={shop.name}
-                        onError={(e) => {
-                          e.target.style.display = 'none';
-                        }}
-                      />
-                    ) : (
-                      <div className="dw-media-ph">
-                        <Svg
-                          d={boxIcon}
-                          s={{ width: 40, height: 40, stroke: '#fff', opacity: 0.9 }}
+                    <div className="dw-img-wrap">
+                      {shop.images && shop.images.length > 0 ? (
+                        <img
+                          src={shop.images[0]}
+                          alt={shop.name}
+                          onError={(e) => {
+                            e.target.style.display = 'none';
+                          }}
                         />
-                      </div>
-                    )}
+                      ) : (
+                        <div className="dw-media-ph">
+                          <Svg
+                            d={boxIcon}
+                            s={{ width: 40, height: 40, stroke: '#fff', opacity: 0.9 }}
+                          />
+                        </div>
+                      )}
+                    </div>
                     {topRated && (
                       <div className="dw-ribbon">
                         <Svg d={starIcon} s={{ width: 13, height: 13, fill: '#fff' }} />
@@ -637,7 +667,10 @@ const HomePage = () => {
                     </button>
                     <div className={`dw-feepill ${fee.free ? 'free' : ''}`}>
                       <Svg d={bikeIcon} s={{ width: 16, height: 16 }} />
-                      {fee.text}
+                      {fee.discountApplied && fee.originalFee && (
+                        <span className="dw-fee-original">₹{fee.originalFee}</span>
+                      )}
+                      <span>{fee.text}</span>
                     </div>
                   </div>
                   <div className="dw-body">

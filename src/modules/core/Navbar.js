@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
 import './Navbar.css';
@@ -14,9 +14,15 @@ const Navbar = () => {
   const { user, logout } = useAuth();
   const { cartItems } = useCart();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [q, setQ] = useState('');
+  const [searchParams] = useSearchParams();
+  const queryParam = searchParams.get('q') || '';
+  const [q, setQ] = useState(queryParam);
   const navigate = useNavigate();
   const location = useLocation();
+
+  useEffect(() => {
+    setQ(queryParam);
+  }, [queryParam]);
 
   const cartItemCount = cartItems.reduce((total, item) => total + item.quantity, 0);
   const isActive = (path) => location.pathname === path;
@@ -25,6 +31,19 @@ const Navbar = () => {
     logout();
     navigate('/');
     setIsMenuOpen(false);
+  };
+
+  const handleSearchChange = (val) => {
+    setQ(val);
+    const trimmed = val.trim();
+    const isSearchPage = location.pathname === '/search';
+    if (trimmed) {
+      navigate(`/search?q=${encodeURIComponent(trimmed)}`, { replace: isSearchPage });
+    } else {
+      if (isSearchPage) {
+        navigate('/', { replace: true });
+      }
+    }
   };
 
   const submitSearch = (e) => {
@@ -89,7 +108,7 @@ const Navbar = () => {
           />
           <input
             value={q}
-            onChange={(e) => setQ(e.target.value)}
+            onChange={(e) => handleSearchChange(e.target.value)}
             placeholder="Search 'biryani', 'fresh milk', 'paracetamol'…"
             aria-label="Search"
           />
@@ -167,7 +186,7 @@ const Navbar = () => {
           />
           <input
             value={q}
-            onChange={(e) => setQ(e.target.value)}
+            onChange={(e) => handleSearchChange(e.target.value)}
             placeholder="Search dishes, shops…"
             aria-label="Search"
           />

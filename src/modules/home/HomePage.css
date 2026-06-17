@@ -306,8 +306,10 @@ section {
 /* CATEGORIES */
 .dw-cats {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 16px;
+  max-width: 500px;
+  margin: 0 auto;
 }
 .dw-cat {
   position: relative;
@@ -449,15 +451,20 @@ section {
   position: relative;
   height: 186px;
   background: linear-gradient(135deg, #ffd9c4, #ffe9b0);
-  overflow: hidden;
 }
-.dw-media img {
+.dw-img-wrap {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: var(--r-lg) var(--r-lg) 0 0;
+}
+.dw-img-wrap img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   transition: 0.45s;
 }
-.dw-card:hover .dw-media img {
+.dw-card:hover .dw-img-wrap img {
   transform: scale(1.07);
 }
 .dw-media-ph {
@@ -526,6 +533,13 @@ section {
 }
 .dw-feepill.free {
   color: var(--leaf);
+}
+.dw-fee-original {
+  text-decoration: line-through;
+  color: var(--ink-3);
+  margin-right: 4px;
+  font-size: 0.9em;
+  font-weight: 500;
 }
 .dw-body {
   padding: 22px 18px 18px;
@@ -625,9 +639,6 @@ section {
   .dw-hero h1 {
     font-size: 42px;
   }
-  .dw-cats {
-    grid-template-columns: repeat(3, 1fr);
-  }
   .dw-promos {
     grid-template-columns: 1fr;
   }
@@ -636,8 +647,7 @@ section {
   }
 }
 @media (max-width: 640px) {
-  .dw-grid,
-  .dw-cats {
+  .dw-grid {
     grid-template-columns: 1fr 1fr;
   }
   .dw-hero h1 {
