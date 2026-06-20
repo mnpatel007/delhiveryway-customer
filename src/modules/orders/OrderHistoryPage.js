@@ -421,7 +421,7 @@ const OrderHistoryPage = () => {
                               // If it's a relative path, prepend the API base URL
                               const fullUrl = billUrl.startsWith('http')
                                 ? billUrl
-                                : `http://localhost:5000${billUrl}`;
+                                : `${config.BACKEND_URL}${billUrl}`;
                               console.log('Opening URL:', fullUrl);
                               window.open(fullUrl, '_blank');
                             }

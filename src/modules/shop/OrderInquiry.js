@@ -2,7 +2,18 @@ import React, { useState, useEffect } from 'react';
 import { apiCall, shopsAPI } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import { useSocket } from '../../context/SocketContext';
+import config from '../../config/config';
 import './OrderInquiry.css';
+
+// Read the auth token from the same storage the rest of the app uses (AuthContext writes `customerAuth`)
+const getAuthToken = () => {
+  try {
+    const auth = localStorage.getItem('customerAuth');
+    return auth ? JSON.parse(auth).token : null;
+  } catch {
+    return null;
+  }
+};
 
 const OrderInquiry = ({ order, onClose }) => {
   const [showContactInfo, setShowContactInfo] = useState(false);
@@ -79,12 +90,12 @@ const OrderInquiry = ({ order, onClose }) => {
     if (!shopper) return;
 
     try {
-      // Track inquiry in backend
-      const response = await fetch(`/api/orders/${order._id}/inquiry`, {
+      // Track inquiry in backend (use the configured API base, not a relative path)
+      const response = await fetch(`${config.API_BASE_URL}/orders/${order._id}/inquiry`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
+          Authorization: `Bearer ${getAuthToken()}`,
         },
         body: JSON.stringify({
           method,
