@@ -1,153 +1,102 @@
-/* Inquiry Button Styles */
+/* ===== DelhiveryWay v2 inquiry button ===== */
 .inquiry-button {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 16px;
-    background: rgba(255, 255, 255, 0.9);
-    color: #667eea;
-    border: none;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    backdrop-filter: blur(10px);
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, var(--brand), var(--brand-deep));
+  color: #fff;
+  border: 0;
+  padding: 10px 16px;
+  border-radius: 12px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  box-shadow: var(--lift-1);
+  transition: 0.2s;
+  white-space: nowrap;
 }
-
 .inquiry-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
-    background: rgba(255, 255, 255, 1);
+  transform: translateY(-2px);
+  box-shadow: var(--lift-2);
 }
-
-.inquiry-button:active {
-    transform: translateY(0);
-}
-
 .inquiry-icon {
-    font-size: 16px;
+  display: grid;
+  place-items: center;
 }
-
-.inquiry-text {
-    font-size: 14px;
+.inquiry-icon svg {
+  width: 16px;
+  height: 16px;
+  stroke: #fff;
+  fill: none;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
-
 .inquiry-pulse {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 100%;
-    height: 100%;
-    border-radius: 8px;
-    background: rgba(102, 126, 234, 0.3);
-    transform: translate(-50%, -50%) scale(0);
-    animation: inquiryPulse 2s ease-out infinite;
+  position: absolute;
+  inset: -3px;
+  border-radius: 15px;
+  border: 2px solid var(--brand);
+  animation: inquiryPulse 1.8s ease-out infinite;
+  pointer-events: none;
 }
-
 @keyframes inquiryPulse {
-    0% {
-        transform: translate(-50%, -50%) scale(0);
-        opacity: 1;
-    }
-
-    70% {
-        transform: translate(-50%, -50%) scale(1);
-        opacity: 0.7;
-    }
-
-    100% {
-        transform: translate(-50%, -50%) scale(1.2);
-        opacity: 0;
-    }
+  0% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.12);
+  }
 }
 
-/* Timer Widget Styles */
+/* Timer (inquiry not yet available) */
 .inquiry-timer-widget {
-    display: inline-flex;
-    flex-direction: column;
-    padding: 8px 12px;
-    background: linear-gradient(135deg, #ffc107, #fd7e14);
-    color: white;
-    border-radius: 6px;
-    font-size: 12px;
-    font-weight: 600;
-    box-shadow: 0 2px 8px rgba(255, 193, 7, 0.3);
-    animation: timerPulse 2s ease-in-out infinite;
-    min-width: 120px;
+  display: inline-flex;
+  flex-direction: column;
+  gap: 6px;
+  background: var(--cream);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 9px 13px;
+  min-width: 150px;
 }
-
-@keyframes timerPulse {
-
-    0%,
-    100% {
-        transform: scale(1);
-    }
-
-    50% {
-        transform: scale(1.05);
-    }
-}
-
 .timer-content {
-    display: flex;
-    align-items: center;
-    gap: 6px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
 }
-
 .timer-icon {
-    font-size: 14px;
+  display: grid;
+  place-items: center;
+  color: var(--saffron);
 }
-
+.timer-icon svg {
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
 .timer-text {
-    font-size: 12px;
-    white-space: nowrap;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-2);
 }
-
 .timer-progress-bar {
-    width: 100%;
-    height: 3px;
-    background: rgba(255, 255, 255, 0.3);
-    border-radius: 2px;
-    margin-top: 6px;
-    overflow: hidden;
+  height: 5px;
+  background: var(--line);
+  border-radius: 4px;
+  overflow: hidden;
 }
-
 .timer-progress-fill {
-    height: 100%;
-    background: rgba(255, 255, 255, 0.8);
-    border-radius: 2px;
-    transition: width 0.3s ease;
-}
-
-/* Mobile Responsive */
-@media (max-width: 768px) {
-    .inquiry-button {
-        padding: 8px 12px;
-        font-size: 13px;
-    }
-
-    .inquiry-icon {
-        font-size: 14px;
-    }
-
-    .inquiry-text {
-        font-size: 13px;
-    }
-
-    .inquiry-timer-widget {
-        padding: 6px 10px;
-        font-size: 11px;
-    }
-
-    .timer-icon {
-        font-size: 12px;
-    }
-
-    .timer-text {
-        font-size: 11px;
-    }
+  height: 100%;
+  background: linear-gradient(90deg, var(--saffron), var(--brand));
+  border-radius: 4px;
+  transition: width 0.4s ease;
 }
