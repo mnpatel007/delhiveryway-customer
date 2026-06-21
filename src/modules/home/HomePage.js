@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useSearch } from '../../context/SearchContext';
+import { useSocket } from '../../context/SocketContext';
 import PermanentNotices from './PermanentNotices';
 import ActiveOrdersWidget from './ActiveOrdersWidget';
 import Logo from '../core/Logo';
@@ -83,6 +84,7 @@ const HomePage = () => {
   const { user } = useAuth();
   const searchInputRef = useRef(null);
   const { indexLoaded, searchLocal } = useSearch();
+  const { socket } = useSocket();
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [globalClosure, setGlobalClosure] = useState({ isClosed: false });
@@ -196,6 +198,16 @@ const HomePage = () => {
   useEffect(() => {
     fetchShops();
   }, [fetchShops]);
+
+  // Keep the global closure banner in sync in real time (admin can open/close while the page is open)
+  useEffect(() => {
+    if (!socket) return;
+    const handleClosureUpdate = (data) => {
+      setGlobalClosure(data || { isClosed: false });
+    };
+    socket.on('globalShopClosureUpdated', handleClosureUpdate);
+    return () => socket.off('globalShopClosureUpdated', handleClosureUpdate);
+  }, [socket]);
 
   useEffect(() => {
     if (location && (location.pathname === '/' || location.pathname === '')) {
