@@ -1,0 +1,148 @@
+.ft {
+  margin-top: 50px;
+  background: var(--ink);
+  color: #cabdb1;
+}
+.ft-ic {
+  width: 22px;
+  height: 22px;
+  stroke: currentColor;
+  stroke-width: 1.9;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.ft-grid {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr 1fr 1fr;
+  gap: 40px;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 56px 28px 36px;
+}
+.ft h4 {
+  font-family: var(--font-display);
+  color: #fff;
+  font-size: 16px;
+  margin-bottom: 18px;
+  font-weight: 600;
+}
+.ft a {
+  display: block;
+  color: #cabdb1;
+  text-decoration: none;
+  font-size: 14px;
+  padding: 6px 0;
+  transition: 0.2s;
+  font-weight: 500;
+}
+.ft a:hover {
+  color: var(--saffron);
+}
+.ft-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 22px;
+  color: #fff;
+  margin-bottom: 14px;
+}
+.ft-dot {
+  width: 36px;
+  height: 36px;
+  border-radius: 11px;
+  background: linear-gradient(140deg, var(--brand), var(--saffron));
+  display: grid;
+  place-items: center;
+}
+.ft-dot .ft-ic {
+  stroke: #fff;
+  width: 20px;
+  height: 20px;
+}
+.ft-about {
+  font-size: 14px;
+  max-width: 34ch;
+  line-height: 1.7;
+  color: #cabdb1;
+}
+.ft-socials {
+  display: flex;
+  gap: 10px;
+  margin-top: 18px;
+}
+.ft-socials a {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.07);
+  display: grid;
+  place-items: center;
+  color: #fff;
+  padding: 0;
+}
+.ft-socials a:hover {
+  background: var(--brand);
+  color: #fff;
+}
+.ft-app {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 13px;
+  padding: 9px 16px;
+  margin-bottom: 10px;
+  color: #fff;
+}
+.ft-app:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+.ft-app small {
+  display: block;
+  font-size: 11px;
+  opacity: 0.7;
+}
+.ft-app b {
+  font-size: 15px;
+  font-family: var(--font-display);
+}
+.ft-bar {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 20px 28px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px;
+  font-size: 13px;
+}
+.ft-pay {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.ft-pay span {
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--ink);
+  font-weight: 700;
+  font-size: 11px;
+  padding: 5px 9px;
+  border-radius: 7px;
+}
+@media (max-width: 900px) {
+  .ft-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+@media (max-width: 560px) {
+  .ft-grid {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+}

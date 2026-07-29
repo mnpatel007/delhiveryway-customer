@@ -1,4 +1,6 @@
 /* Modern CSS Reset and Global Styles for DelhiveryWay Customer Portal */
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
+
 *,
 *::before,
 *::after {
@@ -6,15 +8,26 @@
 }
 
 html {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  font-family:
+    'Inter',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    'Roboto',
+    'Oxygen',
+    'Ubuntu',
+    'Cantarell',
+    'Fira Sans',
+    'Droid Sans',
+    'Helvetica Neue',
+    sans-serif;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   font-size: 16px;
   scroll-behavior: smooth;
-  background-color: var(--gray-50);
-  color: var(--gray-900);
+  background-color: var(--cream);
+  color: var(--ink);
 }
 
 body {
@@ -28,41 +41,63 @@ body {
 
 /* CSS Variables for Design System */
 :root {
-  /* Primary Brand Colors */
-  --primary-50: #EEF2FF;
-  --primary-100: #E0E7FF;
-  --primary-200: #C7D2FE;
-  --primary-300: #A5B4FC;
-  --primary-400: #818CF8;
-  --primary-500: #6366F1;
-  --primary-600: #4F46E5;
-  --primary-700: #4338CA;
-  --primary-800: #3730A3;
-  --primary-900: #312E81;
+  /* Primary Brand Colors — warm "appetite" coral/tomato */
+  --primary-50: #fff0eb;
+  --primary-100: #ffe0d6;
+  --primary-200: #ffc6b5;
+  --primary-300: #ff9f87;
+  --primary-400: #ff7a57;
+  --primary-500: #ff5630;
+  --primary-600: #f2451e;
+  --primary-700: #e23c1a;
+  --primary-800: #b82e12;
+  --primary-900: #8a220d;
+
+  /* Extended brand tokens (v2 redesign) */
+  --brand: #ff5630;
+  --brand-deep: #e23c1a;
+  --brand-soft: #fff0eb;
+  --saffron: #ffab2e;
+  --grape: #7a5cff;
+  --leaf: #1faa6b;
+  --leaf-soft: #e7f7ef;
+  --ink: #1b1410;
+  --ink-2: #4b4038;
+  --ink-3: #857a70;
+  --cream: #fff8f2;
+  --line: #efe5da;
+  --font-display: 'Sora', system-ui, sans-serif;
+  --r-sm: 12px;
+  --r-md: 18px;
+  --r-lg: 26px;
+  --lift-1: 0 1px 2px rgba(27, 20, 16, 0.05), 0 4px 12px rgba(27, 20, 16, 0.05);
+  --lift-2: 0 2px 4px rgba(27, 20, 16, 0.06), 0 14px 30px rgba(27, 20, 16, 0.1);
+  --lift-3: 0 8px 18px rgba(226, 60, 26, 0.12), 0 30px 60px rgba(27, 20, 16, 0.16);
 
   /* Supporting colors */
-  --gray-50: #F9FAFB;
-  --gray-100: #F3F4F6;
-  --gray-200: #E5E7EB;
-  --gray-300: #D1D5DB;
-  --gray-400: #9CA3AF;
-  --gray-500: #6B7280;
-  --gray-600: #4B5563;
+  --gray-50: #f9fafb;
+  --gray-100: #f3f4f6;
+  --gray-200: #e5e7eb;
+  --gray-300: #d1d5db;
+  --gray-400: #9ca3af;
+  --gray-500: #6b7280;
+  --gray-600: #4b5563;
   --gray-700: #374151;
-  --gray-800: #1F2937;
+  --gray-800: #1f2937;
   --gray-900: #111827;
 
-  --success-50: #ECFDF5;
-  --success-500: #10B981;
-  --warning-50: #FFFBEB;
-  --warning-500: #F59E0B;
-  --error-50: #FEF2F2;
-  --error-500: #EF4444;
+  --success-50: #ecfdf5;
+  --success-500: #10b981;
+  --warning-50: #fffbeb;
+  --warning-500: #f59e0b;
+  --error-50: #fef2f2;
+  --error-500: #ef4444;
 
   /* Typography */
-  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
-    Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji',
-    'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  --font-sans:
+    'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue',
+    Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
+    'Noto Color Emoji';
   --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
 
   /* Spacing scale */
@@ -191,7 +226,9 @@ a:focus {
   border-radius: var(--radius-md);
   border: none;
   cursor: pointer;
-  transition: background-color var(--transition-default), transform var(--transition-fast);
+  transition:
+    background-color var(--transition-default),
+    transform var(--transition-fast);
   user-select: none;
   min-height: 44px;
   gap: 0.5rem;
@@ -286,7 +323,9 @@ a:focus {
   border: 1.5px solid var(--gray-300);
   border-radius: var(--radius-md);
   background-color: white;
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
   font-family: var(--font-sans);
   color: #000000 !important;
   -webkit-text-fill-color: #000000 !important;
@@ -327,7 +366,9 @@ a:focus {
   box-shadow: var(--shadow-sm);
   border: 1px solid var(--gray-200);
   overflow: hidden;
-  transition: box-shadow var(--transition-default), transform var(--transition-default);
+  transition:
+    box-shadow var(--transition-default),
+    transform var(--transition-default);
   will-change: transform;
 }
 
@@ -587,41 +628,6 @@ a.underline-link:focus {
   }
 }
 
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --gray-50: #121212;
-    --gray-100: #1E1E1E;
-    --gray-200: #2A2A2A;
-    --gray-300: #3A3A3A;
-    --gray-400: #555555;
-    --gray-500: #999999;
-    --gray-600: #CCCCCC;
-    --gray-700: #E1E1E1;
-    --gray-900: #FFFFFF;
-
-    --primary-600: #818CF8;
-    --primary-700: #A5B4FC;
-
-    --background: #121212;
-    color-scheme: dark;
-  }
-
-  body {
-    background-color: var(--gray-100);
-    color: var(--gray-900);
-  }
-
-  a {
-    color: var(--primary-700);
-  }
-
-  .card {
-    background-color: var(--gray-200);
-    border-color: var(--gray-300);
-  }
-}
-
 /* Smooth interactive transitions on buttons, links, inputs */
 button,
 a,
@@ -632,7 +638,7 @@ textarea {
 }
 
 /* Global input styling for better visibility across all devices and browsers */
-input:not([type="checkbox"]):not([type="radio"]),
+input:not([type='checkbox']):not([type='radio']),
 select,
 textarea {
   color: #000000 !important;
@@ -642,42 +648,42 @@ textarea {
   -webkit-opacity: 1 !important;
 }
 
-input:not([type="checkbox"]):not([type="radio"]):focus,
+input:not([type='checkbox']):not([type='radio']):focus,
 select:focus,
 textarea:focus {
   color: #000000 !important;
   -webkit-text-fill-color: #000000 !important;
 }
 
-input:not([type="checkbox"]):not([type="radio"])::placeholder,
+input:not([type='checkbox']):not([type='radio'])::placeholder,
 textarea::placeholder {
   color: #666666 !important;
   opacity: 1 !important;
   -webkit-text-fill-color: #666666 !important;
 }
 
-input:not([type="checkbox"]):not([type="radio"])::-webkit-input-placeholder,
+input:not([type='checkbox']):not([type='radio'])::-webkit-input-placeholder,
 textarea::-webkit-input-placeholder {
   color: #666666 !important;
   -webkit-text-fill-color: #666666 !important;
 }
 
-input:not([type="checkbox"]):not([type="radio"])::-moz-placeholder,
+input:not([type='checkbox']):not([type='radio'])::-moz-placeholder,
 textarea::-moz-placeholder {
   color: #666666 !important;
   opacity: 1 !important;
 }
 
-input:not([type="checkbox"]):not([type="radio"]):-ms-input-placeholder,
+input:not([type='checkbox']):not([type='radio']):-ms-input-placeholder,
 textarea:-ms-input-placeholder {
   color: #666666 !important;
 }
 
 /* Ensure autocomplete doesn't override colors */
-input:not([type="checkbox"]):not([type="radio"]):-webkit-autofill,
-input:not([type="checkbox"]):not([type="radio"]):-webkit-autofill:hover,
-input:not([type="checkbox"]):not([type="radio"]):-webkit-autofill:focus,
-input:not([type="checkbox"]):not([type="radio"]):-webkit-autofill:active {
+input:not([type='checkbox']):not([type='radio']):-webkit-autofill,
+input:not([type='checkbox']):not([type='radio']):-webkit-autofill:hover,
+input:not([type='checkbox']):not([type='radio']):-webkit-autofill:focus,
+input:not([type='checkbox']):not([type='radio']):-webkit-autofill:active {
   -webkit-text-fill-color: #000000 !important;
   -webkit-box-shadow: 0 0 0 30px white inset !important;
 }
