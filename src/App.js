@@ -27,6 +27,10 @@ import OrderHistoryPage from './modules/orders/OrderHistoryPage';
 import CustomerSocketHandler from './modules/orders/CustomerSocketHandler';
 import CommunityPage from './modules/user/CommunityPage';
 import ProfilePage from './modules/user/ProfilePage';
+import AboutPage from './modules/static/AboutPage';
+import CareersPage from './modules/static/CareersPage';
+import PartnerPage from './modules/static/PartnerPage';
+import TermsPage from './modules/static/TermsPage';
 
 import VerifyEmail from './modules/auth/VerifyEmail';
 import ForgotPasswordPage from './modules/auth/ForgotPasswordPage';
@@ -215,6 +219,10 @@ const AppContent = () => {
               }
             />
             <Route path="/community" element={<CommunityPage />} />
+            <Route path="/about" element={<AboutPage />} />
+            <Route path="/careers" element={<CareersPage />} />
+            <Route path="/partner" element={<PartnerPage />} />
+            <Route path="/terms" element={<TermsPage />} />
 
             <Route path="/verify-email" element={<VerifyEmail />} />
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />

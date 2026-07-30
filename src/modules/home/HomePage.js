@@ -315,12 +315,6 @@ const HomePage = () => {
     setSelectedCategory('all');
   };
 
-  const pickCategory = (key) => {
-    setSelectedCategory((prev) => (prev === key ? 'all' : key));
-    const el = document.getElementById('dw-shops');
-    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  };
-
   const feeInfo = (shop) => {
     const fr = deliveryFees[shop._id];
     if (fr && typeof fr === 'object' && fr.deliveryFee !== undefined) {
@@ -412,7 +406,7 @@ const HomePage = () => {
             <h1>
               Everything you crave,
               <br />
-              <span className="dw-grad">delivered in minutes.</span>
+              <span className="dw-grad">delivered to your door.</span>
             </h1>
             <p className="dw-sub">
               {user?.name ? `Hi ${user.name.split(' ')[0]} — ` : ''}fresh food and daily essentials
@@ -537,41 +531,13 @@ const HomePage = () => {
         </div>
         <div className="dw-cats">
           {CATEGORIES.map((c) => (
-            <button
-              key={c.key}
-              className={`dw-cat ${selectedCategory === c.key ? 'on' : ''}`}
-              onClick={() => pickCategory(c.key)}
-            >
+            <div key={c.key} className="dw-cat dw-cat-static">
               <img alt={c.label} src={`${UN}${c.img}?auto=format&fit=crop&w=300&q=65`} />
               <span className="dw-cat-ov">
                 <span>{c.label}</span>
               </span>
-            </button>
+            </div>
           ))}
-        </div>
-      </section>
-
-      {/* PROMOS */}
-      <section className="dw-wrap">
-        <div className="dw-promos">
-          <div className="dw-promo dw-p1">
-            <div>
-              <h3>50% OFF</h3>
-              <p>Coming soon on your first 3 orders</p>
-            </div>
-          </div>
-          <div className="dw-promo dw-p2">
-            <div>
-              <h3>Special Offers</h3>
-              <p>Free item above ₹500 &amp; festive discounts</p>
-            </div>
-          </div>
-          <div className="dw-promo dw-p3">
-            <div>
-              <h3>Fresh &amp; fast</h3>
-              <p>delivered within 30 min of order pickup</p>
-            </div>
-          </div>
         </div>
       </section>
 
@@ -667,16 +633,6 @@ const HomePage = () => {
                         Top rated
                       </div>
                     )}
-                    <button
-                      className="dw-fav"
-                      aria-label="Save"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        e.currentTarget.classList.toggle('on');
-                      }}
-                    >
-                      <Svg d={<path d="M20 12l-8 8-8-8a5 5 0 117-7 5 5 0 117 7z" />} />
-                    </button>
                     <div className={`dw-feepill ${fee.free ? 'free' : ''}`}>
                       <Svg d={bikeIcon} s={{ width: 16, height: 16 }} />
                       {fee.discountApplied && fee.originalFee && (
