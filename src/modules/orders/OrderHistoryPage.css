@@ -273,8 +273,13 @@
 .total-row {
   display: flex;
   justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
   font-size: 14px;
   color: var(--ink-2);
+}
+.total-row > :last-child {
+  white-space: nowrap;
 }
 .total-row span:last-child {
   font-weight: 600;
