@@ -2,7 +2,6 @@ import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useSearch } from '../../context/SearchContext';
-import { useSocket } from '../../context/SocketContext';
 import PermanentNotices from './PermanentNotices';
 import ActiveOrdersWidget from './ActiveOrdersWidget';
 import Logo from '../core/Logo';
@@ -84,10 +83,8 @@ const HomePage = () => {
   const { user } = useAuth();
   const searchInputRef = useRef(null);
   const { indexLoaded, searchLocal } = useSearch();
-  const { socket } = useSocket();
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
-  const [globalClosure, setGlobalClosure] = useState({ isClosed: false });
 
   const fetchShops = useCallback(async () => {
     try {
@@ -117,10 +114,6 @@ const HomePage = () => {
       } else if (response.data.shops) {
         shopsData = response.data.shops;
       }
-
-      const closureInfo = response.data?.data?.globalClosure ||
-        response.data?.globalClosure || { isClosed: false };
-      setGlobalClosure(closureInfo);
 
       if (shopsData.length > 0) {
         const sortedShops = shopsData.sort((a, b) => {
@@ -198,16 +191,6 @@ const HomePage = () => {
   useEffect(() => {
     fetchShops();
   }, [fetchShops]);
-
-  // Keep the global closure banner in sync in real time (admin can open/close while the page is open)
-  useEffect(() => {
-    if (!socket) return;
-    const handleClosureUpdate = (data) => {
-      setGlobalClosure(data || { isClosed: false });
-    };
-    socket.on('globalShopClosureUpdated', handleClosureUpdate);
-    return () => socket.off('globalShopClosureUpdated', handleClosureUpdate);
-  }, [socket]);
 
   useEffect(() => {
     if (location && (location.pathname === '/' || location.pathname === '')) {
@@ -377,26 +360,6 @@ const HomePage = () => {
   return (
     <div className="dw-home">
       <PermanentNotices />
-      {globalClosure?.isClosed && (
-        <div className="dw-wrap">
-          <div className="dw-closure">
-            <span className="dw-closure-ic">!</span>
-            <div>
-              <strong>All shops are currently closed.</strong>{' '}
-              {globalClosure.mode === 'manual' && 'Please check back later.'}
-              {globalClosure.mode === 'until_time' && globalClosure.reopenAt && (
-                <>Reopening at {new Date(globalClosure.reopenAt).toLocaleString()}.</>
-              )}
-              {globalClosure.mode === 'next_day' && globalClosure.reopenAt && (
-                <>Reopening on {new Date(globalClosure.reopenAt).toLocaleDateString()}.</>
-              )}
-              {globalClosure.reason ? (
-                <div className="dw-closure-reason">{globalClosure.reason}</div>
-              ) : null}
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* HERO */}
       <div className="dw-hero">
