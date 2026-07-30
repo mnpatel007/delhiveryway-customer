@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
+import HelpAssistant from './HelpAssistant';
 import './Navbar.css';
 
 const Ico = ({ d, ...p }) => (
@@ -14,6 +15,7 @@ const Navbar = () => {
   const { user, logout } = useAuth();
   const { cartItems } = useCart();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
   const [searchParams] = useSearchParams();
   const queryParam = searchParams.get('q') || '';
   const [q, setQ] = useState(queryParam);
@@ -144,6 +146,23 @@ const Navbar = () => {
             <Link to="/profile" className="nv-avatar" title={user.name}>
               {user.name?.charAt(0).toUpperCase() || 'U'}
             </Link>
+            <button
+              onClick={() => setHelpOpen(true)}
+              className="nv-help"
+              title="Help"
+              aria-label="Help"
+            >
+              <Ico
+                d={
+                  <>
+                    <circle cx="12" cy="12" r="9" />
+                    <path d="M9.6 9a2.4 2.4 0 014.7.6c0 1.6-2.3 1.9-2.3 3.4" />
+                    <circle cx="12" cy="17" r="0.6" fill="currentColor" stroke="none" />
+                  </>
+                }
+              />
+              <span>Help</span>
+            </button>
             <button onClick={handleLogout} className="nv-logout">
               Logout
             </button>
@@ -244,6 +263,8 @@ const Navbar = () => {
           </div>
         )}
       </div>
+
+      {user && <HelpAssistant open={helpOpen} onClose={() => setHelpOpen(false)} />}
     </header>
   );
 };

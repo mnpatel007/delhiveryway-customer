@@ -1,0 +1,348 @@
+.ha-root {
+  position: fixed;
+  inset: 0;
+  z-index: 100001;
+}
+
+.ha-backdrop {
+  position: absolute;
+  inset: 0;
+  border: none;
+  background: rgba(20, 23, 33, 0.28);
+  cursor: default;
+}
+
+.ha-panel {
+  position: absolute;
+  right: 20px;
+  bottom: 20px;
+  width: 370px;
+  max-width: calc(100vw - 32px);
+  height: 560px;
+  max-height: calc(100vh - 40px);
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 24px 60px rgba(20, 23, 33, 0.28);
+  animation: ha-pop 0.22s ease;
+}
+
+@keyframes ha-pop {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.ha-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  background: linear-gradient(135deg, #ff7a2f, #ff5b1a);
+  color: #fff;
+}
+
+.ha-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ha-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.22);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 17px;
+}
+
+.ha-title strong {
+  display: block;
+  font-size: 15px;
+  line-height: 1.1;
+}
+
+.ha-sub {
+  font-size: 11px;
+  opacity: 0.9;
+}
+
+.ha-close {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 8px;
+}
+
+.ha-close:hover {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.ha-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  background: #f7f8fa;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ha-msg {
+  display: flex;
+  max-width: 88%;
+}
+
+.ha-msg.ha-bot {
+  align-self: flex-start;
+}
+
+.ha-msg.ha-user {
+  align-self: flex-end;
+}
+
+.ha-bubble {
+  padding: 10px 13px;
+  border-radius: 14px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #1f2430;
+  background: #fff;
+  border: 1px solid #ececf0;
+  box-shadow: 0 2px 8px rgba(20, 23, 33, 0.04);
+}
+
+.ha-msg.ha-user .ha-bubble {
+  background: #fff1e8;
+  border-color: #ffd9c2;
+  color: #7a3d18;
+}
+
+.ha-actions {
+  margin-top: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ha-action {
+  background: #fff;
+  border: 1px solid #ff8a4c;
+  color: #e5541a;
+  font-weight: 600;
+  font-size: 13px;
+  padding: 7px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.ha-action:hover {
+  background: #fff4ee;
+}
+
+.ha-quick {
+  padding: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  border-top: 1px solid #ececf0;
+  background: #fff;
+}
+
+.ha-chip {
+  background: #f4f5f7;
+  border: 1px solid #e6e8ec;
+  color: #2a2f3a;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 9px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: 0.15s;
+}
+
+.ha-chip:hover:not(:disabled) {
+  background: #fff1e8;
+  border-color: #ffd0b3;
+}
+
+.ha-chip:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.ha-input {
+  display: flex;
+  gap: 8px;
+  padding: 12px;
+  border-top: 1px solid #ececf0;
+  background: #fff;
+}
+
+.ha-input input {
+  flex: 1;
+  border: 1px solid #e0e2e7;
+  border-radius: 999px;
+  padding: 10px 14px;
+  font-size: 14px;
+  outline: none;
+}
+
+.ha-input input:focus {
+  border-color: #ff8a4c;
+}
+
+.ha-input button {
+  background: linear-gradient(135deg, #ff7a2f, #ff5b1a);
+  color: #fff;
+  border: none;
+  border-radius: 999px;
+  padding: 0 18px;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.ha-input button:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.ha-chip.ha-back,
+.ha-textlink {
+  color: #8a92a1;
+}
+
+.ha-chip.ha-order {
+  width: 100%;
+  justify-content: flex-start;
+  text-align: left;
+  font-weight: 600;
+}
+
+.ha-form {
+  border-top: 1px solid #ececf0;
+  background: #fff;
+  padding: 10px 12px 12px;
+}
+
+.ha-form-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ha-form-row input[type='text'],
+.ha-form-row input:not([type]) {
+  flex: 1;
+  border: 1px solid #e0e2e7;
+  border-radius: 999px;
+  padding: 10px 14px;
+  font-size: 14px;
+  outline: none;
+}
+
+.ha-form-row input:focus {
+  border-color: #ff8a4c;
+}
+
+.ha-attach-btn {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid #e0e2e7;
+  background: #f7f8fa;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.ha-attach-btn:hover {
+  background: #fff1e8;
+  border-color: #ffd0b3;
+}
+
+.ha-form-row > button:last-child {
+  flex-shrink: 0;
+  background: linear-gradient(135deg, #ff7a2f, #ff5b1a);
+  color: #fff;
+  border: none;
+  border-radius: 999px;
+  padding: 0 18px;
+  height: 40px;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.ha-form-row > button:last-child:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.ha-attach-preview {
+  position: relative;
+  display: inline-block;
+  margin-bottom: 10px;
+}
+
+.ha-attach-preview img {
+  max-height: 90px;
+  max-width: 140px;
+  border-radius: 10px;
+  border: 1px solid #e6e8ec;
+  display: block;
+}
+
+.ha-attach-remove {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: none;
+  background: #1f2430;
+  color: #fff;
+  font-size: 11px;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.ha-hint {
+  margin-top: 8px;
+  font-size: 12px;
+  color: #e5541a;
+}
+
+.ha-textlink {
+  margin-top: 10px;
+  background: none;
+  border: none;
+  font-size: 13px;
+  cursor: pointer;
+  padding: 0;
+}
+
+@media (max-width: 480px) {
+  .ha-panel {
+    right: 8px;
+    left: 8px;
+    bottom: 8px;
+    width: auto;
+    height: 78vh;
+  }
+}
