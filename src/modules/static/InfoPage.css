@@ -1,0 +1,125 @@
+/* Shared layout for the static info pages (About, Careers, Partner, Terms). */
+.info-page {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 56px 24px 88px;
+  color: #1f2430;
+}
+
+.info-hero {
+  margin-bottom: 36px;
+}
+
+.info-eyebrow {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #ff6b1a;
+  margin-bottom: 12px;
+}
+
+.info-hero h1 {
+  font-size: 40px;
+  line-height: 1.1;
+  margin: 0 0 14px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.info-hero p {
+  font-size: 18px;
+  line-height: 1.6;
+  color: #5b6472;
+  margin: 0;
+}
+
+.info-body h2 {
+  font-size: 22px;
+  margin: 32px 0 10px;
+  font-weight: 700;
+}
+
+.info-body p {
+  font-size: 16px;
+  line-height: 1.7;
+  color: #3d4453;
+  margin: 0 0 14px;
+}
+
+.info-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin: 20px 0 8px;
+}
+
+.info-card {
+  background: #fff;
+  border: 1px solid #ececf0;
+  border-radius: 14px;
+  padding: 20px;
+  box-shadow: 0 6px 22px rgba(20, 23, 33, 0.05);
+}
+
+.info-card h3 {
+  margin: 0 0 6px;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.info-card p {
+  margin: 0;
+  font-size: 14px;
+  color: #5b6472;
+  line-height: 1.55;
+}
+
+.info-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 22px;
+  padding: 12px 22px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #ff7a2f, #ff5b1a);
+  color: #fff;
+  font-weight: 700;
+  text-decoration: none;
+  box-shadow: 0 8px 20px rgba(255, 91, 26, 0.28);
+}
+
+.info-cta:hover {
+  filter: brightness(1.03);
+}
+
+/* Terms page specifics */
+.info-meta {
+  font-size: 13px;
+  color: #8a92a1;
+  margin-bottom: 24px;
+}
+
+.info-terms-content {
+  white-space: pre-wrap;
+  font-size: 15px;
+  line-height: 1.75;
+  color: #3d4453;
+}
+
+.info-note {
+  background: #fff8f3;
+  border: 1px solid #ffe0cc;
+  border-radius: 12px;
+  padding: 18px 20px;
+  color: #7a4a24;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+@media (max-width: 560px) {
+  .info-hero h1 {
+    font-size: 30px;
+  }
+}

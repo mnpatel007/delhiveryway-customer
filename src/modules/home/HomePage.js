@@ -2,7 +2,6 @@ import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useSearch } from '../../context/SearchContext';
-import { useSocket } from '../../context/SocketContext';
 import PermanentNotices from './PermanentNotices';
 import ActiveOrdersWidget from './ActiveOrdersWidget';
 import Logo from '../core/Logo';
@@ -84,10 +83,8 @@ const HomePage = () => {
   const { user } = useAuth();
   const searchInputRef = useRef(null);
   const { indexLoaded, searchLocal } = useSearch();
-  const { socket } = useSocket();
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
-  const [globalClosure, setGlobalClosure] = useState({ isClosed: false });
 
   const fetchShops = useCallback(async () => {
     try {
@@ -117,10 +114,6 @@ const HomePage = () => {
       } else if (response.data.shops) {
         shopsData = response.data.shops;
       }
-
-      const closureInfo = response.data?.data?.globalClosure ||
-        response.data?.globalClosure || { isClosed: false };
-      setGlobalClosure(closureInfo);
 
       if (shopsData.length > 0) {
         const sortedShops = shopsData.sort((a, b) => {
@@ -198,16 +191,6 @@ const HomePage = () => {
   useEffect(() => {
     fetchShops();
   }, [fetchShops]);
-
-  // Keep the global closure banner in sync in real time (admin can open/close while the page is open)
-  useEffect(() => {
-    if (!socket) return;
-    const handleClosureUpdate = (data) => {
-      setGlobalClosure(data || { isClosed: false });
-    };
-    socket.on('globalShopClosureUpdated', handleClosureUpdate);
-    return () => socket.off('globalShopClosureUpdated', handleClosureUpdate);
-  }, [socket]);
 
   useEffect(() => {
     if (location && (location.pathname === '/' || location.pathname === '')) {
@@ -315,12 +298,6 @@ const HomePage = () => {
     setSelectedCategory('all');
   };
 
-  const pickCategory = (key) => {
-    setSelectedCategory((prev) => (prev === key ? 'all' : key));
-    const el = document.getElementById('dw-shops');
-    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  };
-
   const feeInfo = (shop) => {
     const fr = deliveryFees[shop._id];
     if (fr && typeof fr === 'object' && fr.deliveryFee !== undefined) {
@@ -383,26 +360,6 @@ const HomePage = () => {
   return (
     <div className="dw-home">
       <PermanentNotices />
-      {globalClosure?.isClosed && (
-        <div className="dw-wrap">
-          <div className="dw-closure">
-            <span className="dw-closure-ic">!</span>
-            <div>
-              <strong>All shops are currently closed.</strong>{' '}
-              {globalClosure.mode === 'manual' && 'Please check back later.'}
-              {globalClosure.mode === 'until_time' && globalClosure.reopenAt && (
-                <>Reopening at {new Date(globalClosure.reopenAt).toLocaleString()}.</>
-              )}
-              {globalClosure.mode === 'next_day' && globalClosure.reopenAt && (
-                <>Reopening on {new Date(globalClosure.reopenAt).toLocaleDateString()}.</>
-              )}
-              {globalClosure.reason ? (
-                <div className="dw-closure-reason">{globalClosure.reason}</div>
-              ) : null}
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* HERO */}
       <div className="dw-hero">
@@ -412,7 +369,7 @@ const HomePage = () => {
             <h1>
               Everything you crave,
               <br />
-              <span className="dw-grad">delivered in minutes.</span>
+              <span className="dw-grad">delivered to your door.</span>
             </h1>
             <p className="dw-sub">
               {user?.name ? `Hi ${user.name.split(' ')[0]} — ` : ''}fresh food and daily essentials
@@ -537,41 +494,13 @@ const HomePage = () => {
         </div>
         <div className="dw-cats">
           {CATEGORIES.map((c) => (
-            <button
-              key={c.key}
-              className={`dw-cat ${selectedCategory === c.key ? 'on' : ''}`}
-              onClick={() => pickCategory(c.key)}
-            >
+            <div key={c.key} className="dw-cat dw-cat-static">
               <img alt={c.label} src={`${UN}${c.img}?auto=format&fit=crop&w=300&q=65`} />
               <span className="dw-cat-ov">
                 <span>{c.label}</span>
               </span>
-            </button>
+            </div>
           ))}
-        </div>
-      </section>
-
-      {/* PROMOS */}
-      <section className="dw-wrap">
-        <div className="dw-promos">
-          <div className="dw-promo dw-p1">
-            <div>
-              <h3>50% OFF</h3>
-              <p>Coming soon on your first 3 orders</p>
-            </div>
-          </div>
-          <div className="dw-promo dw-p2">
-            <div>
-              <h3>Special Offers</h3>
-              <p>Free item above ₹500 &amp; festive discounts</p>
-            </div>
-          </div>
-          <div className="dw-promo dw-p3">
-            <div>
-              <h3>Fresh &amp; fast</h3>
-              <p>delivered within 30 min of order pickup</p>
-            </div>
-          </div>
         </div>
       </section>
 
@@ -667,16 +596,6 @@ const HomePage = () => {
                         Top rated
                       </div>
                     )}
-                    <button
-                      className="dw-fav"
-                      aria-label="Save"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        e.currentTarget.classList.toggle('on');
-                      }}
-                    >
-                      <Svg d={<path d="M20 12l-8 8-8-8a5 5 0 117-7 5 5 0 117 7z" />} />
-                    </button>
                     <div className={`dw-feepill ${fee.free ? 'free' : ''}`}>
                       <Svg d={bikeIcon} s={{ width: 16, height: 16 }} />
                       {fee.discountApplied && fee.originalFee && (
