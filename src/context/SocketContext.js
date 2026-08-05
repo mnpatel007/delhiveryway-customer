@@ -482,22 +482,6 @@ export const SocketProvider = ({ children }) => {
         }, 500);
       });
 
-      // Listen for shopper location updates
-      newSocket.on('shopperLocationUpdate', (data) => {
-        console.log('📍 Shopper location update:', data);
-
-        addNotification({
-          id: Date.now(),
-          type: 'shopper_location',
-          title: '📍 Shopper Location Update',
-          message: data.message || 'Your shopper has updated their location.',
-          timestamp: new Date().toISOString(),
-        });
-
-        // Don't play sound for location updates to avoid spam
-        // playNotificationSound();
-      });
-
       // Listen for shopper actions
       newSocket.on('shopperAction', (data) => {
         console.log('🛒 Shopper action:', data);

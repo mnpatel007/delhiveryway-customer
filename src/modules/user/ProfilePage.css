@@ -115,13 +115,13 @@
 }
 .country-code-select {
   flex-shrink: 0;
-  width: auto;
-  min-width: 110px;
+  flex-basis: 110px;
   cursor: pointer;
   font-weight: 600;
 }
 .phone-number-input {
   flex: 1;
+  min-width: 0;
 }
 
 .field-hint {
