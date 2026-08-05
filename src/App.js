@@ -7,6 +7,7 @@ import { SocketProvider, useSocket } from './context/SocketContext';
 import { SearchProvider } from './context/SearchContext';
 
 import ErrorBoundary from './modules/core/ErrorBoundary';
+import ScrollToTop from './modules/core/ScrollToTop';
 import Navbar from './modules/core/Navbar';
 import Footer from './modules/core/Footer';
 import NotificationCenter from './modules/core/NotificationCenter';
@@ -125,6 +126,7 @@ const AppContent = () => {
     <>
       <GlobalCustomerAlert />
       <BrowserRouter>
+        <ScrollToTop />
         <Layout>
           <TermsModal />
           <Routes>
