@@ -184,6 +184,16 @@ const FinalCheckoutPage = () => {
   // Get order summary from cart context
   const orderSummary = getOrderSummary();
 
+  // A customer's registered phone is a placeholder ('0000000000' etc.) until
+  // they explicitly set it via My Profile (e.g. Google sign-up never collects
+  // one). Delivery partners need a real number, so orders are blocked until
+  // this is fixed — checked fresh here rather than stored as a one-time flag,
+  // so it clears itself the moment the profile is actually updated.
+  const registeredPhoneRaw = (user?.user?.phone ?? user?.phone ?? '').toString();
+  const isRegisteredPhoneValid =
+    /^[0-9]{10}$/.test(registeredPhoneRaw) &&
+    !['0000000000', '1111111111', '1234567890'].includes(registeredPhoneRaw);
+
   const getShopName = (shopId) => {
     const id = typeof shopId === 'object' ? shopId._id : shopId;
     const match = shops.find((shop) => shop._id === id);
@@ -192,6 +202,14 @@ const FinalCheckoutPage = () => {
 
   const placeOrderRequest = async (confirmDuplicate = false) => {
     // No cooldown needed - backend handles duplicate prevention
+
+    if (!isRegisteredPhoneValid) {
+      alert(
+        '❌ Please complete your profile before placing an order. Add a valid phone number in My Profile so our delivery partner can reach you.'
+      );
+      navigate('/profile');
+      return;
+    }
 
     // Validate delivery address and contact information
     if (
@@ -651,6 +669,38 @@ const FinalCheckoutPage = () => {
           <p>Review your order and complete your purchase.</p>
         </div>
 
+        {!isRegisteredPhoneValid && (
+          <div
+            style={{
+              margin: '0 0 1.5rem',
+              padding: '1rem 1.25rem',
+              backgroundColor: '#fff3cd',
+              border: '1px solid #ffeeba',
+              borderRadius: '8px',
+              color: '#856404',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              gap: '0.75rem',
+            }}
+          >
+            <span>
+              <strong>⚠️ Complete your profile to place an order.</strong> Add a valid phone number
+              in My Profile so our delivery partner can reach you — you'll only need to do this
+              once.
+            </span>
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={() => navigate('/profile')}
+              style={{ whiteSpace: 'nowrap' }}
+            >
+              Complete My Profile
+            </button>
+          </div>
+        )}
+
         <div className="checkout-content">
           <div className="checkout-user-details">
             <h3>Customer</h3>
@@ -766,14 +816,7 @@ const FinalCheckoutPage = () => {
                   const userPhone = user?.phone || user?.user?.phone;
                   const userCountryCode = user?.countryCode || user?.user?.countryCode || '+91';
 
-                  const isValidPhone =
-                    userPhone &&
-                    /^[0-9]{10}$/.test(userPhone.replace(/\D/g, '')) &&
-                    userPhone !== '0000000000' &&
-                    userPhone !== '1111111111' &&
-                    userPhone !== '1234567890';
-
-                  if (isValidPhone) {
+                  if (isRegisteredPhoneValid) {
                     return (
                       <div
                         style={{
@@ -871,13 +914,8 @@ const FinalCheckoutPage = () => {
                 {(() => {
                   const userObj = user?.user || user;
                   const userPhone = userObj?.phone;
-                  const isValidPhone =
-                    /^[0-9]{10}$/.test(userPhone) &&
-                    userPhone !== '0000000000' &&
-                    userPhone !== '1111111111' &&
-                    userPhone !== '1234567890';
 
-                  if (isValidPhone) {
+                  if (isRegisteredPhoneValid) {
                     return (
                       <div
                         style={{
@@ -1129,6 +1167,7 @@ const FinalCheckoutPage = () => {
           onClick={handleConfirmOrder}
           disabled={
             loading ||
+            !isRegisteredPhoneValid ||
             !deliveryAddress.street.trim() ||
             !deliveryAddress.city.trim() ||
             !deliveryAddress.state.trim() ||
@@ -1136,6 +1175,7 @@ const FinalCheckoutPage = () => {
             !deliveryAddress.contactPhone.trim() ||
             deliveryAddress.contactPhone.length !== 10
           }
+          title={!isRegisteredPhoneValid ? 'Complete your profile to place an order' : undefined}
         >
           {loading ? 'Placing order…' : 'Confirm order'}
         </button>
