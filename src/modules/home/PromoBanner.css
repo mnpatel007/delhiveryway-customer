@@ -1,0 +1,22 @@
+.promo-banner-strip {
+  margin: 24px 0 0;
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  box-shadow: var(--lift-2);
+}
+.promo-banner-slide {
+  display: block;
+  line-height: 0;
+}
+.promo-banner-slide img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+@media (max-width: 640px) {
+  .promo-banner-strip {
+    margin-top: 16px;
+    border-radius: 14px;
+  }
+}

@@ -4,6 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useSearch } from '../../context/SearchContext';
 import PermanentNotices from './PermanentNotices';
 import ActiveOrdersWidget from './ActiveOrdersWidget';
+import PromoBanner from './PromoBanner';
 import Logo from '../core/Logo';
 import {
   calculateDeliveryFeesBulk,
@@ -486,6 +487,8 @@ const HomePage = () => {
       <div className="dw-wrap">
         <ActiveOrdersWidget />
       </div>
+
+      <PromoBanner />
 
       {/* CATEGORIES */}
       <section className="dw-wrap">
