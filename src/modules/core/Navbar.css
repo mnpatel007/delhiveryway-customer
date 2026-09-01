@@ -377,3 +377,41 @@
     text-align: center;
   }
 }
+
+/* Phones: the top row (logo + orders + cart + avatar + Help + hamburger) was
+   wider than the viewport. body has overflow-x:hidden, so instead of a visible
+   scrollbar the overflow was silently CLIPPED - the hamburger ended up off
+   screen and the page sat scrolled sideways, cutting the hero text off on the
+   left. Tighten spacing and drop one item so everything fits down to 320px. */
+@media (max-width: 560px) {
+  .nv-bar {
+    gap: 6px;
+    padding: 8px;
+    width: calc(100% - 12px);
+  }
+  .nv-logo {
+    flex-shrink: 0;
+    font-size: 17px;
+  }
+  /* Orders is reachable from the hamburger menu, so dropping it here is what
+     buys the room needed to keep the hamburger itself on screen at 320px. */
+  .nv-bar > a.nv-btn[aria-label='Orders'] {
+    display: none;
+  }
+  .nv-user {
+    gap: 6px;
+  }
+  /* Help has NO entry in the hamburger menu, so it must stay reachable.
+     Collapse it to its icon rather than hiding it. */
+  .nv-help {
+    padding: 8px;
+    gap: 0;
+  }
+  .nv-help > span {
+    display: none;
+  }
+  .nv-avatar {
+    width: 38px;
+    height: 38px;
+  }
+}
