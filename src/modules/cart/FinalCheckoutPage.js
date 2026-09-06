@@ -1146,6 +1146,13 @@ const FinalCheckoutPage = () => {
               </div>
             )}
 
+            {getOrderSummary().convenienceCharge > 0 && (
+              <div className="pricing-row">
+                <span>Convenience Charge</span>
+                <span>{formatPrice(getOrderSummary().convenienceCharge)}</span>
+              </div>
+            )}
+
             {getOrderSummary().tax > 0 && (
               <div className="pricing-row">
                 <span>Tax ({selectedShop?.taxRate || 5}%)</span>
