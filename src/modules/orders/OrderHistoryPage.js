@@ -502,6 +502,11 @@ const OrderHistoryPage = () => {
                       // Get order values for breakdown
                       const orderValues = order.revisedOrderValue || order.orderValue;
 
+                      // Flat per-order charge. Orders placed before it was
+                      // introduced have no value, so the row stays hidden for them.
+                      const convenienceCharge =
+                        orderValues?.convenienceCharge ?? order.orderValue?.convenienceCharge ?? 0;
+
                       if (orderValues) {
                         return (
                           <>
@@ -523,6 +528,12 @@ const OrderHistoryPage = () => {
                               <div className="total-row">
                                 <span>Packaging Charges</span>
                                 <span>₹{orderValues.packagingCharges?.toFixed(2) || '0.00'}</span>
+                              </div>
+                            )}
+                            {convenienceCharge > 0 && (
+                              <div className="total-row">
+                                <span>Convenience Charge</span>
+                                <span>₹{convenienceCharge.toFixed(2)}</span>
                               </div>
                             )}
                             <div className="total-row grand-total">

@@ -105,6 +105,12 @@ const RevisedOrderPage = () => {
         ? safeNumber(order?.orderValue?.deliveryFee)
         : safeNumber(order?.deliveryFee);
 
+  // Flat per-order charge; absent on orders placed before it was introduced.
+  const convenienceCharge =
+    safeNumber(order?.revisedOrderValue?.convenienceCharge, undefined) !== undefined
+      ? safeNumber(order?.revisedOrderValue?.convenienceCharge)
+      : safeNumber(order?.orderValue?.convenienceCharge);
+
   // No taxes - removed as per requirements
   const originalTaxes = 0;
   const revisedTaxes = 0;
@@ -387,6 +393,12 @@ const RevisedOrderPage = () => {
                 <span>Delivery Fee</span>
                 <span>{formatPrice(deliveryFee)}</span>
               </div>
+              {convenienceCharge > 0 && (
+                <div className="summary-row">
+                  <span>Convenience Charge</span>
+                  <span>{formatPrice(convenienceCharge)}</span>
+                </div>
+              )}
               <div className="summary-divider"></div>
               <div className="summary-row total-row">
                 <span>Total Amount</span>
