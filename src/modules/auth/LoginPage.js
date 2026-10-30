@@ -85,7 +85,12 @@ const LoginForm = () => {
         const { email, name, sub: googleId } = userInfo.data;
 
         console.log('🔄 Sending Google login request to backend...');
+        // The access token is what matters: the server re-asks Google who this
+        // is rather than trusting anything sent from the browser. The profile
+        // fields are kept only so an older backend still understands us during
+        // a rollout.
         const result = await apiCall(authAPI.googleLogin, {
+          accessToken: tokenResponse.access_token,
           email,
           name,
           googleId,
