@@ -1,6 +1,7 @@
 import React, { useContext, useState } from 'react';
 import { useCart } from '../../context/CartContext';
 import { useNavigate } from 'react-router-dom';
+import { productDescription } from '../../utils/productText';
 import './CartPage.css';
 
 const SvgIcon = ({ children, size = 20, style }) => (
@@ -240,7 +241,7 @@ const CartPage = () => {
                     <div className="item-details">
                       <h4 className="item-name">{item.name}</h4>
                       <p className="item-description">
-                        {item.description || 'No description available'}
+                        {productDescription(item.description) || 'No description available'}
                       </p>
                       <div className="item-price">{formatPrice(item.price || 0)} per unit</div>
                     </div>

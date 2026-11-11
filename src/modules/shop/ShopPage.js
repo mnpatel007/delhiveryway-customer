@@ -2,6 +2,7 @@ import React, { useEffect, useState, useContext, useRef } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { shopsAPI, productsAPI, apiCall } from '../../services/api';
 import { useCart } from '../../context/CartContext';
+import { productDescription } from '../../utils/productText';
 import './ShopPage.css';
 
 const SvgIcon = ({ children, size = 20, style }) => (
@@ -342,7 +343,7 @@ const ShopPage = () => {
       filtered = filtered.filter(
         (product) =>
           product.name?.toLowerCase().includes(searchLower) ||
-          product.description?.toLowerCase().includes(searchLower) ||
+          productDescription(product.description).toLowerCase().includes(searchLower) ||
           product.category?.toLowerCase().includes(searchLower)
       );
     }
@@ -793,9 +794,9 @@ const ShopPage = () => {
 
                       <div>
                         <div style={{ fontWeight: 700 }}>{item.name}</div>
-                        {item.description && (
+                        {productDescription(item.description) && (
                           <div style={{ fontSize: 13, color: '#666', marginTop: 4 }}>
-                            {item.description}
+                            {productDescription(item.description)}
                           </div>
                         )}
                         <div
@@ -1021,11 +1022,11 @@ const ShopPage = () => {
                       <span className="product-name-main">{product.name || 'Unnamed Product'}</span>
                     </h3>
 
-                    {product.description ? (
+                    {productDescription(product.description) ? (
                       <p className="product-description">
-                        {product.description.length > 80
-                          ? `${product.description.substring(0, 80)}...`
-                          : product.description}
+                        {productDescription(product.description).length > 80
+                          ? `${productDescription(product.description).substring(0, 80)}...`
+                          : productDescription(product.description)}
                       </p>
                     ) : (
                       <p className="product-description no-description">No description available</p>
