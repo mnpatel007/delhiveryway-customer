@@ -5,6 +5,13 @@ import { useCart } from '../../context/CartContext';
 import { productDescription } from '../../utils/productText';
 import './ShopPage.css';
 
+// The PDF is served by the backend, which is a different origin from this
+// app in production, so the link has to be absolute.
+const API_ORIGIN = (process.env.REACT_APP_API_URL || 'http://localhost:5000/api').replace(
+  /\/api\/?$/,
+  ''
+);
+
 const SvgIcon = ({ children, size = 20, style }) => (
   <svg
     viewBox="0 0 24 24"
@@ -907,6 +914,30 @@ const ShopPage = () => {
             className="view-controls"
             style={{ display: 'flex', alignItems: 'center', gap: '10px' }}
           >
+            {/* The shop's own menu PDF, when they have uploaded one. */}
+            {shop.menuPdf?.filename && (
+              <a
+                href={`${API_ORIGIN}/api/shops/${shop._id}/menu-pdf`}
+                target="_blank"
+                rel="noreferrer"
+                className="view-menu-btn"
+                style={{
+                  background: 'var(--surface-2, #fff)',
+                  color: 'var(--brand)',
+                  border: '1.5px solid var(--brand)',
+                  padding: '10px 16px',
+                  borderRadius: '12px',
+                  cursor: 'pointer',
+                  fontWeight: 700,
+                  textDecoration: 'none',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 7,
+                }}
+              >
+                <SvgIcon size={17}>{ic.menu}</SvgIcon> Menu card (PDF)
+              </a>
+            )}
             {/* View Menu button placed to the left of Grid/List */}
             <button
               onClick={() => setShowMenu(true)}
