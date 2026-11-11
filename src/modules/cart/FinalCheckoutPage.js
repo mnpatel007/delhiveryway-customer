@@ -4,6 +4,7 @@ import { useCart } from '../../context/CartContext';
 import { useSocket } from '../../context/SocketContext';
 import { useNavigate } from 'react-router-dom';
 import { apiCall, paymentAPI, ordersAPI, api } from '../../services/api';
+import ShopOffers from '../offers/ShopOffers';
 import { geocodeAddress } from '../../utils/geocoding';
 import { getCurrentLocation } from '../../utils/deliveryCalculator';
 import './Finalcheckoutpage.css';
@@ -32,6 +33,9 @@ const FinalCheckoutPage = () => {
   } = useCart();
   const [loading, setLoading] = useState(false);
   const [shops, setShops] = useState([]);
+  // The customer's picks for any "choose your free item" offer the shop is
+  // running. The backend re-checks every one of these before honouring it.
+  const [offerSelections, setOfferSelections] = useState([]);
   const [deliveryAddress, setDeliveryAddress] = useState({
     street: '',
     city: '',
@@ -193,6 +197,24 @@ const FinalCheckoutPage = () => {
   const isRegisteredPhoneValid =
     /^[0-9]{10}$/.test(registeredPhoneRaw) &&
     !['0000000000', '1111111111', '1234567890'].includes(registeredPhoneRaw);
+
+  // The shop these items belong to, however the cart happens to store it.
+  const cartShopId = (() => {
+    const raw = cartItems[0]?.shopId;
+    if (!raw) return selectedShop?._id || null;
+    return typeof raw === 'object' ? raw._id : raw;
+  })();
+
+  const chooseFreeItem = (offerId, productId) => {
+    setOfferSelections((current) => {
+      const rest = current.filter((s) => String(s.offerId) !== String(offerId));
+      // Tapping the item already chosen clears the choice.
+      const already = current.find(
+        (s) => String(s.offerId) === String(offerId) && String(s.productId) === String(productId)
+      );
+      return already ? rest : [...rest, { offerId, productId }];
+    });
+  };
 
   const getShopName = (shopId) => {
     const id = typeof shopId === 'object' ? shopId._id : shopId;
@@ -366,6 +388,7 @@ const FinalCheckoutPage = () => {
         },
         paymentMethod: 'cash', // Default to cash on delivery
         confirmDuplicate: confirmDuplicate,
+        offerSelections,
       });
 
       if (response.data.success) {
@@ -1107,6 +1130,13 @@ const FinalCheckoutPage = () => {
               ))}
             </div>
           )}
+
+          <ShopOffers
+            shopId={cartShopId}
+            subtotal={getOrderSummary().subtotal}
+            selections={offerSelections}
+            onSelect={chooseFreeItem}
+          />
 
           {/* Pricing Breakdown */}
           <div className="order-pricing-breakdown">

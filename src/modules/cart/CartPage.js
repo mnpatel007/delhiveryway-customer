@@ -2,6 +2,7 @@ import React, { useContext, useState } from 'react';
 import { useCart } from '../../context/CartContext';
 import { useNavigate } from 'react-router-dom';
 import { productDescription } from '../../utils/productText';
+import ShopOffers from '../offers/ShopOffers';
 import './CartPage.css';
 
 const SvgIcon = ({ children, size = 20, style }) => (
@@ -280,6 +281,17 @@ const CartPage = () => {
             {/* Order Summary */}
             <div className="order-summary">
               <h3>Order Summary</h3>
+
+              {/* What the shop is giving away, and how far off it is. The
+                  choice itself is made at checkout. */}
+              <ShopOffers
+                shopId={
+                  typeof cartItems[0]?.shopId === 'object'
+                    ? cartItems[0]?.shopId?._id
+                    : cartItems[0]?.shopId || selectedShop?._id
+                }
+                subtotal={orderSummary.subtotal}
+              />
 
               <div className="summary-breakdown">
                 <div className="summary-row">
