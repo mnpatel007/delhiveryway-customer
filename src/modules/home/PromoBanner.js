@@ -1,16 +1,11 @@
 import React from 'react';
 import './PromoBanner.css';
 
-// Add more entries here to turn this into a rotating carousel later —
-// the layout already supports it, only a slide index/dots would need adding.
-const PROMO_BANNERS = [
-  {
-    id: 'kanak-family-restaurant',
-    image: '/promos/kanak-family-restaurant.jpeg',
-    alt: 'Kanak, Family Restaurant — Authentic Indian & Indo-Chinese Cuisine, Pure Vegetarian',
-    href: null, // set to `/shop/<shopId>` once we have the shop's id
-  },
-];
+// No promo banner is running. Add an entry here to put one up again:
+// { id, image, alt, href } — href null for a banner that is not clickable.
+// With several entries this becomes a carousel; the layout already supports
+// it, only a slide index and dots would need adding.
+const PROMO_BANNERS = [];
 
 const PromoBanner = () => {
   if (PROMO_BANNERS.length === 0) return null;
